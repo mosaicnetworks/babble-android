@@ -40,6 +40,7 @@ public class HTTPDiscoveryRequest {
     class RequestTask extends AsyncTask<Void, Void, Peer[]> {
 
         HttpURLConnection httpURLConnection = null;
+        int errorCode;
 
         @Override
         protected Peer[] doInBackground(Void... params) {
@@ -69,14 +70,15 @@ public class HTTPDiscoveryRequest {
 
 
             } catch (MalformedURLException e) {
-                failureListener.onFailure(MALFORMED_URL);
+                errorCode = MALFORMED_URL;
             } catch (IOException e) {
-                failureListener.onFailure(CONNECTION_ERROR);
+                errorCode = CONNECTION_ERROR;
             } catch(JsonSyntaxException ex) {
-                failureListener.onFailure(INVALID_JSON);
+                errorCode = INVALID_JSON;
             } catch(IllegalStateException ex) {
-                failureListener.onFailure(INVALID_JSON);
+                errorCode = INVALID_JSON;
             }
+
             return null;
         }
 
@@ -84,6 +86,8 @@ public class HTTPDiscoveryRequest {
         protected void onPostExecute(Peer[] result) {
             if (result != null){
                 responseListener.onReceivePeers(result);
+            } else {
+                failureListener.onFailure(errorCode);
             }
         }
     }

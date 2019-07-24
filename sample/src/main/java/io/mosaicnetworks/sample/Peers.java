@@ -20,7 +20,7 @@ public class Peers {
 
             @Override
             public void onReceivePeers(Peer[] peers) {
-                //Will run on same thread as where "run" is called
+                //Invoked on the UI thread
 
                 Gson gson = new Gson();
                 String peersJSON = gson.toJson(peers);
@@ -31,6 +31,8 @@ public class Peers {
         }, new FailureListener() {
             @Override
             public void onFailure(int code) {
+                //Invoked on the UI thread
+
                 Log.d(MainActivity.TAG, "Failed to get peers info, failure code: " + code);
 
                 //TODO: automatically run on same thread or UI thread? - use async task onprogress update??
