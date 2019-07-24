@@ -70,12 +70,16 @@ public class HTTPDiscoveryRequest {
 
 
             } catch (MalformedURLException e) {
+                Log.d("Babble", "HTTPDiscoveryRequest error: " + e);
                 errorCode = MALFORMED_URL;
             } catch (IOException e) {
+                Log.d("Babble", "HTTPDiscoveryRequest error: " + e);
                 errorCode = CONNECTION_ERROR;
-            } catch(JsonSyntaxException ex) {
+            } catch(JsonSyntaxException e) {
+                Log.d("Babble", "HTTPDiscoveryRequest error: " + e);
                 errorCode = INVALID_JSON;
-            } catch(IllegalStateException ex) {
+            } catch(IllegalStateException e) {
+                Log.d("Babble", "HTTPDiscoveryRequest error: " + e);
                 errorCode = INVALID_JSON;
             }
 
