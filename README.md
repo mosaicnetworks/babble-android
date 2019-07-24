@@ -78,7 +78,7 @@ the app. It should have all the properties of a [cryptographic hash function](ht
 If you're not concerned with verifying the state of the app, then the state hash
 can essentially be ignored, for example, you could return a constant byte.
 
-Once you're finished with the Babble node shut it down, this will ensure it
+Once you're finished with the Babble node, shut it down, this will ensure it
 releases all it's resources:
 
 ```babbleNode.shutdown()```
@@ -151,7 +151,7 @@ httpDiscoveryRequest.send();
 ```
 
 Where the url should be that of the peers resource on the discovery server e.g.
-if the discovery server has the hostname ```"192.168.2.1``` then the url of the
+if the discovery server has the hostname `192.168.2.1` then the url of the
 peers resource is `http://192.168.2.1/peers`
 
 TODO: Which thread callbacks run
