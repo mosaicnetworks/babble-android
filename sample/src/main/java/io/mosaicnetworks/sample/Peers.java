@@ -35,8 +35,6 @@ public class Peers {
 
                 Log.d(MainActivity.TAG, "Failed to get peers info, failure code: " + code);
 
-                //TODO: automatically run on same thread or UI thread? - use async task onprogress update??
-
                 chatActivity.getPeersFail();
             }
         });
