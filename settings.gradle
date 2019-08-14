@@ -1,1 +1,1 @@
-include ':sample', ':babble', ':mobile'
+include ':sample', ':babble'

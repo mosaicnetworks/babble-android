@@ -11,3 +11,9 @@
 /build
 /captures
 .externalNativeBuild
+
+#VScode
+.project
+.classpath
+.settings
+.vscode
