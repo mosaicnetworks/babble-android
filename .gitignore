@@ -17,3 +17,6 @@
 .classpath
 .settings
 .vscode
+
+#vim
+*.swp
