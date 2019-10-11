@@ -101,9 +101,17 @@ public class BabbleNode implements PeersGetter {
         }
     }
 
-    public void leave() {
+    public void leave(final LeaveResponseListener listener) {
         if (node != null) {
-            node.leave();
+            // this blocks so we'll run in a separate thread
+            new Thread(new Runnable() {
+                public void run() {
+                    node.leave();
+                    listener.onSuccess();
+                }
+            }).start();
+        } else {
+            listener.onSuccess();
         }
     }
 
