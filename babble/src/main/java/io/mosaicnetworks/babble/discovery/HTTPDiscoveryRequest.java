@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 
 public class HTTPDiscoveryRequest {
 
@@ -22,9 +23,9 @@ public class HTTPDiscoveryRequest {
     private RequestTask requestTask;
 
     //Define failure codes
-    public int INVALID_JSON = 0;
-    public int CONNECTION_ERROR = 1;
-    public int MALFORMED_URL = 2;
+    public static final int INVALID_JSON = 0;
+    public static final int CONNECTION_ERROR = 1;
+    public static final int MALFORMED_URL = 2;
 
     public HTTPDiscoveryRequest(String url, ResponseListener responseListener, FailureListener failureListener) {
         this.url = url;
@@ -89,7 +90,7 @@ public class HTTPDiscoveryRequest {
         @Override
         protected void onPostExecute(Peer[] result) {
             if (result != null){
-                responseListener.onReceivePeers(result);
+                responseListener.onReceivePeers(Arrays.asList(result));
             } else {
                 failureListener.onFailure(errorCode);
             }

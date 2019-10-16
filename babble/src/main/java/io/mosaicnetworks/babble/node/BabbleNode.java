@@ -1,38 +1,35 @@
 package io.mosaicnetworks.babble.node;
 
-import android.util.Base64;
-import android.util.Log;
-
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 
-import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.util.List;
 
+import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.PeersGetter;
 import mobile.Mobile;
 import mobile.Node;
 import mobile.MobileConfig;
 
-public class BabbleNode implements PeersGetter {
+public final class BabbleNode implements PeersGetter {
 
-    private Node node;
-    private BabbleNodeListeners listeners;
-    private Gson customGson;
+    private final static Gson mGson = new Gson();
+    private final Node mNode;
+    private final BabbleNodeListeners mListeners;
 
-    // Constructor which uses the default babble config
-    public BabbleNode(String peersJSON, String privateKeyHex, String netAddr, String moniker, BabbleNodeListeners listeners) {
-        this(peersJSON, privateKeyHex, netAddr, moniker, listeners, new BabbleConfig());
+    public BabbleNode(List<Peer> peers, String privateKeyHex, String ipAddress, int port,
+                      String moniker, BabbleNodeListeners listeners) {
+
+        this(peers, privateKeyHex, ipAddress, port, moniker, listeners,
+                new BabbleConfig.Builder().build());
     }
 
-    public BabbleNode(String peersJSON, String privateKeyHex, String netAddr, String moniker, BabbleNodeListeners listeners, BabbleConfig babbleConfig) {
+    //TODO: consider factory named create
+    public BabbleNode(List<Peer> peers, String privateKeyHex, String ipAddress, int port,
+                      String moniker, BabbleNodeListeners listeners, BabbleConfig babbleConfig) {
 
-        this.listeners = listeners;
-        initialiseJSONDecoder();
+        mListeners = listeners;
 
         MobileConfig mobileConfig = new MobileConfig(
                 babbleConfig.heartbeat,
@@ -42,71 +39,65 @@ public class BabbleNode implements PeersGetter {
                 babbleConfig.syncLimit,
                 babbleConfig.enableFastSync,
                 babbleConfig.store,
-                babbleConfig.loglevel,
+                babbleConfig.logLevel,
                 moniker
         );
 
-        node = Mobile.new_(
+        mNode = Mobile.new_(
                 privateKeyHex,
-                netAddr,
-                peersJSON,
+                ipAddress + ":" + port,
+                mGson.toJson(peers),
                 new mobile.CommitHandler() {
                     @Override
                     public byte[] onCommit(final byte[] blockBytes) {
-                        String strJson = new String(blockBytes);
-                        Log.d("Babble", "Received CommitBlock " + strJson);
-                        Block block;
+                        String strJson = new String(blockBytes, Charset.forName("UTF-8"));
                         try {
-                            block = customGson.fromJson(strJson, Block.class);
+                            Block block = Block.fromJson(strJson);
+                            return mListeners.onReceiveTransactions(block.body.transactions);
                         } catch (JsonSyntaxException ex) {
-                            Log.e("Babble", "Failed to parse Block", ex);
                             return null;
                         }
-
-                        return BabbleNode.this.listeners.onReceiveTransactions(block.body.transactions);
                     }
-
                 },
                 new mobile.ExceptionHandler() {
                     @Override
                     public void onException(final String msg) {
-                        BabbleNode.this.listeners.onException(msg);
+                        // Since golang does not support throwing exceptions, if an
+                        // initialisation error occurs, this callback is called synchronously
+                        // (before Mobile.new_ returns).
+
+                        throw new IllegalArgumentException(msg);
                     }
                 },
                 mobileConfig);
 
+        // If mobile ExceptionHandler isn't called then mNode should not be null, however
+        // just in case...
+        if (mNode==null) {
+            throw new IllegalArgumentException("Failed to initialise node");
+        }
     }
 
-    private void initialiseJSONDecoder() {
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(byte[].class, new JsonDeserializer<byte[]>() {
-            public byte[] deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-                return Base64.decode(json.getAsString(), Base64.NO_WRAP);
-            }
-        });
-
-        customGson = builder.create();
-    }
-
+    //TODO: get rid of null checks
+    //TODO: timeout on calls - each call can block indefinitely
     public void run() {
-        //Not sure whether node can be null so we'll check just in case
-        if (node != null) {
-            node.run(true);
+        if (mNode != null) {
+            mNode.run(true);
         }
     }
 
     public void shutdown() {
-        if (node != null) {
-            node.shutdown();
+        if (mNode != null) {
+            mNode.shutdown();
         }
     }
 
     public void leave(final LeaveResponseListener listener) {
-        if (node != null) {
+        if (mNode != null) {
             // this blocks so we'll run in a separate thread
             new Thread(new Runnable() {
                 public void run() {
-                    node.leave();
+                    mNode.leave();
                     listener.onSuccess();
                 }
             }).start();
@@ -116,28 +107,30 @@ public class BabbleNode implements PeersGetter {
     }
 
     public void submitTx(byte[] tx) {
-        if (node != null) {
-            node.submitTx(tx);
+        if (mNode != null) {
+            mNode.submitTx(tx);
         }
     }
 
     @Override
     public String getPeers() {
-        if (node != null) {
-            return node.getPeers();
+        if (mNode != null) {
+            return mNode.getPeers();
         }
 
         return "";
     }
 
     public String getStats() {
-        if (node != null) {
-            return node.getStats();
+        if (mNode != null) {
+            return mNode.getStats();
         }
 
         return "";
     }
 }
+
+
 
 
 

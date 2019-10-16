@@ -1,6 +1,8 @@
 package io.mosaicnetworks.babble.discovery;
 
+import java.util.List;
+
 public interface ResponseListener {
 
-    void onReceivePeers(Peer[] peers);
+    void onReceivePeers(List<Peer> peers);
 }
