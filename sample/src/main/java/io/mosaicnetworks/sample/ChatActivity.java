@@ -13,12 +13,16 @@ import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import io.mosaicnetworks.babble.discovery.HTTPDiscoveryServer;
+import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.KeyPair;
 
 public class ChatActivity extends AppCompatActivity implements PeersListeners, StateListeners {
 
+    private static final int BABBLE_PORT = 6666;
+    private static final int PEER_PORT = 8988;
     private MessagesList messagesList;
     private State state;
     private MessagesListAdapter<Message> adapter;
@@ -28,9 +32,6 @@ public class ChatActivity extends AppCompatActivity implements PeersListeners, S
     private String peerIP;
     private KeyPair keyPair;
     private String mIPAddr;
-
-    private final String BABBLE_PORT = "6666";
-    private final int PEER_PORT = 8988;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,9 +95,8 @@ public class ChatActivity extends AppCompatActivity implements PeersListeners, S
     }
 
     @Override
-    public void receivedPeers(String peersJSON) {
-        Log.d(MainActivity.TAG, "Received peers: " + peersJSON);
-        state = new State(keyPair, moniker, this, peersJSON, mIPAddr, BABBLE_PORT);
+    public void receivedPeers(List<Peer> peers) {
+        state = new State(keyPair, moniker, this, peers, mIPAddr, BABBLE_PORT);
         advertisePeers();
     }
 

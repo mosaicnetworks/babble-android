@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.BabbleNode;
 import io.mosaicnetworks.babble.node.BabbleNodeListeners;
 import io.mosaicnetworks.babble.node.KeyPair;
@@ -24,26 +25,14 @@ public class State implements BabbleNodeListeners {
     private List<Message> pendingMessages = new ArrayList<>();
     private byte[] stateHash = "genesis-hash".getBytes();
 
-    State(KeyPair keyPair, String moniker, ChatActivity chatActivity, String peersJSON, String mIPAddr, String babblePort) {
+    State(KeyPair keyPair, String moniker, ChatActivity chatActivity, List<Peer> peers, String mIPAddr, int babblePort) {
 
         this.chatActivity = chatActivity;
 
-        babbleNode = new BabbleNode(peersJSON, keyPair.privateKey,
-                mIPAddr + ":" + babblePort, moniker, this);
+        babbleNode = new BabbleNode(peers, keyPair.privateKey,
+                mIPAddr, babblePort, moniker, this);
 
         babbleNode.run();
-    }
-
-    @Override
-    public void onException(String msg) {
-        //TODO automatically run on same thread or UI thread?
-        chatActivity.runOnUiThread(new Runnable() {
-                                       @Override
-                                       public void run() {
-                                           chatActivity.babbleError();
-                                       }
-                                   }
-        );
     }
 
     @Override
@@ -88,7 +77,6 @@ public class State implements BabbleNodeListeners {
 
         return stateHash;
     }
-
 
     private void updateStateHash(String tx) {
         stateHash = hashFromTwoHashes(stateHash, Hash(tx));

@@ -4,6 +4,9 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.mosaicnetworks.babble.discovery.HTTPDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.FailureListener;
 import io.mosaicnetworks.babble.discovery.Peer;
@@ -19,13 +22,10 @@ public class Peers {
         HTTPDiscoveryRequest httpDiscoveryRequest = new HTTPDiscoveryRequest(endpoint, new ResponseListener() {
 
             @Override
-            public void onReceivePeers(Peer[] peers) {
+            public void onReceivePeers(List<Peer> peers) {
                 //Invoked on the UI thread
 
-                Gson gson = new Gson();
-                String peersJSON = gson.toJson(peers);
-
-                chatActivity.receivedPeers(peersJSON);
+                chatActivity.receivedPeers(peers);
 
             }
         }, new FailureListener() {
@@ -43,15 +43,12 @@ public class Peers {
 
     }
 
-    public static void genPeers(KeyPair keyPair, String mIPAddr, String port, String moniker, ChatActivity chatActivity) {
+    public static void genPeers(KeyPair keyPair, String mIPAddr, int port, String moniker, ChatActivity chatActivity) {
 
-        Peer mPeer = new Peer(keyPair.publicKey, mIPAddr + ":" + port, moniker);
+        List<Peer> peers = new ArrayList();
+        peers.add(new Peer(keyPair.publicKey, mIPAddr + ":" + port, moniker));
 
-        Peer[] peersArray = new Peer[1];
-        peersArray[0] = mPeer;
-        Gson gson = new Gson();
-
-        chatActivity.receivedPeers(gson.toJson(peersArray));
+        chatActivity.receivedPeers(peers);
 
     }
 }
