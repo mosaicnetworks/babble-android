@@ -2,17 +2,16 @@ package io.mosaicnetworks.babble.node;
 
 import mobile.Mobile;
 
-public class KeyPair {
+public final class KeyPair {
 
-    public String publicKey;
-    public String privateKey;
+    public final String publicKey;
+    public final String privateKey;
 
     public KeyPair() {
-        String keyPair = Mobile.getPrivPublKeys();    //publicKey[!@#$%^]privateKey
-        String[] separated =  keyPair.split("=!@#@!=");
+        String keyPair = Mobile.getPrivPublKeys(); //publicKey=!@#@!=privateKey
+        String[] separated =  keyPair.split("=!@#@!="); //keys are hex so won't contain these characters!
 
-        this.publicKey = separated[0].trim();
-        this.privateKey = separated[1].trim();
+        publicKey = separated[0].trim();
+        privateKey = separated[1].trim();
     }
-
 }
