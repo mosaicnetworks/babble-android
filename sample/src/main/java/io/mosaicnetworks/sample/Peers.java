@@ -2,12 +2,10 @@ package io.mosaicnetworks.sample;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import io.mosaicnetworks.babble.discovery.HTTPDiscoveryRequest;
+import io.mosaicnetworks.babble.discovery.HttpDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.FailureListener;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.KeyPair;
@@ -19,7 +17,7 @@ public class Peers {
 
         String endpoint = "http://" + peerIP + ":" + port + "/peers";
         Log.d(MainActivity.TAG, "Connecting to endpoint: " + endpoint);
-        HTTPDiscoveryRequest httpDiscoveryRequest = new HTTPDiscoveryRequest(endpoint, new ResponseListener() {
+        HttpDiscoveryRequest httpDiscoveryRequest = new HttpDiscoveryRequest(endpoint, new ResponseListener() {
 
             @Override
             public void onReceivePeers(List<Peer> peers) {

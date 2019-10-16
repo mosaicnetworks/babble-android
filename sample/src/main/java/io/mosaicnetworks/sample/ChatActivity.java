@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import io.mosaicnetworks.babble.discovery.HTTPDiscoveryServer;
+import io.mosaicnetworks.babble.discovery.HttpDiscoveryServer;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.KeyPair;
 
@@ -26,7 +26,7 @@ public class ChatActivity extends AppCompatActivity implements PeersListeners, S
     private MessagesList messagesList;
     private State state;
     private MessagesListAdapter<Message> adapter;
-    private HTTPDiscoveryServer httpDiscoveryServer;
+    private HttpDiscoveryServer httpDiscoveryServer;
     private String moniker;
     private boolean newChat;
     private String peerIP;
@@ -117,7 +117,7 @@ public class ChatActivity extends AppCompatActivity implements PeersListeners, S
     private void advertisePeers() {
 
         if (state != null) {
-            httpDiscoveryServer = new HTTPDiscoveryServer(PEER_PORT, state.getNode());
+            httpDiscoveryServer = new HttpDiscoveryServer(PEER_PORT, state.getNode());
 
             try {
                 httpDiscoveryServer.start();

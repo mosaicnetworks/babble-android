@@ -2,7 +2,6 @@ package io.mosaicnetworks.babble;
 
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,8 +12,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import io.mosaicnetworks.babble.discovery.FailureListener;
-import io.mosaicnetworks.babble.discovery.HTTPDiscoveryRequest;
-import io.mosaicnetworks.babble.discovery.HTTPDiscoveryServer;
+import io.mosaicnetworks.babble.discovery.HttpDiscoveryRequest;
+import io.mosaicnetworks.babble.discovery.HttpDiscoveryServer;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.PeersGetter;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
@@ -43,11 +42,11 @@ public class HTTPDiscoveryTest {
             }
         }
 
-        HTTPDiscoveryServer httpDiscoveryServer = new HTTPDiscoveryServer("localhost", 8988, new PeersGet());
+        HttpDiscoveryServer httpDiscoveryServer = new HttpDiscoveryServer("localhost", 8988, new PeersGet());
         httpDiscoveryServer.start();
 
         String url = "http://localhost:8988/peers";
-        HTTPDiscoveryRequest httpDiscoveryRequest = new HTTPDiscoveryRequest(url, new ResponseListener() {
+        HttpDiscoveryRequest httpDiscoveryRequest = new HttpDiscoveryRequest(url, new ResponseListener() {
             @Override
             public void onReceivePeers(Peer[] peers) {
                 rcvPeers = peers;

@@ -15,7 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 
-public class HTTPDiscoveryRequest {
+public class HttpDiscoveryRequest {
 
     private String url;
     private ResponseListener responseListener;
@@ -27,7 +27,7 @@ public class HTTPDiscoveryRequest {
     public static final int CONNECTION_ERROR = 1;
     public static final int MALFORMED_URL = 2;
 
-    public HTTPDiscoveryRequest(String url, ResponseListener responseListener, FailureListener failureListener) {
+    public HttpDiscoveryRequest(String url, ResponseListener responseListener, FailureListener failureListener) {
         this.url = url;
         this.responseListener = responseListener;
         this.failureListener = failureListener;
@@ -71,16 +71,16 @@ public class HTTPDiscoveryRequest {
 
 
             } catch (MalformedURLException e) {
-                Log.d("Babble", "HTTPDiscoveryRequest error: " + e);
+                Log.d("Babble", "HttpDiscoveryRequest error: " + e);
                 errorCode = MALFORMED_URL;
             } catch (IOException e) {
-                Log.d("Babble", "HTTPDiscoveryRequest error: " + e);
+                Log.d("Babble", "HttpDiscoveryRequest error: " + e);
                 errorCode = CONNECTION_ERROR;
             } catch(JsonSyntaxException e) {
-                Log.d("Babble", "HTTPDiscoveryRequest error: " + e);
+                Log.d("Babble", "HttpDiscoveryRequest error: " + e);
                 errorCode = INVALID_JSON;
             } catch(IllegalStateException e) {
-                Log.d("Babble", "HTTPDiscoveryRequest error: " + e);
+                Log.d("Babble", "HttpDiscoveryRequest error: " + e);
                 errorCode = INVALID_JSON;
             }
 
