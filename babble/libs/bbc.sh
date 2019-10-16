@@ -11,7 +11,7 @@ if [ -z ${GOPATH+x} ]; then
     # GOPATH is not set, so we'll use the standard Go tree
     cp ~/go/src/github.com/mosaicnetworks/babble/src/mobile/build/${babble_core_version}/mobile.aar .
 else 
-    cp ${GOPATH}/github.com/mosaicnetworks/babble/src/mobile/build/${babble_core_version}/mobile.aar .
+    cp ${GOPATH}/src/github.com/mosaicnetworks/babble/src/mobile/build/${babble_core_version}/mobile.aar .
 fi
 
 unzip mobile.aar -d mobile.aar.unzip
