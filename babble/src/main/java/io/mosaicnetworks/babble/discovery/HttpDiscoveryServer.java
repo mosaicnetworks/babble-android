@@ -18,6 +18,10 @@ public class HttpDiscoveryServer {
         nanoWrapper = new NanoWrapper(hostname, port, peersGetter);
     }
 
+    /***
+     *
+     * @throws IOException if the socket is in use.
+     */
     public void start() throws IOException {
         nanoWrapper.start();
     }
@@ -44,8 +48,6 @@ public class HttpDiscoveryServer {
         public Response serve(IHTTPSession session) {
 
             if (session.getMethod() == Method.GET) {
-
-                Log.d("Babble", session.getUri());
 
                 if (session.getUri().equals("/peers")) {
                     if (peersGetter != null) {

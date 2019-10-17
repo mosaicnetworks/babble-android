@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -21,13 +22,13 @@ import io.mosaicnetworks.babble.discovery.ResponseListener;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
-public class HTTPDiscoveryTest {
+public class HttpDiscoveryTest {
 
     @Rule
     public GrantPermissionRule mRuntimePermissionRule = GrantPermissionRule.grant(
             android.Manifest.permission.INTERNET);
 
-    private Peer[] rcvPeers;
+    private List<Peer> mRcvPeers;
 
     @Test
     public void integrationTest() throws IOException, InterruptedException {
@@ -43,13 +44,18 @@ public class HTTPDiscoveryTest {
         }
 
         HttpDiscoveryServer httpDiscoveryServer = new HttpDiscoveryServer("localhost", 8988, new PeersGet());
-        httpDiscoveryServer.start();
+
+        try {
+            httpDiscoveryServer.start();
+        }catch (IOException ex){
+            System.out.println("Caught exception");
+        }
 
         String url = "http://localhost:8988/peers";
         HttpDiscoveryRequest httpDiscoveryRequest = new HttpDiscoveryRequest(url, new ResponseListener() {
             @Override
-            public void onReceivePeers(Peer[] peers) {
-                rcvPeers = peers;
+            public void onReceivePeers(List<Peer> peers) {
+                mRcvPeers = peers;
                 lock.countDown();
 
             }
@@ -66,11 +72,10 @@ public class HTTPDiscoveryTest {
 
         httpDiscoveryServer.stop();
 
-        assertNotNull(rcvPeers);
-
-        assertEquals(rcvPeers[0].moniker, "mosaic");
-        assertEquals(rcvPeers[0].netAddr, "localhost:6666");
-        assertEquals(rcvPeers[0].pubKeyHex, "0X04362B55F78A2614DC1B5FD3AC90A3162E213CC0F07925AC99E420722CDF3C656AE7BB88A0FEDF01DDD8669E159F9DC20CC5F253AC11F8B5AC2E10A30D0654873B");
-
+        assertNotNull(mRcvPeers);
+        assertEquals("mosaic", mRcvPeers.get(0).moniker);
+        assertEquals("localhost:6666", mRcvPeers.get(0).netAddr);
+        assertEquals("0X04362B55F78A2614DC1B5FD3AC90A3162E213CC0F07925AC99E420722CDF3C656AE7BB88A0FEDF01DDD8669E159F9DC20CC5F253AC11F8B5AC2E10A30D0654873B",
+                mRcvPeers.get(0).pubKeyHex);
     }
 }
