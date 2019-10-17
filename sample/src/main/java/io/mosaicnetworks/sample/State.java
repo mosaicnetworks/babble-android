@@ -29,7 +29,7 @@ public class State implements BabbleNodeListeners {
 
         this.chatActivity = chatActivity;
 
-        babbleNode = new BabbleNode(peers, keyPair.privateKey,
+        babbleNode = BabbleNode.create(peers, keyPair.privateKey,
                 mIPAddr, babblePort, moniker, this);
 
         babbleNode.run();

@@ -16,20 +16,18 @@ public final class BabbleNode implements PeersGetter {
 
     private final static Gson mGson = new Gson();
     private final Node mNode;
-    private final BabbleNodeListeners mListeners;
 
-    public BabbleNode(List<Peer> peers, String privateKeyHex, String ipAddress, int port,
-                      String moniker, BabbleNodeListeners listeners) {
+    public static BabbleNode create(List<Peer> peers, String privateKeyHex, String ipAddress,
+                                    int port, String moniker, BabbleNodeListeners listeners) {
 
-        this(peers, privateKeyHex, ipAddress, port, moniker, listeners,
+        return createWithConfig(peers, privateKeyHex, ipAddress, port, moniker, listeners,
                 new BabbleConfig.Builder().build());
     }
 
-    //TODO: consider factory named create
-    public BabbleNode(List<Peer> peers, String privateKeyHex, String ipAddress, int port,
-                      String moniker, BabbleNodeListeners listeners, BabbleConfig babbleConfig) {
-
-        mListeners = listeners;
+    public static BabbleNode createWithConfig(List<Peer> peers, String privateKeyHex,
+                                              String ipAddress, int port, String moniker,
+                                              final BabbleNodeListeners listeners,
+                                              BabbleConfig babbleConfig) {
 
         MobileConfig mobileConfig = new MobileConfig(
                 babbleConfig.heartbeat,
@@ -43,7 +41,7 @@ public final class BabbleNode implements PeersGetter {
                 moniker
         );
 
-        mNode = Mobile.new_(
+        Node node = Mobile.new_(
                 privateKeyHex,
                 ipAddress + ":" + port,
                 mGson.toJson(peers),
@@ -53,7 +51,7 @@ public final class BabbleNode implements PeersGetter {
                         String strJson = new String(blockBytes, Charset.forName("UTF-8"));
                         try {
                             Block block = Block.fromJson(strJson);
-                            return mListeners.onReceiveTransactions(block.body.transactions);
+                            return listeners.onReceiveTransactions(block.body.transactions);
                         } catch (JsonSyntaxException ex) {
                             return null;
                         }
@@ -73,9 +71,15 @@ public final class BabbleNode implements PeersGetter {
 
         // If mobile ExceptionHandler isn't called then mNode should not be null, however
         // just in case...
-        if (mNode==null) {
+        if (node==null) {
             throw new IllegalArgumentException("Failed to initialise node");
         }
+
+        return new BabbleNode(node);
+    }
+
+    private BabbleNode(Node node) {
+        mNode = node;
     }
 
     //TODO: get rid of null checks
