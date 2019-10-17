@@ -17,15 +17,15 @@ public final class BabbleNode implements PeersGetter {
     private final static Gson mGson = new Gson();
     private final Node mNode;
 
-    public static BabbleNode create(List<Peer> peers, String privateKeyHex, String ipAddress,
+    public static BabbleNode create(List<Peer> peers, String privateKeyHex, String inetAddress,
                                     int port, String moniker, BabbleNodeListeners listeners) {
 
-        return createWithConfig(peers, privateKeyHex, ipAddress, port, moniker, listeners,
+        return createWithConfig(peers, privateKeyHex, inetAddress, port, moniker, listeners,
                 new BabbleConfig.Builder().build());
     }
 
     public static BabbleNode createWithConfig(List<Peer> peers, String privateKeyHex,
-                                              String ipAddress, int port, String moniker,
+                                              String inetAddress, int port, String moniker,
                                               final BabbleNodeListeners listeners,
                                               BabbleConfig babbleConfig) {
 
@@ -43,7 +43,7 @@ public final class BabbleNode implements PeersGetter {
 
         Node node = Mobile.new_(
                 privateKeyHex,
-                ipAddress + ":" + port,
+                inetAddress + ":" + port,
                 mGson.toJson(peers),
                 new mobile.CommitHandler() {
                     @Override
