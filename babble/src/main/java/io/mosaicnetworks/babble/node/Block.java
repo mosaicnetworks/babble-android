@@ -13,7 +13,7 @@ import com.google.gson.annotations.SerializedName;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-class Block {
+final class Block {
 
     private final static Gson mCustomGson;
 
