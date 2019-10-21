@@ -1,7 +1,6 @@
 package io.mosaicnetworks.babble.discovery;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -15,46 +14,45 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 
-public class HttpDiscoveryRequest {
+public final class HttpDiscoveryRequest {
 
-    private String url;
-    private ResponseListener responseListener;
-    private FailureListener failureListener;
-    private RequestTask requestTask;
+    private final URL mUrl;
+    private final ResponseListener mResponseListener;
+    private final RequestTask mRequestTask;
 
-    //Define failure codes
-    public static final int INVALID_JSON = 0;
-    public static final int CONNECTION_ERROR = 1;
-    public static final int MALFORMED_URL = 2;
-
-    public HttpDiscoveryRequest(String url, ResponseListener responseListener, FailureListener failureListener) {
-        this.url = url;
-        this.responseListener = responseListener;
-        this.failureListener = failureListener;
-        requestTask = new RequestTask();
+    public HttpDiscoveryRequest(String url, ResponseListener responseListener) throws MalformedURLException {
+        mUrl = new URL(url);
+        mResponseListener = responseListener;
+        mRequestTask = new RequestTask();
     }
 
     public void send() {
-        requestTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        mRequestTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     class RequestTask extends AsyncTask<Void, Void, Peer[]> {
 
-        HttpURLConnection httpURLConnection = null;
-        int errorCode;
+        ResponseListener.Error error;
 
         @Override
         protected Peer[] doInBackground(Void... params) {
+
+            HttpURLConnection httpURLConnection;
+            BufferedReader bufferedReader;
+            InputStream inputStream;
+
             try {
-                URL urlT = new URL(url);
-                httpURLConnection = (HttpURLConnection) urlT.openConnection();
-                InputStream inputStream = httpURLConnection.getInputStream();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+                httpURLConnection = (HttpURLConnection) mUrl.openConnection();
+
+                inputStream = httpURLConnection.getInputStream();
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
                 StringBuilder stringBuilder = new StringBuilder();
 
-                String JSON_STRING;
-                while ((JSON_STRING = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(JSON_STRING + "\n");
+                String resp;
+                while ((resp = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(resp);
                 }
 
                 bufferedReader.close();
@@ -63,25 +61,15 @@ public class HttpDiscoveryRequest {
 
                 String response = stringBuilder.toString().trim();
 
-                Log.d("Babble", "Received response: " + response);
-                Gson gson = new Gson();
+                Gson gson = new Gson(); //TODO: static
                 Peer[] peers = gson.fromJson(response, Peer[].class);
 
                 return peers;
 
-
-            } catch (MalformedURLException e) {
-                Log.d("Babble", "HttpDiscoveryRequest error: " + e);
-                errorCode = MALFORMED_URL;
             } catch (IOException e) {
-                Log.d("Babble", "HttpDiscoveryRequest error: " + e);
-                errorCode = CONNECTION_ERROR;
-            } catch(JsonSyntaxException e) {
-                Log.d("Babble", "HttpDiscoveryRequest error: " + e);
-                errorCode = INVALID_JSON;
-            } catch(IllegalStateException e) {
-                Log.d("Babble", "HttpDiscoveryRequest error: " + e);
-                errorCode = INVALID_JSON;
+                error = ResponseListener.Error.CONNECTION_ERROR;
+            } catch(JsonSyntaxException | IllegalStateException e) {
+                error = ResponseListener.Error.INVALID_JSON;
             }
 
             return null;
@@ -90,9 +78,9 @@ public class HttpDiscoveryRequest {
         @Override
         protected void onPostExecute(Peer[] result) {
             if (result != null){
-                responseListener.onReceivePeers(Arrays.asList(result));
+                mResponseListener.onReceivePeers(Arrays.asList(result));
             } else {
-                failureListener.onFailure(errorCode);
+                mResponseListener.onFailure(error);
             }
         }
     }

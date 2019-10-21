@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import io.mosaicnetworks.babble.discovery.FailureListener;
 import io.mosaicnetworks.babble.discovery.HttpDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.HttpDiscoveryServer;
 import io.mosaicnetworks.babble.discovery.Peer;
@@ -44,24 +43,19 @@ public class HttpDiscoveryTest {
         }
 
         HttpDiscoveryServer httpDiscoveryServer = new HttpDiscoveryServer("localhost", 8988, new PeersGet());
-
-        try {
-            httpDiscoveryServer.start();
-        }catch (IOException ex){
-            System.out.println("Caught exception");
-        }
+        httpDiscoveryServer.start();
 
         String url = "http://localhost:8988/peers";
+
         HttpDiscoveryRequest httpDiscoveryRequest = new HttpDiscoveryRequest(url, new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
                 mRcvPeers = peers;
                 lock.countDown();
-
             }
-        }, new FailureListener() {
+
             @Override
-            public void onFailure(int code) {
+            public void onFailure(Error error) {
                 lock.countDown();
             }
         });
@@ -77,5 +71,6 @@ public class HttpDiscoveryTest {
         assertEquals("localhost:6666", mRcvPeers.get(0).netAddr);
         assertEquals("0X04362B55F78A2614DC1B5FD3AC90A3162E213CC0F07925AC99E420722CDF3C656AE7BB88A0FEDF01DDD8669E159F9DC20CC5F253AC11F8B5AC2E10A30D0654873B",
                 mRcvPeers.get(0).pubKeyHex);
+
     }
 }
