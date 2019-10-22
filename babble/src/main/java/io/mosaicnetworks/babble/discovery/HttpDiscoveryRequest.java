@@ -7,10 +7,10 @@ import com.google.gson.JsonSyntaxException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.Arrays;
 
@@ -19,6 +19,8 @@ public final class HttpDiscoveryRequest {
     private final URL mUrl;
     private final ResponseListener mResponseListener;
     private final RequestTask mRequestTask;
+    private int mConnectTimeout = 0;
+    private int mReadTimeout = 0;
 
     public HttpDiscoveryRequest(String url, ResponseListener responseListener) throws MalformedURLException {
         mUrl = new URL(url);
@@ -26,11 +28,19 @@ public final class HttpDiscoveryRequest {
         mRequestTask = new RequestTask();
     }
 
+    public void setConnectTimeout(int timeout) {
+        mConnectTimeout = timeout;
+    }
+
+    public void setReadTimeout(int timeout) {
+        mReadTimeout = timeout;
+    }
+
     public void send() {
         mRequestTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    class RequestTask extends AsyncTask<Void, Void, Peer[]> {
+    private class RequestTask extends AsyncTask<Void, Void, Peer[]> {
 
         ResponseListener.Error error;
 
@@ -38,38 +48,40 @@ public final class HttpDiscoveryRequest {
         protected Peer[] doInBackground(Void... params) {
 
             HttpURLConnection httpURLConnection;
-            BufferedReader bufferedReader;
-            InputStream inputStream;
 
             try {
 
                 httpURLConnection = (HttpURLConnection) mUrl.openConnection();
+                httpURLConnection.setConnectTimeout(mConnectTimeout);
+                httpURLConnection.setReadTimeout(mReadTimeout);
 
-                inputStream = httpURLConnection.getInputStream();
-                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                try (BufferedReader bufRd = new BufferedReader(new InputStreamReader(
+                        httpURLConnection.getInputStream()))) {
 
-                StringBuilder stringBuilder = new StringBuilder();
+                    StringBuilder stringBuilder = new StringBuilder();
 
-                String resp;
-                while ((resp = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(resp);
+                    String resp;
+                    while ((resp = bufRd.readLine()) != null) {
+                        stringBuilder.append(resp);
+                    }
+
+                    String response = stringBuilder.toString().trim();
+
+                    Gson gson = new Gson();
+                    Peer[] peers = gson.fromJson(response, Peer[].class);
+
+                    return peers;
+
+                } catch (IOException e) {
+                    error = ResponseListener.Error.CONNECTION_ERROR;
+                } catch (JsonSyntaxException | IllegalStateException e) {
+                    error = ResponseListener.Error.INVALID_JSON;
                 }
 
-                bufferedReader.close();
-                inputStream.close();
-                httpURLConnection.disconnect();
-
-                String response = stringBuilder.toString().trim();
-
-                Gson gson = new Gson(); //TODO: static
-                Peer[] peers = gson.fromJson(response, Peer[].class);
-
-                return peers;
-
+            } catch (SocketTimeoutException e) {
+                error = ResponseListener.Error.TIMEOUT;
             } catch (IOException e) {
                 error = ResponseListener.Error.CONNECTION_ERROR;
-            } catch(JsonSyntaxException | IllegalStateException e) {
-                error = ResponseListener.Error.INVALID_JSON;
             }
 
             return null;

@@ -7,7 +7,8 @@ public interface ResponseListener {
     enum Error {
 
         INVALID_JSON(0, "Invalid JSON"),
-        CONNECTION_ERROR(1, "Connection error");
+        CONNECTION_ERROR(1, "Connection error"),
+        TIMEOUT(2,"Timed out");
 
         private final int mCode;
         private final String mDescription;
