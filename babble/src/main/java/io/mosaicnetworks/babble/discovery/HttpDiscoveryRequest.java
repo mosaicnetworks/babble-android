@@ -77,14 +77,14 @@ public final class HttpDiscoveryRequest {
 
                     return peers;
 
+                } catch (SocketTimeoutException e) {
+                    error = ResponseListener.Error.TIMEOUT;
                 } catch (IOException e) {
                     error = ResponseListener.Error.CONNECTION_ERROR;
                 } catch (JsonSyntaxException | IllegalStateException e) {
                     error = ResponseListener.Error.INVALID_JSON;
                 }
 
-            } catch (SocketTimeoutException e) {
-                error = ResponseListener.Error.TIMEOUT;
             } catch (IOException e) {
                 error = ResponseListener.Error.CONNECTION_ERROR;
             }
