@@ -1,7 +1,5 @@
 package io.mosaicnetworks.babble.discovery;
 
-import android.util.Log;
-
 import java.io.IOException;
 
 import fi.iki.elonen.NanoHTTPD;
@@ -10,12 +8,12 @@ public class HttpDiscoveryServer {
 
     private NanoWrapper nanoWrapper;
 
-    public HttpDiscoveryServer(int port, PeersGetter peersGetter) {
-        nanoWrapper = new NanoWrapper(port, peersGetter);
+    public HttpDiscoveryServer(int port, PeersProvider peersProvider) {
+        nanoWrapper = new NanoWrapper(port, peersProvider);
     }
 
-    public HttpDiscoveryServer(String hostname, int port, PeersGetter peersGetter) {
-        nanoWrapper = new NanoWrapper(hostname, port, peersGetter);
+    public HttpDiscoveryServer(String hostname, int port, PeersProvider peersProvider) {
+        nanoWrapper = new NanoWrapper(hostname, port, peersProvider);
     }
 
     /***
@@ -32,16 +30,16 @@ public class HttpDiscoveryServer {
 
     private class NanoWrapper extends NanoHTTPD {
 
-        private PeersGetter peersGetter;
+        private PeersProvider peersProvider;
 
-        public NanoWrapper(int port, PeersGetter peersGetter) {
+        public NanoWrapper(int port, PeersProvider peersProvider) {
             super(port);
-            this.peersGetter = peersGetter;
+            this.peersProvider = peersProvider;
         }
 
-        public NanoWrapper(String hostname, int port, PeersGetter peersGetter) {
+        public NanoWrapper(String hostname, int port, PeersProvider peersProvider) {
             super(hostname, port);
-            this.peersGetter = peersGetter;
+            this.peersProvider = peersProvider;
         }
 
         @Override
@@ -50,8 +48,8 @@ public class HttpDiscoveryServer {
             if (session.getMethod() == Method.GET) {
 
                 if (session.getUri().equals("/peers")) {
-                    if (peersGetter != null) {
-                        return newFixedLengthResponse(peersGetter.getPeers());
+                    if (peersProvider != null) {
+                        return newFixedLengthResponse(peersProvider.getPeers());
                     }
                     return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
                             "Could not get requested resource");

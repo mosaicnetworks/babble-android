@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import io.mosaicnetworks.babble.discovery.HttpDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.HttpDiscoveryServer;
 import io.mosaicnetworks.babble.discovery.Peer;
-import io.mosaicnetworks.babble.discovery.PeersGetter;
+import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 
 import static org.junit.Assert.*;
@@ -35,14 +35,14 @@ public class HttpDiscoveryTest {
         final CountDownLatch lock = new CountDownLatch(1);
         final String peersJSON = "[{\"NetAddr\":\"localhost:6666\",\"PubKeyHex\":\"0X04362B55F78A2614DC1B5FD3AC90A3162E213CC0F07925AC99E420722CDF3C656AE7BB88A0FEDF01DDD8669E159F9DC20CC5F253AC11F8B5AC2E10A30D0654873B\",\"Moniker\":\"mosaic\"}]\n";
 
-        class PeersGet implements PeersGetter {
+        class MockPeersProvider implements PeersProvider {
             @Override
             public String getPeers() {
                 return peersJSON;
             }
         }
 
-        HttpDiscoveryServer httpDiscoveryServer = new HttpDiscoveryServer("localhost", 8988, new PeersGet());
+        HttpDiscoveryServer httpDiscoveryServer = new HttpDiscoveryServer("localhost", 8988, new MockPeersProvider());
         httpDiscoveryServer.start();
 
         String host = "localhost";

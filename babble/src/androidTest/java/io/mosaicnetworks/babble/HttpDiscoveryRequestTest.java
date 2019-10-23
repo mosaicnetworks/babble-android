@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import fi.iki.elonen.NanoHTTPD;
 import io.mosaicnetworks.babble.discovery.HttpDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
-import io.mosaicnetworks.babble.discovery.PeersGetter;
+import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 
 import static org.junit.Assert.assertEquals;
@@ -37,7 +37,7 @@ public class HttpDiscoveryRequestTest {
         final CountDownLatch lock = new CountDownLatch(1);
         final String peersJSON = "[{\"NetAddr\":\"localhost:6666\",\"PubKeyHex\":\"0X04362B55F78A2614DC1B5FD3AC90A3162E213CC0F07925AC99E420722CDF3C656AE7BB88A0FEDF01DDD8669E159F9DC20CC5F253AC11F8B5AC2E10A30D0654873B\",\"Moniker\":\"mosaic\"}]\n";
 
-        class PeersGet implements PeersGetter {
+        class PeersGet implements PeersProvider {
             @Override
             public String getPeers() {
                 return peersJSON;
@@ -113,8 +113,8 @@ class MockHttpDiscoveryServer {
     private NanoWrapper nanoWrapper;
     private int mResponseDelayMilliSec;
 
-    public MockHttpDiscoveryServer(String hostname, int port, PeersGetter peersGetter, int responseDelayMilliSec) {
-        nanoWrapper = new NanoWrapper(hostname, port, peersGetter);
+    public MockHttpDiscoveryServer(String hostname, int port, PeersProvider peersProvider, int responseDelayMilliSec) {
+        nanoWrapper = new NanoWrapper(hostname, port, peersProvider);
         mResponseDelayMilliSec = responseDelayMilliSec;
     }
 
@@ -128,16 +128,16 @@ class MockHttpDiscoveryServer {
 
     private class NanoWrapper extends NanoHTTPD {
 
-        private PeersGetter peersGetter;
+        private PeersProvider peersProvider;
 
-        public NanoWrapper(int port, PeersGetter peersGetter) {
+        public NanoWrapper(int port, PeersProvider peersProvider) {
             super(port);
-            this.peersGetter = peersGetter;
+            this.peersProvider = peersProvider;
         }
 
-        public NanoWrapper(String hostname, int port, PeersGetter peersGetter) {
+        public NanoWrapper(String hostname, int port, PeersProvider peersProvider) {
             super(hostname, port);
-            this.peersGetter = peersGetter;
+            this.peersProvider = peersProvider;
         }
 
         @Override
@@ -146,14 +146,14 @@ class MockHttpDiscoveryServer {
             if (session.getMethod() == Method.GET) {
 
                 if (session.getUri().equals("/peers")) {
-                    if (peersGetter != null) {
+                    if (peersProvider != null) {
                         try {
                             Thread.sleep(mResponseDelayMilliSec);
                         } catch (InterruptedException e) {
                             //Cannot change the method signature, so throw an unchecked exception
                             throw new RuntimeException();
                         }
-                        return newFixedLengthResponse(peersGetter.getPeers());
+                        return newFixedLengthResponse(peersProvider.getPeers());
                     }
                     return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
                             "Could not get requested resource");

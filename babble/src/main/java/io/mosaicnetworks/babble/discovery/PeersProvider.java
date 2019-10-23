@@ -1,5 +1,5 @@
 package io.mosaicnetworks.babble.discovery;
 
-public interface PeersGetter {
+public interface PeersProvider {
     String getPeers();
 }

@@ -7,12 +7,12 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import io.mosaicnetworks.babble.discovery.Peer;
-import io.mosaicnetworks.babble.discovery.PeersGetter;
+import io.mosaicnetworks.babble.discovery.PeersProvider;
 import mobile.Mobile;
 import mobile.Node;
 import mobile.MobileConfig;
 
-public final class BabbleNode implements PeersGetter {
+public final class BabbleNode implements PeersProvider {
 
     private final static Gson mGson = new Gson();
     private final Node mNode;
