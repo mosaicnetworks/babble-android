@@ -15,25 +15,17 @@ public class Peers {
 
     public static void requestPeers(String peerIP, int port, final ChatActivity chatActivity) {
 
-        String endpoint = "http://" + peerIP + ":" + port + "/peers";
-        Log.d(MainActivity.TAG, "Connecting to endpoint: " + endpoint);
+        HttpDiscoveryRequest httpDiscoveryRequest = new HttpDiscoveryRequest(peerIP, new ResponseListener() {
+            @Override
+            public void onReceivePeers(List<Peer> peers) {
+                chatActivity.receivedPeers(peers);
+            }
 
-        HttpDiscoveryRequest httpDiscoveryRequest;
-        try {
-            httpDiscoveryRequest = new HttpDiscoveryRequest(endpoint, new ResponseListener() {
-                @Override
-                public void onReceivePeers(List<Peer> peers) {
-                    chatActivity.receivedPeers(peers);
-                }
-
-                @Override
-                public void onFailure(Error error) {
-                    chatActivity.getPeersFail();
-                }
-            });
-        } catch (MalformedURLException ex) {
-            throw new IllegalArgumentException("Invalid IP string");
-        }
+            @Override
+            public void onFailure(Error error) {
+                chatActivity.getPeersFail();
+            }
+        });
 
         httpDiscoveryRequest.send();
     }

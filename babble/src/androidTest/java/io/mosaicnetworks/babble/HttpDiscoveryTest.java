@@ -45,9 +45,9 @@ public class HttpDiscoveryTest {
         HttpDiscoveryServer httpDiscoveryServer = new HttpDiscoveryServer("localhost", 8988, new PeersGet());
         httpDiscoveryServer.start();
 
-        String url = "http://localhost:8988/peers";
+        String host = "localhost";
 
-        HttpDiscoveryRequest httpDiscoveryRequest = new HttpDiscoveryRequest(url, new ResponseListener() {
+        HttpDiscoveryRequest httpDiscoveryRequest = new HttpDiscoveryRequest(host, new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
                 mRcvPeers = peers;

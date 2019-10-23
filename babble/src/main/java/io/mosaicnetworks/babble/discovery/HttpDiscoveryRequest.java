@@ -22,8 +22,13 @@ public final class HttpDiscoveryRequest {
     private int mConnectTimeout = 0;
     private int mReadTimeout = 0;
 
-    public HttpDiscoveryRequest(String url, ResponseListener responseListener) throws MalformedURLException {
-        mUrl = new URL(url);
+    public HttpDiscoveryRequest(String host, ResponseListener responseListener) {
+        try {
+            mUrl = new URL("http", host, 8988, "/peers");
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Invalid host");
+        }
+
         mResponseListener = responseListener;
         mRequestTask = new RequestTask();
     }
