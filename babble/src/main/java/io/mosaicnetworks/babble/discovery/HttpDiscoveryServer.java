@@ -4,16 +4,16 @@ import java.io.IOException;
 
 import fi.iki.elonen.NanoHTTPD;
 
-public class HttpDiscoveryServer {
+public final class HttpDiscoveryServer {
 
-    private NanoWrapper nanoWrapper;
+    private final NanoWrapper mNanoWrapper;
 
     public HttpDiscoveryServer(int port, PeersProvider peersProvider) {
-        nanoWrapper = new NanoWrapper(port, peersProvider);
+        mNanoWrapper = new NanoWrapper(port, peersProvider);
     }
 
     public HttpDiscoveryServer(String hostname, int port, PeersProvider peersProvider) {
-        nanoWrapper = new NanoWrapper(hostname, port, peersProvider);
+        mNanoWrapper = new NanoWrapper(hostname, port, peersProvider);
     }
 
     /***
@@ -21,16 +21,16 @@ public class HttpDiscoveryServer {
      * @throws IOException if the socket is in use.
      */
     public void start() throws IOException {
-        nanoWrapper.start();
+        mNanoWrapper.start();
     }
 
     public void stop() {
-        nanoWrapper.stop();
+        mNanoWrapper.stop();
     }
 
     private class NanoWrapper extends NanoHTTPD {
 
-        private PeersProvider peersProvider;
+        private final PeersProvider peersProvider;
 
         public NanoWrapper(int port, PeersProvider peersProvider) {
             super(port);
