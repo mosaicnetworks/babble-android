@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import io.mosaicnetworks.babble.discovery.HttpDiscoveryServer;
+import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.KeyPair;
 
@@ -26,7 +26,7 @@ public class ChatActivity extends AppCompatActivity implements PeersListeners, S
     private MessagesList messagesList;
     private State state;
     private MessagesListAdapter<Message> adapter;
-    private HttpDiscoveryServer httpDiscoveryServer;
+    private HttpPeerDiscoveryServer httpPeerDiscoveryServer;
     private String moniker;
     private boolean newChat;
     private String peerIP;
@@ -117,10 +117,10 @@ public class ChatActivity extends AppCompatActivity implements PeersListeners, S
     private void advertisePeers() {
 
         if (state != null) {
-            httpDiscoveryServer = new HttpDiscoveryServer(PEER_PORT, state.getNode());
+            httpPeerDiscoveryServer = new HttpPeerDiscoveryServer(PEER_PORT, state.getNode());
 
             try {
-                httpDiscoveryServer.start();
+                httpPeerDiscoveryServer.start();
             } catch (IOException ex) {
                 Log.d(MainActivity.TAG, String.format("Port %d in use, unable to advertise peers",
                         PEER_PORT));
@@ -141,8 +141,8 @@ public class ChatActivity extends AppCompatActivity implements PeersListeners, S
             state.shutdown();
         }
 
-        if (httpDiscoveryServer != null) {
-            httpDiscoveryServer.stop();
+        if (httpPeerDiscoveryServer != null) {
+            httpPeerDiscoveryServer.stop();
         }
 
         super.onDestroy();

@@ -1,12 +1,9 @@
 package io.mosaicnetworks.sample;
 
-import android.util.Log;
-
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.mosaicnetworks.babble.discovery.HttpDiscoveryRequest;
+import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.KeyPair;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
@@ -15,7 +12,7 @@ public class Peers {
 
     public static void requestPeers(String peerIP, int port, final ChatActivity chatActivity) {
 
-        HttpDiscoveryRequest httpDiscoveryRequest = new HttpDiscoveryRequest(peerIP, new ResponseListener() {
+        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(peerIP, new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
                 chatActivity.receivedPeers(peers);
@@ -27,7 +24,7 @@ public class Peers {
             }
         });
 
-        httpDiscoveryRequest.send();
+        httpPeerDiscoveryRequest.send();
     }
 
     public static void genPeers(KeyPair keyPair, String mIPAddr, int port, String moniker, ChatActivity chatActivity) {

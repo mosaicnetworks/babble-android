@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import io.mosaicnetworks.babble.discovery.HttpDiscoveryRequest;
-import io.mosaicnetworks.babble.discovery.HttpDiscoveryServer;
+import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
+import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
@@ -21,7 +21,7 @@ import io.mosaicnetworks.babble.discovery.ResponseListener;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
-public class HttpDiscoveryTest {
+public class HttpPeerDiscoveryTest {
 
     @Rule
     public GrantPermissionRule mRuntimePermissionRule = GrantPermissionRule.grant(
@@ -33,21 +33,23 @@ public class HttpDiscoveryTest {
     public void integrationTest() throws IOException, InterruptedException {
 
         final CountDownLatch lock = new CountDownLatch(1);
-        final String peersJSON = "[{\"NetAddr\":\"localhost:6666\",\"PubKeyHex\":\"0X04362B55F78A2614DC1B5FD3AC90A3162E213CC0F07925AC99E420722CDF3C656AE7BB88A0FEDF01DDD8669E159F9DC20CC5F253AC11F8B5AC2E10A30D0654873B\",\"Moniker\":\"mosaic\"}]\n";
 
         class MockPeersProvider implements PeersProvider {
+
+            final String peersJSON = "[{\"NetAddr\":\"localhost:6666\",\"PubKeyHex\":\"0X04362B55F78A2614DC1B5FD3AC90A3162E213CC0F07925AC99E420722CDF3C656AE7BB88A0FEDF01DDD8669E159F9DC20CC5F253AC11F8B5AC2E10A30D0654873B\",\"Moniker\":\"mosaic\"}]\n";
+
             @Override
             public String getPeers() {
                 return peersJSON;
             }
         }
 
-        HttpDiscoveryServer httpDiscoveryServer = new HttpDiscoveryServer("localhost", 8988, new MockPeersProvider());
-        httpDiscoveryServer.start();
+        HttpPeerDiscoveryServer httpPeerDiscoveryServer = new HttpPeerDiscoveryServer("localhost", 8988, new MockPeersProvider());
+        httpPeerDiscoveryServer.start();
 
         String host = "localhost";
 
-        HttpDiscoveryRequest httpDiscoveryRequest = new HttpDiscoveryRequest(host, new ResponseListener() {
+        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(host, new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
                 mRcvPeers = peers;
@@ -60,11 +62,11 @@ public class HttpDiscoveryTest {
             }
         });
 
-        httpDiscoveryRequest.send();
+        httpPeerDiscoveryRequest.send();
 
         lock.await(3000, TimeUnit.MILLISECONDS);
 
-        httpDiscoveryServer.stop();
+        httpPeerDiscoveryServer.stop();
 
         assertNotNull(mRcvPeers);
         assertEquals("mosaic", mRcvPeers.get(0).moniker);

@@ -11,7 +11,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import fi.iki.elonen.NanoHTTPD;
-import io.mosaicnetworks.babble.discovery.HttpDiscoveryRequest;
+import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
@@ -19,7 +19,7 @@ import io.mosaicnetworks.babble.discovery.ResponseListener;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class HttpDiscoveryRequestTest {
+public class HttpPeerDiscoveryRequestTest {
 
     @Rule
     public GrantPermissionRule mRuntimePermissionRule = GrantPermissionRule.grant(
@@ -44,12 +44,12 @@ public class HttpDiscoveryRequestTest {
             }
         }
 
-        MockHttpDiscoveryServer mockHttpDiscoveryServer = new MockHttpDiscoveryServer("localhost", 8988, new PeersGet(), serverResponseDelay);
-        mockHttpDiscoveryServer.start();
+        MockHttpPeerDiscoveryServer mockHttpPeerDiscoveryServer = new MockHttpPeerDiscoveryServer("localhost", 8988, new PeersGet(), serverResponseDelay);
+        mockHttpPeerDiscoveryServer.start();
 
         String host = "localhost";
 
-        HttpDiscoveryRequest httpDiscoveryRequest = new HttpDiscoveryRequest(host, new ResponseListener() {
+        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(host, new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
             }
@@ -61,12 +61,12 @@ public class HttpDiscoveryRequestTest {
             }
         });
 
-        httpDiscoveryRequest.setReadTimeout(requestReadTimeout);
-        httpDiscoveryRequest.send();
+        httpPeerDiscoveryRequest.setReadTimeout(requestReadTimeout);
+        httpPeerDiscoveryRequest.send();
 
         lock.await(testTimeout, TimeUnit.MILLISECONDS);
 
-        mockHttpDiscoveryServer.stop();
+        mockHttpPeerDiscoveryServer.stop();
 
         assertNotNull(mError);
         assertEquals(ResponseListener.Error.TIMEOUT, mError);
@@ -85,7 +85,7 @@ public class HttpDiscoveryRequestTest {
 
         String host = "10.255.255.1"; // should be an unreachable ip address
 
-        HttpDiscoveryRequest httpDiscoveryRequest = new HttpDiscoveryRequest(host, new ResponseListener() {
+        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(host, new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
             }
@@ -97,8 +97,8 @@ public class HttpDiscoveryRequestTest {
             }
         });
 
-        httpDiscoveryRequest.setConnectTimeout(requestConnectTimeout);
-        httpDiscoveryRequest.send();
+        httpPeerDiscoveryRequest.setConnectTimeout(requestConnectTimeout);
+        httpPeerDiscoveryRequest.send();
 
         lock.await(testTimeout, TimeUnit.MILLISECONDS);
 
@@ -108,12 +108,12 @@ public class HttpDiscoveryRequestTest {
     }
 }
 
-class MockHttpDiscoveryServer {
+class MockHttpPeerDiscoveryServer {
 
     private NanoWrapper nanoWrapper;
     private int mResponseDelayMilliSec;
 
-    public MockHttpDiscoveryServer(String hostname, int port, PeersProvider peersProvider, int responseDelayMilliSec) {
+    public MockHttpPeerDiscoveryServer(String hostname, int port, PeersProvider peersProvider, int responseDelayMilliSec) {
         nanoWrapper = new NanoWrapper(hostname, port, peersProvider);
         mResponseDelayMilliSec = responseDelayMilliSec;
     }
@@ -129,11 +129,6 @@ class MockHttpDiscoveryServer {
     private class NanoWrapper extends NanoHTTPD {
 
         private PeersProvider peersProvider;
-
-        public NanoWrapper(int port, PeersProvider peersProvider) {
-            super(port);
-            this.peersProvider = peersProvider;
-        }
 
         public NanoWrapper(String hostname, int port, PeersProvider peersProvider) {
             super(hostname, port);

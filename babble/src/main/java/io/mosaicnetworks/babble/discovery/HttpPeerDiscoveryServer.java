@@ -4,15 +4,15 @@ import java.io.IOException;
 
 import fi.iki.elonen.NanoHTTPD;
 
-public final class HttpDiscoveryServer {
+public final class HttpPeerDiscoveryServer {
 
     private final NanoWrapper mNanoWrapper;
 
-    public HttpDiscoveryServer(int port, PeersProvider peersProvider) {
+    public HttpPeerDiscoveryServer(int port, PeersProvider peersProvider) {
         mNanoWrapper = new NanoWrapper(port, peersProvider);
     }
 
-    public HttpDiscoveryServer(String hostname, int port, PeersProvider peersProvider) {
+    public HttpPeerDiscoveryServer(String hostname, int port, PeersProvider peersProvider) {
         mNanoWrapper = new NanoWrapper(hostname, port, peersProvider);
     }
 

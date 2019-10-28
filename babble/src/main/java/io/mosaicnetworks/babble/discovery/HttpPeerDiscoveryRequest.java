@@ -14,7 +14,7 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.Arrays;
 
-public final class HttpDiscoveryRequest {
+public final class HttpPeerDiscoveryRequest {
 
     private final URL mUrl;
     private final ResponseListener mResponseListener;
@@ -22,7 +22,7 @@ public final class HttpDiscoveryRequest {
     private int mConnectTimeout = 0;
     private int mReadTimeout = 0;
 
-    public HttpDiscoveryRequest(String host, ResponseListener responseListener) {
+    public HttpPeerDiscoveryRequest(String host, ResponseListener responseListener) {
         try {
             mUrl = new URL("http", host, 8988, "/peers");
         } catch (MalformedURLException e) {

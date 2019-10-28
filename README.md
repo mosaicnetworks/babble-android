@@ -112,7 +112,7 @@ A discovery server sets up a RESTful web service with a single, `/peers`,
 endpoint which can be queried by other devices to get the peersJSON string.
 
 ```
-HTTPDiscoveryServer httpDiscoveryServer = new HTTPDiscoveryServer(hostname,
+HTTPDiscoveryServer httpPeerDiscoveryServer = new HTTPDiscoveryServer(hostname,
         port, new PeersGetter() {
     @Override
     public String getPeers() {
@@ -120,10 +120,10 @@ HTTPDiscoveryServer httpDiscoveryServer = new HTTPDiscoveryServer(hostname,
     }
 });
 
-httpDiscoveryServer.start()
+httpPeerDiscoveryServer.start()
 ```
 
-Call ```httpDiscoveryServer.stop()``` to stop the service and release the
+Call ```httpPeerDiscoveryServer.stop()``` to stop the service and release the
 resources.
 
 TODO: Which thread callbacks run
@@ -134,7 +134,7 @@ The HTTPDiscoveryRequest class complements the HTTPDiscoveryServer by providing
 a wrapper around an HTTP request to a `/peers` endpoint.
 
 ```
-HTTPDiscoveryRequest httpDiscoveryRequest = new HTTPDiscoveryRequest(url, 
+HTTPDiscoveryRequest httpPeerDiscoveryRequest = new HTTPDiscoveryRequest(url,
         new ResponseListener() {
     @Override
     public void onReceivePeers(Peer[] peers) {
@@ -147,7 +147,7 @@ HTTPDiscoveryRequest httpDiscoveryRequest = new HTTPDiscoveryRequest(url,
     }
 });
         
-httpDiscoveryRequest.send();
+httpPeerDiscoveryRequest.send();
 ```
 
 Where the url should be that of the peers resource on the discovery server e.g.
