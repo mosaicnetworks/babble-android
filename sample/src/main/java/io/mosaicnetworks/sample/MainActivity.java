@@ -15,14 +15,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    // called when the user presses the new group button
-    public void newGroup(View view) {
+    // called when the user presses the new chat button
+    public void newChat(View view) {
         Intent intent = new Intent(this, NewChatActivity.class);
         startActivity(intent);
     }
 
-    // called when the user presses the join group button
-    public void joinGroup(View view) {
+    // called when the user presses the join chat button
+    public void joinChat(View view) {
         Intent intent = new Intent(this, JoinChatActivity.class);
         startActivity(intent);
     }

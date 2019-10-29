@@ -13,13 +13,13 @@ public class NewChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_group);
+        setContentView(R.layout.activity_new_chat);
     }
 
-    // called when the user presses the start group button
-    public void startGroup(View view) {
+    // called when the user presses the start chat button
+    public void startChat(View view) {
         //get moniker
-        EditText editText = (EditText) findViewById(R.id.editText);
+        EditText editText = findViewById(R.id.editText);
         String moniker = editText.getText().toString();
         if (moniker.isEmpty()) {
             Random random = new Random();

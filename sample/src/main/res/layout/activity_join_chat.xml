@@ -41,7 +41,7 @@
             android:id="@+id/button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="joinGroup"
+            android:onClick="joinChat"
             android:text="Join" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

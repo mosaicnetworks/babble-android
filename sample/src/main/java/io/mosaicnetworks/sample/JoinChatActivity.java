@@ -12,11 +12,11 @@ public class JoinChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_join_group);
+        setContentView(R.layout.activity_join_chat);
     }
 
-    // called when the user presses the join group button
-    public void joinGroup(View view) {
+    // called when the user presses the join chat button
+    public void joinChat(View view) {
 
         //get moniker
         EditText editText = findViewById(R.id.editText2);
