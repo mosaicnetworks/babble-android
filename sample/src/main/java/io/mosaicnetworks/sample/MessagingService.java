@@ -1,5 +1,9 @@
 package io.mosaicnetworks.sample;
 
+import android.content.Context;
+
+import com.google.gson.JsonSyntaxException;
+
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +14,7 @@ import io.mosaicnetworks.babble.node.BabbleNodeListeners;
 import io.mosaicnetworks.babble.node.KeyPair;
 import io.mosaicnetworks.babble.node.LeaveResponseListener;
 
-public class MessagingService implements BabbleNodeListeners {
+public class MessagingService {
 
     private enum State {
         UNCONFIGURED,
@@ -26,11 +30,7 @@ public class MessagingService implements BabbleNodeListeners {
     private byte[] mStateHash;
     private State mState = State.UNCONFIGURED;
 
-    private MessagingService() {
-
-    }
-
-    public MessagingService getInstance() {
+    public static MessagingService getInstance() {
         if (instance==null) {
             instance = new MessagingService();
         }
@@ -40,22 +40,45 @@ public class MessagingService implements BabbleNodeListeners {
     public void configure(List<Peer> peers, String moniker, String inetAddress) {
 
         if (mState==State.RUNNING) {
-            throw new IllegalStateException("Cannot configure when the service is running");
+            throw new IllegalStateException("Cannot configure while the service is running");
         }
+
+        //add ourselves to the peers list
+        peers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + BABBLING_PORT, moniker));
 
         try {
             mBabbleNode = BabbleNode.create(peers, mKeyPair.privateKey, inetAddress, BABBLING_PORT,
-                    moniker, this);
+                    moniker, new BabbleNodeListeners() {
+                        @Override
+                        public byte[] onReceiveTransactions(byte[][] transactions) {
+                            for (byte[] rawTx:transactions) {
+                                String tx = new String(rawTx, StandardCharsets.UTF_8);
+
+                                BabbleTx babbleTx;
+                                try {
+                                    babbleTx = BabbleTx.fromJson(tx);
+                                } catch (JsonSyntaxException ex) {
+                                    //skip any malformed transactions
+                                    continue;
+                                }
+
+                                Message message = Message.fromBabbleTx(babbleTx);
+                                notifyObservers(message);
+                            }
+
+                            return mStateHash;
+                        }
+                    });
             mState = State.CONFIGURED;
         } catch (IllegalArgumentException ex) {
             //The reassignment of mState has failed, so leave it and the service state as before
-            //TODO: need to catch port in use exceptions (IOException) and throw others
+            //TODO: need to catch port in use exception (IOException) and throw others
         }
     }
 
     public void start() {
         if (mState==State.UNCONFIGURED || mState==State.RUNNING) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("Cannot start an unconfigured or running service");
         }
 
         mBabbleNode.run();
@@ -63,8 +86,8 @@ public class MessagingService implements BabbleNodeListeners {
     }
 
     public void stop() {
-        if (mState==State.UNCONFIGURED || mState==State.RUNNING) {
-            throw new IllegalStateException();
+        if (mState!=State.RUNNING) {
+            throw new IllegalStateException("Cannot stop a service which isn't running");
         }
 
         mBabbleNode.leave(new LeaveResponseListener() {
@@ -76,15 +99,8 @@ public class MessagingService implements BabbleNodeListeners {
         });
     }
 
-    public byte[] onReceiveTransactions(byte[][] transactions) {
-        for (byte[] rawTx:transactions) {
-            String tx = new String(rawTx, StandardCharsets.UTF_8);
-            BabbleTx babbleTx = BabbleTx.fromJson(tx);
-            Message message = Message.fromBabbleTx(babbleTx);
-            notifyObservers(message);
-        }
-
-        return mStateHash;
+    public void submitMessage(Message message) {
+        mBabbleNode.submitTx(message.toBabbleTx().toBytes());
     }
 
     public void registerObserver(MessageObserver messageObserver) {
@@ -97,7 +113,7 @@ public class MessagingService implements BabbleNodeListeners {
         mObservers.remove(messageObserver);
     }
 
-    public void notifyObservers(Message message) {
+    private void notifyObservers(Message message) {
         for (MessageObserver observer: mObservers) {
             observer.onMessageReceived(message);
         }
