@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import java.util.ArrayList;
 import java.util.Random;
+
+import io.mosaicnetworks.babble.discovery.Peer;
 
 public class NewChatActivity extends AppCompatActivity {
 
@@ -26,9 +29,11 @@ public class NewChatActivity extends AppCompatActivity {
             moniker = "AnonymousUser" + random.nextInt(10000);
         }
 
+        MessagingService messagingService = MessagingService.getInstance();
+        messagingService.configure(new ArrayList<Peer>(), moniker, Utils.getIPAddr(this));
+
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("MONIKER", moniker);
         startActivity(intent);
-
     }
 }
