@@ -24,6 +24,7 @@ public final class BabbleNode implements PeersProvider {
                 new BabbleConfig.Builder().build());
     }
 
+    //TODO: rename BabbleNodeListeners to TxConsumer
     public static BabbleNode createWithConfig(List<Peer> peers, String privateKeyHex,
                                               String inetAddress, int port, String moniker,
                                               final BabbleNodeListeners listeners,
@@ -64,6 +65,8 @@ public final class BabbleNode implements PeersProvider {
                         // initialisation error occurs, this callback is called synchronously
                         // (before Mobile.new_ returns).
 
+                        //TODO: throw different exceptions based on the received message
+
                         throw new IllegalArgumentException(msg);
                     }
                 },
@@ -96,6 +99,7 @@ public final class BabbleNode implements PeersProvider {
         }
     }
 
+    //TODO: move LeaveResponseListener to BabbleNodeListeners
     public void leave(final LeaveResponseListener listener) {
         if (mNode != null) {
             // this blocks so we'll run in a separate thread

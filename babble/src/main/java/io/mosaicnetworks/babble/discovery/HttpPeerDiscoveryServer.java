@@ -8,6 +8,7 @@ public final class HttpPeerDiscoveryServer {
 
     private final NanoWrapper mNanoWrapper;
 
+    //TODO: make port behaviour consistent with HttpDiscoveryRequest
     public HttpPeerDiscoveryServer(int port, PeersProvider peersProvider) {
         mNanoWrapper = new NanoWrapper(port, peersProvider);
     }
@@ -42,17 +43,21 @@ public final class HttpPeerDiscoveryServer {
             this.peersProvider = peersProvider;
         }
 
+        //TODO: return correct http status codes
         @Override
         public Response serve(IHTTPSession session) {
 
             if (session.getMethod() == Method.GET) {
 
                 if (session.getUri().equals("/peers")) {
-                    if (peersProvider != null) {
-                        return newFixedLengthResponse(peersProvider.getPeers());
+                    String peersJson = peersProvider.getPeers();
+
+                    if (peersJson==null) {
+                        return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
+                                "Could not get requested resource");
                     }
-                    return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
-                            "Could not get requested resource");
+
+                    return newFixedLengthResponse(peersJson);
                 }
             }
             return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
