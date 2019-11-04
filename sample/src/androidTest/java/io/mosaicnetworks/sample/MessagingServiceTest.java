@@ -24,7 +24,7 @@ public class MessagingServiceTest {
     public void submitTxTest() throws InterruptedException{
 
         final CountDownLatch lock = new CountDownLatch(1);
-        Message sentMessage = new Message("hello", new Author("alice"), new Date());
+        Message sentMessage = new Message("hello", "alice");
 
         MessagingService messagingService = MessagingService.getInstance();
         messagingService.registerObserver(new MessageObserver() {

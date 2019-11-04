@@ -9,11 +9,8 @@ import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
-import java.util.Date;
-
 public class ChatActivity extends AppCompatActivity implements MessageObserver {
 
-    private MessagesList mMessagesList;
     private MessagesListAdapter<Message> mAdapter;
     private String mMoniker;
     private final MessagingService mMessagingService = MessagingService.getInstance();
@@ -36,7 +33,7 @@ public class ChatActivity extends AppCompatActivity implements MessageObserver {
     }
 
     private void initialiseAdapter() {
-        mMessagesList = findViewById(R.id.messagesList);
+        MessagesList mMessagesList = findViewById(R.id.messagesList);
 
         mAdapter = new MessagesListAdapter<>(mMoniker, null);
         mMessagesList.setAdapter(mAdapter);
@@ -46,7 +43,7 @@ public class ChatActivity extends AppCompatActivity implements MessageObserver {
         input.setInputListener(new MessageInput.InputListener() {
             @Override
             public boolean onSubmit(CharSequence input) {
-                mMessagingService.submitMessage(new Message(input.toString(), new Author(mMoniker), new Date()));
+                mMessagingService.submitMessage(new Message(input.toString(), mMoniker));
                 return true;
             }
         });
