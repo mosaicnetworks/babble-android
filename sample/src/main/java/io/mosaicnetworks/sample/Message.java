@@ -4,35 +4,43 @@ import com.stfalcon.chatkit.commons.models.IMessage;
 
 import java.util.Date;
 
-public class Message implements IMessage {
+public final class Message implements IMessage {
 
-    private String text;
-    private Author author;
-    private Date date;
+    private final String mText;
+    private final Author mAuthor;
+    private Date mDate;
 
     public Message(String text, Author author, Date date) {
-        this.text = text;
-        this.author = author;
-        this.date = date;
+        mText = text;
+        mAuthor = author;
+        mDate = date;
+    }
+
+    public static Message fromBabbleTx(BabbleTx babbleTx) {
+        return new Message(babbleTx.text, new Author(babbleTx.from), new Date());
+    }
+
+    public BabbleTx toBabbleTx() {
+        return new BabbleTx(mAuthor.getName(), mText);
     }
 
     @Override
     public String getId() {
-        return author.getName();
+        return mAuthor.getName();
     }
 
     @Override
     public String getText() {
-        return text;
+        return mText;
     }
 
     @Override
     public Author getUser() {
-        return author;
+        return mAuthor;
     }
 
     @Override
     public Date getCreatedAt() {
-        return date;
+        return mDate;
     }
 }

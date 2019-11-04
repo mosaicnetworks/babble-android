@@ -21,4 +21,8 @@ public class BabbleTx {
     public static BabbleTx fromJson(String txJson) {
         return gson.fromJson(txJson, BabbleTx.class);
     }
+
+    public byte[] toBytes() {
+        return gson.toJson(this).getBytes();
+    }
 }
