@@ -9,6 +9,7 @@ import java.util.List;
 
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
 import io.mosaicnetworks.babble.discovery.Peer;
+import io.mosaicnetworks.babble.node.BabbleConfig;
 import io.mosaicnetworks.babble.node.BabbleNode;
 import io.mosaicnetworks.babble.node.BabbleNodeListeners;
 import io.mosaicnetworks.babble.node.KeyPair;
@@ -46,11 +47,8 @@ public class MessagingService {
             throw new IllegalStateException("Cannot configure while the service is running");
         }
 
-        //add ourselves to the peers list
-        peers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + BABBLING_PORT, moniker));
-
         try {
-            mBabbleNode = BabbleNode.create(peers, mKeyPair.privateKey, inetAddress, BABBLING_PORT,
+            mBabbleNode = BabbleNode.createWithConfig(peers, mKeyPair.privateKey, inetAddress, BABBLING_PORT,
                     moniker, new BabbleNodeListeners() {
                         @Override
                         public byte[] onReceiveTransactions(byte[][] transactions) {
@@ -72,7 +70,7 @@ public class MessagingService {
                             //TODO: update state hash
                             return mStateHash;
                         }
-                    });
+                    }, new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
             mState = State.CONFIGURED;
         } catch (IllegalArgumentException ex) {
             //The reassignment of mState and MBabbleNode has failed, so leave them as before

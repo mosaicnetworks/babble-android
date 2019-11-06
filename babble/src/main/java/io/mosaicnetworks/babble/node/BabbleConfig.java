@@ -13,6 +13,7 @@ public final class BabbleConfig {
 
     public static final class Builder {
 
+        //TODO: change variable names to m prefix
         private int heartbeat = 100;
         private boolean store = false;
         private String logLevel = "error";
