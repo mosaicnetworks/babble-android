@@ -1,9 +1,6 @@
 package io.mosaicnetworks.sample;
 
-import com.google.gson.JsonSyntaxException;
-
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +8,6 @@ import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.BabbleConfig;
 import io.mosaicnetworks.babble.node.BabbleNode;
-import io.mosaicnetworks.babble.node.BabbleNodeListeners;
 import io.mosaicnetworks.babble.node.KeyPair;
 import io.mosaicnetworks.babble.node.LeaveResponseListener;
 
@@ -26,12 +22,12 @@ public class MessagingService {
 
     private static MessagingService instance;
     private List<MessageObserver> mObservers = new ArrayList<>();
+    private BabbleState mBabbleState;
     private BabbleNode mBabbleNode;
     private HttpPeerDiscoveryServer mHttpPeerDiscoveryServer;
     private KeyPair mKeyPair = new KeyPair();
     private static final int BABBLING_PORT = 6666;
     private static final int DISCOVERY_PORT = 8988;
-    private byte[] mStateHash;
     private State mState = State.UNCONFIGURED;
 
     public static MessagingService getInstance() {
@@ -47,6 +43,13 @@ public class MessagingService {
             throw new IllegalStateException("Cannot configure while the service is running");
         }
 
+        mBabbleState = new BabbleState(new StateObserver() {
+            @Override
+            public void onStateChanged(Message message) {
+                notifyObservers(message);
+            }
+        });
+
         // If peers list is empty we need to setup a new babble group, this requires a peers list
         // which contains this node
         if (peers.isEmpty()) {
@@ -54,32 +57,12 @@ public class MessagingService {
         }
 
         try {
-            mBabbleNode = BabbleNode.createWithConfig(peers, mKeyPair.privateKey, inetAddress, BABBLING_PORT,
-                    moniker, new BabbleNodeListeners() {
-                        @Override
-                        public byte[] onReceiveTransactions(byte[][] transactions) {
-                            for (byte[] rawTx:transactions) {
-                                String tx = new String(rawTx, StandardCharsets.UTF_8);
-
-                                BabbleTx babbleTx;
-                                try {
-                                    babbleTx = BabbleTx.fromJson(tx);
-                                } catch (JsonSyntaxException ex) {
-                                    //skip any malformed transactions
-                                    continue;
-                                }
-
-                                Message message = Message.fromBabbleTx(babbleTx);
-                                notifyObservers(message);
-                            }
-
-                            //TODO: update state hash
-                            return mStateHash;
-                        }
-                    }, new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
+            mBabbleNode = BabbleNode.createWithConfig(peers, mKeyPair.privateKey, inetAddress,
+                    BABBLING_PORT, moniker, mBabbleState,
+                    new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
             mState = State.CONFIGURED;
         } catch (IllegalArgumentException ex) {
-            //The reassignment of mState and MBabbleNode has failed, so leave them as before
+            //The reassignment of mState and mBabbleNode has failed, so leave them as before
             //TODO: need to catch port in use exception (IOException) and throw others
         }
 
