@@ -1,7 +1,9 @@
 # build babble core (bbc)
 set -e
 
-babble_core_version=0.5.1
+babble_core_version=test
+
+if [ -d jni ]; then rm -rf jni; fi
 
 if [ -d build ]; then rm -r build; fi
 mkdir build
