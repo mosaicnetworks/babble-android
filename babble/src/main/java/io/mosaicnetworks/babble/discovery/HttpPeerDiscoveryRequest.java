@@ -12,6 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public final class HttpPeerDiscoveryRequest {
@@ -95,7 +96,7 @@ public final class HttpPeerDiscoveryRequest {
         @Override
         protected void onPostExecute(Peer[] result) {
             if (result != null){
-                mResponseListener.onReceivePeers(Arrays.asList(result));
+                mResponseListener.onReceivePeers(new ArrayList<Peer>(Arrays.asList(result)));
             } else {
                 mResponseListener.onFailure(error);
             }
