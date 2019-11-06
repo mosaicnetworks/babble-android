@@ -47,6 +47,12 @@ public class MessagingService {
             throw new IllegalStateException("Cannot configure while the service is running");
         }
 
+        // If peers list is empty we need to setup a new babble group, this requires a peers list
+        // which contains this node
+        if (peers.isEmpty()) {
+            peers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + BABBLING_PORT, moniker));
+        }
+
         try {
             mBabbleNode = BabbleNode.createWithConfig(peers, mKeyPair.privateKey, inetAddress, BABBLING_PORT,
                     moniker, new BabbleNodeListeners() {
