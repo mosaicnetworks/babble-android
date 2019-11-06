@@ -1,17 +1,16 @@
 package io.mosaicnetworks.sample;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.StringRes;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-import com.google.gson.Gson;
-
 import java.util.List;
-import java.util.Random;
 
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
@@ -20,8 +19,8 @@ import io.mosaicnetworks.babble.discovery.ResponseListener;
 public class JoinChatActivity extends AppCompatActivity implements ResponseListener {
 
     private ProgressDialog mLoadingDialog;
-    private static final Gson gson = new Gson();
-    private String moniker;
+    private String mMoniker;
+    private HttpPeerDiscoveryRequest mHttpPeerDiscoveryRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,59 +31,91 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
 
     // called when the user presses the join chat button
     public void joinChat(View view) {
-        mLoadingDialog.show();
-
-        //get peer IP address
-        EditText editIP = findViewById(R.id.editText);
-        final String peerIP = editIP.getText().toString();
-        if (peerIP.isEmpty()) {
-            return; //TODO: display alert dialog?
+        //get moniker
+        EditText editText = findViewById(R.id.editMoniker);
+        mMoniker = editText.getText().toString();
+        if (mMoniker.isEmpty()) {
+            displayOkAlertDialog(R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
+            return;
         }
 
-        //get moniker
-        EditText editText = findViewById(R.id.editText2);
-        moniker = editText.getText().toString();
-        if (moniker.isEmpty()) {
-            Random random = new Random();
-            moniker = "AnonymousUser" + random.nextInt(10000); //TODO: check this is a reliable way of getting rand
+        //get peer IP address
+        EditText editIP = findViewById(R.id.editHost);
+        final String peerIP = editIP.getText().toString();
+        if (peerIP.isEmpty()) {
+            displayOkAlertDialog(R.string.no_hostname_alert_title, R.string.no_hostname_alert_message);
+            return;
         }
 
         //get peersJson
-        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest;
         try {
-            httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(peerIP, this);
-
+            mHttpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(peerIP, this);
         } catch (IllegalArgumentException ex) {
-            mLoadingDialog.dismiss();
-            return; //TODO: display alert dialog?
+            displayOkAlertDialog(R.string.invalid_hostname_alert_title, R.string.invalid_hostname_alert_message);
+            return;
         }
-        httpPeerDiscoveryRequest.send();
+        mLoadingDialog.show();
+        mHttpPeerDiscoveryRequest.send();
     }
 
+    @Override
     public void onReceivePeers(List<Peer> peers) {
         MessagingService messagingService = MessagingService.getInstance();
-        messagingService.configure(peers, moniker, Utils.getIPAddr(this));
+        messagingService.configure(peers, mMoniker, Utils.getIPAddr(this));
 
         mLoadingDialog.dismiss();
         Intent intent = new Intent(JoinChatActivity.this, ChatActivity.class);
-        intent.putExtra("MONIKER", moniker);
+        intent.putExtra("MONIKER", mMoniker);
         startActivity(intent);
     }
 
+    @Override
     public void onFailure(io.mosaicnetworks.babble.discovery.ResponseListener.Error error) {
-        //TODO: display alert dialog
-        Log.d("TAG", error.toString());
         mLoadingDialog.dismiss();
+        int messageId;
+        switch (error) {
+            case INVALID_JSON:
+                messageId = R.string.peers_json_error_alert_message;
+                break;
+            case CONNECTION_ERROR:
+                messageId = R.string.peers_connection_error_alert_message;
+                break;
+            case TIMEOUT:
+                messageId = R.string.peers_timeout_error_alert_message;
+                break;
+            default:
+                messageId = R.string.peers_unknown_error_alert_message;
+        }
+        displayOkAlertDialog(R.string.peers_error_alert_title, messageId);
     }
 
-
     private void initLoadingDialog() {
-        //TODO: replace ProgressDialog with ProgressBar
         mLoadingDialog = new ProgressDialog(this);
         mLoadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mLoadingDialog.setTitle("Please wait...");
-        mLoadingDialog.setMessage("Fetching peers list from host");
+        mLoadingDialog.setTitle(R.string.loading_title);
+        mLoadingDialog.setMessage(getString(R.string.loading_message));
         mLoadingDialog.setIndeterminate(true);
         mLoadingDialog.setCanceledOnTouchOutside(false);
+        mLoadingDialog.setCancelable(true);
+        mLoadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
+            @Override
+            public void onCancel(DialogInterface dialog){
+                //TODO: cancel and nullify httpDiscoverRequest - stop memory leak
+            }});
+    }
+
+    private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle(titleId)
+                .setMessage(messageId)
+                .setNeutralButton(R.string.ok_button, null)
+                .create();
+        alertDialog.show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        //TODO: cancel and nullify httpDiscoverRequest - stop memory leak
+        super.onDestroy();
     }
 }

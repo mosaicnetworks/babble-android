@@ -22,26 +22,26 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <EditText
-            android:id="@+id/editText2"
+            android:id="@+id/editMoniker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Moniker"
+            android:hint="@string/moniker"
             android:inputType="textPersonName" />
 
         <EditText
-            android:id="@+id/editText"
+            android:id="@+id/editHost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="192.168.2.1"
-            android:inputType="phone" />
+            android:hint="@string/host"
+            android:inputType="textUri" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/buttonJoin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="joinChat"
-            android:text="Join" />
+            android:text="@string/join" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
