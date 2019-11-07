@@ -1,6 +1,6 @@
 package io.mosaicnetworks.babble.node;
 
-public interface BabbleNodeListeners {
+public interface TxConsumer {
 
     byte[] onReceiveTransactions(byte[][] transactions);
 }
