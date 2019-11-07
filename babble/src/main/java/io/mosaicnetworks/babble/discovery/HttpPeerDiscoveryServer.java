@@ -8,7 +8,6 @@ public final class HttpPeerDiscoveryServer {
 
     private final NanoWrapper mNanoWrapper;
 
-    //TODO: make port behaviour consistent with HttpDiscoveryRequest
     public HttpPeerDiscoveryServer(int port, PeersProvider peersProvider) {
         mNanoWrapper = new NanoWrapper(port, peersProvider);
     }

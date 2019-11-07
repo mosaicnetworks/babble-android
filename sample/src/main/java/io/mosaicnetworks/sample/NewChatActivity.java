@@ -39,6 +39,10 @@ public class NewChatActivity extends AppCompatActivity {
             displayOkAlertDialog(R.string.babble_busy_title, R.string.babble_busy_message);
             return;
         }
+
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("MONIKER", moniker);
+        startActivity(intent);
     }
 
     private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {

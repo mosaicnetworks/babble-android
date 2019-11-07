@@ -13,45 +13,44 @@ public final class BabbleConfig {
 
     public static final class Builder {
 
-        //TODO: change variable names to m prefix
-        private int heartbeat = 100;
-        private boolean store = false;
-        private String logLevel = "error";
-        private int tcpTimeout = 1000;
-        private int maxPool = 2;
-        private int cacheSize = 50000;
-        private int syncLimit = 1000;
-        private boolean enableFastSync = false;
+        private int mHeartbeat = 100;
+        private boolean mStore = false;
+        private String mLogLevel = "error";
+        private int mTcpTimeout = 1000;
+        private int mMaxPool = 2;
+        private int mCacheSize = 50000;
+        private int mSyncLimit = 1000;
+        private boolean mEnableFastSync = false;
 
         public Builder heartbeat(int heartbeat) {
-            this.heartbeat = heartbeat;
+            mHeartbeat = heartbeat;
             return this;
         }
 
         public Builder store(boolean store) {
-            this.store = store;
+            mStore = store;
             return this;
         }
 
         public Builder logLevel(LogLevel logLevel) {
             switch (logLevel) {
                 case DEBUG:
-                    this.logLevel = "debug";
+                    mLogLevel = "debug";
                     break;
                 case INFO:
-                    this.logLevel = "info";
+                    mLogLevel = "info";
                     break;
                 case WARN:
-                    this.logLevel = "warn";
+                    mLogLevel = "warn";
                     break;
                 case ERROR:
-                    this.logLevel = "error";
+                    mLogLevel = "error";
                     break;
                 case FATAL:
-                    this.logLevel = "fatal";
+                    mLogLevel = "fatal";
                     break;
                 case PANIC:
-                    this.logLevel = "panic";
+                    mLogLevel = "panic";
                     break;
             }
 
@@ -59,29 +58,29 @@ public final class BabbleConfig {
         }
 
         public Builder tcpTimeout(int tcpTimeout) {
-            this.tcpTimeout = tcpTimeout;
+            mTcpTimeout = tcpTimeout;
             return this;
         }
 
         public Builder maxPool(int maxPool) {
-            this.maxPool = maxPool;
+            mMaxPool = maxPool;
             return this;
         }
 
         public Builder cacheSize(int cacheSize) {
-            this.cacheSize = cacheSize;
+            mCacheSize = cacheSize;
             return this;
         }
 
         public Builder syncLimit(int syncLimit) {
-            this.syncLimit = syncLimit;
+            mSyncLimit = syncLimit;
             return this;
         }
 
         /*
         //temporarily disable method
         public Builder enableFastSync(boolean enableFastSync) {
-            this.enableFastSync = enableFastSync;
+            mEnableFastSync = enableFastSync;
             return this;
         }
          */
@@ -101,14 +100,14 @@ public final class BabbleConfig {
     public final Boolean enableFastSync;  //enable fast sync
 
     private BabbleConfig(Builder builder) {
-        heartbeat = builder.heartbeat;
-        store = builder.store;
-        logLevel = builder.logLevel;
-        tcpTimeout = builder.tcpTimeout;
-        maxPool = builder.maxPool;
-        cacheSize = builder.cacheSize;
-        syncLimit = builder.syncLimit;
-        enableFastSync = builder.enableFastSync;
+        heartbeat = builder.mHeartbeat;
+        store = builder.mStore;
+        logLevel = builder.mLogLevel;
+        tcpTimeout = builder.mTcpTimeout;
+        maxPool = builder.mMaxPool;
+        cacheSize = builder.mCacheSize;
+        syncLimit = builder.mSyncLimit;
+        enableFastSync = builder.mEnableFastSync;
     }
 
 
