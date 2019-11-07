@@ -7,9 +7,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import io.mosaicnetworks.babble.node.BabbleNodeListeners;
+import io.mosaicnetworks.babble.node.TxConsumer;
 
-public final class BabbleState implements BabbleNodeListeners {
+public final class BabbleState implements TxConsumer {
 
     private static final MessageDigest mSha256Digest;
     private StateObserver mObserver;

@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.BabbleNode;
-import io.mosaicnetworks.babble.node.BabbleNodeListeners;
+import io.mosaicnetworks.babble.node.TxConsumer;
 
 import static org.junit.Assert.*;
 
@@ -45,7 +45,7 @@ public class BabbleNodeTest {
                 "localhost:6666", "camille"));
         String privateKeyHex = "0e63404232a2c096792fcd7e5a8dcf1c5abd2677312aa8492ee86824c02b10d6";
 
-        BabbleNodeListeners listeners = new BabbleNodeListeners() {
+        TxConsumer txConsumer = new TxConsumer() {
 
             @Override
             public byte[] onReceiveTransactions(byte[][] transactions) {
@@ -57,7 +57,7 @@ public class BabbleNodeTest {
         };
 
         BabbleNode babbleNode = BabbleNode.create(peers, privateKeyHex, "localhost",
-                6666, "camille", listeners);
+                6666, "camille", txConsumer);
 
         babbleNode.run();
         babbleNode.submitTx(sendBytes);

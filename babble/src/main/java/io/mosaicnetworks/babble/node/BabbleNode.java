@@ -18,16 +18,15 @@ public final class BabbleNode implements PeersProvider {
     private final Node mNode;
 
     public static BabbleNode create(List<Peer> peers, String privateKeyHex, String inetAddress,
-                                    int port, String moniker, BabbleNodeListeners listeners) {
+                                    int port, String moniker, TxConsumer txConsumer) {
 
-        return createWithConfig(peers, privateKeyHex, inetAddress, port, moniker, listeners,
+        return createWithConfig(peers, privateKeyHex, inetAddress, port, moniker, txConsumer,
                 new BabbleConfig.Builder().build());
     }
 
-    //TODO: rename BabbleNodeListeners to TxConsumer
     public static BabbleNode createWithConfig(List<Peer> peers, String privateKeyHex,
                                               String inetAddress, int port, String moniker,
-                                              final BabbleNodeListeners listeners,
+                                              final TxConsumer txConsumer,
                                               BabbleConfig babbleConfig) {
 
         MobileConfig mobileConfig = new MobileConfig(
@@ -52,7 +51,7 @@ public final class BabbleNode implements PeersProvider {
                         String strJson = new String(blockBytes, Charset.forName("UTF-8"));
                         try {
                             Block block = Block.fromJson(strJson);
-                            return listeners.onReceiveTransactions(block.body.transactions);
+                            return txConsumer.onReceiveTransactions(block.body.transactions);
                         } catch (JsonSyntaxException ex) {
                             return null;
                         }
@@ -99,7 +98,6 @@ public final class BabbleNode implements PeersProvider {
         }
     }
 
-    //TODO: move LeaveResponseListener to BabbleNodeListeners
     public void leave(final LeaveResponseListener listener) {
         if (mNode != null) {
             // this blocks so we'll run in a separate thread
