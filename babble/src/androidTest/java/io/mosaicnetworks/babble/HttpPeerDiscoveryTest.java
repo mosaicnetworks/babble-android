@@ -49,7 +49,7 @@ public class HttpPeerDiscoveryTest {
 
         String host = "localhost";
 
-        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(host, new ResponseListener() {
+        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(host, 8988, new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
                 mRcvPeers = peers;

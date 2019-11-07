@@ -27,7 +27,7 @@ public class MessagingService {
     private HttpPeerDiscoveryServer mHttpPeerDiscoveryServer;
     private KeyPair mKeyPair = new KeyPair();
     private static final int BABBLING_PORT = 6666;
-    private static final int DISCOVERY_PORT = 8988;
+    public static final int DISCOVERY_PORT = 8988;
     private State mState = State.UNCONFIGURED;
 
     public static MessagingService getInstance() {

@@ -49,7 +49,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
 
         //get peersJson
         try {
-            mHttpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(peerIP, this);
+            mHttpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(peerIP, MessagingService.DISCOVERY_PORT, this);
         } catch (IllegalArgumentException ex) {
             displayOkAlertDialog(R.string.invalid_hostname_alert_title, R.string.invalid_hostname_alert_message);
             return;
@@ -63,7 +63,6 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         try {
             MessagingService messagingService = MessagingService.getInstance();
             messagingService.configure(peers, mMoniker, Utils.getIPAddr(this));
-            throw new IllegalStateException();
         } catch (IllegalStateException ex) {
             //we tried to reconfigure before a leave completed
             mLoadingDialog.dismiss();
@@ -71,10 +70,10 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
             return;
         }
 
-        //mLoadingDialog.dismiss();
-        //Intent intent = new Intent(JoinChatActivity.this, ChatActivity.class);
-        //intent.putExtra("MONIKER", mMoniker);
-        //startActivity(intent);
+        mLoadingDialog.dismiss();
+        Intent intent = new Intent(JoinChatActivity.this, ChatActivity.class);
+        intent.putExtra("MONIKER", mMoniker);
+        startActivity(intent);
     }
 
     @Override

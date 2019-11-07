@@ -49,7 +49,7 @@ public class HttpPeerDiscoveryRequestTest {
 
         String host = "localhost";
 
-        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(host, new ResponseListener() {
+        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(host, 8988, new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
             }
@@ -85,7 +85,7 @@ public class HttpPeerDiscoveryRequestTest {
 
         String host = "10.255.255.1"; // should be an unreachable ip address
 
-        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(host, new ResponseListener() {
+        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(host, 8988, new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
             }

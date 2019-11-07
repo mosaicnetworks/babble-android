@@ -23,9 +23,9 @@ public final class HttpPeerDiscoveryRequest {
     private int mConnectTimeout = 0;
     private int mReadTimeout = 0;
 
-    public HttpPeerDiscoveryRequest(String host, ResponseListener responseListener) {
+    public HttpPeerDiscoveryRequest(String host, int port, ResponseListener responseListener) {
         try {
-            mUrl = new URL("http", host, 8988, "/peers");
+            mUrl = new URL("http", host, port, "/peers");
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Invalid host");
         }
