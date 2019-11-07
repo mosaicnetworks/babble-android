@@ -1,24 +1,38 @@
 # build babble core (bbc)
 set -e
 
-babble_core_version=9ad37c8cf79f61a9d40e88e949c6a0f1840e23a7
+BABBLE_CORE_RELEASE_VERSION="0.5.9"
 
-if [ -d jni ]; then rm -rf jni; fi
+mydir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )"
 
-if [ -d build ]; then rm -r build; fi
-mkdir build
-cd build
 
-if [ -z ${GOPATH+x} ]; then 
-    # GOPATH is not set, so we'll use the standard Go tree
-    cp ~/go/src/github.com/mosaicnetworks/babble/src/mobile/build/${babble_core_version}/mobile.aar .
-else 
-    cp ${GOPATH}/src/github.com/mosaicnetworks/babble/src/mobile/build/${babble_core_version}/mobile.aar .
+# Create tmp working sub directory
+if [ -d "${mydir}/tmp" ] ; then
+    rm -rf "${mydir}/tmp"
+fi
+mkdir -p "${mydir}/tmp"
+
+# Get released library
+RELEASE_ZIP="https://github.com/mosaicnetworks/babble/releases/download/v${BABBLE_CORE_RELEASE_VERSION}/babble_${BABBLE_CORE_RELEASE_VERSION}_android_library.zip"
+
+wget -q -O ${mydir}/tmp/babble.zip "$RELEASE_ZIP" 
+ret=$?
+
+if [ $ret -ne 0 ] ; then
+    echo "Failed to download release $RELEASE_ZIP"
 fi
 
-unzip mobile.aar -d mobile.aar.unzip
-cd ..
-cp build/mobile.aar.unzip/classes.jar .
-cp -r build/mobile.aar.unzip/jni .
+# unzip into the tmp folder
+unzip ${mydir}/tmp/babble.zip -d ${mydir}/tmp
 
-rm -r build
+if [ -d "${mydir}/jni" ]; then rm -rf "${mydir}/jni"; fi
+
+cd "${mydir}/tmp"
+
+unzip babble_${BABBLE_CORE_RELEASE_VERSION}_mobile.aar -d unzip
+
+cd ${mydir}
+cp tmp/unzip/classes.jar .
+cp -r tmp/unzip/jni .
+
+rm -rf tmp
