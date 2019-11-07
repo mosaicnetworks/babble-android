@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Your name"
+            android:hint="@string/moniker"
             android:inputType="textPersonName" />
 
         <Button
@@ -34,6 +34,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="startChat"
-            android:text="Start" />
+            android:text="@string/start" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

@@ -1,6 +1,8 @@
 package io.mosaicnetworks.sample;
 
 import android.content.Intent;
+import android.support.annotation.StringRes;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -25,15 +27,26 @@ public class NewChatActivity extends AppCompatActivity {
         EditText editText = findViewById(R.id.editText);
         String moniker = editText.getText().toString();
         if (moniker.isEmpty()) {
-            Random random = new Random();
-            moniker = "AnonymousUser" + random.nextInt(10000);
+            displayOkAlertDialog(R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
+            return;
         }
 
-        MessagingService messagingService = MessagingService.getInstance();
-        messagingService.configure(new ArrayList<Peer>(), moniker, Utils.getIPAddr(this));
+        try {
+            MessagingService messagingService = MessagingService.getInstance();
+            messagingService.configure(new ArrayList<Peer>(), moniker, Utils.getIPAddr(this));
+        } catch (IllegalStateException ex) {
+            //we tried to reconfigure before a leave completed
+            displayOkAlertDialog(R.string.babble_busy_title, R.string.babble_busy_message);
+            return;
+        }
+    }
 
-        Intent intent = new Intent(this, ChatActivity.class);
-        intent.putExtra("MONIKER", moniker);
-        startActivity(intent);
+    private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle(titleId)
+                .setMessage(messageId)
+                .setNeutralButton(R.string.ok_button, null)
+                .create();
+        alertDialog.show();
     }
 }

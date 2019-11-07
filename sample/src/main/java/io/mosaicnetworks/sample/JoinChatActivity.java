@@ -60,13 +60,21 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
 
     @Override
     public void onReceivePeers(List<Peer> peers) {
-        MessagingService messagingService = MessagingService.getInstance();
-        messagingService.configure(peers, mMoniker, Utils.getIPAddr(this));
+        try {
+            MessagingService messagingService = MessagingService.getInstance();
+            messagingService.configure(peers, mMoniker, Utils.getIPAddr(this));
+            throw new IllegalStateException();
+        } catch (IllegalStateException ex) {
+            //we tried to reconfigure before a leave completed
+            mLoadingDialog.dismiss();
+            displayOkAlertDialog(R.string.babble_busy_title, R.string.babble_busy_message);
+            return;
+        }
 
-        mLoadingDialog.dismiss();
-        Intent intent = new Intent(JoinChatActivity.this, ChatActivity.class);
-        intent.putExtra("MONIKER", mMoniker);
-        startActivity(intent);
+        //mLoadingDialog.dismiss();
+        //Intent intent = new Intent(JoinChatActivity.this, ChatActivity.class);
+        //intent.putExtra("MONIKER", mMoniker);
+        //startActivity(intent);
     }
 
     @Override

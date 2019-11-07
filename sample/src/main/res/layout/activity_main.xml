@@ -26,13 +26,13 @@ tools:context=".MainActivity">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="newChat"
-            android:text="New" />
+            android:text="@string/new_chat" />
 
         <Button
             android:id="@+id/button4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="joinChat"
-            android:text="Join" />
+            android:text="@string/join" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
