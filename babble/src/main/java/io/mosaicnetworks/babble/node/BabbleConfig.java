@@ -21,7 +21,7 @@ public final class BabbleConfig {
         private int maxPool = 2;
         private int cacheSize = 50000;
         private int syncLimit = 1000;
-        private boolean enableFastSync = true;
+        private boolean enableFastSync = false;
 
         public Builder heartbeat(int heartbeat) {
             this.heartbeat = heartbeat;
@@ -78,10 +78,13 @@ public final class BabbleConfig {
             return this;
         }
 
+        /*
+        //temporarily disable method
         public Builder enableFastSync(boolean enableFastSync) {
             this.enableFastSync = enableFastSync;
             return this;
         }
+         */
 
         public BabbleConfig build() {
             return new BabbleConfig(this);
