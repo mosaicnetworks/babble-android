@@ -64,6 +64,7 @@ public class MessagingService {
         } catch (IllegalArgumentException ex) {
             //The reassignment of mState and mBabbleNode has failed, so leave them as before
             //TODO: need to catch port in use exception (IOException) and throw others
+            throw new RuntimeException(ex);
         }
 
         mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(inetAddress, DISCOVERY_PORT, mBabbleNode);
