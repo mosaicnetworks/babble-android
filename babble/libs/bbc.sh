@@ -34,5 +34,6 @@ unzip babble_${BABBLE_CORE_RELEASE_VERSION}_mobile.aar -d unzip
 cd ${mydir}
 cp tmp/unzip/classes.jar .
 cp -r tmp/unzip/jni .
+[[ -e tmp/git.version ]] && cp tmp/git.version .
 
 rm -rf tmp
