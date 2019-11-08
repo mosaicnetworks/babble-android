@@ -15,6 +15,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Requests a list of peers from a remote device. The peers list can be passed to the BabbleNode
+ * constructor. The complement class, HttpPeerDiscoveryServer, can be used on the remote device
+ * to service the request.
+ */
 public final class HttpPeerDiscoveryRequest {
 
     private final URL mUrl;
@@ -23,6 +28,14 @@ public final class HttpPeerDiscoveryRequest {
     private int mConnectTimeout = 0;
     private int mReadTimeout = 0;
 
+    /**
+     * Creates a request but does not send it.
+     * @param host the hostname of the device to connect to
+     * @param port the port number on the host
+     * @param responseListener the response listener is either notified of any errors or is passed a
+     *                         peers list
+     * @throws IllegalArgumentException if the host is not valid as determined by java.net.URL
+     */
     public HttpPeerDiscoveryRequest(String host, int port, ResponseListener responseListener) {
         try {
             mUrl = new URL("http", host, port, "/peers");
@@ -34,14 +47,28 @@ public final class HttpPeerDiscoveryRequest {
         mRequestTask = new RequestTask();
     }
 
+    /**
+     * Set the connect timeout
+     * @param timeout connect timeout in milliseconds
+     */
     public void setConnectTimeout(int timeout) {
         mConnectTimeout = timeout;
     }
 
+    /**
+     * Set the read timeout
+     * @param timeout read timeout in milliseconds
+     */
     public void setReadTimeout(int timeout) {
         mReadTimeout = timeout;
     }
 
+    //TODO: do use asynctask
+    /**
+     * Send the request. This is an asynchronous call, the response listener passed via the
+     * constructor will be notified of any failures or will receive a peers list. The response
+     * listener is called on the main (UI) thread.
+     */
     public void send() {
         mRequestTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }

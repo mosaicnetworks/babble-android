@@ -4,26 +4,47 @@ import java.io.IOException;
 
 import fi.iki.elonen.NanoHTTPD;
 
+/**
+ * An HttpPeerDiscoveryServer serves a list of peers. The complementary HttpPeersDiscoveryRequest
+ * class can be used to request peers from this server. The server obtains the list of peers via
+ * a PeersProvider which is passed in the constructor
+ */
 public final class HttpPeerDiscoveryServer {
 
     private final NanoWrapper mNanoWrapper;
 
+    /**
+     * Constructs the server on given port.
+     * @param port the port number on which to serve
+     * @param peersProvider provides a method for obtaining the list of peers (the BabbleNode class
+     *                      implements this interface so it can be used as a provider)
+     */
     public HttpPeerDiscoveryServer(int port, PeersProvider peersProvider) {
         mNanoWrapper = new NanoWrapper(port, peersProvider);
     }
 
+    /**
+     * Constructs the server on given hostname and port
+     * @param hostname the hostname of the interface to bind to
+     * @param port the port number on which to serve
+     * @param peersProvider provides a method for obtaining the list of peers (the BabbleNode class
+     *                      implements this interface so it can be used as a provider)
+     */
     public HttpPeerDiscoveryServer(String hostname, int port, PeersProvider peersProvider) {
         mNanoWrapper = new NanoWrapper(hostname, port, peersProvider);
     }
 
-    /***
-     *
-     * @throws IOException if the socket is in use.
+    /**
+     * Start serving
+     * @throws IOException if the socket is in use or it cannot bind to the interface.
      */
     public void start() throws IOException {
         mNanoWrapper.start();
     }
 
+    /**
+     * Stop serving
+     */
     public void stop() {
         mNanoWrapper.stop();
     }
