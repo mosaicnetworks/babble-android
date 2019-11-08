@@ -63,7 +63,7 @@ public final class HttpPeerDiscoveryRequest {
         mReadTimeout = timeout;
     }
 
-    //TODO: do use asynctask
+    //TODO: don't use asynctask
     /**
      * Send the request. This is an asynchronous call, the response listener passed via the
      * constructor will be notified of any failures or will receive a peers list. The response
