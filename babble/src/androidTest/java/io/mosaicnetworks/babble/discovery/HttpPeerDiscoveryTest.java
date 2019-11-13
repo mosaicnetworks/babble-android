@@ -1,4 +1,4 @@
-package io.mosaicnetworks.babble;
+package io.mosaicnetworks.babble.discovery;
 
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
