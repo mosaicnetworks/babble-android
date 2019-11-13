@@ -1,4 +1,4 @@
-package io.mosaicnetworks.babble;
+package io.mosaicnetworks.babble.node;
 
 import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
