@@ -22,6 +22,7 @@ public class MessagingService {
 
     private static MessagingService instance;
     private List<MessageObserver> mObservers = new ArrayList<>();
+    private List<StoppedObserver> mStoppedObservers = new ArrayList<>();
     private BabbleState mBabbleState;
     private BabbleNode mBabbleNode;
     private HttpPeerDiscoveryServer mHttpPeerDiscoveryServer;
@@ -100,6 +101,7 @@ public class MessagingService {
             public void onSuccess() {
                 mBabbleNode=null;
                 mState = State.UNCONFIGURED;
+                notifyStoppedObservers();
             }
         });
     }
@@ -128,6 +130,22 @@ public class MessagingService {
     private void notifyObservers(Message message) {
         for (MessageObserver observer: mObservers) {
             observer.onMessageReceived(message);
+        }
+    }
+
+    public void registerStoppedObserver(StoppedObserver stoppedObserver) {
+        if (!mStoppedObservers.contains(stoppedObserver)) {
+            mStoppedObservers.add(stoppedObserver);
+        }
+    }
+
+    public void removeStoppedObserver(StoppedObserver stoppedObserver) {
+        mStoppedObservers.remove(stoppedObserver);
+    }
+
+    private void notifyStoppedObservers() {
+        for (StoppedObserver observer: mStoppedObservers) {
+            observer.onServiceStopped();
         }
     }
 }

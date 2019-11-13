@@ -25,7 +25,6 @@ public class ChatActivity extends AppCompatActivity implements MessageObserver {
 
         initialiseAdapter();
         mMessagingService.registerObserver(this);
-        mMessagingService.start();
 
         if (mMessagingService.getState()!=MessagingService.State.RUNNING_WITH_DISCOVERY) {
             Toast.makeText(this, "Unable to advertise peers", Toast.LENGTH_LONG).show();
@@ -61,7 +60,6 @@ public class ChatActivity extends AppCompatActivity implements MessageObserver {
 
     @Override
     protected void onDestroy() {
-        mMessagingService.stop();
         mMessagingService.removeObserver(this);
 
         super.onDestroy();
