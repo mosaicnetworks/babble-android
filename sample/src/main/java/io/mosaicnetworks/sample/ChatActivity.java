@@ -59,6 +59,12 @@ public class ChatActivity extends AppCompatActivity implements MessageObserver {
     };
 
     @Override
+    public void onBackPressed() {
+        mMessagingService.stop();
+        super.onBackPressed();
+    }
+
+    @Override
     protected void onDestroy() {
         mMessagingService.removeObserver(this);
 

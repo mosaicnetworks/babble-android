@@ -64,15 +64,15 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
     }
 
     @Override
-    public void onReceivePeers(final List<Peer> peers) {
-        mDiscoveredPeers = peers;
-        mPeersLoadingDialog.dismiss();
+    public void onReceivePeers(List<Peer> peers) {
+        MessagingService messagingService = MessagingService.getInstance();
 
-        MessagingService.State serviceState = mMessagingService.getState();
-        if (serviceState == MessagingService.State.RUNNING || serviceState == MessagingService.State.RUNNING_WITH_DISCOVERY) {
-            mServiceStoppingDialog.show();
-            mMessagingService.registerStoppedObserver(this);
-            mMessagingService.stop();
+        try {
+            messagingService.configure(peers, mMoniker, Utils.getIPAddr(this));
+        } catch (IllegalStateException ex) {
+            //we tried to reconfigure before a leave completed
+            mLoadingDialog.dismiss();
+            displayOkAlertDialog(R.string.babble_busy_title, R.string.babble_busy_message);
             return;
         }
         joinChat();
@@ -91,9 +91,8 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         
     }
 
-    private void joinChat() {
-        mMessagingService.configure(mDiscoveredPeers, mMoniker, Utils.getIPAddr(this));
-        mMessagingService.start();
+        mLoadingDialog.dismiss();
+        messagingService.start();
         Intent intent = new Intent(JoinChatActivity.this, ChatActivity.class);
         intent.putExtra("MONIKER", mMoniker);
         startActivity(intent);
@@ -145,7 +144,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         mServiceStoppingDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
-                mMessagingService.removeStoppedObserver(JoinChatActivity.this);
+                ////TODO: cancel httpDiscoverRequest - the callback will still run
             }});
     }
 
@@ -160,8 +159,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
 
     @Override
     protected void onDestroy() {
-        mMessagingService.removeStoppedObserver(this);
-        //TODO: cancel httpDiscoverRequest - stop memory leak + potential crash when the callback runs
+        ////TODO: cancel httpDiscoverRequest - stop memory leak (if screen rotated etc) + potential crash when the callback runs
         super.onDestroy();
     }
 }

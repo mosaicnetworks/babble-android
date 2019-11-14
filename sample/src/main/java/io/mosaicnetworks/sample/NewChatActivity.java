@@ -37,11 +37,12 @@ public class NewChatActivity extends AppCompatActivity implements StoppedObserve
             return;
         }
 
-        MessagingService.State serviceState = mMessagingService.getState();
-        if (serviceState == MessagingService.State.RUNNING || serviceState == MessagingService.State.RUNNING_WITH_DISCOVERY) {
-            mServiceStoppingDialog.show();
-            mMessagingService.registerStoppedObserver(this);
-            mMessagingService.stop();
+        MessagingService messagingService = MessagingService.getInstance();
+        try {
+            messagingService.configure(new ArrayList<Peer>(), moniker, Utils.getIPAddr(this));
+        } catch (IllegalStateException ex) {
+            //we tried to reconfigure before a leave completed
+            displayOkAlertDialog(R.string.babble_busy_title, R.string.babble_busy_message);
             return;
         }
         joinChat();
@@ -60,9 +61,7 @@ public class NewChatActivity extends AppCompatActivity implements StoppedObserve
 
     }
 
-    private void joinChat() {
-        mMessagingService.configure(new ArrayList<Peer>(), mMoniker, Utils.getIPAddr(this));
-        mMessagingService.start();
+        messagingService.start();
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("MONIKER", mMoniker);
         startActivity(intent);
