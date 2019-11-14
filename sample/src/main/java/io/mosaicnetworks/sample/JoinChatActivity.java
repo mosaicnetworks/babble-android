@@ -60,8 +60,9 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
 
     @Override
     public void onReceivePeers(List<Peer> peers) {
+        MessagingService messagingService = MessagingService.getInstance();
+
         try {
-            MessagingService messagingService = MessagingService.getInstance();
             messagingService.configure(peers, mMoniker, Utils.getIPAddr(this));
         } catch (IllegalStateException ex) {
             //we tried to reconfigure before a leave completed
@@ -71,6 +72,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         }
 
         mLoadingDialog.dismiss();
+        messagingService.start();
         Intent intent = new Intent(JoinChatActivity.this, ChatActivity.class);
         intent.putExtra("MONIKER", mMoniker);
         startActivity(intent);
@@ -107,7 +109,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         mLoadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
-                //TODO: cancel and nullify httpDiscoverRequest - stop memory leak
+                ////TODO: cancel httpDiscoverRequest - the callback will still run
             }});
     }
 
@@ -122,7 +124,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
 
     @Override
     protected void onDestroy() {
-        //TODO: cancel and nullify httpDiscoverRequest - stop memory leak
+        ////TODO: cancel httpDiscoverRequest - stop memory leak (if screen rotated etc) + potential crash when the callback runs
         super.onDestroy();
     }
 }

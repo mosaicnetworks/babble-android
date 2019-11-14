@@ -31,8 +31,8 @@ public class NewChatActivity extends AppCompatActivity {
             return;
         }
 
+        MessagingService messagingService = MessagingService.getInstance();
         try {
-            MessagingService messagingService = MessagingService.getInstance();
             messagingService.configure(new ArrayList<Peer>(), moniker, Utils.getIPAddr(this));
         } catch (IllegalStateException ex) {
             //we tried to reconfigure before a leave completed
@@ -40,6 +40,7 @@ public class NewChatActivity extends AppCompatActivity {
             return;
         }
 
+        messagingService.start();
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("MONIKER", moniker);
         startActivity(intent);
