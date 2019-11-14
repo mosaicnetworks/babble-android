@@ -19,8 +19,6 @@
     <string name="peers_unknown_error_alert_message">Unknown error</string>
     <string name="loading_title">Please wait...</string>
     <string name="loading_message">Fetching peers list from host</string>
-    <string name="stopping_title">Please wait...</string>
-    <string name="stopping_message">Stopping previous chat</string>
     <string name="ok_button">OK</string>
     <string name="babble_busy_title">Babble node busy</string>
     <string name="babble_busy_message">Please try again in a few seconds!</string>

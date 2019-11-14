@@ -7,7 +7,6 @@ import android.support.annotation.StringRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -17,21 +16,17 @@ import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 
-public class JoinChatActivity extends AppCompatActivity implements ResponseListener, StoppedObserver {
+public class JoinChatActivity extends AppCompatActivity implements ResponseListener {
 
-    private ProgressDialog mPeersLoadingDialog;
-    private ProgressDialog mServiceStoppingDialog;
+    private ProgressDialog mLoadingDialog;
     private String mMoniker;
     private HttpPeerDiscoveryRequest mHttpPeerDiscoveryRequest;
-    private final MessagingService mMessagingService = MessagingService.getInstance();
-    private List<Peer> mDiscoveredPeers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join_chat);
-        initPeersLoadingDialog();
-        initServiceStoppingDialog();
+        initLoadingDialog();
     }
 
     // called when the user presses the join chat button
@@ -59,7 +54,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
             displayOkAlertDialog(R.string.invalid_hostname_alert_title, R.string.invalid_hostname_alert_message);
             return;
         }
-        mPeersLoadingDialog.show();
+        mLoadingDialog.show();
         mHttpPeerDiscoveryRequest.send();
     }
 
@@ -75,21 +70,6 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
             displayOkAlertDialog(R.string.babble_busy_title, R.string.babble_busy_message);
             return;
         }
-        joinChat();
-    }
-    
-    @Override
-    public void onServiceStopped() {
-        mMessagingService.removeStoppedObserver(this);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mServiceStoppingDialog.dismiss();
-                joinChat();
-            }
-        });
-        
-    }
 
         mLoadingDialog.dismiss();
         messagingService.start();
@@ -100,7 +80,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
 
     @Override
     public void onFailure(io.mosaicnetworks.babble.discovery.ResponseListener.Error error) {
-        mPeersLoadingDialog.dismiss();
+        mLoadingDialog.dismiss();
         int messageId;
         switch (error) {
             case INVALID_JSON:
@@ -118,30 +98,15 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         displayOkAlertDialog(R.string.peers_error_alert_title, messageId);
     }
 
-    private void initPeersLoadingDialog() {
-        mPeersLoadingDialog = new ProgressDialog(this);
-        mPeersLoadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mPeersLoadingDialog.setTitle(R.string.loading_title);
-        mPeersLoadingDialog.setMessage(getString(R.string.loading_message));
-        mPeersLoadingDialog.setIndeterminate(true);
-        mPeersLoadingDialog.setCanceledOnTouchOutside(false);
-        mPeersLoadingDialog.setCancelable(true);
-        mPeersLoadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
-            @Override
-            public void onCancel(DialogInterface dialog){
-                //TODO: cancel httpDiscoverRequest - the callback will still run
-            }});
-    }
-
-    private void initServiceStoppingDialog() {
-        mServiceStoppingDialog = new ProgressDialog(this);
-        mServiceStoppingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mServiceStoppingDialog.setTitle(R.string.stopping_title);
-        mServiceStoppingDialog.setMessage(getString(R.string.stopping_message));
-        mServiceStoppingDialog.setIndeterminate(true);
-        mServiceStoppingDialog.setCanceledOnTouchOutside(false);
-        mServiceStoppingDialog.setCancelable(true);
-        mServiceStoppingDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
+    private void initLoadingDialog() {
+        mLoadingDialog = new ProgressDialog(this);
+        mLoadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mLoadingDialog.setTitle(R.string.loading_title);
+        mLoadingDialog.setMessage(getString(R.string.loading_message));
+        mLoadingDialog.setIndeterminate(true);
+        mLoadingDialog.setCanceledOnTouchOutside(false);
+        mLoadingDialog.setCancelable(true);
+        mLoadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
                 ////TODO: cancel httpDiscoverRequest - the callback will still run
