@@ -33,7 +33,7 @@ public class NewChatActivity extends AppCompatActivity {
 
         MessagingService messagingService = MessagingService.getInstance();
         try {
-            messagingService.configure(new ArrayList<Peer>(), moniker, Utils.getIPAddr(this));
+            messagingService.configureNew(moniker, Utils.getIPAddr(this));
         } catch (IllegalStateException ex) {
             //we tried to reconfigure before a leave completed
             displayOkAlertDialog(R.string.babble_busy_title, R.string.babble_busy_message);

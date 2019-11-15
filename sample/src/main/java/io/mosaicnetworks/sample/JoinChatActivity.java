@@ -20,7 +20,9 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
 
     private ProgressDialog mLoadingDialog;
     private String mMoniker;
-    private HttpPeerDiscoveryRequest mHttpPeerDiscoveryRequest;
+    private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
+    private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
+    private List<Peer> mGenesisPeers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,23 +49,45 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
             return;
         }
 
-        //get peersJson
+        getPeers(peerIP);
+    }
+
+    private void getPeers(final String peerIP) {
         try {
-            mHttpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(peerIP, MessagingService.DISCOVERY_PORT, this);
+            mHttpGenesisPeerDiscoveryRequest = HttpPeerDiscoveryRequest.createGenesisPeersRequest(peerIP,
+                    MessagingService.DISCOVERY_PORT, new ResponseListener() {
+                        @Override
+                        public void onReceivePeers(List<Peer> genesisPeers) {
+                            mGenesisPeers = genesisPeers;
+
+                            mHttpCurrentPeerDiscoveryRequest =
+                                    HttpPeerDiscoveryRequest.createCurrentPeersRequest(
+                                            peerIP, MessagingService.DISCOVERY_PORT,
+                                            JoinChatActivity.this, JoinChatActivity.this);
+
+                            mHttpCurrentPeerDiscoveryRequest.send();
+                        }
+
+                        @Override
+                        public void onFailure(Error error) {
+                            JoinChatActivity.this.onFailure(error);
+                        }
+                    }, this);
         } catch (IllegalArgumentException ex) {
             displayOkAlertDialog(R.string.invalid_hostname_alert_title, R.string.invalid_hostname_alert_message);
             return;
         }
+
         mLoadingDialog.show();
-        mHttpPeerDiscoveryRequest.send();
+        mHttpGenesisPeerDiscoveryRequest.send();
     }
 
     @Override
-    public void onReceivePeers(List<Peer> peers) {
+    public void onReceivePeers(List<Peer> currentPeers) {
         MessagingService messagingService = MessagingService.getInstance();
 
         try {
-            messagingService.configure(peers, mMoniker, Utils.getIPAddr(this));
+            messagingService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(this));
         } catch (IllegalStateException ex) {
             //we tried to reconfigure before a leave completed
             mLoadingDialog.dismiss();
@@ -109,7 +133,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         mLoadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
-                ////TODO: cancel httpDiscoverRequest - the callback will still run
+                cancelRequets();
             }});
     }
 
@@ -122,9 +146,20 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         alertDialog.show();
     }
 
+    private void cancelRequets() {
+        if (mHttpCurrentPeerDiscoveryRequest!=null) {
+            mHttpCurrentPeerDiscoveryRequest.cancel();
+        }
+
+        if (mHttpGenesisPeerDiscoveryRequest!=null) {
+            mHttpGenesisPeerDiscoveryRequest.cancel();
+        }
+    }
+
     @Override
     protected void onDestroy() {
-        ////TODO: cancel httpDiscoverRequest - stop memory leak (if screen rotated etc) + potential crash when the callback runs
+        cancelRequets();
         super.onDestroy();
     }
+
 }

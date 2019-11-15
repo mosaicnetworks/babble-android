@@ -20,7 +20,7 @@ public class MessagingServiceTest {
 
     private Message rcvdMessage;
     @Test
-    public void submitTxTest() throws InterruptedException{
+    public void configureNewTest() throws InterruptedException{
 
         final CountDownLatch lock = new CountDownLatch(1);
         Message sentMessage = new Message("hello", "alice");
@@ -34,8 +34,7 @@ public class MessagingServiceTest {
             }
         });
 
-        List<Peer> peers = new ArrayList<>();
-        messagingService.configure(peers, "alice", "localhost");
+        messagingService.configureNew("alice", "localhost");
         messagingService.start();
         messagingService.submitMessage(sentMessage);
         lock.await(3000, TimeUnit.MILLISECONDS);

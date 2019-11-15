@@ -39,6 +39,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.nanohttpd:nanohttpd:2.2.0'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    implementation 'com.android.volley:volley:1.1.1'
     implementation files('libs/classes.jar')
 }
 

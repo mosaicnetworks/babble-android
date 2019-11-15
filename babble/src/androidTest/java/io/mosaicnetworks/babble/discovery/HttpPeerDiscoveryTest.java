@@ -1,5 +1,7 @@
 package io.mosaicnetworks.babble.discovery;
 
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -33,13 +35,19 @@ public class HttpPeerDiscoveryTest {
     public void integrationTest() throws IOException, InterruptedException {
 
         final CountDownLatch lock = new CountDownLatch(1);
+        final Context appContext = InstrumentationRegistry.getTargetContext();
 
         class MockPeersProvider implements PeersProvider {
 
             final String peersJSON = "[{\"NetAddr\":\"localhost:6666\",\"PubKeyHex\":\"0X04362B55F78A2614DC1B5FD3AC90A3162E213CC0F07925AC99E420722CDF3C656AE7BB88A0FEDF01DDD8669E159F9DC20CC5F253AC11F8B5AC2E10A30D0654873B\",\"Moniker\":\"mosaic\"}]\n";
 
             @Override
-            public String getPeers() {
+            public String getGenesisPeers() {
+                return peersJSON;
+            }
+
+            @Override
+            public String getCurrentPeers() {
                 return peersJSON;
             }
         }
@@ -49,7 +57,8 @@ public class HttpPeerDiscoveryTest {
 
         String host = "localhost";
 
-        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(host, 8988, new ResponseListener() {
+        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest =
+                HttpPeerDiscoveryRequest.createCurrentPeersRequest(host, 8988, new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
                 mRcvPeers = peers;
@@ -60,7 +69,7 @@ public class HttpPeerDiscoveryTest {
             public void onFailure(Error error) {
                 lock.countDown();
             }
-        });
+        }, appContext);
 
         httpPeerDiscoveryRequest.send();
 

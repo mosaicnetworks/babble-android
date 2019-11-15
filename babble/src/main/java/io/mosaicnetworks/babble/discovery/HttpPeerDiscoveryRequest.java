@@ -1,133 +1,94 @@
 package io.mosaicnetworks.babble.discovery;
 
-import android.os.AsyncTask;
+import android.content.Context;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-/**
- * Requests a list of peers from a remote device. The peers list can be passed to the BabbleNode
- * constructor. The complement class, HttpPeerDiscoveryServer, can be used on the remote device
- * to service the request.
- */
 public final class HttpPeerDiscoveryRequest {
 
-    private final URL mUrl;
-    private final ResponseListener mResponseListener;
-    private final RequestTask mRequestTask;
-    private int mConnectTimeout = 0;
-    private int mReadTimeout = 0;
+    public static HttpPeerDiscoveryRequest createGenesisPeersRequest(String host, int port,
+                                                                final ResponseListener responseListener,
+                                                                Context context) {
 
-    /**
-     * Creates a request but does not send it.
-     * @param host the hostname of the device to connect to
-     * @param port the port number on the host
-     * @param responseListener the response listener is either notified of any errors or is passed a
-     *                         peers list
-     * @throws IllegalArgumentException if the host is not valid as determined by java.net.URL
-     */
-    public HttpPeerDiscoveryRequest(String host, int port, ResponseListener responseListener) {
+        return createPeersRequest("/genesis-peers", host, port, responseListener, context);
+    }
+
+    public static HttpPeerDiscoveryRequest createCurrentPeersRequest(String host, int port,
+                                                                     final ResponseListener responseListener,
+                                                                     Context context) {
+
+        return createPeersRequest("/current-peers", host, port, responseListener, context);
+    }
+
+    private static HttpPeerDiscoveryRequest createPeersRequest(String file, String host, int port,
+                                                          final ResponseListener responseListener,
+                                                          Context context) {
+
+        URL url;
+
         try {
-            mUrl = new URL("http", host, port, "/peers");
+            url = new URL("http", host, port, file);
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Invalid host");
         }
 
-        mResponseListener = responseListener;
-        mRequestTask = new RequestTask();
-    }
+        final RequestQueue queue = Volley.newRequestQueue(context.getApplicationContext());
 
-    /**
-     * Set the connect timeout
-     * @param timeout connect timeout in milliseconds
-     */
-    public void setConnectTimeout(int timeout) {
-        mConnectTimeout = timeout;
-    }
+        StringRequest request = new StringRequest(Request.Method.GET, url.toString(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
 
-    /**
-     * Set the read timeout
-     * @param timeout read timeout in milliseconds
-     */
-    public void setReadTimeout(int timeout) {
-        mReadTimeout = timeout;
-    }
+                        //TODO: move this off the UI thread
+                        Gson gson = new Gson();
+                        Peer[] peers = gson.fromJson(response, Peer[].class);
 
-    //TODO: don't use asynctask
-    /**
-     * Send the request. This is an asynchronous call, the response listener passed via the
-     * constructor will be notified of any failures or will receive a peers list. The response
-     * listener is called on the main (UI) thread.
-     */
-    public void send() {
-        mRequestTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
-    private class RequestTask extends AsyncTask<Void, Void, Peer[]> {
-
-        ResponseListener.Error error;
-
-        @Override
-        protected Peer[] doInBackground(Void... params) {
-
-            HttpURLConnection httpURLConnection;
-
-            try {
-
-                httpURLConnection = (HttpURLConnection) mUrl.openConnection();
-                httpURLConnection.setConnectTimeout(mConnectTimeout);
-                httpURLConnection.setReadTimeout(mReadTimeout);
-
-                try (BufferedReader bufRd = new BufferedReader(new InputStreamReader(
-                        httpURLConnection.getInputStream()))) {
-
-                    StringBuilder stringBuilder = new StringBuilder();
-
-                    String resp;
-                    while ((resp = bufRd.readLine()) != null) {
-                        stringBuilder.append(resp);
+                        queue.stop();
+                        responseListener.onReceivePeers(new ArrayList<>(Arrays.asList(peers)));
                     }
-
-                    String response = stringBuilder.toString().trim();
-
-                    Gson gson = new Gson();
-                    Peer[] peers = gson.fromJson(response, Peer[].class);
-
-                    return peers;
-
-                } catch (SocketTimeoutException e) {
-                    error = ResponseListener.Error.TIMEOUT;
-                } catch (IOException e) {
-                    error = ResponseListener.Error.CONNECTION_ERROR;
-                } catch (JsonSyntaxException | IllegalStateException e) {
-                    error = ResponseListener.Error.INVALID_JSON;
-                }
-
-            } catch (IOException e) {
-                error = ResponseListener.Error.CONNECTION_ERROR;
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //TODO: error handling
+                queue.stop();
+                responseListener.onFailure(ResponseListener.Error.CONNECTION_ERROR);
             }
+        });
 
-            return null;
-        }
+        return new HttpPeerDiscoveryRequest(queue, request);
+    }
 
-        @Override
-        protected void onPostExecute(Peer[] result) {
-            if (result != null){
-                mResponseListener.onReceivePeers(new ArrayList<Peer>(Arrays.asList(result)));
-            } else {
-                mResponseListener.onFailure(error);
-            }
-        }
+    private final RequestQueue mQueue;
+    private final StringRequest mRequest;
+
+    private HttpPeerDiscoveryRequest(RequestQueue queue, StringRequest request) {
+        mQueue = queue;
+        mRequest = request;
+    }
+
+    public void setRetryPolicy(int timeoutMs, int maxNumRetries, float backoffMultiplier) {
+        mRequest.setRetryPolicy(new DefaultRetryPolicy(timeoutMs, maxNumRetries, backoffMultiplier));
+    }
+
+    public void send() {
+        mQueue.add(mRequest);
+    }
+
+    public void cancel() {
+        mRequest.cancel();
+        mQueue.stop();
     }
 
 }

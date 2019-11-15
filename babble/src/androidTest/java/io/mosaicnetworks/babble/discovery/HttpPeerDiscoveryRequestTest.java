@@ -1,5 +1,7 @@
 package io.mosaicnetworks.babble.discovery;
 
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.GrantPermissionRule;
 
 import org.junit.Rule;
@@ -22,64 +24,72 @@ public class HttpPeerDiscoveryRequestTest {
             android.Manifest.permission.INTERNET);
 
     private ResponseListener.Error mError;
+    private List<Peer> mRcvPeers;
 
     @Test
-    public void requestReadTimeoutTest() throws IOException, InterruptedException {
+    public void requestCurrentPeersTest() throws IOException, InterruptedException {
 
-        final int serverResponseDelay = 2000;
-        final int requestReadTimeout = 100;
-        final int testTimeout = 3000;
-
+        final Context appContext = InstrumentationRegistry.getTargetContext();
         final CountDownLatch lock = new CountDownLatch(1);
         final String peersJSON = "[{\"NetAddr\":\"localhost:6666\",\"PubKeyHex\":\"0X04362B55F78A2614DC1B5FD3AC90A3162E213CC0F07925AC99E420722CDF3C656AE7BB88A0FEDF01DDD8669E159F9DC20CC5F253AC11F8B5AC2E10A30D0654873B\",\"Moniker\":\"mosaic\"}]\n";
 
         class PeersGet implements PeersProvider {
             @Override
-            public String getPeers() {
+            public String getGenesisPeers() {
+                return peersJSON;
+            }
+
+            @Override
+            public String getCurrentPeers() {
                 return peersJSON;
             }
         }
 
-        MockHttpPeerDiscoveryServer mockHttpPeerDiscoveryServer = new MockHttpPeerDiscoveryServer("localhost", 8988, new PeersGet(), serverResponseDelay);
+        MockHttpPeerDiscoveryServer mockHttpPeerDiscoveryServer = new MockHttpPeerDiscoveryServer(
+                "localhost", 8988, new PeersGet(), 0);
         mockHttpPeerDiscoveryServer.start();
 
         String host = "localhost";
 
-        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(host, 8988, new ResponseListener() {
+        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest =
+                HttpPeerDiscoveryRequest.createCurrentPeersRequest(host, 8988, new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
-            }
-
-            @Override
-            public void onFailure(Error error) {
-                mError = error;
+                mRcvPeers = peers;
                 lock.countDown();
             }
-        });
+            @Override
+            public void onFailure(Error error) {
+            }
+        }, appContext);
 
-        httpPeerDiscoveryRequest.setReadTimeout(requestReadTimeout);
         httpPeerDiscoveryRequest.send();
 
-        lock.await(testTimeout, TimeUnit.MILLISECONDS);
+        lock.await(3000, TimeUnit.MILLISECONDS);
 
         mockHttpPeerDiscoveryServer.stop();
 
-        assertNotNull(mError);
-        assertEquals(ResponseListener.Error.TIMEOUT, mError);
+        assertNotNull(mRcvPeers);
+        assertEquals("mosaic", mRcvPeers.get(0).moniker);
+        assertEquals("localhost:6666", mRcvPeers.get(0).netAddr);
+        assertEquals("0X04362B55F78A2614DC1B5FD3AC90A3162E213CC0F07925AC99E420722CDF3C656AE7BB88A0FEDF01DDD8669E159F9DC20CC5F253AC11F8B5AC2E10A30D0654873B",
+                mRcvPeers.get(0).pubKeyHex);
 
     }
 
     @Test
-    public void requestConnectTimeoutTest() throws InterruptedException {
+    public void requestTimeoutTest() throws InterruptedException {
 
-        final int requestConnectTimeout = 100;
+        final int requestTimeout = 100;
         final int testTimeout = 3000;
+        final Context appContext = InstrumentationRegistry.getTargetContext();
 
         final CountDownLatch lock = new CountDownLatch(1);
 
         String host = "10.255.255.1"; // should be an unreachable ip address
 
-        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest = new HttpPeerDiscoveryRequest(host, 8988, new ResponseListener() {
+        HttpPeerDiscoveryRequest httpPeerDiscoveryRequest =
+                HttpPeerDiscoveryRequest.createCurrentPeersRequest(host, 8988, new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
             }
@@ -89,9 +99,9 @@ public class HttpPeerDiscoveryRequestTest {
                 mError = error;
                 lock.countDown();
             }
-        });
+        }, appContext);
 
-        httpPeerDiscoveryRequest.setConnectTimeout(requestConnectTimeout);
+        httpPeerDiscoveryRequest.setRetryPolicy(requestTimeout, 0, 0);
         httpPeerDiscoveryRequest.send();
 
         lock.await(testTimeout, TimeUnit.MILLISECONDS);
@@ -134,7 +144,7 @@ class MockHttpPeerDiscoveryServer {
 
             if (session.getMethod() == Method.GET) {
 
-                if (session.getUri().equals("/peers")) {
+                if (session.getUri().equals("/current-peers")) {
                     if (peersProvider != null) {
                         try {
                             Thread.sleep(mResponseDelayMilliSec);
@@ -142,7 +152,7 @@ class MockHttpPeerDiscoveryServer {
                             //Cannot change the method signature, so throw an unchecked exception
                             throw new RuntimeException();
                         }
-                        return newFixedLengthResponse(peersProvider.getPeers());
+                        return newFixedLengthResponse(peersProvider.getCurrentPeers());
                     }
                     return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
                             "Could not get requested resource");
