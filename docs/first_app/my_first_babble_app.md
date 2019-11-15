@@ -479,16 +479,19 @@ public class NewChatActivity extends AppCompatActivity {
         EditText editText = findViewById(R.id.editText);
         String moniker = editText.getText().toString();
         if (moniker.isEmpty()) {
-            displayOkAlertDialog(R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
+            displayOkAlertDialog(R.string.no_moniker_alert_title, 
+    			R.string.no_moniker_alert_message);
             return;
         }
 
         MessagingService messagingService = MessagingService.getInstance();
         try {
-            messagingService.configure(new ArrayList<Peer>(), moniker, Utils.getIPAddr(this));
+            messagingService.configure(new ArrayList<Peer>(), moniker,
+			Utils.getIPAddr(this));
         } catch (IllegalStateException ex) {
             //we tried to reconfigure before a leave completed
-            displayOkAlertDialog(R.string.babble_busy_title, R.string.babble_busy_message);
+            displayOkAlertDialog(R.string.babble_busy_title, 
+			R.string.babble_busy_message);
             return;
         }
 
@@ -498,7 +501,8 @@ public class NewChatActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
+    private void displayOkAlertDialog(@StringRes int titleId, 
+    			@StringRes int messageId) {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(titleId)
                 .setMessage(messageId)
@@ -554,8 +558,9 @@ public final class BabbleState implements TxConsumer {
         try {
             mSha256Digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException ex) {
-            //  Every implementation of the Java platform is required to support the SHA-256
-            //  MessageDigest algorithm, so we shouldn't get here!
+            //  Every implementation of the Java platform is required to
+            //  support the SHA-256 MessageDigest algorithm, so we 
+            //  shouldn't get here!
             throw new RuntimeException(ex);
         }
     }
@@ -827,8 +832,10 @@ public class MessagingService {
 
     public void configure(List<Peer> peers, String moniker, String inetAddress) {
 
-        if (mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY) {
-            throw new IllegalStateException("Cannot configure while the service is running");
+        if (mState==State.RUNNING || 
+			mState ==State.RUNNING_WITH_DISCOVERY) {
+            throw new IllegalStateException(
+            		"Cannot configure while the service is running");
         }
 
         mBabbleState = new BabbleState(new StateObserver() {
@@ -838,30 +845,37 @@ public class MessagingService {
             }
         });
 
-        // If peers list is empty we need to setup a new babble group, this requires a peers list
-        // which contains this node
+        // If peers list is empty we need to setup a new babble group, this 
+        // requires a peers list which contains this node
         if (peers.isEmpty()) {
-            peers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + BABBLING_PORT, moniker));
+            peers.add(new Peer(mKeyPair.publicKey, inetAddress + 
+            		":" + BABBLING_PORT, moniker));
         }
 
         try {
-            mBabbleNode = BabbleNode.createWithConfig(peers, mKeyPair.privateKey, inetAddress,
+            mBabbleNode = BabbleNode.createWithConfig(peers, 
+                    mKeyPair.privateKey, inetAddress,
                     BABBLING_PORT, moniker, mBabbleState,
-                    new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
+                    new BabbleConfig.Builder().logLevel(
+                            BabbleConfig.LogLevel.DEBUG).build());
             mState = State.CONFIGURED;
         } catch (IllegalArgumentException ex) {
-            //The reassignment of mState and mBabbleNode has failed, so leave them as before
-            //TODO: need to catch port in use exception (IOException) and throw others
+            // The reassignment of mState and mBabbleNode has failed, so
+            // leave them as before
+            //TODO: need to catch port in use exception (IOException)
+            // and throw others
             throw new RuntimeException(ex);
         }
 
-        mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(inetAddress, DISCOVERY_PORT, mBabbleNode);
+        mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(inetAddress,
+               DISCOVERY_PORT, mBabbleNode);
     }
 
     public void start() {
         if (mState==State.UNCONFIGURED || mState==State.RUNNING ||
                 mState==State.RUNNING_WITH_DISCOVERY) {
-            throw new IllegalStateException("Cannot start an unconfigured or running service");
+            throw new IllegalStateException(
+                          "Cannot start an unconfigured or running service");
         }
 
         mBabbleNode.run();
@@ -871,13 +885,15 @@ public class MessagingService {
             mHttpPeerDiscoveryServer.start();
             mState=State.RUNNING_WITH_DISCOVERY;
         } catch (IOException ex) {
-            //Probably the port is in use, we'll continue without the discovery service
+            // Probably the port is in use, we'll continue without the
+            // discovery service
         }
     }
 
     public void stop() {
         if (!(mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY)) {
-            throw new IllegalStateException("Cannot stop a service which isn't running");
+            throw new IllegalStateException(
+                    "Cannot stop a service which isn't running");
         }
 
         mHttpPeerDiscoveryServer.stop();
@@ -894,7 +910,8 @@ public class MessagingService {
 
     public void submitMessage(Message message) {
         if (!(mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY)) {
-            throw new IllegalStateException("Cannot submit when the service isn't running");
+            throw new IllegalStateException(
+                    "Cannot submit when the service isn't running");
         }
         mBabbleNode.submitTx(message.toBabbleTx().toBytes());
     }
@@ -1072,8 +1089,10 @@ public class ChatActivity extends AppCompatActivity implements MessageObserver {
         initialiseAdapter();
         mMessagingService.registerObserver(this);
 
-        if (mMessagingService.getState()!=MessagingService.State.RUNNING_WITH_DISCOVERY) {
-            Toast.makeText(this, "Unable to advertise peers", Toast.LENGTH_LONG).show();
+        if (mMessagingService.getState()!=
+                      MessagingService.State.RUNNING_WITH_DISCOVERY) {
+            Toast.makeText(this, "Unable to advertise peers",
+                      Toast.LENGTH_LONG).show();
         }
     }
 
@@ -1088,7 +1107,8 @@ public class ChatActivity extends AppCompatActivity implements MessageObserver {
         input.setInputListener(new MessageInput.InputListener() {
             @Override
             public boolean onSubmit(CharSequence input) {
-                mMessagingService.submitMessage(new Message(input.toString(), mMoniker));
+                mMessagingService.submitMessage(
+                            new Message(input.toString(), mMoniker));
                 return true;
             }
         });
