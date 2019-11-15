@@ -67,21 +67,33 @@ public final class HttpPeerDiscoveryServer {
         @Override
         public Response serve(IHTTPSession session) {
 
-            if (session.getMethod() == Method.GET) {
-
-                if (session.getUri().equals("/peers")) {
-                    String peersJson = peersProvider.getPeers();
-
-                    if (peersJson==null) {
-                        return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
-                                "Could not get requested resource");
-                    }
-
-                    return newFixedLengthResponse(peersJson);
-                }
+            if (session.getMethod() != Method.GET) {
+                return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
+                        "The requested resource does not exist");
             }
-            return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
-                    "The requested resource does not exist");
+
+            String uri = session.getUri();
+            String peersJson;
+
+            switch (uri) {
+                case "/genesis-peers":
+                    peersJson = peersProvider.getGenesisPeers();
+                    break;
+                case "/current-peers":
+                    peersJson = peersProvider.getCurrentPeers();
+                    break;
+                default :
+                    return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
+                            "The requested resource does not exist");
+            }
+
+            if (peersJson==null) {
+                return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
+                        "Could not get requested resource");
+            }
+
+            return newFixedLengthResponse(peersJson);
+
         }
     }
 }

@@ -59,7 +59,7 @@ public class BabbleNodeTest {
             }
         };
 
-        BabbleNode babbleNode = BabbleNode.create(peers, privateKeyHex, "localhost",
+        BabbleNode babbleNode = BabbleNode.create(peers, peers, privateKeyHex, "localhost",
                 6666, "camille", txConsumer);
 
         babbleNode.run();
@@ -99,7 +99,7 @@ public class BabbleNodeTest {
             }
         };
 
-        BabbleNode babbleNodeOne = BabbleNode.create(peers, nodeOnePrivateKeyHex, "localhost",
+        BabbleNode babbleNodeOne = BabbleNode.create(peers, peers, nodeOnePrivateKeyHex, "localhost",
                 6666, "camille", nodeOneTxConsumer);
 
         babbleNodeOne.run();
@@ -123,7 +123,7 @@ public class BabbleNodeTest {
             }
         };
 
-        BabbleNode babbleNodeTwo = BabbleNode.create(peers, nodeTwoPrivateKeyHex, "localhost",
+        BabbleNode babbleNodeTwo = BabbleNode.create(peers, peers, nodeTwoPrivateKeyHex, "localhost",
                 6667, "alice", nodeTwoTxConsumer);
 
         babbleNodeTwo.run();
@@ -171,7 +171,7 @@ public class BabbleNodeTest {
             }
         };
 
-        BabbleNode babbleNodeOne = BabbleNode.create(peers, nodeOnePrivateKeyHex, "localhost",
+        BabbleNode babbleNodeOne = BabbleNode.create(peers, peers, nodeOnePrivateKeyHex, "localhost",
                 6666, "camille", nodeOneTxConsumer);
 
         babbleNodeOne.run();
@@ -195,7 +195,7 @@ public class BabbleNodeTest {
             }
         };
 
-        BabbleNode babbleNodeTwo = BabbleNode.create(peers, nodeTwoPrivateKeyHex, "localhost",
+        BabbleNode babbleNodeTwo = BabbleNode.create(peers, peers, nodeTwoPrivateKeyHex, "localhost",
                 6667, "alice", nodeTwoTxConsumer);
 
         babbleNodeTwo.run();
@@ -219,7 +219,7 @@ public class BabbleNodeTest {
             }
         };
 
-        BabbleNode babbleNodeThree = BabbleNode.create(peers, nodeThreePrivateKeyHex, "localhost",
+        BabbleNode babbleNodeThree = BabbleNode.create(peers, peers, nodeThreePrivateKeyHex, "localhost",
                 6668, "monet", nodeThreeTxConsumer);
 
         babbleNodeThree.run();

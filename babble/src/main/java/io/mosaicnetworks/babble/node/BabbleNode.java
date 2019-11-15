@@ -17,14 +17,16 @@ public final class BabbleNode implements PeersProvider {
     private final static Gson mGson = new Gson();
     private final Node mNode;
 
-    public static BabbleNode create(List<Peer> peers, String privateKeyHex, String inetAddress,
+    public static BabbleNode create(List<Peer> genesisPeers, List<Peer> currentPeers,
+                                    String privateKeyHex, String inetAddress,
                                     int port, String moniker, TxConsumer txConsumer) {
 
-        return createWithConfig(peers, privateKeyHex, inetAddress, port, moniker, txConsumer,
+        return createWithConfig(genesisPeers, currentPeers, privateKeyHex, inetAddress, port, moniker, txConsumer,
                 new BabbleConfig.Builder().build());
     }
 
-    public static BabbleNode createWithConfig(List<Peer> peers, String privateKeyHex,
+    public static BabbleNode createWithConfig(List<Peer> genesisPeers, List<Peer> currentPeers,
+                                              String privateKeyHex,
                                               String inetAddress, int port, String moniker,
                                               final TxConsumer txConsumer,
                                               BabbleConfig babbleConfig) {
@@ -41,10 +43,11 @@ public final class BabbleNode implements PeersProvider {
                 moniker
         );
 
+        //TODO: genesis and current peers distinction
         Node node = Mobile.new_(
                 privateKeyHex,
                 inetAddress + ":" + port,
-                mGson.toJson(peers),
+                mGson.toJson(genesisPeers),
                 new mobile.CommitHandler() {
                     @Override
                     public byte[] onCommit(final byte[] blockBytes) {
@@ -119,12 +122,22 @@ public final class BabbleNode implements PeersProvider {
     }
 
     @Override
-    public String getPeers() {
+    public String getGenesisPeers() {
         if (mNode != null) {
             return mNode.getPeers();
         }
 
-        return "";
+        return null;
+    }
+
+    @Override
+    public String getCurrentPeers() {
+        //TODO: implement this
+        if (mNode != null) {
+            return mNode.getPeers();
+        }
+
+        return null;
     }
 
     public String getStats() {
@@ -132,7 +145,7 @@ public final class BabbleNode implements PeersProvider {
             return mNode.getStats();
         }
 
-        return "";
+        return null;
     }
 }
 

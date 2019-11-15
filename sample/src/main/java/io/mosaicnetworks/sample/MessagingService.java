@@ -37,7 +37,19 @@ public class MessagingService {
         return instance;
     }
 
-    public void configure(List<Peer> peers, String moniker, String inetAddress) {
+    public void configureNew(String moniker, String inetAddress) {
+        List<Peer> genesisPeers = new ArrayList<>();
+        List<Peer> currentPeers = genesisPeers;
+        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + BABBLING_PORT, moniker));
+
+        configure(genesisPeers, currentPeers, moniker, inetAddress);
+    }
+
+    public void configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress) {
+        configure(genesisPeers, currentPeers, moniker, inetAddress);
+    }
+
+    private void configure(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress) {
 
         if (mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY) {
             throw new IllegalStateException("Cannot configure while the service is running");
@@ -50,14 +62,9 @@ public class MessagingService {
             }
         });
 
-        // If peers list is empty we need to setup a new babble group, this requires a peers list
-        // which contains this node
-        if (peers.isEmpty()) {
-            peers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + BABBLING_PORT, moniker));
-        }
-
         try {
-            mBabbleNode = BabbleNode.createWithConfig(peers, mKeyPair.privateKey, inetAddress,
+            mBabbleNode = BabbleNode.createWithConfig(genesisPeers, currentPeers,
+                    mKeyPair.privateKey, inetAddress,
                     BABBLING_PORT, moniker, mBabbleState,
                     new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
             mState = State.CONFIGURED;
