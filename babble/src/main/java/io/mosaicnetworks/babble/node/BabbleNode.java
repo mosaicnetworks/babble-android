@@ -47,6 +47,7 @@ public final class BabbleNode implements PeersProvider {
         Node node = Mobile.new_(
                 privateKeyHex,
                 inetAddress + ":" + port,
+                mGson.toJson(currentPeers),
                 mGson.toJson(genesisPeers),
                 new mobile.CommitHandler() {
                     @Override
@@ -124,7 +125,7 @@ public final class BabbleNode implements PeersProvider {
     @Override
     public String getGenesisPeers() {
         if (mNode != null) {
-            return mNode.getPeers();
+            return mNode.getGenesisPeers();
         }
 
         return null;
@@ -132,7 +133,6 @@ public final class BabbleNode implements PeersProvider {
 
     @Override
     public String getCurrentPeers() {
-        //TODO: implement this
         if (mNode != null) {
             return mNode.getPeers();
         }
