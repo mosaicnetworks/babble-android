@@ -13,7 +13,7 @@ fi
 mkdir -p "${mydir}/tmp"
 
 # Get released library
-RELEASE_ZIP="https://github.com/mosaicnetworks/babble/releases/download/v${BABBLE_CORE_RELEASE_VERSION}/babble_${BABBLE_CORE_RELEASE_VERSION}_android_library.zip"
+RELEASE_ZIP="https://github.com/mosaicnetworks/babble/releases/download/v${BABBLE_CORE_RELEASE_VERSION}/babble_${BABBLE_CORE_RELEASE_VERSION}_android_library_dev.zip"
 
 wget -q -O ${mydir}/tmp/babble.zip "$RELEASE_ZIP" 
 ret=$?
