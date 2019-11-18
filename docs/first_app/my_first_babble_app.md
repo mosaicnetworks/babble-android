@@ -14,13 +14,124 @@ This article is a walkthrough of the process of building your first Android App 
 
 ## Babble
 
-Babble, mobile ad hoc block chain, yadda, yadda, yadda. **//TODO**
+Babble enables multiple computers to behave as one. It uses Peer to Peer (P2P) networking and a consensus algorithm to guarantee that a group of connected computers process the same commands in the same order; a technique known as state-machine replication. This makes for secure systems that can tolerate arbitrary failures, including malicious behaviour.
+
+We use an adaptation of the Hashgraph consensus algorithm, invented by Leemon
+Baird. Hashgraph is best described in the
+[white-paper](http://www.swirlds.com/downloads/SWIRLDS-TR-2016-01.pdf) and its
+[accompanying document](http://www.swirlds.com/downloads/SWIRLDS-TR-2016-02.pdf).
+The original algorithm is protected by [patents](http://www.swirlds.com/ip/) in
+the USA. Therefore, anyone intending to use this software in the USA should
+obtain a license from the patent holders.
+
+Hashgraph is based on the intuitive idea that gossiping about gossip itself
+yields enough information to compute a consensus ordering of events. It attains
+the theoretical limit of tolerating up to one-third of faulty nodes without
+compromising on speed. For those familiar with the jargon, it is a leaderless,
+asynchronous BFT consensus algorithm.
+
+Babble projects the output of the consensus algorithm onto a linear blockchain
+which is more suitable for representing an ordered list of transactions and
+facilitates the creation of light-clients. For information about this projection
+please refer to [documentation](http://docs.babble.io/en/latest/blockchain.html)
+pages.
+
+This blockchain mapping is also instrumental in two important features that were
+alluded to in Baird's paper, but not implemented:
+
+- A [fast-sync](http://docs.babble.io/en/latest/fastsync.html) protocol which
+  enables nodes to join a cluster without having to download the entire history
+  of gossip.
+
+- A [dynamic membership](http://docs.babble.io/en/latest/dynamic_membership.html)
+  protocol, which enables peers to join or leave a cluster on demand.
+
+### Design
+
+Babble is designed to integrate with applications written in any programming
+language.
+
+#### Overview
+
+
+![](./screenshots/babble_design_2.png "Babble Design")
+
+
+
+Almost any software application can be modelled in terms of a *service* and a
+*state*. The *service* is responsible for processing commands (ex. user input),
+while the *state* is responsible for manipulating and storing the data (eg.
+database). Usually, when commands need to update the data, the *service* will
+invoke the *state* directly. In a distributed application, however, commands
+(referred to as *transactions* in this context), must be broadcast to all
+replicas and consistently ordered before being applied to the *state*. This
+ensures that all replicas process the same commands in the same order. Hence,
+the *service* no longer communicates directly with the *state* (except for
+read-only requests), but forwards commands to a *transaction ordering system*
+which takes care of broadcasting and ordering the transactions across all
+replicas before feeding them back to the application's *state*.
+
+Babble is an ordering system that plugs into any application thanks to a very
+simple interface. It uses a consensus algorithm, to replicate and order the
+transactions, and a blockchain to represent the resulting list. A blockchain is
+a linear data structure composed of batches of transactions, hashed and signed
+together, easily allowing to verify any transaction. So, instead of applying
+commands directly to the *state*, Babble applications must forward the commands
+to Babble and let them be processed asynchronously by the consensus system
+before receiving them back, in blocks, ready to be applied to the *state*.
+
+Note that it is left to the application layer to filter out bad transactions 
+before relaying them from clients to the consensus engine. Unlike other 
+middleware designed to sit in front of the application (like Apache or 
+Tendermint), the user-facing API is app-specific, and Babble just takes care or
+managing the consensus "under the hood". This filtering partially addresses spam
+from anonymous clients, but doesn't protect against malicious nodes spamming the
+network; that is a potential enhancement on the roadmap.  
+
+#### API
+
+Babble communicates with the App through an `AppProxy` interface, which has two
+implementations:
+
+- `SocketProxy`: A SocketProxy connects to an App via TCP sockets. It enables
+                 the application to run in a separate process or machine, and to
+                 be written in any programming language.
+
+- `InmemProxy` : An InmemProxy uses native callback handlers to integrate Babble
+                 as a regular Go dependency.
+
+The `AppProxy` interface exposes three methods for Babble to call the App:
+
+- `CommitBlock(Block) (CommitResponse, error)`: Commits a block to the
+        application and returns the resulting state-hash, with accepted internal
+        transactions.
+- `GetSnapshot(int) ([]byte, error)`: Gets the application snapshot
+        corresponding to a particular block index.
+- `Restore([]byte) error`: Restores the App state from a snapshot.
+
+Reciprocally, `AppProxy` relays transactions from the App to Babble via a native
+Go channel - `SubmitCh` - which ties into the application differently depending
+on the type of proxy (Socket or Inmem).
+
+Babble asynchronously processes transactions and eventually feeds them back to
+the App, in consensus order and bundled into blocks, with a **CommitBlock**
+call. Transactions are just raw bytes and Babble does not need to know what they
+represent. Therefore, encoding and decoding transactions is done by the App.
+
+
+<div style="page-break-after: always; visibility: hidden"> 
+\pagebreak 
+</div>
 
 ## Prerequisites
 
-We will assume that you have installed Android Studio, an appropriate Android SDK (I am using version 29) and Android NDK. 
+We will assume that you have installed Android Studio, an Android SDK with API version 29 and Android NDK. Android API 29 (10.0 / Q) is assumed, if use a previous version the create activity items in these instructions will use AppCompat instead of AndroidX[^androidx], leading to incompatibilities with the pasted source code. The babble node itself is compatible with AppCompat, but converting the sample to use AppCompat is beyond the scope of this article.
 
 This tutorial is going to assume deployment to a physical Android device. Thus you will need an Android device (Android device requirements **//TODO**) with the developer options turned on, debugging enabled, and a suitable USB cable. You could use the android emulator, but that is beyond the scope of this article.
+
+
+[^androidx]: You can read more about AndroidX here: [https://android-developers.googleblog.com/2018/05/hello-world-androidx.html](https://android-developers.googleblog.com/2018/05/hello-world-androidx.html) 
+
 
 <div style="page-break-after: always; visibility: hidden"> 
 \pagebreak 
@@ -1157,7 +1268,112 @@ This project at this stage is available from github from [here](https://github.c
 
 [^stage3]: This code is the stage3 branch at https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3
 
+----
 
+<div style="page-break-after: always; visibility: hidden"> 
+\pagebreak 
+</div>
+
+## Joining
+
+Thus far, we have been dealing with a single node, which kind of misses the whole point of having a blockchain. So this section remedies this. We will add a new button the MainActivity to Join an existing blockchain. This will require discovering the network - we will just enter an IP address for the moment - although more complex schemes would be used in a production environment.
+
+###  Create Join Chat Activity
+
+We create a new Activity: ``JoinChatActivity`` using the wizard at ``File > New > Activity > Empty Activity``. Enter the name JoinChatActivity and the rest autocompletes.
+
+![](./screenshots/create_JoinChatActivity.png "Create JoinChatActivity"){width=50%}
+
+
+### activity_join_chat.xml
+
+First we set the layout in ``res/layout/activity_join_chat.xml``. Overwrite all the contents of the file.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".JoinChatActivity">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <EditText
+            android:id="@+id/editMoniker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/moniker"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/editHost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/host"
+            android:inputType="textUri" />
+
+        <Button
+            android:id="@+id/buttonJoin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="joinChat"
+            android:text="@string/join" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+This defines a screen where the user can enter a moniker, exactly as per the ``NewChatActivity``. In contrast the ``NewChatActivity``, there is an additional field to enter the address (IP/hostname) of an existing node on the network. 
+
+### strings.xml
+
+We need to the add the following to ``res/values/strings.xml`` as they are used in the code changes below.
+
+```xml
+    <string name="invalid_hostname_alert_title">Invalid hostname</string>
+    <string name="invalid_hostname_alert_message">Please enter a valid hostname!</string>
+    <string name="no_hostname_alert_title">No hostname</string>
+    <string name="no_hostname_alert_message">Please enter a hostname!</string>
+    <string name="peers_error_alert_title">Unable to retrieve peers list</string>
+    <string name="peers_json_error_alert_message">Did not receive a valid response from the host</string>
+    <string name="peers_connection_error_alert_message">Failed to connect to host</string>
+    <string name="peers_timeout_error_alert_message">Timed out waiting for host</string>
+    <string name="peers_unknown_error_alert_message">Unknown error</string>
+    <string name="loading_title">Please wait...</string>
+    <string name="loading_message">Fetching peers list from host</string>
+
+```    
+
+### JoinChatActivity.java
+
+Now we need to add the Java source to ``JoinChatActivity.java``.
+
+```java
+
+```
+
+
+**//TODO**
+
+### Add Join to MainActivity
+
+**//TODO**
 
 
 # Release Checklist:
