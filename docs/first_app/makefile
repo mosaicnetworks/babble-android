@@ -27,12 +27,9 @@ rst:
 gfm:
 	pandoc -V papersize:a4 --toc -f markdown-implicit_figures    -o first.md my_first_babble_app.md 
 
-
-
-
-
 s5:
 	pandoc -V papersize:a4 --toc -f markdown-implicit_figures -s  -t s5  -o first.slidy.html my_first_babble_app.md 
 
 
 
+.PHONY: pdf html latex docx rst epub  gfm s5

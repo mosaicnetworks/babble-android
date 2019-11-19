@@ -145,7 +145,7 @@ First up we will create a minimal app to test our environment and prove that we 
 
 Choose *Empty Activity* from the *Phone and Tablet* tab, and click Next.
 
-![ ](./screenshots/new_project_options.png  "New Project Options"){width=80%}
+![ ](./screenshots/new_project_options.png  "New Project Options"){width=60%}
 
 The options here should be self-explanatory. We would recommend not using spaces in the Package Name or the Save Location. Do not set the Minimum API Level below 19. Click Finish.
 
@@ -180,11 +180,11 @@ If you cannot find your device in the list, the ``Troubleshoot device connection
 
 Then press that little green triangle to the right of the dropdown device menu. Gradle then builds the app, which is then installed onto the physical android device that you selected. The whole process tool about 20 seconds on my laptop (feel free to buy me a quicker one). 
 
-![](./screenshots/mobile_step_1.png "First App Screenshot"){width=50%}
+![](./screenshots/mobile_step_1.png "First App Screenshot"){width=50%} ![](./screenshots/default_icon.png "First App Icon"){width=25%}
 
-If you look on the device, you should find the app installed, as below:
 
-![](./screenshots/default_icon.png "First App Icon"){width=25%}
+If you look on the device, you should find the app installed, as on the right above.
+
 
 Congratulations, you have an app. Now onto Babble...
 
@@ -944,19 +944,24 @@ public class MessagingService {
     public void configureNew(String moniker, String inetAddress) {
         List<Peer> genesisPeers = new ArrayList<>();
         List<Peer> currentPeers = genesisPeers;
-        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + BABBLING_PORT, moniker));
+        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress +
+             ":" + BABBLING_PORT, moniker));
 
         configure(genesisPeers, currentPeers, moniker, inetAddress);
     }
 
-    public void configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress) {
+    public void configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, 
+        String moniker, String inetAddress) {
+
         configure(genesisPeers, currentPeers, moniker, inetAddress);
     }
 
-    private void configure(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress) {
+    private void configure(List<Peer> genesisPeers, List<Peer> currentPeers, 
+        String moniker, String inetAddress) {
 
         if (mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY) {
-            throw new IllegalStateException("Cannot configure while the service is running");
+            throw new IllegalStateException(
+                "Cannot configure while the service is running");
         }
 
         mBabbleState = new BabbleState(new StateObserver() {
@@ -968,23 +973,26 @@ public class MessagingService {
 
         try {
             mBabbleNode = BabbleNode.createWithConfig(genesisPeers, currentPeers,
-                    mKeyPair.privateKey, inetAddress,
-                    BABBLING_PORT, moniker, mBabbleState,
-                    new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
+                mKeyPair.privateKey, inetAddress,
+                BABBLING_PORT, moniker, mBabbleState,
+                new BabbleConfig.Builder().logLevel(
+                    BabbleConfig.LogLevel.DEBUG).build());
             mState = State.CONFIGURED;
         } catch (IllegalArgumentException ex) {
-            //The reassignment of mState and mBabbleNode has failed, so leave them as before
-            //TODO: need to catch port in use exception (IOException) and throw others
+//The reassignment of mState and mBabbleNode has failed, so leave them as before
+//TODO: need to catch port in use exception (IOException) and throw others
             throw new RuntimeException(ex);
         }
 
-        mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(inetAddress, DISCOVERY_PORT, mBabbleNode);
+        mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(inetAddress, 
+            DISCOVERY_PORT, mBabbleNode);
     }
 
     public void start() {
         if (mState==State.UNCONFIGURED || mState==State.RUNNING ||
                 mState==State.RUNNING_WITH_DISCOVERY) {
-            throw new IllegalStateException("Cannot start an unconfigured or running service");
+            throw new IllegalStateException(
+                "Cannot start an unconfigured or running service");
         }
 
         mBabbleNode.run();
@@ -994,13 +1002,14 @@ public class MessagingService {
             mHttpPeerDiscoveryServer.start();
             mState=State.RUNNING_WITH_DISCOVERY;
         } catch (IOException ex) {
-            //Probably the port is in use, we'll continue without the discovery service
+//Probably the port is in use, we'll continue without the discovery service
         }
     }
 
     public void stop() {
         if (!(mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY)) {
-            throw new IllegalStateException("Cannot stop a service which isn't running");
+            throw new IllegalStateException(
+                "Cannot stop a service which isn't running");
         }
 
         mHttpPeerDiscoveryServer.stop();
@@ -1017,7 +1026,8 @@ public class MessagingService {
 
     public void submitMessage(Message message) {
         if (!(mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY)) {
-            throw new IllegalStateException("Cannot submit when the service isn't running");
+            throw new IllegalStateException(
+                "Cannot submit when the service isn't running");
         }
         mBabbleNode.submitTx(message.toBabbleTx().toBytes());
     }
@@ -1077,20 +1087,18 @@ Within the ``NewChatActivity.java`` button click handler the contents of the edi
 Within ``joinChat()`` are the 2 key lines:
 
 ```java
-        mMessagingService.configure(new ArrayList<Peer>(), 
-                  mMoniker, Utils.getIPAddr(this));
-        mMessagingService.start();
+    messagingService.configureNew(moniker, Utils.getIPAddr(this));
+
+        ...
+
+    messagingService.start();
 ```
 
 They invoke the singleton instance of the ``MessagingService`` class. The MessagingService class is a simplified version of the code from the sample app included in the babble-android repo. 
 
 At a high level, it configures, then starts a babble node.
 
-Delving a little deeper, the configure method takes a peers list, the moniker and IP for this node. In our initial use case, the peers list will always be empty as we can only create new networks at the moment. 
-
-
-//TODO Expand this explanation section?
-
+Delving a little deeper, the configureNew method is a wrapper for a configure method that takes a peers list, the moniker and IP for this node. In our New Node use case, the peers list will always be empty. 
 
 
 This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2) [^stage2]
@@ -1182,7 +1190,8 @@ public class ChatActivity extends AppCompatActivity implements MessageObserver {
 
     private MessagesListAdapter<Message> mAdapter;
     private String mMoniker;
-    private final MessagingService mMessagingService = MessagingService.getInstance();
+    private final MessagingService mMessagingService =
+         MessagingService.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1286,7 +1295,8 @@ First we set the layout in ``res/layout/activity_join_chat.xml``. Overwrite all 
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -1341,20 +1351,27 @@ This defines a screen where the user can enter a moniker, exactly as per the ``N
 We need to the add the following to ``res/values/strings.xml`` as they are used in the code changes below.
 
 ```xml
-    <string name="invalid_hostname_alert_title">Invalid hostname</string>
-    <string name="invalid_hostname_alert_message">Please enter a valid hostname!</string>
-    <string name="no_hostname_alert_title">No hostname</string>
-    <string name="no_hostname_alert_message">Please enter a hostname!</string>
-    <string name="peers_error_alert_title">Unable to retrieve peers list</string>
-    <string name="peers_json_error_alert_message">Did not receive a valid response from the host</string>
-    <string name="peers_connection_error_alert_message">Failed to connect to host</string>
-    <string name="peers_timeout_error_alert_message">Timed out waiting for host</string>
-    <string name="peers_unknown_error_alert_message">Unknown error</string>
-    <string name="loading_title">Please wait...</string>
-    <string name="loading_message">Fetching peers list from host</string>
-    <string name="join">Join</string>
-    <string name="host">Hostname</string>
-
+<string name="invalid_hostname_alert_title"
+    >Invalid hostname</string>
+<string name="invalid_hostname_alert_message"
+    >Please enter a valid hostname!</string>
+<string name="no_hostname_alert_title">No hostname</string>
+<string name="no_hostname_alert_message"
+    >Please enter a hostname!</string>
+<string name="peers_error_alert_title"
+    >Unable to retrieve peers list</string>
+<string name="peers_json_error_alert_message"
+    >Did not receive a valid response from the host</string>
+<string name="peers_connection_error_alert_message">Failed to connect to host</string>
+<string name="peers_timeout_error_alert_message"
+    >Timed out waiting for host</string>
+<string name="peers_unknown_error_alert_message"
+    >Unknown error</string>
+<string name="loading_title">Please wait...</string>
+<string name="loading_message"
+    >Fetching peers list from host</string>
+<string name="join">Join</string>
+<string name="host">Hostname</string>
 ```    
 
 ### JoinChatActivity.java
@@ -1382,7 +1399,8 @@ import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 
-public class JoinChatActivity extends AppCompatActivity implements ResponseListener {
+public class JoinChatActivity extends AppCompatActivity 
+        implements ResponseListener {
 
     private ProgressDialog mLoadingDialog;
     private String mMoniker;
@@ -1403,7 +1421,8 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         EditText editText = findViewById(R.id.editMoniker);
         mMoniker = editText.getText().toString();
         if (mMoniker.isEmpty()) {
-            displayOkAlertDialog(R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
+            displayOkAlertDialog(R.string.no_moniker_alert_title,
+                R.string.no_moniker_alert_message);
             return;
         }
 
@@ -1411,7 +1430,8 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         EditText editIP = findViewById(R.id.editHost);
         final String peerIP = editIP.getText().toString();
         if (peerIP.isEmpty()) {
-            displayOkAlertDialog(R.string.no_hostname_alert_title, R.string.no_hostname_alert_message);
+            displayOkAlertDialog(R.string.no_hostname_alert_title,
+                R.string.no_hostname_alert_message);
             return;
         }
 
@@ -1419,29 +1439,36 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
     }
 
     private void getPeers(final String peerIP) {
-        try {
-            mHttpGenesisPeerDiscoveryRequest = HttpPeerDiscoveryRequest.createGenesisPeersRequest(peerIP,
-                    MessagingService.DISCOVERY_PORT, new ResponseListener() {
-                        @Override
-                        public void onReceivePeers(List<Peer> genesisPeers) {
-                            mGenesisPeers = genesisPeers;
+      try {
+        mHttpGenesisPeerDiscoveryRequest = 
+        HttpPeerDiscoveryRequest.createGenesisPeersRequest(
+          peerIP,
+          MessagingService.DISCOVERY_PORT,
+          new ResponseListener() {
+            @Override
+            public void onReceivePeers(List<Peer> genesisPeers) {
+              mGenesisPeers = genesisPeers;
 
-                            mHttpCurrentPeerDiscoveryRequest =
-                                    HttpPeerDiscoveryRequest.createCurrentPeersRequest(
-                                            peerIP, MessagingService.DISCOVERY_PORT,
-                                            JoinChatActivity.this, JoinChatActivity.this);
+              mHttpCurrentPeerDiscoveryRequest =
+                HttpPeerDiscoveryRequest.createCurrentPeersRequest(
+                  peerIP, 
+                  MessagingService.DISCOVERY_PORT,
+                  JoinChatActivity.this, 
+                  JoinChatActivity.this);
 
-                            mHttpCurrentPeerDiscoveryRequest.send();
-                        }
+              mHttpCurrentPeerDiscoveryRequest.send();
+            }
 
-                        @Override
-                        public void onFailure(Error error) {
-                            JoinChatActivity.this.onFailure(error);
-                        }
-                    }, this);
+            @Override
+            public void onFailure(Error error) {
+              JoinChatActivity.this.onFailure(error);
+            }
+          }, this);
         } catch (IllegalArgumentException ex) {
-            displayOkAlertDialog(R.string.invalid_hostname_alert_title, R.string.invalid_hostname_alert_message);
-            return;
+          displayOkAlertDialog(
+              R.string.invalid_hostname_alert_title,
+              R.string.invalid_hostname_alert_message);
+          return;
         }
 
         mLoadingDialog.show();
@@ -1453,17 +1480,20 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         MessagingService messagingService = MessagingService.getInstance();
 
         try {
-            messagingService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(this));
+            messagingService.configureJoin(mGenesisPeers, currentPeers,
+               mMoniker, Utils.getIPAddr(this));
         } catch (IllegalStateException ex) {
             //we tried to reconfigure before a leave completed
             mLoadingDialog.dismiss();
-            displayOkAlertDialog(R.string.babble_busy_title, R.string.babble_busy_message);
+            displayOkAlertDialog(R.string.babble_busy_title,
+            R.string.babble_busy_message);
             return;
         }
 
         mLoadingDialog.dismiss();
         messagingService.start();
-        Intent intent = new Intent(JoinChatActivity.this, ChatActivity.class);
+        Intent intent = new Intent(JoinChatActivity.this, 
+            ChatActivity.class);
         intent.putExtra("MONIKER", mMoniker);
         startActivity(intent);
     }
@@ -1503,7 +1533,9 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
             }});
     }
 
-    private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
+    private void displayOkAlertDialog(@StringRes int titleId, 
+            @StringRes int messageId) {
+
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(titleId)
                 .setMessage(messageId)
@@ -1585,7 +1617,8 @@ configure the ``messagingService``. The invocation is then exactly as per the ``
 where the ``messagingService`` starts a babble node, and then invokes a ``ChatActivity``.
 
 ```java
-	messagingService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(this));
+    messagingService.configureJoin(mGenesisPeers, 
+        currentPeers, mMoniker, Utils.getIPAddr(this));
 
 ...
 
@@ -1634,6 +1667,10 @@ Having added the Join button, we add the click handler to invoke the ``JoinChatA
 
 Build your app and run it on 2 devices. You should now be able to start a chat on one and join with the other:
 
+![](./screenshots/stage_4.png "Stage 4 Phone"){width=35%} ![](./screenshots/stage_4_tab.png "Stage 4 Tablet"){width=60%}
+
+
+
 This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4) [^stage4]
 
 [^stage4]: This code is the stage4 branch at https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4
@@ -1643,10 +1680,5 @@ This project at this stage is available from github from [here](https://github.c
 <div style="page-break-after: always; visibility: hidden"> 
 \pagebreak 
 </div>
-
-# Release Checklist:
-
-+ Search for //TODO and make sure all are excised
-+ Delete this section
 
 
