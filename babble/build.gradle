@@ -57,6 +57,9 @@ bintray {
     key = properties.getProperty('apiKey')
     publications = ['MyPublication']
     configurations = ['archives']
+    publish = true //[Default: false] Whether version should be auto published after an upload
+    override = true //[Default: false] Whether to override version artifacts already published
+
     pkg {
         repo = 'maven'
         userOrg = 'mosaicnetworks'
@@ -81,6 +84,10 @@ publishing {
         MyPublication(MavenPublication) {
 
             artifact sourcesJar
+
+            pom {
+                packaging = "aar"
+            }
 
             pom.withXml {
 
