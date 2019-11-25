@@ -8,11 +8,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
-import java.util.ArrayList;
-import java.util.Random;
-
-import io.mosaicnetworks.babble.discovery.Peer;
-
 public class NewChatActivity extends AppCompatActivity {
 
     @Override

@@ -3,7 +3,7 @@ package io.mosaicnetworks.sample;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
-public class BabbleTx {
+public class BabbleTx implements io.mosaicnetworks.babble.node.BabbleTx {
 
     private final static Gson gson = new Gson();
 
