@@ -1,10 +1,11 @@
 ---
-title: My First Babble App Tutorial
+title: My First Babble App Tutorial 
+subtitle: Version 0.1.0
 documentclass: article
 fontsize: 12pt
 mainfont: Gillius
 author: Mosaic Networks
-date: November, 2019
+date: Version 0.1.0 -- November, 2019
 geometry: "left=2cm,right=2cm,top=3cm,bottom=3cm"
 ---
 
