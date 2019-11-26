@@ -4,8 +4,8 @@
 ## It may be unstable during this process
 
 **NOTE**:
-This is alpha software. Breaking changes are likely to be made as the
-interfaces are refined.
+This is alpha software. Breaking changes are likely to be made as the interfaces
+are refined.
 
 Babble-Android allows developers to easily integrate
 [Babble](https://github.com/mosaicnetworks/babble) into their own apps.
@@ -13,90 +13,40 @@ Babble-Android allows developers to easily integrate
 ## Quickstart
 
 This section gives a brief overview of how the library can be used. To see the
-library components in context, take a look at the sample app in this repo. For a 
-comprehensive guide to building an app using this library take a look at the
-**My First App** tutorial. A complete API reference can be found in the
-documentation. //TODO: link to tutorial + documentation
-
-### Add Dependency
+code snippets in context, take a look at the sample app in this repo. A complete
+API reference can be found in the documentation. 
 
 Add the following to your apps `build.gradle` file:
 
-```implementation location/on/jcenter``` //TODO: link to jcenter
+```implementation location/on/jcenter```
 
 ### Library Components
 
 #### Babble Node
 
 The core component of the library is the BabbleNode class. This is a wrapper
-around our golang implementation of
-[Babble](https://github.com/mosaicnetworks/babble). To start a node create a
-BabbleNode instance, then call run:
+around our golang implementation of [Babble](https://github.com/mosaicnetworks/babble
+). To start a node create a BabbleNode instance, then call run:
 
 ```
-BabbleNode babbleNode = BabbleNode.create(genesisPeers, currentPeers, privateKeyHex,
-                    inetAddress, port, moniker, new TxConsumer() {
-                @Override
-                public byte[] onReceiveTransactions(byte[][] transactions) {
-                    //process transactions which have gone through consensus
+BabbleNode babbleNode = new BabbleNode(peersJSON, privateKeyHex, netAddr,
+	moniker, new BabbleNodeListeners() {
+    @Override
+    public void onException(String msg) {
+    	//do something if babble throws an exception
+    }
 
-                    //return the state hash
-                    return new byte[0];
-                }
-            });
+    @Override
+    public byte[] onReceiveTransactions(byte[][] transactions) {
+    	//process transactions which have gone through consensus
+
+    	//return the state hash
+        return new byte[0];
+    }
+});
 
 babbleNode.run();
 ```
-
-Everyone has to agree on the genesis peers
-
-Validator - signs blocks - defined by a keypair
-
-Peer - shares "blocks" / someone to gossip with - defined by an IP address
-
-
-
-
-What is a peer? Validator with an IP address
-
-
-The genesisPeers are 
-
-
-
-
-Babble blockchains are
-
-
-
-
-Babble blockchains are permissioned, this means that at each round there is a
-set of validators which sign blocks. This set of validators is dynamic -
-validato'r can join and leave a network. The progression of the validator set
-is recorded in the blockchain. Given the starting set of validators a node
-can validate a blockchain by 
-
-
-The genesisPeers are the set of peers which initiated the blockchain, the node
-n
-
-
-The genesisPeers and currentPeers are Java Lists of Peer (TODO: link to docs)
-objects. The gene
-
-
-The BabbleNode makes a distinction between genesis and current peers
-
-
-
-
-
-For a full definition of the parameters, take a look at the documentation //TODO : link to docs
-
-
-
-
-
 
 The `peersJSON` String is a list of the group's current validators. It has the
 form:
