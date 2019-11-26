@@ -56,14 +56,14 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
     private void getPeers(final String peerIP) {
         try {
             mHttpGenesisPeerDiscoveryRequest = HttpPeerDiscoveryRequest.createGenesisPeersRequest(peerIP,
-                    BabbleService.DISCOVERY_PORT, new ResponseListener() {
+                    BabbleService.DEFAULT_DISCOVERY_PORT, new ResponseListener() {
                         @Override
                         public void onReceivePeers(List<Peer> genesisPeers) {
                             mGenesisPeers = genesisPeers;
 
                             mHttpCurrentPeerDiscoveryRequest =
                                     HttpPeerDiscoveryRequest.createCurrentPeersRequest(
-                                            peerIP, BabbleService.DISCOVERY_PORT,
+                                            peerIP, BabbleService.DEFAULT_DISCOVERY_PORT,
                                             JoinChatActivity.this, JoinChatActivity.this);
 
                             mHttpCurrentPeerDiscoveryRequest.send();

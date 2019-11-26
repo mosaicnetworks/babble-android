@@ -16,8 +16,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
         RUNNING_WITH_DISCOVERY
     }
 
-    private static final int BABBLING_PORT = 6666; //TODO: this cannot be hard coded in the library
-    public static final int DISCOVERY_PORT = 8988; //TODO: this cannot be hard coded in the library
+    public static final int DEFAULT_BABBLING_PORT = 6666;
+    public static final int DEFAULT_DISCOVERY_PORT = 8988;
     private final List<ServiceObserver> mObservers = new ArrayList<>();
     private State mState = State.UNCONFIGURED;
     private KeyPair mKeyPair = new KeyPair();
@@ -33,46 +33,50 @@ public abstract class BabbleService<AppState extends BabbleState> {
     }
 
     public void configureNew(String moniker, String inetAddress) {
+        configureNew(moniker, inetAddress, DEFAULT_BABBLING_PORT, DEFAULT_DISCOVERY_PORT);
+    }
+
+    public void configureNew(String moniker, String inetAddress, int babblingPort, int discoveryPort) {
         List<Peer> genesisPeers = new ArrayList<>();
-        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + BABBLING_PORT, moniker));
+        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
         List<Peer> currentPeers = genesisPeers;
 
-        configure(genesisPeers, currentPeers, moniker, inetAddress);
+        configure(genesisPeers, currentPeers, moniker, inetAddress, babblingPort, discoveryPort);
     }
 
     public void configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress) {
-        configure(genesisPeers, currentPeers, moniker, inetAddress);
+        configure(genesisPeers, currentPeers, moniker, inetAddress, DEFAULT_BABBLING_PORT, DEFAULT_DISCOVERY_PORT);
     }
 
-    private void configure(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress) {
+    public void configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress, int babblingPort, int discoveryPort) {
+        configure(genesisPeers, currentPeers, moniker, inetAddress, babblingPort, discoveryPort);
+    }
+
+    private void configure(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress, int babblingPort, int discoveryPort) {
 
         if (mState == State.RUNNING || mState == State.RUNNING_WITH_DISCOVERY) {
             throw new IllegalStateException("Cannot configure while the service is running");
         }
 
-        try {
-            mBabbleNode = BabbleNode.createWithConfig(genesisPeers, currentPeers,
-                    mKeyPair.privateKey, inetAddress,
-                    BABBLING_PORT, moniker, new TxConsumer() {
-                        @Override
-                        public byte[] onReceiveTransactions(byte[][] transactions) {
+        //TODO: reset state
 
-                            byte[] stateHash = mBabbleState.applyTransactions(transactions);
+        mBabbleNode = BabbleNode.createWithConfig(genesisPeers, currentPeers,
+                mKeyPair.privateKey, inetAddress,
+                babblingPort, moniker, new TxConsumer() {
+                    @Override
+                    public byte[] onReceiveTransactions(byte[][] transactions) {
 
-                            notifyObservers();
+                        byte[] stateHash = mBabbleState.applyTransactions(transactions);
 
-                            return stateHash;
-                        }
-                    },
-                    new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
-            mState = State.CONFIGURED;
-        } catch (IllegalArgumentException ex) {
-            //The reassignment of mState and mBabbleNode has failed, so leave them as before
-            //TODO: need to catch port in use exception (IOException) and throw others
-            throw new RuntimeException(ex);
-        }
+                        notifyObservers();
 
-        mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(inetAddress, DISCOVERY_PORT, mBabbleNode);
+                        return stateHash;
+                    }
+                },
+                new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
+        mState = State.CONFIGURED;
+
+        mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(inetAddress, discoveryPort, mBabbleNode);
     }
 
     public void start() {
@@ -98,7 +102,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
         }
 
         mHttpPeerDiscoveryServer.stop();
-        mHttpPeerDiscoveryServer=null;
+        mHttpPeerDiscoveryServer = null;
 
         mBabbleNode.leave(new LeaveResponseListener() {
             @Override
