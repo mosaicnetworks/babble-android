@@ -58,8 +58,6 @@ public abstract class BabbleService<AppState extends BabbleState> {
             throw new IllegalStateException("Cannot configure while the service is running");
         }
 
-        //TODO: reset state
-
         mBabbleNode = BabbleNode.createWithConfig(genesisPeers, currentPeers,
                 mKeyPair.privateKey, inetAddress,
                 babblingPort, moniker, new TxConsumer() {
@@ -74,6 +72,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
                     }
                 },
                 new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
+
+        mBabbleState.reset();
         mState = State.CONFIGURED;
 
         mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(inetAddress, discoveryPort, mBabbleNode);

@@ -45,6 +45,11 @@ public class AppState implements BabbleState {
         return new byte[0];
     }
 
+    @Override
+    public void reset() {
+        //do nothing
+    }
+
     private void onMessageReceived(Message message) {
 
         mLatestMessage = message;
