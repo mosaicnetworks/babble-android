@@ -43,7 +43,6 @@ public final class BabbleNode implements PeersProvider {
                 moniker
         );
 
-        //TODO: genesis and current peers distinction
         Node node = Mobile.new_(
                 privateKeyHex,
                 inetAddress + ":" + port,
@@ -108,11 +107,11 @@ public final class BabbleNode implements PeersProvider {
             new Thread(new Runnable() {
                 public void run() {
                     mNode.leave();
-                    listener.onSuccess();
+                    listener.onComplete();
                 }
             }).start();
         } else {
-            listener.onSuccess();
+            listener.onComplete();
         }
     }
 

@@ -9,7 +9,10 @@ import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
-public class ChatActivity extends AppCompatActivity implements MessageObserver {
+import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.node.ServiceObserver;
+
+public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
     private MessagesListAdapter<Message> mAdapter;
     private String mMoniker;
@@ -26,7 +29,7 @@ public class ChatActivity extends AppCompatActivity implements MessageObserver {
         initialiseAdapter();
         mMessagingService.registerObserver(this);
 
-        if (mMessagingService.getState()!=MessagingService.State.RUNNING_WITH_DISCOVERY) {
+        if (mMessagingService.getState()!= BabbleService.State.RUNNING_WITH_DISCOVERY) {
             Toast.makeText(this, "Unable to advertise peers", Toast.LENGTH_LONG).show();
         }
     }
@@ -42,25 +45,27 @@ public class ChatActivity extends AppCompatActivity implements MessageObserver {
         input.setInputListener(new MessageInput.InputListener() {
             @Override
             public boolean onSubmit(CharSequence input) {
-                mMessagingService.submitMessage(new Message(input.toString(), mMoniker));
+                mMessagingService.submitTx(new Message(input.toString(), mMoniker).toBabbleTx());
                 return true;
             }
         });
     }
 
     @Override
-    public void onMessageReceived(final Message message) {
+    public void stateUpdated() {
+        final Message message = mMessagingService.state.getLatestMessage();
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 mAdapter.addToStart(message, true);
             }
         });
-    };
+    }
 
     @Override
     public void onBackPressed() {
-        mMessagingService.stop();
+        mMessagingService.leave(null);
         super.onBackPressed();
     }
 

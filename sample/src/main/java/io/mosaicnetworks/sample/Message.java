@@ -1,11 +1,14 @@
 package io.mosaicnetworks.sample;
 
+import com.google.gson.Gson;
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.IUser;
 
 import java.util.Date;
 
 public final class Message implements IMessage {
+
+    private final static Gson gson = new Gson();
 
     public final static class Author implements IUser {
 
@@ -68,4 +71,5 @@ public final class Message implements IMessage {
     public Date getCreatedAt() {
         return mDate;
     }
+
 }
