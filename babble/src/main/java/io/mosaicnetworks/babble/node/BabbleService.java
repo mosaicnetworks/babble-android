@@ -124,6 +124,10 @@ public abstract class BabbleService<AppState extends BabbleState> {
         mBabbleNode.submitTx(tx.toBytes());
     }
 
+    public String getPublicKey() {
+        return mKeyPair.publicKey;
+    }
+
     public State getState() {
         return mState;
     }
