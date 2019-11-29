@@ -50,4 +50,22 @@ public class AppStateTest {
         assertEquals("alice", messages.get(0).getUser().getName());
         assertEquals("hello camille, we need to talk!", messages.get(0).getText());
     }
+
+    @Test
+    public void resetTest() {
+
+        AppState appState = new AppState();
+
+        BabbleTx babbleTx = new BabbleTx("alice", "hello camille, we need to talk!");
+        byte[][] txs = new byte[1][];
+        txs[0] = babbleTx.toBytes();
+        appState.applyTransactions(txs);
+
+        appState.reset();
+
+        List<Message> messages = appState.getMessagesFromIndex(0);
+
+        assertEquals(0, messages.size());
+
+    }
 }

@@ -40,6 +40,7 @@ public class AppState implements BabbleState {
     @Override
     public void reset() {
         mState.clear();
+        mNextIndex = 0;
     }
 
     public List<Message> getMessagesFromIndex(Integer index) {
