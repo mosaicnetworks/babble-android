@@ -1,4 +1,4 @@
-package io.mosaicnetworks.sample;
+package io.mosaicnetworks.babble.configure;
 
 import io.mosaicnetworks.babble.node.BabbleService;
 

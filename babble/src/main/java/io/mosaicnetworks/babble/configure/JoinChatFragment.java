@@ -1,10 +1,8 @@
-package io.mosaicnetworks.sample;
+package io.mosaicnetworks.babble.configure;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
@@ -17,10 +15,12 @@ import android.widget.EditText;
 
 import java.util.List;
 
+import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.utils.Utils;
 
 
 /**
@@ -138,10 +138,11 @@ public class JoinChatFragment extends Fragment implements ResponseListener {
 
     @Override
     public void onReceivePeers(List<Peer> currentPeers) {
-        MessagingService messagingService = MessagingService.getInstance();
+        //TODO: check this is safe
+        BabbleService<?> babbleService = mListener.getBabbleService();
 
         try {
-            messagingService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(getContext()));
+            babbleService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(getContext()));
         } catch (IllegalStateException ex) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous chat,
@@ -153,7 +154,7 @@ public class JoinChatFragment extends Fragment implements ResponseListener {
         }
 
         mLoadingDialog.dismiss();
-        messagingService.start();
+        babbleService.start();
         mListener.onJoined(mMoniker);
     }
 

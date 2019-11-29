@@ -1,8 +1,6 @@
-package io.mosaicnetworks.sample;
+package io.mosaicnetworks.babble.configure;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
@@ -10,11 +8,12 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.utils.Utils;
 
 
 /**
@@ -74,8 +73,8 @@ public class NewChatFragment extends Fragment {
 
     // called when the user presses the start chat button
     public void startChat(View view) {
-
-        BabbleService babbleService = mListener.getBabbleService();
+        //TODO: check this is safe
+        BabbleService<?> babbleService = mListener.getBabbleService();
         //get moniker
         EditText editText = view.findViewById(R.id.editText);
         String moniker = editText.getText().toString();

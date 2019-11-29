@@ -1,14 +1,8 @@
 package io.mosaicnetworks.sample;
 
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
+import io.mosaicnetworks.babble.configure.BaseConfigActivity;
 import io.mosaicnetworks.babble.node.BabbleService;
 
 public class MainActivity extends BaseConfigActivity {
@@ -30,7 +24,5 @@ public class MainActivity extends BaseConfigActivity {
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("MONIKER", moniker);
         startActivity(intent);
-
     }
-
 }

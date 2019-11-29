@@ -1,4 +1,4 @@
-package io.mosaicnetworks.sample;
+package io.mosaicnetworks.babble.utils;
 
 import android.content.Context;
 import android.net.wifi.WifiManager;
@@ -12,7 +12,6 @@ public class Utils {
     public static String getIPAddr(Context context) {
         WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
-        Log.d(MainActivity.TAG, "Got IP address: " + ip);
         return ip;
     }
 }
