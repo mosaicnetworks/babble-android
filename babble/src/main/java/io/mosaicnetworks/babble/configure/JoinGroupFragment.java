@@ -143,13 +143,13 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
         try {
             babbleService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(getContext()));
-        } catch (IllegalStateException ex) {
+        } catch (IllegalArgumentException ex) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port - in which case
             //we'll keep getting stuck here until the port is available!
             mLoadingDialog.dismiss();
-            displayOkAlertDialog(R.string.babble_busy_title, R.string.babble_busy_message);
+            displayOkAlertDialog(R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             return;
         }
 
