@@ -16,7 +16,8 @@
             android:name=".NewChatActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ChatActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

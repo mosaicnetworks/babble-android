@@ -13,7 +13,7 @@ import io.mosaicnetworks.babble.node.BabbleState;
 public class AppState implements BabbleState {
 
     private byte[] mStateHash = new byte[0];
-    private final Map<Integer, BabbleTx> mState = new HashMap();
+    private final Map<Integer, BabbleTx> mState = new HashMap<>();
     private Integer mNextIndex = 0;
 
     @Override
@@ -40,6 +40,7 @@ public class AppState implements BabbleState {
     @Override
     public void reset() {
         mState.clear();
+        mNextIndex = 0;
     }
 
     public List<Message> getMessagesFromIndex(Integer index) {

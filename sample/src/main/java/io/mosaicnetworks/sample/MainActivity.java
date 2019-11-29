@@ -1,29 +1,28 @@
 package io.mosaicnetworks.sample;
 
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
-public class MainActivity extends AppCompatActivity {
+import io.mosaicnetworks.babble.configure.BaseConfigActivity;
+import io.mosaicnetworks.babble.node.BabbleService;
 
-    public static final String TAG = "SAMPLE-CHAT";
+public class MainActivity extends BaseConfigActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    public BabbleService getBabbleService() {
+        return MessagingService.getInstance();
     }
 
-    // called when the user presses the new chat button
-    public void newChat(View view) {
-        Intent intent = new Intent(this, NewChatActivity.class);
+    @Override
+    public void onJoined(String moniker) {
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("MONIKER", moniker);
         startActivity(intent);
     }
 
-    // called when the user presses the join chat button
-    public void joinChat(View view) {
-        Intent intent = new Intent(this, JoinChatActivity.class);
+    @Override
+    public void onStartedNew(String moniker) {
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("MONIKER", moniker);
         startActivity(intent);
     }
 }

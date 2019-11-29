@@ -1,28 +1,5 @@
 <resources>
     <string name="app_name">BabbleSample</string>
     <string name="hint_enter_a_message">Enter a message</string>
-    <string name="moniker">Moniker</string>
-    <string name="host">Hostname</string>
-    <string name="join">Join</string>
-    <string name="start">Start</string>
-    <string name="new_chat">New</string>
-    <string name="no_moniker_alert_title">No moniker</string>
-    <string name="no_moniker_alert_message">Please enter a moniker!</string>
-    <string name="no_hostname_alert_title">No hostname</string>
-    <string name="no_hostname_alert_message">Please enter a hostname!</string>
-    <string name="invalid_hostname_alert_title">Invalid hostname</string>
-    <string name="invalid_hostname_alert_message">Please enter a valid hostname!</string>
-    <string name="peers_error_alert_title">Unable to retrieve peers list</string>
-    <string name="peers_json_error_alert_message">Did not receive a valid response from the host</string>
-    <string name="peers_connection_error_alert_message">Failed to connect to host</string>
-    <string name="peers_timeout_error_alert_message">Timed out waiting for host</string>
-    <string name="peers_unknown_error_alert_message">Unknown error</string>
-    <string name="loading_title">Please wait...</string>
-    <string name="loading_message">Fetching peers list from host</string>
-    <string name="ok_button">OK</string>
-    <string name="babble_busy_title">Babble node busy</string>
-    <string name="babble_busy_message">Please try again in a few seconds!</string>
-
-
 
 </resources>
