@@ -9,6 +9,8 @@ import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
+import java.util.List;
+
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ServiceObserver;
 
@@ -17,6 +19,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
     private MessagesListAdapter<Message> mAdapter;
     private String mMoniker;
     private final MessagingService mMessagingService = MessagingService.getInstance();
+    private Integer mMessageIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,14 +56,19 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
     @Override
     public void stateUpdated() {
-        final Message message = mMessagingService.state.getLatestMessage();
+
+        final List<Message> newMessages = mMessagingService.state.getMessagesFromIndex(mMessageIndex);
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mAdapter.addToStart(message, true);
+                for (Message message : newMessages ) {
+                    mAdapter.addToStart(message, true);
+                }
             }
         });
+
+        mMessageIndex = mMessageIndex + newMessages.size();
     }
 
     @Override

@@ -2,28 +2,19 @@ package io.mosaicnetworks.sample;
 
 import com.google.gson.JsonSyntaxException;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import io.mosaicnetworks.babble.node.BabbleState;
 
 public class AppState implements BabbleState {
 
-    private Message mLatestMessage;
-    private static final MessageDigest mSha256Digest;
-    private byte[] mStateHash = "genesis-state".getBytes();
-
-    static {
-        try {
-            mSha256Digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException ex) {
-            //  Every implementation of the Java platform is required to support the SHA-256
-            //  MessageDigest algorithm, so we shouldn't get here!
-            throw new RuntimeException(ex);
-        }
-    }
+    private byte[] mStateHash = new byte[0];
+    private final Map<Integer, BabbleTx> mState = new HashMap();
+    private Integer mNextIndex = 0;
 
     @Override
     public byte[] applyTransactions(byte[][] transactions) {
@@ -38,41 +29,41 @@ public class AppState implements BabbleState {
                 continue;
             }
 
-            onMessageReceived(Message.fromBabbleTx(babbleTx));
-
+            mState.put(mNextIndex, babbleTx);
+            mNextIndex++;
         }
 
-        return new byte[0];
+        updateStateHash();
+        return mStateHash;
     }
 
     @Override
     public void reset() {
-        //do nothing
+        mState.clear();
     }
 
-    private void onMessageReceived(Message message) {
+    public List<Message> getMessagesFromIndex(Integer index) {
 
-        mLatestMessage = message;
+        if (index<0) {
+            throw new IllegalArgumentException("Index cannot be less than 0");
+        }
+
+        if (index >= mNextIndex) {
+            return new ArrayList<>();
+        }
+
+        Integer numMessages = mNextIndex - index;
+
+        List<Message> messages = new ArrayList<>(numMessages);
+
+        for (int i = 0; i < numMessages; i++) {
+            messages.add(Message.fromBabbleTx(mState.get(index)));
+        }
+
+        return messages;
     }
 
-    public Message getLatestMessage() {
-        //TODO: this can return null if no messages are successfully parsed
-        return mLatestMessage;
-    }
-
-    //TODO: use state hash
-    private void updateStateHash(String tx) {
-        mStateHash = hashFromTwoHashes(mStateHash, hash(tx));
-    }
-
-    private static byte[] hash(String tx) {
-        return mSha256Digest.digest(tx.getBytes(Charset.forName("UTF-8")));
-    }
-
-    private static byte[] hashFromTwoHashes(byte[] a, byte[] b) {
-        byte[] tempHash = new byte[a.length + b.length];
-        System.arraycopy(a, 0, tempHash, 0, a.length);
-        System.arraycopy(b, 0, tempHash, 0, b.length);
-        return mSha256Digest.digest(tempHash);
+    private void updateStateHash() {
+        //TODO: implement this
     }
 }

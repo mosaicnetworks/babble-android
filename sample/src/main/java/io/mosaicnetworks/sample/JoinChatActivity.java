@@ -90,7 +90,10 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         try {
             messagingService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(this));
         } catch (IllegalStateException ex) {
-            //we tried to reconfigure before a leave completed
+            //TODO: just catch IOException - this will mean the port is in use
+            //we'll assume this is caused by the node taking a while to leave a previous chat,
+            //though it could be that another application is using the port - in which case
+            //we'll keep getting stuck here until the port is available!
             mLoadingDialog.dismiss();
             displayOkAlertDialog(R.string.babble_busy_title, R.string.babble_busy_message);
             return;
