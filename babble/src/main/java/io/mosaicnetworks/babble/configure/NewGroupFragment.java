@@ -21,14 +21,14 @@ import io.mosaicnetworks.babble.utils.Utils;
  * Activities that contain this fragment must implement the
  * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link NewChatFragment#newInstance} factory method to
+ * Use the {@link NewGroupFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NewChatFragment extends Fragment {
+public class NewGroupFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public NewChatFragment() {
+    public NewGroupFragment() {
         // Required empty public constructor
     }
 
@@ -36,10 +36,10 @@ public class NewChatFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment NewChatFragment.
+     * @return A new instance of fragment NewGroupFragment.
      */
-    public static NewChatFragment newInstance() {
-        return new NewChatFragment();
+    public static NewGroupFragment newInstance() {
+        return new NewGroupFragment();
     }
 
     @Override
@@ -51,13 +51,13 @@ public class NewChatFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        final View view = inflater.inflate(R.layout.fragment_new_chat, container, false);
-        final View newChatButton = view.findViewById(R.id.button);
-        newChatButton.setOnClickListener(
+        final View view = inflater.inflate(R.layout.fragment_new_group, container, false);
+        final View newGroupButton = view.findViewById(R.id.button);
+        newGroupButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startChat(view);
+                        startGroup(view);
                     }
                 }
         );
@@ -71,8 +71,8 @@ public class NewChatFragment extends Fragment {
         return view;
     }
 
-    // called when the user presses the start chat button
-    public void startChat(View view) {
+    // called when the user presses the start button
+    public void startGroup(View view) {
         //TODO: check this is safe
         BabbleService<?> babbleService = mListener.getBabbleService();
         //get moniker
@@ -88,7 +88,7 @@ public class NewChatFragment extends Fragment {
             babbleService.configureNew(moniker, Utils.getIPAddr(getContext()));
         } catch (IllegalStateException ex) {
             //TODO: just catch IOException - this will mean the port is in use
-            //we'll assume this is caused by the node taking a while to leave a previous chat,
+            //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port - in which case
             //we'll keep getting stuck here until the port is available!
             displayOkAlertDialog(R.string.babble_busy_title, R.string.babble_busy_message);

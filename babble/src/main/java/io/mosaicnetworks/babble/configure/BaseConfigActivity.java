@@ -15,8 +15,8 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     public static final String TAG = "SAMPLE-CHAT";
     private FragmentManager mFragmentManager;
     private HomeFragment mHomeFragment;
-    private NewChatFragment mNewChatFragment;
-    private JoinChatFragment mJoinChatFragment;
+    private NewGroupFragment mNewGroupFragment;
+    private JoinGroupFragment mJoinGroupFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,16 +48,16 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         fragmentTransaction.commit();
     }
 
-    // called when the user presses the new chat button
-    public void newChat(View view) {
-        mNewChatFragment = NewChatFragment.newInstance();
-        replaceFragment(mNewChatFragment);
+    // called when the user presses the new button
+    public void newGroup(View view) {
+        mNewGroupFragment = NewGroupFragment.newInstance();
+        replaceFragment(mNewGroupFragment);
     }
 
-    // called when the user presses the join chat button
-    public void joinChat(View view) {
-        mJoinChatFragment = JoinChatFragment.newInstance();
-        replaceFragment(mJoinChatFragment);
+    // called when the user presses the join button
+    public void joinGroup(View view) {
+        mJoinGroupFragment = JoinGroupFragment.newInstance();
+        replaceFragment(mJoinGroupFragment);
     }
 
     @Override

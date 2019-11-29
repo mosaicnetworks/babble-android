@@ -28,10 +28,10 @@ import io.mosaicnetworks.babble.utils.Utils;
  * Activities that contain this fragment must implement the
  * {@link OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link JoinChatFragment#newInstance} factory method to
+ * Use the {@link JoinGroupFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class JoinChatFragment extends Fragment implements ResponseListener {
+public class JoinGroupFragment extends Fragment implements ResponseListener {
 
     private OnFragmentInteractionListener mListener;
     private ProgressDialog mLoadingDialog;
@@ -40,7 +40,7 @@ public class JoinChatFragment extends Fragment implements ResponseListener {
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
 
-    public JoinChatFragment() {
+    public JoinGroupFragment() {
         // Required empty public constructor
     }
 
@@ -48,11 +48,11 @@ public class JoinChatFragment extends Fragment implements ResponseListener {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment JoinChatFragment.
+     * @return A new instance of fragment JoinGroupFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static JoinChatFragment newInstance() {
-        return new JoinChatFragment();
+    public static JoinGroupFragment newInstance() {
+        return new JoinGroupFragment();
     }
 
     @Override
@@ -64,13 +64,13 @@ public class JoinChatFragment extends Fragment implements ResponseListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_join_chat, container, false);
-        final View joinChatButton = view.findViewById(R.id.buttonJoin);
-        joinChatButton.setOnClickListener(
+        final View view = inflater.inflate(R.layout.fragment_join_group, container, false);
+        final View joinGroupButton = view.findViewById(R.id.buttonJoin);
+        joinGroupButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        joinChat(view);
+                        joinGroup(view);
                     }
                 }
         );
@@ -85,8 +85,8 @@ public class JoinChatFragment extends Fragment implements ResponseListener {
 
     }
 
-    // called when the user presses the join chat button
-    public void joinChat(View view) {
+    // called when the user presses the join button
+    public void joinGroup(View view) {
         //get moniker
         EditText editText = view.findViewById(R.id.editMoniker);
         mMoniker = editText.getText().toString();
@@ -117,14 +117,14 @@ public class JoinChatFragment extends Fragment implements ResponseListener {
                             mHttpCurrentPeerDiscoveryRequest =
                                     HttpPeerDiscoveryRequest.createCurrentPeersRequest(
                                             peerIP, BabbleService.DEFAULT_DISCOVERY_PORT,
-                                            JoinChatFragment.this, getContext());
+                                            JoinGroupFragment.this, getContext());
 
                             mHttpCurrentPeerDiscoveryRequest.send();
                         }
 
                         @Override
                         public void onFailure(Error error) {
-                            JoinChatFragment.this.onFailure(error);
+                            JoinGroupFragment.this.onFailure(error);
                         }
                     }, getContext());
         } catch (IllegalArgumentException ex) {
@@ -145,7 +145,7 @@ public class JoinChatFragment extends Fragment implements ResponseListener {
             babbleService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(getContext()));
         } catch (IllegalStateException ex) {
             //TODO: just catch IOException - this will mean the port is in use
-            //we'll assume this is caused by the node taking a while to leave a previous chat,
+            //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port - in which case
             //we'll keep getting stuck here until the port is available!
             mLoadingDialog.dismiss();

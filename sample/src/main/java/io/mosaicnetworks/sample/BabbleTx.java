@@ -22,6 +22,7 @@ public class BabbleTx implements io.mosaicnetworks.babble.node.BabbleTx {
         return gson.fromJson(txJson, BabbleTx.class);
     }
 
+    @Override
     public byte[] toBytes() {
         return gson.toJson(this).getBytes();
     }
