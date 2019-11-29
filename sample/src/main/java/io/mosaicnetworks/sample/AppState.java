@@ -13,7 +13,7 @@ import io.mosaicnetworks.babble.node.BabbleState;
 public class AppState implements BabbleState {
 
     private byte[] mStateHash = new byte[0];
-    private final Map<Integer, BabbleTx> mState = new HashMap();
+    private final Map<Integer, BabbleTx> mState = new HashMap<>();
     private Integer mNextIndex = 0;
 
     @Override

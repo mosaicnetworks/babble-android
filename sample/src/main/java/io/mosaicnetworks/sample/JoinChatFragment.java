@@ -1,13 +1,18 @@
 package io.mosaicnetworks.sample;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.annotation.StringRes;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import java.util.List;
@@ -17,25 +22,73 @@ import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 import io.mosaicnetworks.babble.node.BabbleService;
 
-public class JoinChatActivity extends AppCompatActivity implements ResponseListener {
 
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link JoinChatFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class JoinChatFragment extends Fragment implements ResponseListener {
+
+    private OnFragmentInteractionListener mListener;
     private ProgressDialog mLoadingDialog;
     private String mMoniker;
     private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
 
+    public JoinChatFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment JoinChatFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static JoinChatFragment newInstance() {
+        return new JoinChatFragment();
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_join_chat);
         initLoadingDialog();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        final View view = inflater.inflate(R.layout.fragment_join_chat, container, false);
+        final View joinChatButton = view.findViewById(R.id.buttonJoin);
+        joinChatButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        joinChat(view);
+                    }
+                }
+        );
+
+        EditText edit = (EditText) view.findViewById(R.id.editMoniker);
+        edit.requestFocus();
+
+        InputMethodManager imgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
+
+        return view;
+
     }
 
     // called when the user presses the join chat button
     public void joinChat(View view) {
         //get moniker
-        EditText editText = findViewById(R.id.editMoniker);
+        EditText editText = view.findViewById(R.id.editMoniker);
         mMoniker = editText.getText().toString();
         if (mMoniker.isEmpty()) {
             displayOkAlertDialog(R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
@@ -43,7 +96,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         }
 
         //get peer IP address
-        EditText editIP = findViewById(R.id.editHost);
+        EditText editIP = view.findViewById(R.id.editHost);
         final String peerIP = editIP.getText().toString();
         if (peerIP.isEmpty()) {
             displayOkAlertDialog(R.string.no_hostname_alert_title, R.string.no_hostname_alert_message);
@@ -64,16 +117,16 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
                             mHttpCurrentPeerDiscoveryRequest =
                                     HttpPeerDiscoveryRequest.createCurrentPeersRequest(
                                             peerIP, BabbleService.DEFAULT_DISCOVERY_PORT,
-                                            JoinChatActivity.this, JoinChatActivity.this);
+                                            JoinChatFragment.this, getContext());
 
                             mHttpCurrentPeerDiscoveryRequest.send();
                         }
 
                         @Override
                         public void onFailure(Error error) {
-                            JoinChatActivity.this.onFailure(error);
+                            JoinChatFragment.this.onFailure(error);
                         }
-                    }, this);
+                    }, getContext());
         } catch (IllegalArgumentException ex) {
             displayOkAlertDialog(R.string.invalid_hostname_alert_title, R.string.invalid_hostname_alert_message);
             return;
@@ -88,7 +141,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
         MessagingService messagingService = MessagingService.getInstance();
 
         try {
-            messagingService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(this));
+            messagingService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(getContext()));
         } catch (IllegalStateException ex) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous chat,
@@ -101,9 +154,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
 
         mLoadingDialog.dismiss();
         messagingService.start();
-        Intent intent = new Intent(JoinChatActivity.this, ChatActivity.class);
-        intent.putExtra("MONIKER", mMoniker);
-        startActivity(intent);
+        mListener.onJoined(mMoniker);
     }
 
     @Override
@@ -127,7 +178,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
     }
 
     private void initLoadingDialog() {
-        mLoadingDialog = new ProgressDialog(this);
+        mLoadingDialog = new ProgressDialog(getContext());
         mLoadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         mLoadingDialog.setTitle(R.string.loading_title);
         mLoadingDialog.setMessage(getString(R.string.loading_message));
@@ -142,7 +193,7 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
     }
 
     private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
+        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
                 .setTitle(titleId)
                 .setMessage(messageId)
                 .setNeutralButton(R.string.ok_button, null)
@@ -161,9 +212,27 @@ public class JoinChatActivity extends AppCompatActivity implements ResponseListe
     }
 
     @Override
-    protected void onDestroy() {
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    @Override
+    public void onPause() {
+        //TODO: is this the right place to cancel the requests?
         cancelRequets();
-        super.onDestroy();
+        super.onPause();
     }
 
 }
