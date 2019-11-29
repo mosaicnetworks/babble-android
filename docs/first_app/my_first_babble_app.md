@@ -290,7 +290,7 @@ buildTypes {
 
 dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
-  implementation 'io.mosaicnetworks:babble:0.1.0'
+  implementation 'io.mosaicnetworks:babble:0.2.1'
   implementation 'androidx.appcompat:appcompat:1.1.0'
   implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
   testImplementation 'junit:junit:4.12'
@@ -562,29 +562,22 @@ package io.mosaicnetworks.myfirstapp;
 
 import android.content.Intent;
 import android.os.Bundle;
-
-
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
-
 import android.view.View;
 import android.widget.EditText;
-
 import java.util.ArrayList;
-
 import io.mosaicnetworks.babble.discovery.Peer;
 
-public class NewChatActivity extends AppCompatActivity {
 
+public class NewChatActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_chat);
     }
-
 
     // called when the user presses the start chat button
     public void startChat(View view) {
@@ -593,17 +586,17 @@ public class NewChatActivity extends AppCompatActivity {
         String moniker = editText.getText().toString();
         if (moniker.isEmpty()) {
             displayOkAlertDialog(R.string.no_moniker_alert_title, 
-    			R.string.no_moniker_alert_message);
+                R.string.no_moniker_alert_message);
             return;
         }
 
         MessagingService messagingService = MessagingService.getInstance();
         try {
-           messagingService.configureNew(moniker, Utils.getIPAddr(this));
+            messagingService.configureNew(moniker, Utils.getIPAddr(this));
         } catch (IllegalStateException ex) {
             //we tried to reconfigure before a leave completed
             displayOkAlertDialog(R.string.babble_busy_title, 
-			R.string.babble_busy_message);
+                R.string.babble_busy_message);
             return;
         }
 
@@ -614,7 +607,7 @@ public class NewChatActivity extends AppCompatActivity {
     }
 
     private void displayOkAlertDialog(@StringRes int titleId, 
-    			@StringRes int messageId) {
+                    @StringRes int messageId) {
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(titleId)
                 .setMessage(messageId)
@@ -626,25 +619,7 @@ public class NewChatActivity extends AppCompatActivity {
 ```
 
 
-### StateObserver.java
-
-Copy the code below into a new file: ``StateObserver.java`` in the same folder as ``MainActivity.java``:
-
-```java
-package io.mosaicnetworks.myfirstapp;
-
-public interface StateObserver {
-
-    void onStateChanged(Message message);
-}
-```
-
-This class provides an event handler for use in the MessagingService we are about to create...
-
-
-
-
-### BabbleState.java
+### AppState.java
 
 Copy the source below into place in the same folder as ``MainActivity.java``:
 
@@ -658,31 +633,27 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import io.mosaicnetworks.babble.node.TxConsumer;
+import io.mosaicnetworks.babble.node.BabbleState;
 
-public final class BabbleState implements TxConsumer {
+public class AppState implements BabbleState {
 
+    private Message mLatestMessage;
     private static final MessageDigest mSha256Digest;
-    private StateObserver mObserver;
-    private byte[] mStateHash = "geneseis-state".getBytes();
+    private byte[] mStateHash = "genesis-state".getBytes();
 
     static {
         try {
             mSha256Digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException ex) {
-            //  Every implementation of the Java platform is required to
-            //  support the SHA-256 MessageDigest algorithm, so we 
-            //  shouldn't get here!
+            //  Every implementation of the Java platform is required
+            //  to support the SHA-256 MessageDigest algorithm, 
+            //  so we shouldn't get here!
             throw new RuntimeException(ex);
         }
     }
 
-    public BabbleState(StateObserver observer) {
-        mObserver = observer;
-    }
-
     @Override
-    public byte[] onReceiveTransactions(byte[][] transactions) {
+    public byte[] applyTransactions(byte[][] transactions) {
         for (byte[] rawTx:transactions) {
             String tx = new String(rawTx, StandardCharsets.UTF_8);
 
@@ -694,30 +665,44 @@ public final class BabbleState implements TxConsumer {
                 continue;
             }
 
-            mObserver.onStateChanged(Message.fromBabbleTx(babbleTx));
-            updateStateHash(tx);
+            onMessageReceived(Message.fromBabbleTx(babbleTx));
+
         }
 
-        return mStateHash;
+        return new byte[0];
     }
 
+    @Override
+    public void reset() {
+        //do nothing
+    }
+
+    private void onMessageReceived(Message message) {
+
+        mLatestMessage = message;
+    }
+
+    public Message getLatestMessage() {
+        //TODO: this can return null if no messages are successfully parsed
+        return mLatestMessage;
+    }
+
+    //TODO: use state hash
     private void updateStateHash(String tx) {
         mStateHash = hashFromTwoHashes(mStateHash, hash(tx));
     }
 
     private static byte[] hash(String tx) {
-            return mSha256Digest.digest(tx.getBytes(Charset.forName("UTF-8")));
+        return mSha256Digest.digest(tx.getBytes(Charset.forName("UTF-8")));
     }
 
     private static byte[] hashFromTwoHashes(byte[] a, byte[] b) {
-            byte[] tempHash = new byte[a.length + b.length];
-            System.arraycopy(a, 0, tempHash, 0, a.length);
-            System.arraycopy(b, 0, tempHash, 0, b.length);
-            return mSha256Digest.digest(tempHash);
+        byte[] tempHash = new byte[a.length + b.length];
+        System.arraycopy(a, 0, tempHash, 0, a.length);
+        System.arraycopy(b, 0, tempHash, 0, b.length);
+        return mSha256Digest.digest(tempHash);
     }
 }
-
-
 ```
 
 
@@ -732,7 +717,7 @@ package io.mosaicnetworks.myfirstapp;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
-public class BabbleTx {
+public class BabbleTx implements io.mosaicnetworks.babble.node.BabbleTx {
 
     private final static Gson gson = new Gson();
 
@@ -755,8 +740,6 @@ public class BabbleTx {
         return gson.toJson(this).getBytes();
     }
 }
-
-
 ``` 
 
 
@@ -768,12 +751,15 @@ Copy the source below into place in the same folder as ``MainActivity.java``:
 ```java
 package io.mosaicnetworks.myfirstapp;
 
+import com.google.gson.Gson;
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.IUser;
 
 import java.util.Date;
 
 public final class Message implements IMessage {
+
+    private final static Gson gson = new Gson();
 
     public final static class Author implements IUser {
 
@@ -836,8 +822,8 @@ public final class Message implements IMessage {
     public Date getCreatedAt() {
         return mDate;
     }
-}
 
+}
 ```
 
 You will note the section below introduces an external dependency: 
@@ -856,20 +842,6 @@ Add the lines below to the app ``build.gradle`` file dependencies section, and c
 
 
  
-### MessageObserver.java
-
-Copy the source below into place in the same folder as ``MainActivity.java``:
-
-```java
-package io.mosaicnetworks.myfirstapp;
-
-public interface MessageObserver {
-
-    void onMessageReceived(Message message);
-}
-
-```
-
 ### Utils.java
 Copy the source below into place in the same folder as ``MainActivity.java``:
 
@@ -905,152 +877,22 @@ Copy the source below into place in the same folder as ``MainActivity.java``:
 ```java
 package io.mosaicnetworks.myfirstapp;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import io.mosaicnetworks.babble.node.BabbleService;
 
-import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
-import io.mosaicnetworks.babble.discovery.Peer;
-import io.mosaicnetworks.babble.node.BabbleConfig;
-import io.mosaicnetworks.babble.node.BabbleNode;
-import io.mosaicnetworks.babble.node.KeyPair;
-import io.mosaicnetworks.babble.node.LeaveResponseListener;
+public final class MessagingService extends BabbleService<AppState> {
 
-public class MessagingService {
-
-    public enum State {
-        UNCONFIGURED,
-        CONFIGURED,
-        RUNNING,
-        RUNNING_WITH_DISCOVERY
-    }
-
-    private static MessagingService instance;
-    private List<MessageObserver> mObservers = new ArrayList<>();
-    private BabbleState mBabbleState;
-    private BabbleNode mBabbleNode;
-    private HttpPeerDiscoveryServer mHttpPeerDiscoveryServer;
-    private KeyPair mKeyPair = new KeyPair();
-    private static final int BABBLING_PORT = 6666;
-    public static final int DISCOVERY_PORT = 8988;
-    private State mState = State.UNCONFIGURED;
+    private static MessagingService INSTANCE;
 
     public static MessagingService getInstance() {
-        if (instance==null) {
-            instance = new MessagingService();
-        }
-        return instance;
-    }
-
-    public void configureNew(String moniker, String inetAddress) {
-        List<Peer> genesisPeers = new ArrayList<>();
-        List<Peer> currentPeers = genesisPeers;
-        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress +
-             ":" + BABBLING_PORT, moniker));
-
-        configure(genesisPeers, currentPeers, moniker, inetAddress);
-    }
-
-    public void configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, 
-        String moniker, String inetAddress) {
-
-        configure(genesisPeers, currentPeers, moniker, inetAddress);
-    }
-
-    private void configure(List<Peer> genesisPeers, List<Peer> currentPeers, 
-        String moniker, String inetAddress) {
-
-        if (mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY) {
-            throw new IllegalStateException(
-                "Cannot configure while the service is running");
+        if (INSTANCE==null) {
+            INSTANCE = new MessagingService();
         }
 
-        mBabbleState = new BabbleState(new StateObserver() {
-            @Override
-            public void onStateChanged(Message message) {
-                notifyObservers(message);
-            }
-        });
-
-        try {
-            mBabbleNode = BabbleNode.createWithConfig(genesisPeers, currentPeers,
-                mKeyPair.privateKey, inetAddress,
-                BABBLING_PORT, moniker, mBabbleState,
-                new BabbleConfig.Builder().logLevel(
-                    BabbleConfig.LogLevel.DEBUG).build());
-            mState = State.CONFIGURED;
-        } catch (IllegalArgumentException ex) {
-//The reassignment of mState and mBabbleNode has failed, so leave them as before
-//TODO: need to catch port in use exception (IOException) and throw others
-            throw new RuntimeException(ex);
-        }
-
-        mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(inetAddress, 
-            DISCOVERY_PORT, mBabbleNode);
+        return INSTANCE;
     }
 
-    public void start() {
-        if (mState==State.UNCONFIGURED || mState==State.RUNNING ||
-                mState==State.RUNNING_WITH_DISCOVERY) {
-            throw new IllegalStateException(
-                "Cannot start an unconfigured or running service");
-        }
-
-        mBabbleNode.run();
-        mState=State.RUNNING;
-
-        try {
-            mHttpPeerDiscoveryServer.start();
-            mState=State.RUNNING_WITH_DISCOVERY;
-        } catch (IOException ex) {
-//Probably the port is in use, we'll continue without the discovery service
-        }
-    }
-
-    public void stop() {
-        if (!(mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY)) {
-            throw new IllegalStateException(
-                "Cannot stop a service which isn't running");
-        }
-
-        mHttpPeerDiscoveryServer.stop();
-        mHttpPeerDiscoveryServer=null;
-
-        mBabbleNode.leave(new LeaveResponseListener() {
-            @Override
-            public void onSuccess() {
-                mBabbleNode=null;
-                mState = State.UNCONFIGURED;
-            }
-        });
-    }
-
-    public void submitMessage(Message message) {
-        if (!(mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY)) {
-            throw new IllegalStateException(
-                "Cannot submit when the service isn't running");
-        }
-        mBabbleNode.submitTx(message.toBabbleTx().toBytes());
-    }
-
-    public State getState() {
-        return mState;
-    }
-
-    public void registerObserver(MessageObserver messageObserver) {
-        if (!mObservers.contains(messageObserver)) {
-            mObservers.add(messageObserver);
-        }
-    }
-
-    public void removeObserver(MessageObserver messageObserver) {
-        mObservers.remove(messageObserver);
-    }
-
-    private void notifyObservers(Message message) {
-        for (MessageObserver observer: mObservers) {
-            observer.onMessageReceived(message);
-        }
+    private MessagingService() {
+        super(new AppState());
     }
 }
 
@@ -1187,12 +1029,15 @@ import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
-public class ChatActivity extends AppCompatActivity implements MessageObserver {
+import io.mosaicnetworks.babble.node.ServiceObserver;
+
+public class ChatActivity extends AppCompatActivity implements ServiceObserver {
+
 
     private MessagesListAdapter<Message> mAdapter;
     private String mMoniker;
     private final MessagingService mMessagingService =
-         MessagingService.getInstance();
+            MessagingService.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1206,9 +1051,9 @@ public class ChatActivity extends AppCompatActivity implements MessageObserver {
         mMessagingService.registerObserver(this);
 
         if (mMessagingService.getState()!=
-                      MessagingService.State.RUNNING_WITH_DISCOVERY) {
+                MessagingService.State.RUNNING_WITH_DISCOVERY) {
             Toast.makeText(this, "Unable to advertise peers",
-                      Toast.LENGTH_LONG).show();
+                    Toast.LENGTH_LONG).show();
         }
     }
 
@@ -1223,26 +1068,28 @@ public class ChatActivity extends AppCompatActivity implements MessageObserver {
         input.setInputListener(new MessageInput.InputListener() {
             @Override
             public boolean onSubmit(CharSequence input) {
-                mMessagingService.submitMessage(
-                            new Message(input.toString(), mMoniker));
+                mMessagingService.submitTx(new Message(input.toString(),
+                      mMoniker).toBabbleTx());
                 return true;
             }
         });
     }
 
     @Override
-    public void onMessageReceived(final Message message) {
+    public void stateUpdated() {
+        final Message message = mMessagingService.state.getLatestMessage();
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 mAdapter.addToStart(message, true);
             }
         });
-    };
+    }
 
     @Override
     public void onBackPressed() {
-        mMessagingService.stop();
+        mMessagingService.leave(null);
         super.onBackPressed();
     }
 
@@ -1400,7 +1247,7 @@ import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 
-public class JoinChatActivity extends AppCompatActivity 
+public class JoinChatActivity extends AppCompatActivity
         implements ResponseListener {
 
     private ProgressDialog mLoadingDialog;
@@ -1423,7 +1270,7 @@ public class JoinChatActivity extends AppCompatActivity
         mMoniker = editText.getText().toString();
         if (mMoniker.isEmpty()) {
             displayOkAlertDialog(R.string.no_moniker_alert_title,
-                R.string.no_moniker_alert_message);
+                    R.string.no_moniker_alert_message);
             return;
         }
 
@@ -1432,7 +1279,7 @@ public class JoinChatActivity extends AppCompatActivity
         final String peerIP = editIP.getText().toString();
         if (peerIP.isEmpty()) {
             displayOkAlertDialog(R.string.no_hostname_alert_title,
-                R.string.no_hostname_alert_message);
+                    R.string.no_hostname_alert_message);
             return;
         }
 
@@ -1441,39 +1288,39 @@ public class JoinChatActivity extends AppCompatActivity
 
     private void getPeers(final String peerIP) {
       try {
-        mHttpGenesisPeerDiscoveryRequest = 
-        HttpPeerDiscoveryRequest.createGenesisPeersRequest(
-          peerIP,
-          MessagingService.DISCOVERY_PORT,
-          new ResponseListener() {
-            @Override
-            public void onReceivePeers(List<Peer> genesisPeers) {
-              mGenesisPeers = genesisPeers;
+        mHttpGenesisPeerDiscoveryRequest =
+           HttpPeerDiscoveryRequest.createGenesisPeersRequest(
+             peerIP,
+             MessagingService.DEFAULT_DISCOVERY_PORT,
+             new ResponseListener() {
+               @Override
+               public void onReceivePeers(List<Peer> genesisPeers) {
+                 mGenesisPeers = genesisPeers;
 
-              mHttpCurrentPeerDiscoveryRequest =
-                HttpPeerDiscoveryRequest.createCurrentPeersRequest(
-                  peerIP, 
-                  MessagingService.DISCOVERY_PORT,
-                  JoinChatActivity.this, 
-                  JoinChatActivity.this);
+                 mHttpCurrentPeerDiscoveryRequest =
+                   HttpPeerDiscoveryRequest.createCurrentPeersRequest(
+                     peerIP,
+                     MessagingService.DEFAULT_DISCOVERY_PORT,
+                     JoinChatActivity.this,
+                     JoinChatActivity.this);
 
-              mHttpCurrentPeerDiscoveryRequest.send();
-            }
+                 mHttpCurrentPeerDiscoveryRequest.send();
+               }
 
-            @Override
-            public void onFailure(Error error) {
-              JoinChatActivity.this.onFailure(error);
-            }
-          }, this);
+               @Override
+               public void onFailure(Error error) {
+                 JoinChatActivity.this.onFailure(error);
+               }
+             }, this);
         } catch (IllegalArgumentException ex) {
           displayOkAlertDialog(
-              R.string.invalid_hostname_alert_title,
-              R.string.invalid_hostname_alert_message);
-          return;
-        }
+            R.string.invalid_hostname_alert_title,
+            R.string.invalid_hostname_alert_message);
+        return;
+      }
 
-        mLoadingDialog.show();
-        mHttpGenesisPeerDiscoveryRequest.send();
+      mLoadingDialog.show();
+      mHttpGenesisPeerDiscoveryRequest.send();
     }
 
     @Override
@@ -1482,25 +1329,27 @@ public class JoinChatActivity extends AppCompatActivity
 
         try {
             messagingService.configureJoin(mGenesisPeers, currentPeers,
-               mMoniker, Utils.getIPAddr(this));
+                    mMoniker, Utils.getIPAddr(this));
         } catch (IllegalStateException ex) {
             //we tried to reconfigure before a leave completed
             mLoadingDialog.dismiss();
             displayOkAlertDialog(R.string.babble_busy_title,
-            R.string.babble_busy_message);
+                    R.string.babble_busy_message);
             return;
         }
 
         mLoadingDialog.dismiss();
         messagingService.start();
-        Intent intent = new Intent(JoinChatActivity.this, 
-            ChatActivity.class);
+        Intent intent = new Intent(JoinChatActivity.this,
+                ChatActivity.class);
         intent.putExtra("MONIKER", mMoniker);
         startActivity(intent);
     }
 
     @Override
-    public void onFailure(io.mosaicnetworks.babble.discovery.ResponseListener.Error error) {
+    public void onFailure(
+        io.mosaicnetworks.babble.discovery.ResponseListener.Error error) {
+            
         mLoadingDialog.dismiss();
         int messageId;
         switch (error) {
@@ -1527,6 +1376,7 @@ public class JoinChatActivity extends AppCompatActivity
         mLoadingDialog.setIndeterminate(true);
         mLoadingDialog.setCanceledOnTouchOutside(false);
         mLoadingDialog.setCancelable(true);
+
         mLoadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
@@ -1534,8 +1384,8 @@ public class JoinChatActivity extends AppCompatActivity
             }});
     }
 
-    private void displayOkAlertDialog(@StringRes int titleId, 
-            @StringRes int messageId) {
+    private void displayOkAlertDialog(@StringRes int titleId,
+                                      @StringRes int messageId) {
 
         AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle(titleId)
