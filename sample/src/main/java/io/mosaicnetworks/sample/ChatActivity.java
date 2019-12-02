@@ -14,6 +14,10 @@ import java.util.List;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ServiceObserver;
 
+/**
+ * This is the central UI component. It receives messages from the {@link MessagingService} and
+ * displays them as a list.
+ */
 public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
     private MessagesListAdapter<Message> mAdapter;
@@ -54,6 +58,11 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         });
     }
 
+    /**
+     * Called after the {@link MessagingService} state is updated. This happens after transactions
+     * received from the babble node are applied to the state. At this point the
+     * {@link ChatActivity} retrieves all messages with index greater than it's current index.
+     */
     @Override
     public void stateUpdated() {
 
@@ -71,6 +80,10 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         mMessageIndex = mMessageIndex + newMessages.size();
     }
 
+    /**
+     * When back is pressed we should leave the group. The {@link #onDestroy()} method will handle
+     * unregistering from the service
+     */
     @Override
     public void onBackPressed() {
         mMessagingService.leave(null);

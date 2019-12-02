@@ -10,6 +10,10 @@ import java.util.Map;
 
 import io.mosaicnetworks.babble.node.BabbleState;
 
+/**
+ * The core state of the App. The state is passed to the service during service construction. Public
+ * methods in this class will be accessible to observers of the service.
+ */
 public class AppState implements BabbleState {
 
     private byte[] mStateHash = new byte[0];
@@ -43,6 +47,11 @@ public class AppState implements BabbleState {
         mNextIndex = 0;
     }
 
+    /**
+     * Observers of the service can query the state to get all messages from a given index
+     * @param index the index from which all messages with a higher index should be returned
+     * @return a list of messages
+     */
     public List<Message> getMessagesFromIndex(Integer index) {
 
         if (index<0) {
