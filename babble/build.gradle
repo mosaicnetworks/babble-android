@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 3
-        versionName "0.2.1"
+        versionCode 4
+        versionName "0.2.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -51,7 +51,7 @@ artifacts {
     archives sourcesJar
 }
 
-version '0.2.1'
+version '0.2.2'
 
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
@@ -62,7 +62,7 @@ bintray {
     publications = ['MyPublication']
     configurations = ['archives']
     publish = true //[Default: false] Whether version should be auto published after an upload
-    override = true //[Default: false] Whether to override version artifacts already published
+    override = false //[Default: false] Whether to override version artifacts already published
 
     pkg {
         repo = 'maven'
