@@ -16,8 +16,21 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * A wrapper around volley's {@link StringRequest} to request peers over http. There are two request
+ * types that can be constructed, a genesis-peers request and a current-peers request. The
+ * complementary {@link HttpPeerDiscoveryServer} can be used a serve the peers list
+ */
 public final class HttpPeerDiscoveryRequest {
 
+    /**
+     * Construct a genesis-peers request
+     * @param host the host address of the server
+     * @param port the port number on the server
+     * @param responseListener a listener to return the result or error
+     * @param context the application context
+     * @return the request
+     */
     public static HttpPeerDiscoveryRequest createGenesisPeersRequest(String host, int port,
                                                                 final ResponseListener responseListener,
                                                                 Context context) {
@@ -25,6 +38,14 @@ public final class HttpPeerDiscoveryRequest {
         return createPeersRequest("/genesis-peers", host, port, responseListener, context);
     }
 
+    /**
+     * Construct a current-peers request
+     * @param host the host address of the server
+     * @param port the port number on the server
+     * @param responseListener a listener to return the result or error
+     * @param context the application context
+     * @return the request
+     */
     public static HttpPeerDiscoveryRequest createCurrentPeersRequest(String host, int port,
                                                                      final ResponseListener responseListener,
                                                                      Context context) {
@@ -78,14 +99,26 @@ public final class HttpPeerDiscoveryRequest {
         mRequest = request;
     }
 
+    /**
+     * Set the retry policy
+     * @param timeoutMs request timeout in milliseconds
+     * @param maxNumRetries num of retries before throwing an error
+     * @param backoffMultiplier back off multiplier value
+     */
     public void setRetryPolicy(int timeoutMs, int maxNumRetries, float backoffMultiplier) {
         mRequest.setRetryPolicy(new DefaultRetryPolicy(timeoutMs, maxNumRetries, backoffMultiplier));
     }
 
+    /**
+     * Send the request
+     */
     public void send() {
         mQueue.add(mRequest);
     }
 
+    /**
+     * Cancel the request
+     */
     public void cancel() {
         mRequest.cancel();
         mQueue.stop();

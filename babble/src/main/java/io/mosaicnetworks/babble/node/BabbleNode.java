@@ -12,11 +12,27 @@ import mobile.Mobile;
 import mobile.Node;
 import mobile.MobileConfig;
 
+/**
+ * This is the core Babble node. It can be used directly or alternatively the {@link BabbleService}
+ * class can be used to offer the same functionality wrapped up as a service. After creating the
+ * node, call {@link BabbleNode#run()} to start it.
+ */
 public final class BabbleNode implements PeersProvider {
 
     private final static Gson mGson = new Gson();
     private final Node mNode;
 
+    /**
+     * Create a node with default config
+     * @param genesisPeers list of genesis peers
+     * @param currentPeers list of current peers
+     * @param privateKeyHex private key as produced by the {@link KeyPair} class
+     * @param inetAddress ip address for the node to bind to
+     * @param port the port number to bind to
+     * @param moniker node moniker
+     * @param txConsumer the object which will receive the transactions
+     * @return
+     */
     public static BabbleNode create(List<Peer> genesisPeers, List<Peer> currentPeers,
                                     String privateKeyHex, String inetAddress,
                                     int port, String moniker, TxConsumer txConsumer) {
@@ -25,6 +41,18 @@ public final class BabbleNode implements PeersProvider {
                 new BabbleConfig.Builder().build());
     }
 
+    /**
+     * Create a node with custom config
+     * @param genesisPeers list of genesis peers
+     * @param currentPeers list of current peers
+     * @param privateKeyHex private key as produced by the {@link KeyPair} class
+     * @param inetAddress ip address for the node to bind to
+     * @param port the port number to bind to
+     * @param moniker node moniker
+     * @param txConsumer the object which will receive the transactions
+     * @param babbleConfig custom configuration
+     * @return
+     */
     public static BabbleNode createWithConfig(List<Peer> genesisPeers, List<Peer> currentPeers,
                                               String privateKeyHex,
                                               String inetAddress, int port, String moniker,
@@ -87,6 +115,9 @@ public final class BabbleNode implements PeersProvider {
         mNode = node;
     }
 
+    /**
+     * Run the node
+     */
     //TODO: get rid of null checks
     //TODO: timeout on calls - each call can block indefinitely
     public void run() {
@@ -95,12 +126,21 @@ public final class BabbleNode implements PeersProvider {
         }
     }
 
+    /**
+     * Shutdown the node without exiting the group. The node will not be removed from the validator
+     * set when shutdown is called
+     */
     public void shutdown() {
         if (mNode != null) {
             mNode.shutdown();
         }
     }
 
+    /**
+     * Asynchronous method for leaving a group. The node is removed from the validator set when leave
+     * is called
+     * @param listener called when leave completes
+     */
     public void leave(final LeaveResponseListener listener) {
         if (mNode != null) {
             // this blocks so we'll run in a separate thread
@@ -115,12 +155,20 @@ public final class BabbleNode implements PeersProvider {
         }
     }
 
+    /**
+     * Submit a transaction to the network
+     * @param tx the raw transaction
+     */
     public void submitTx(byte[] tx) {
         if (mNode != null) {
             mNode.submitTx(tx);
         }
     }
 
+    /**
+     * Provide genesis peers
+     * @return list of genesis peers
+     */
     @Override
     public String getGenesisPeers() {
         if (mNode != null) {
@@ -130,6 +178,10 @@ public final class BabbleNode implements PeersProvider {
         return null;
     }
 
+    /**
+     * Provide current peers
+     * @return list of current peers
+     */
     @Override
     public String getCurrentPeers() {
         if (mNode != null) {
@@ -139,6 +191,10 @@ public final class BabbleNode implements PeersProvider {
         return null;
     }
 
+    /**
+     * Provide node statistics
+     * @return json formatted string of statistics
+     */
     public String getStats() {
         if (mNode != null) {
             return mNode.getStats();
