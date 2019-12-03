@@ -931,11 +931,3 @@ Build your app and run it on 2 devices. You should now be able to start a chat o
 This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4) [^stage4]
 
 [^stage4]: This code is the stage4 branch at https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4
-
-----
-
-<div style="page-break-after: always; visibility: hidden"> 
-\pagebreak 
-</div>
-
-
