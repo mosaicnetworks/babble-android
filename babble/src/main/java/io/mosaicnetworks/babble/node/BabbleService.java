@@ -7,8 +7,19 @@ import java.util.List;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
 import io.mosaicnetworks.babble.discovery.Peer;
 
+/**
+ * This is a wrapper around {@link BabbleNode} to allow the node to run as a service. Beyond what a
+ * {@link BabbleNode} provides, this class:
+ * 1. Provides a lifecycle around the node configure -> start -> leave -> configure
+ * 2. Allows observers to register and unregister
+ * 3. Starts a {@link HttpPeerDiscoveryServer} which starts and stops with the node
+ * @param <AppState>
+ */
 public abstract class BabbleService<AppState extends BabbleState> {
 
+    /**
+     * The current state of the service
+     */
     public enum State {
         UNCONFIGURED,
         CONFIGURED,
@@ -16,26 +27,55 @@ public abstract class BabbleService<AppState extends BabbleState> {
         RUNNING_WITH_DISCOVERY
     }
 
+    /**
+     * The default babbling port. This can be overridden when configuring the service
+     */
     public static final int DEFAULT_BABBLING_PORT = 6666;
+
+    /**
+     * The default discovery port. This can be overridden when configuring the service
+     */
     public static final int DEFAULT_DISCOVERY_PORT = 8988;
     private final List<ServiceObserver> mObservers = new ArrayList<>();
     private State mState = State.UNCONFIGURED;
     private KeyPair mKeyPair = new KeyPair();
     private BabbleNode mBabbleNode;
     private BabbleState mBabbleState;
+
+    /**
+     * The underlying app state, to which babble transactions are applied
+     */
     public AppState state;
 
     private HttpPeerDiscoveryServer mHttpPeerDiscoveryServer;
 
+    /**
+     * Constructor
+     * @param babbleState the underlying app state, to which babble transactions are applied
+     */
     public BabbleService(AppState babbleState) {
         mBabbleState = babbleState;
         state = babbleState; //TODO: this is just mirroring mBabbleState
     }
 
+    /**
+     * Configure the service to create a new group using the default ports
+     * @param moniker node moniker
+     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
+     * @throws IllegalStateException if the service is currently running
+     */
     public void configureNew(String moniker, String inetAddress) {
         configureNew(moniker, inetAddress, DEFAULT_BABBLING_PORT, DEFAULT_DISCOVERY_PORT);
     }
 
+    /**
+     * Configure the service to create a new group, overriding the default ports
+     * @param moniker node moniker
+     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
+     * @param babblingPort the port used for Babble consesnsus
+     * @param discoveryPort the port used by the {@link HttpPeerDiscoveryServer}
+     * @throws IllegalStateException if the service is currently running
+     */
     public void configureNew(String moniker, String inetAddress, int babblingPort, int discoveryPort) {
         List<Peer> genesisPeers = new ArrayList<>();
         genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
@@ -44,10 +84,28 @@ public abstract class BabbleService<AppState extends BabbleState> {
         configure(genesisPeers, currentPeers, moniker, inetAddress, babblingPort, discoveryPort);
     }
 
+    /**
+     * Configure the service to join an existing group using the default ports
+     * @param genesisPeers list of genesis peers
+     * @param currentPeers list of current peers
+     * @param moniker node moniker
+     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
+     * @throws IllegalStateException if the service is currently running
+     */
     public void configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress) {
         configure(genesisPeers, currentPeers, moniker, inetAddress, DEFAULT_BABBLING_PORT, DEFAULT_DISCOVERY_PORT);
     }
 
+    /**
+     *
+     * @param genesisPeers list of genesis peers
+     * @param currentPeers list of current peers
+     * @param moniker node moniker
+     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
+     * @param babblingPort the port used for Babble consensus
+     * @param discoveryPort the port used by the {@link HttpPeerDiscoveryServer}
+     * @throws IllegalStateException if the service is currently running
+     */
     public void configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress, int babblingPort, int discoveryPort) {
         configure(genesisPeers, currentPeers, moniker, inetAddress, babblingPort, discoveryPort);
     }
@@ -79,6 +137,10 @@ public abstract class BabbleService<AppState extends BabbleState> {
         mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(inetAddress, discoveryPort, mBabbleNode);
     }
 
+    /**
+     * Start the service
+     * @throws IllegalStateException if the service is currently running or is unconfigured
+     */
     public void start() {
         if (mState==State.UNCONFIGURED || mState==State.RUNNING ||
                 mState==State.RUNNING_WITH_DISCOVERY) {
@@ -96,6 +158,11 @@ public abstract class BabbleService<AppState extends BabbleState> {
         }
     }
 
+    /**
+     * Asynchronous method for leaving a group
+     * @param listener called when the leave completes
+     * @throws IllegalStateException if the service is not currently running
+     */
     public void leave(final LeaveResponseListener listener) {
         if (!(mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY)) {
             throw new IllegalStateException("Cannot stop a service which isn't running");
@@ -117,6 +184,11 @@ public abstract class BabbleService<AppState extends BabbleState> {
         });
     }
 
+    /**
+     * Submit a transaction
+     * @param tx the transaction, which must implement {@link BabbleTx}
+     * @throws IllegalStateException if the service is not currently running
+     */
     public void submitTx(BabbleTx tx) {
         if (!(mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY)) {
             throw new IllegalStateException("Cannot submit when the service isn't running");
@@ -124,20 +196,38 @@ public abstract class BabbleService<AppState extends BabbleState> {
         mBabbleNode.submitTx(tx.toBytes());
     }
 
+    /**
+     * Get the public key
+     * @return public key
+     */
     public String getPublicKey() {
         return mKeyPair.publicKey;
     }
 
+    /**
+     * Get the current state of the service
+     * @return current state if the service
+     */
     public State getState() {
         return mState;
     }
 
+    /**
+     * Register an observer
+     * @param serviceObserver the observer to be registered, the observer must implement the
+     * {@link ServiceObserver} interface
+     */
     public void registerObserver(ServiceObserver serviceObserver) {
         if (!mObservers.contains(serviceObserver)) {
             mObservers.add(serviceObserver);
         }
     }
 
+    /**
+     * Remove an observer
+     * @param messageObserver the observer to be removed, the observer must implement the
+     *                        {@link ServiceObserver} interface
+     */
     public void removeObserver(ServiceObserver messageObserver) {
         mObservers.remove(messageObserver);
     }

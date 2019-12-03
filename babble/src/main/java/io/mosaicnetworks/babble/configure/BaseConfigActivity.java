@@ -10,9 +10,14 @@ import android.view.View;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
 
+/**
+ * This activity complements the {@link BabbleService}. It consists of a set of fragments which
+ * allow the {@link BabbleService} to be configured. Extend class and override the
+ * {@link BaseConfigActivity#getBabbleService()}, {@link BaseConfigActivity#onJoined(String)} and
+ * {@link BaseConfigActivity#onStartedNew(String)} methods.
+ */
 public abstract class BaseConfigActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 
-    public static final String TAG = "SAMPLE-CHAT";
     private FragmentManager mFragmentManager;
     private HomeFragment mHomeFragment;
     private NewGroupFragment mNewGroupFragment;
@@ -29,19 +34,19 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         addFragment(mHomeFragment);
     }
 
-    public void addFragment(Fragment fragment) {
+    private void addFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.constraint_layout, fragment);
         fragmentTransaction.commit();
     }
 
-    public void removeFragment(Fragment fragment) {
+    private void removeFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         fragmentTransaction.remove(fragment);
         fragmentTransaction.commit();
     }
 
-    public void replaceFragment(Fragment fragment) {
+    private void replaceFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.constraint_layout, fragment);
         fragmentTransaction.addToBackStack(null);

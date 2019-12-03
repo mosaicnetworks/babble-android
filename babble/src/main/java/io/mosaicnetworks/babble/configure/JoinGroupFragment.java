@@ -24,12 +24,10 @@ import io.mosaicnetworks.babble.utils.Utils;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link JoinGroupFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * This fragment enables the user to configure the {@link BabbleService} to join an existing group.
+ * Activities that contain this fragment must implement the {@link OnFragmentInteractionListener}
+ * interface to handle interaction events. Use the {@link JoinGroupFragment#newInstance} factory
+ * method to create an instance of this fragment.
  */
 public class JoinGroupFragment extends Fragment implements ResponseListener {
 
@@ -46,11 +44,10 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
     /**
      * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
+     * this fragment.
      *
      * @return A new instance of fragment JoinGroupFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static JoinGroupFragment newInstance() {
         return new JoinGroupFragment();
     }

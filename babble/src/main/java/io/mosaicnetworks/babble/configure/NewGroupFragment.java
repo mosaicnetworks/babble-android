@@ -17,12 +17,10 @@ import io.mosaicnetworks.babble.utils.Utils;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link NewGroupFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * This fragment enables the user to configure the {@link BabbleService} to create a new group.
+ * Activities that contain this fragment must implement the {@link OnFragmentInteractionListener}
+ * interface to handle interaction events. Use the {@link NewGroupFragment#newInstance} factory
+ * method to create an instance of this fragment.
  */
 public class NewGroupFragment extends Fragment {
 
@@ -34,7 +32,7 @@ public class NewGroupFragment extends Fragment {
 
     /**
      * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
+     * this fragment.
      *
      * @return A new instance of fragment NewGroupFragment.
      */

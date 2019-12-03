@@ -11,7 +11,7 @@ import io.mosaicnetworks.babble.R;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * This fragment lets the user choose between joining an existing group or creating a new one
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
@@ -22,7 +22,7 @@ public class HomeFragment extends Fragment {
 
     /**
      * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
+     * this fragment.
      *
      * @return A new instance of fragment HomeFragment.
      */
