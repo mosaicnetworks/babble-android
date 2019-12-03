@@ -1,8 +1,8 @@
 package io.mosaicnetworks.babble.discovery;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.GrantPermissionRule;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
 
 import org.junit.Rule;
 import org.junit.Test;

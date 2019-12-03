@@ -1,9 +1,9 @@
 package io.mosaicnetworks.babble.discovery;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.GrantPermissionRule;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.rule.GrantPermissionRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,12 +13,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
-import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
-import io.mosaicnetworks.babble.discovery.Peer;
-import io.mosaicnetworks.babble.discovery.PeersProvider;
-import io.mosaicnetworks.babble.discovery.ResponseListener;
 
 import static org.junit.Assert.*;
 
