@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import io.mosaicnetworks.babble.test.BuildConfig;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -42,15 +44,52 @@ public class BabbleServiceTest {
         }
     }
 
+    private static class TestServiceWithConfig extends BabbleService<TestState> {
+
+        TestServiceWithConfig() {
+            super(new TestState(), new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
+        }
+    }
+
+
     private byte[] rcvdTx;
 
     @Test
-    public void configureNew() throws InterruptedException {
+    public void configureNewTest() throws InterruptedException {
 
         final CountDownLatch lock = new CountDownLatch(1);
         final byte[] sentBytes = new byte[0];
 
         final TestService testService = new TestService();
+        testService.registerObserver(new ServiceObserver() {
+            @Override
+            public void stateUpdated() {
+                rcvdTx = testService.state.getLastTx();
+                lock.countDown();
+            }
+        });
+
+        testService.configureNew("alice", "localhost");
+        testService.start();
+        testService.submitTx(new BabbleTx() {
+            @Override
+            public byte[] toBytes() {
+                return sentBytes;
+            }
+        });
+        lock.await(3000, TimeUnit.MILLISECONDS);
+
+        assertNotNull(rcvdTx);
+        assertTrue(Arrays.equals(sentBytes, rcvdTx));
+    }
+
+    @Test
+    public void configureNewWithConfigTest() throws InterruptedException {
+
+        final CountDownLatch lock = new CountDownLatch(1);
+        final byte[] sentBytes = new byte[0];
+
+        final TestServiceWithConfig testService = new TestServiceWithConfig();
         testService.registerObserver(new ServiceObserver() {
             @Override
             public void stateUpdated() {
