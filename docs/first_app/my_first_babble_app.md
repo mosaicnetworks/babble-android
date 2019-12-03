@@ -360,78 +360,68 @@ As **New** is standalone functionality, and **Join** requires **New** be impleme
 
 ### Main Activity
 
-First up we will amend ``MainActivity.java``. In the Android view it's layout should be under ``app/res/layout/activity_main.xml``. Double click on that file to open the XML layout file. It may also show a Preview:
-
-![](./screenshots/activity_main_xml.png "Main Activity Layout")
-
-Delete the ``TextView`` tag. We have passed beyond the "Hello World!" stage. 
-
-In the preview window. Click on ``Palette / Layouts / LinearLayout (vertical)`` and drag it onto the preview window. 
-
-![](./screenshots/add_layout.png "Add Layout")
-
-We will then set some properties for the LinearLayout. Amend it to look like this:
-
-```xml
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-        
-        </LinearLayout>
-```
-
-The principal effect of theses changes are to set a margin so the buttons will not reach to the edge of the screen. Next we add a button by adding the following code between the opening and closing ``LinearLayout`` tags. 
-
-```xml
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="newChat"
-        android:text="@string/new_chat" />
-```
-
-Note that the onClick method is marked as an error as we have not created it yet, as is the caption. The preview should look as below:
-
-![](./screenshots/main_activity_preview.png "Main Activity Preview"){width=50%}
-
-Update the ``strings.xml`` file found under ``app/res/values/strings.xml`` adding the line:
-
-```xml
-   <string name="new_chat">New</string>
-```
-
-to give:
-
-```xml
-<resources>
-    <string name="app_name">First Babble Android App</string>
-    <string name="new_chat">New</string>
-</resources>
-```
-Save the file, and if you navigate back to the MainActivity preview, the text New should now appear on the button.
-
-Open MainActivity.java (the java code, not the XML). 
-
-Add the following code to the MainActivity class, under the onCreate method:
+First up we will amend ``MainActivity.java``. replace all of the code with the following:
 
 ```java
-    // called when the user presses the new chat button
-    public void newChat(View view) {
-        Log.i("Ki","newChat Called");
+package io.mosaicnetworks.myfirstapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.os.Bundle;
+
+import io.mosaicnetworks.babble.node.KeyPair;
+
+
+import io.mosaicnetworks.babble.configure.BaseConfigActivity;
+import io.mosaicnetworks.babble.node.BabbleService;
+
+
+import android.util.Log;
+
+public class MainActivity extends BaseConfigActivity {
+    
+    @Override
+    public BabbleService getBabbleService() {
+        return MessagingService.getInstance();
     }
+
+    @Override
+    public void onJoined(String moniker) {
+        // DO nothing for now  
+    }
+
+    @Override
+    public void onStartedNew(String moniker) {
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("MONIKER", moniker);
+        startActivity(intent);
+    }
+    
+}
+
 ```
+
+We have removed our key generation in the onCreate method. Instead
+``MainActivity`` now extends ``BaseConfigActivity``. The ``BaseConfigActivity``
+provides screens to create **New** and to **Join** networks. We just need to
+define the callback event handlers for each case. The further processing is
+identical in both cases - both result in your babble node being started and
+in a babble network -- the only difference is the number of nodes. 
+
+If you want more control over the network joining screens, the branches with
+0.2.1 suffices in the github repo have a worked version using activities
+external to the ``babble-android`` library. 
+
+
+
+
+
+
+
+
+
+
 
 Add the line below as the first line of the class, we will use this later to identified log messages from our app. :
 
@@ -441,182 +431,11 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "FIRST-BABBLE-APP";
 ```
 
-
-If the IDE does not add the line below, add it manually:
-
-```java
-import android.view.View;
-``` 
-The project should now build successfully. So build and run it. If you search for ``Ki`` in the logcat window --- exactly as you searched for ``Yippee`` before you should find results like below (if you have pressed the New button a few times...).
-
-
-![](./screenshots/logcat_ki.png "Main Activity Preview")
-
 ----
 
 <div style="page-break-after: always; visibility: hidden"> 
 \pagebreak 
 </div>
-
-## New Chat Activity
-
-When we press the New button, we want to open a new screen where we can set some Chat Options. So lets create NewChatActivity.
-
-Right click on MainActivity under the java tree. Select ``New > Activity > Basic Activity`` and enter the details as below:
-
-![](./screenshots/NewChatActivityCreate.png "Create NewChatActivity")
-
-
-Edit MainActivity.java and amend the newChat function to read as follows:
-
-```java
-    // called when the user presses the new chat button
-    public void newChat(View view) {
-        Log.i("Ki","newChat Called");
-        Intent intent = new Intent(this, NewChatActivity.class);
-        startActivity(intent);
-    }
-```
-
-If the IDE does not add the line below, add it manually:
-
-```java
-import android.content.Intent;
-``` 
-
-This change means pressing the button opens the NewChat Activity. The app will compile and run at this point. After pressing the button, you should get a screen that looks like this:
-
-![](./screenshots/first_newchat.png "Minimal NewChatActivity")
-
-Update ``res/values/strings.xml`` to set the title_activity_new_chat to "New Chat"
-
-```bash
-<resources>
-    <string name="app_name">First Babble Android App</string>
-    <string name="new_chat">New</string>
-    <string name="title_activity_new_chat">New Chat</string>
-</resources>
-```
-
-### New Chat Activity Layout
-
-Create new ``BasicActivity`` activity ``ChatActivity`` as per the NewChatActivity abov, using the values below:
-
-![](./screenshots/create_chatactivity.png "Create ChatActivity")
-
-
-
-In ``activity_new_chat.xml`` replace the whole file with the following code:
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".NewChatActivity">
-
-    <LinearLayout
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:layout_marginLeft="8dp"
-    android:layout_marginTop="8dp"
-    android:layout_marginEnd="8dp"
-    android:layout_marginRight="8dp"
-    android:layout_marginBottom="8dp"
-    android:orientation="vertical"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
-
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="@string/moniker"
-        android:inputType="textPersonName" />
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="startChat"
-        android:text="@string/start" />
-</LinearLayout>
-    
-</androidx.constraintlayout.widget.ConstraintLayout>
-```
-
-This adds and edit box to set the moniker for this node and a button to actually start the Chat.
-
-You can delete ``content_new_chat.xml`` from the ``res/layout`` folder now as we have just removed the reference to it. 
-
-In ``NewChatActivity.java`` replace the whole file with the code below: 
-```java
-package io.mosaicnetworks.myfirstapp;
-
-import android.content.Intent;
-import android.os.Bundle;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import android.view.View;
-import android.widget.EditText;
-import java.util.ArrayList;
-import io.mosaicnetworks.babble.discovery.Peer;
-
-
-public class NewChatActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_chat);
-    }
-
-    // called when the user presses the start chat button
-    public void startChat(View view) {
-        //get moniker
-        EditText editText = findViewById(R.id.editText);
-        String moniker = editText.getText().toString();
-        if (moniker.isEmpty()) {
-            displayOkAlertDialog(R.string.no_moniker_alert_title, 
-                R.string.no_moniker_alert_message);
-            return;
-        }
-
-        MessagingService messagingService = MessagingService.getInstance();
-        try {
-            messagingService.configureNew(moniker, Utils.getIPAddr(this));
-        } catch (IllegalStateException ex) {
-            //we tried to reconfigure before a leave completed
-            displayOkAlertDialog(R.string.babble_busy_title, 
-                R.string.babble_busy_message);
-            return;
-        }
-
-        messagingService.start();
-        Intent intent = new Intent(this, ChatActivity.class);
-        intent.putExtra("MONIKER", moniker);
-        startActivity(intent);
-    }
-
-    private void displayOkAlertDialog(@StringRes int titleId, 
-                    @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setTitle(titleId)
-                .setMessage(messageId)
-                .setNeutralButton(R.string.ok_button, null)
-                .create();
-        alertDialog.show();
-    }
-}
-```
 
 
 ### AppState.java
@@ -628,29 +447,19 @@ package io.mosaicnetworks.myfirstapp;
 
 import com.google.gson.JsonSyntaxException;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import io.mosaicnetworks.babble.node.BabbleState;
 
 public class AppState implements BabbleState {
 
-    private Message mLatestMessage;
-    private static final MessageDigest mSha256Digest;
-    private byte[] mStateHash = "genesis-state".getBytes();
-
-    static {
-        try {
-            mSha256Digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException ex) {
-            //  Every implementation of the Java platform is required
-            //  to support the SHA-256 MessageDigest algorithm, 
-            //  so we shouldn't get here!
-            throw new RuntimeException(ex);
-        }
-    }
+    private byte[] mStateHash = new byte[0];
+    private final Map<Integer, BabbleTx> mState = new HashMap<>();
+    private Integer mNextIndex = 0;
 
     @Override
     public byte[] applyTransactions(byte[][] transactions) {
@@ -665,44 +474,46 @@ public class AppState implements BabbleState {
                 continue;
             }
 
-            onMessageReceived(Message.fromBabbleTx(babbleTx));
-
+            mState.put(mNextIndex, babbleTx);
+            mNextIndex++;
         }
 
-        return new byte[0];
+        updateStateHash();
+        return mStateHash;
     }
 
     @Override
     public void reset() {
-        //do nothing
+        mState.clear();
+        mNextIndex = 0;
     }
 
-    private void onMessageReceived(Message message) {
+    public List<Message> getMessagesFromIndex(Integer index) {
 
-        mLatestMessage = message;
+        if (index<0) {
+            throw new IllegalArgumentException("Index cannot be less than 0");
+        }
+
+        if (index >= mNextIndex) {
+            return new ArrayList<>();
+        }
+
+        Integer numMessages = mNextIndex - index;
+
+        List<Message> messages = new ArrayList<>(numMessages);
+
+        for (int i = 0; i < numMessages; i++) {
+            messages.add(Message.fromBabbleTx(mState.get(index)));
+        }
+
+        return messages;
     }
 
-    public Message getLatestMessage() {
-        //TODO: this can return null if no messages are successfully parsed
-        return mLatestMessage;
-    }
-
-    //TODO: use state hash
-    private void updateStateHash(String tx) {
-        mStateHash = hashFromTwoHashes(mStateHash, hash(tx));
-    }
-
-    private static byte[] hash(String tx) {
-        return mSha256Digest.digest(tx.getBytes(Charset.forName("UTF-8")));
-    }
-
-    private static byte[] hashFromTwoHashes(byte[] a, byte[] b) {
-        byte[] tempHash = new byte[a.length + b.length];
-        System.arraycopy(a, 0, tempHash, 0, a.length);
-        System.arraycopy(b, 0, tempHash, 0, b.length);
-        return mSha256Digest.digest(tempHash);
+    private void updateStateHash() {
+        //TODO: implement this
     }
 }
+
 ```
 
 
@@ -736,10 +547,12 @@ public class BabbleTx implements io.mosaicnetworks.babble.node.BabbleTx {
         return gson.fromJson(txJson, BabbleTx.class);
     }
 
+    @Override
     public byte[] toBytes() {
         return gson.toJson(this).getBytes();
     }
 }
+
 ``` 
 
 
@@ -751,15 +564,12 @@ Copy the source below into place in the same folder as ``MainActivity.java``:
 ```java
 package io.mosaicnetworks.myfirstapp;
 
-import com.google.gson.Gson;
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.IUser;
 
 import java.util.Date;
 
 public final class Message implements IMessage {
-
-    private final static Gson gson = new Gson();
 
     public final static class Author implements IUser {
 
@@ -841,35 +651,6 @@ Add the lines below to the app ``build.gradle`` file dependencies section, and c
 ```
 
 
- 
-### Utils.java
-Copy the source below into place in the same folder as ``MainActivity.java``:
-
-```java
-package io.mosaicnetworks.myfirstapp;
-
-import android.content.Context;
-import android.net.wifi.WifiManager;
-import android.text.format.Formatter;
-import android.util.Log;
-
-import static android.content.Context.WIFI_SERVICE;
-
-public class Utils {
-
-    public static String getIPAddr(Context context) {
-        WifiManager wm = (WifiManager) 
-                context.getApplicationContext().getSystemService(WIFI_SERVICE);
-        String ip = 
-                Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
-        Log.d("getIPAddr", "Got IP address: " + ip);
-        return ip;
-    }
-}
-```
-
-
-
 ### MessagingService.java
 
 Copy the source below into place in the same folder as ``MainActivity.java``:
@@ -895,21 +676,13 @@ public final class MessagingService extends BabbleService<AppState> {
         super(new AppState());
     }
 }
-
 ```
 
-### strings.xml
+### Chat Activity
 
-We need to the add the following to ``res/values/strings.xml`` as they are used in the code changes above.
-```xml
-    <string name="moniker">Moniker</string>
-    <string name="start">Start</string>
-    <string name="no_moniker_alert_title">No moniker</string>
-    <string name="no_moniker_alert_message">Please enter a moniker!</string>
-    <string name="ok_button">OK</string>
-    <string name="babble_busy_title">Babble node busy</string>
-    <string name="babble_busy_message">Please try again in a few seconds!</string>
-```
+Create a new empty activity, ``ChatActivity``. We will not add any functionality to it at this point, we just need it
+to exist as it is referenced in ``MainActivity``. 
+
 
 ### Running Babble
 
@@ -918,31 +691,36 @@ And finally after all of that cut and paste, we have a working instance of babbl
 If you start the app through Android Studio, and look at the logcat output (filtered to just our app), after pressing the New button, entering a Moniker and pressing the Join button, you should see something like below:
 
 
-![](./screenshots/first_babble_logcat.png "First Babble LogCat")
+![](./screenshots/logcat_babble.png "First Babble LogCat")
 
+The lines of red text are the lines of interest, stripping out the date and other
+prefixes gives something like:
+
+```
+msg="Creating InmemStore" prefix=babble
+msg=PARTICIPANTS genesis_peers=1 id=2193277640 moniker=Jon peers=1 prefix=babble
+msg="Start Listening" prefix=babble
+msg="Node belongs to PeerSet" prefix=babble
+msg="FastSync not enabled => Babbling" prefix=babble
+msg=SetHeadAndSeq core.Head= core.Seq=-1 prefix=babble
+msg=runasync gossip=true prefix=babble
+msg="Run loop" prefix=babble state=Babbling
+msg=BABBLING prefix=babble
+```
+
+The key item is the "**state=Babbling**" line, which denotes that Babble is up
+and running. 
 
 ## Some Explanations
 
 We have just added a lot of code, which is all co-dependent. Now we have a babble invocation in place, we can pause to explain what just happened there. 
 
-Within the ``NewChatActivity.java`` button click handler the contents of the edit box are processed into ``mMoniker`` and the function ``joinChat()`` is called. 
+The configuration of a babble node is handled by the ``BaseConfigActivity`` class from whom
+``MainActivity`` inherits. We just need to wire in the ``ChatActivity`` to take over
+once we have a Babble network.  
 
-Within ``joinChat()`` are the 2 key lines:
-
-```java
-    messagingService.configureNew(moniker, Utils.getIPAddr(this));
-
-        ...
-
-    messagingService.start();
-```
-
-They invoke the singleton instance of the ``MessagingService`` class. The MessagingService class is a simplified version of the code from the sample app included in the babble-android repo. 
-
-At a high level, it configures, then starts a babble node.
-
-Delving a little deeper, the configureNew method is a wrapper for a configure method that takes a peers list, the moniker and IP for this node. In our New Node use case, the peers list will always be empty. 
-
+We define a MessagingService using the ``getBabbleService()`` function. This boilerplate
+class wraps BabbleService from the babble-android library. 
 
 This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2) [^stage2]
 
@@ -955,14 +733,6 @@ This project at this stage is available from github from [here](https://github.c
 The next stage is to make Babble usable. To do that we need to work on the ``ChatActivity`` so it sends and receives messages from Babble. 
 
 First up we need a UI. We are going to use [ChatKit](https://github.com/stfalcon-studio/ChatKit) rather than reinvent the wheel. 
-
-### build.gradle (app)
-
-We need to add this library to the app ``build.gradle`` file by adding the following line: 
-
-```
-    implementation 'com.github.stfalcon:chatkit:0.3.3'
-``` 
 
 ### activity_chat.xml
 
@@ -1021,23 +791,27 @@ Replace all of the file ``ChatActivity.java`` with the code below:
 ```java
 package io.mosaicnetworks.myfirstapp;
 
-import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
+import java.util.List;
+
+import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ServiceObserver;
 
 public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
-
     private MessagesListAdapter<Message> mAdapter;
     private String mMoniker;
-    private final MessagingService mMessagingService =
-            MessagingService.getInstance();
+    private final MessagingService mMessagingService = MessagingService.getInstance();
+    private Integer mMessageIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1050,10 +824,8 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         initialiseAdapter();
         mMessagingService.registerObserver(this);
 
-        if (mMessagingService.getState()!=
-                MessagingService.State.RUNNING_WITH_DISCOVERY) {
-            Toast.makeText(this, "Unable to advertise peers",
-                    Toast.LENGTH_LONG).show();
+        if (mMessagingService.getState()!= BabbleService.State.RUNNING_WITH_DISCOVERY) {
+            Toast.makeText(this, "Unable to advertise peers", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -1068,8 +840,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         input.setInputListener(new MessageInput.InputListener() {
             @Override
             public boolean onSubmit(CharSequence input) {
-                mMessagingService.submitTx(new Message(input.toString(),
-                      mMoniker).toBabbleTx());
+                mMessagingService.submitTx(new Message(input.toString(), mMoniker).toBabbleTx());
                 return true;
             }
         });
@@ -1077,14 +848,19 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
     @Override
     public void stateUpdated() {
-        final Message message = mMessagingService.state.getLatestMessage();
+
+        final List<Message> newMessages = mMessagingService.state.getMessagesFromIndex(mMessageIndex);
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mAdapter.addToStart(message, true);
+                for (Message message : newMessages ) {
+                    mAdapter.addToStart(message, true);
+                }
             }
         });
+
+        mMessageIndex = mMessageIndex + newMessages.size();
     }
 
     @Override
@@ -1130,389 +906,19 @@ This project at this stage is available from github from [here](https://github.c
 
 Thus far, we have been dealing with a single node, which kind of misses the whole point of having a blockchain. So this section remedies this. We will add a new button the MainActivity to Join an existing blockchain. This will require discovering the network - we will just enter an IP address for the moment - although more complex schemes would be used in a production environment.
 
-###  Create Join Chat Activity
-
-We create a new Activity: ``JoinChatActivity`` using the wizard at ``File > New > Activity > Empty Activity``. Enter the name JoinChatActivity and the rest autocompletes.
-
-![](./screenshots/create_JoinChatActivity.png "Create JoinChatActivity"){width=50%}
-
-
-### activity_join_chat.xml
-
-First we set the layout in ``res/layout/activity_join_chat.xml``. Overwrite all the contents of the file.
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".JoinChatActivity">
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <EditText
-            android:id="@+id/editMoniker"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/moniker"
-            android:inputType="textPersonName" />
-
-        <EditText
-            android:id="@+id/editHost"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/host"
-            android:inputType="textUri" />
-
-        <Button
-            android:id="@+id/buttonJoin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="joinChat"
-            android:text="@string/join" />
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
-```
-
-This defines a screen where the user can enter a moniker, exactly as per the ``NewChatActivity``. In contrast the ``NewChatActivity``, there is an additional field to enter the address (IP/hostname) of an existing node on the network. 
-
-### strings.xml
-
-We need to the add the following to ``res/values/strings.xml`` as they are used in the code changes below.
-
-```xml
-<string name="invalid_hostname_alert_title"
-    >Invalid hostname</string>
-<string name="invalid_hostname_alert_message"
-    >Please enter a valid hostname!</string>
-<string name="no_hostname_alert_title">No hostname</string>
-<string name="no_hostname_alert_message"
-    >Please enter a hostname!</string>
-<string name="peers_error_alert_title"
-    >Unable to retrieve peers list</string>
-<string name="peers_json_error_alert_message"
-    >Did not receive a valid response from the host</string>
-<string name="peers_connection_error_alert_message">Failed to connect to host</string>
-<string name="peers_timeout_error_alert_message"
-    >Timed out waiting for host</string>
-<string name="peers_unknown_error_alert_message"
-    >Unknown error</string>
-<string name="loading_title">Please wait...</string>
-<string name="loading_message"
-    >Fetching peers list from host</string>
-<string name="join">Join</string>
-<string name="host">Hostname</string>
-```    
-
-### JoinChatActivity.java
-
-Now we need to add the Java source to ``JoinChatActivity.java`` overwriting the code that is already there.
-
-```java
-package io.mosaicnetworks.myfirstapp;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
-
-import androidx.annotation.StringRes;
-
-import java.util.List;
-
-import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
-import io.mosaicnetworks.babble.discovery.Peer;
-import io.mosaicnetworks.babble.discovery.ResponseListener;
-
-public class JoinChatActivity extends AppCompatActivity
-        implements ResponseListener {
-
-    private ProgressDialog mLoadingDialog;
-    private String mMoniker;
-    private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
-    private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
-    private List<Peer> mGenesisPeers;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_join_chat);
-        initLoadingDialog();
-    }
-
-    // called when the user presses the join chat button
-    public void joinChat(View view) {
-        //get moniker
-        EditText editText = findViewById(R.id.editMoniker);
-        mMoniker = editText.getText().toString();
-        if (mMoniker.isEmpty()) {
-            displayOkAlertDialog(R.string.no_moniker_alert_title,
-                    R.string.no_moniker_alert_message);
-            return;
-        }
-
-        //get peer IP address
-        EditText editIP = findViewById(R.id.editHost);
-        final String peerIP = editIP.getText().toString();
-        if (peerIP.isEmpty()) {
-            displayOkAlertDialog(R.string.no_hostname_alert_title,
-                    R.string.no_hostname_alert_message);
-            return;
-        }
-
-        getPeers(peerIP);
-    }
-
-    private void getPeers(final String peerIP) {
-      try {
-        mHttpGenesisPeerDiscoveryRequest =
-           HttpPeerDiscoveryRequest.createGenesisPeersRequest(
-             peerIP,
-             MessagingService.DEFAULT_DISCOVERY_PORT,
-             new ResponseListener() {
-               @Override
-               public void onReceivePeers(List<Peer> genesisPeers) {
-                 mGenesisPeers = genesisPeers;
-
-                 mHttpCurrentPeerDiscoveryRequest =
-                   HttpPeerDiscoveryRequest.createCurrentPeersRequest(
-                     peerIP,
-                     MessagingService.DEFAULT_DISCOVERY_PORT,
-                     JoinChatActivity.this,
-                     JoinChatActivity.this);
-
-                 mHttpCurrentPeerDiscoveryRequest.send();
-               }
-
-               @Override
-               public void onFailure(Error error) {
-                 JoinChatActivity.this.onFailure(error);
-               }
-             }, this);
-        } catch (IllegalArgumentException ex) {
-          displayOkAlertDialog(
-            R.string.invalid_hostname_alert_title,
-            R.string.invalid_hostname_alert_message);
-        return;
-      }
-
-      mLoadingDialog.show();
-      mHttpGenesisPeerDiscoveryRequest.send();
-    }
-
-    @Override
-    public void onReceivePeers(List<Peer> currentPeers) {
-        MessagingService messagingService = MessagingService.getInstance();
-
-        try {
-            messagingService.configureJoin(mGenesisPeers, currentPeers,
-                    mMoniker, Utils.getIPAddr(this));
-        } catch (IllegalStateException ex) {
-            //we tried to reconfigure before a leave completed
-            mLoadingDialog.dismiss();
-            displayOkAlertDialog(R.string.babble_busy_title,
-                    R.string.babble_busy_message);
-            return;
-        }
-
-        mLoadingDialog.dismiss();
-        messagingService.start();
-        Intent intent = new Intent(JoinChatActivity.this,
-                ChatActivity.class);
-        intent.putExtra("MONIKER", mMoniker);
-        startActivity(intent);
-    }
-
-    @Override
-    public void onFailure(
-        io.mosaicnetworks.babble.discovery.ResponseListener.Error error) {
-            
-        mLoadingDialog.dismiss();
-        int messageId;
-        switch (error) {
-            case INVALID_JSON:
-                messageId = R.string.peers_json_error_alert_message;
-                break;
-            case CONNECTION_ERROR:
-                messageId = R.string.peers_connection_error_alert_message;
-                break;
-            case TIMEOUT:
-                messageId = R.string.peers_timeout_error_alert_message;
-                break;
-            default:
-                messageId = R.string.peers_unknown_error_alert_message;
-        }
-        displayOkAlertDialog(R.string.peers_error_alert_title, messageId);
-    }
-
-    private void initLoadingDialog() {
-        mLoadingDialog = new ProgressDialog(this);
-        mLoadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mLoadingDialog.setTitle(R.string.loading_title);
-        mLoadingDialog.setMessage(getString(R.string.loading_message));
-        mLoadingDialog.setIndeterminate(true);
-        mLoadingDialog.setCanceledOnTouchOutside(false);
-        mLoadingDialog.setCancelable(true);
-
-        mLoadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
-            @Override
-            public void onCancel(DialogInterface dialog){
-                cancelRequets();
-            }});
-    }
-
-    private void displayOkAlertDialog(@StringRes int titleId,
-                                      @StringRes int messageId) {
-
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setTitle(titleId)
-                .setMessage(messageId)
-                .setNeutralButton(R.string.ok_button, null)
-                .create();
-        alertDialog.show();
-    }
-
-    private void cancelRequets() {
-        if (mHttpCurrentPeerDiscoveryRequest!=null) {
-            mHttpCurrentPeerDiscoveryRequest.cancel();
-        }
-
-        if (mHttpGenesisPeerDiscoveryRequest!=null) {
-            mHttpGenesisPeerDiscoveryRequest.cancel();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        cancelRequets();
-        super.onDestroy();
-    }
-
-}
-```
-
-There is a lot going in that code, so we will break it down into easier pieces. The 
-``JoinChatActivity`` is more complicated because it has to negotiate with another node
-and play nicely with it rather than just having the freedom to do its own thing that
-a ``NewChatActivity`` has. To join a network, our joining node needs to know the address
-of a node on the existing network. It then also needs the current peer set - so it know who to
-ask about the hashgraph history, and the genesis peer set (simply the peerset at the time that
-the network was instantiated). In a more complex example than this one, we would also need
-an initial state. By defining the initial state as blank, this app has circumvented that need, but in 
-a more complex system utilising babble as a consensus engine, it would be required. Thus, 
-``monetd``[^monetd] also requires a genesis.json file with a POA smart contract and initial Tenom
-assignments. 
-
-[^monetd]: [Monetd](https://github.com/mosaicnetworks/monetd) is the daemon component of the **Monet Toolchain**; a distributed smart-contract platform based on 
-	[EVM-Lite](https://github.com/mosaicnetworks/evm-lite) and
-	[Babble](https://github.com/mosaicnetworks/babble).
-
-	The **Monet Toolchain** underpins the
-	[MONET Hub](https://monet.network/faq.html), but it is also available for use in 
-	other projects. You can read more about MONET in the 
-	[whitepaper](http://bit.ly/monet-whitepaper).
-
+In the previous version (0.2.1) of Babble-Android, the explanation for joining was over 400 lines of markdown text (plus screenshots).
+As of 0.2.2, it is just to add 3 lines of code (shown in context below) to ``MainActivity.java``
 
 ```java
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_join_chat);
-        initLoadingDialog();
-    }
-```
-The ``onCreate`` event sets up the UI and initialises a Dialog for later use.
-
-```java
-    public void joinChat(View view) {
-```
-
-JoinChat is involved on pressing the Join button. This sanity checks the user input and then calls:
-
-```java
-    getPeers(peerIP);
-```
-
-``getPeers`` requests both peers lists from the node specified by the user. If successful, the function
-below is invoked:
-
-```java
-public void onReceivePeers(List<Peer> currentPeers) {
-```
-
-Which contains the following lines. It uses the information retrieved from the existing node to 
-configure the ``messagingService``. The invocation is then exactly as per the ``NewChatActivity`` 
-where the ``messagingService`` starts a babble node, and then invokes a ``ChatActivity``.
-
-```java
-    messagingService.configureJoin(mGenesisPeers, 
-        currentPeers, mMoniker, Utils.getIPAddr(this));
-
-...
-
-        messagingService.start();
-        Intent intent = new Intent(JoinChatActivity.this, ChatActivity.class);
-        intent.putExtra("MONIKER", mMoniker);
-        startActivity(intent);
-
-```
-
-
-
-### activity_main.xml
-
-We amend ``res/layout/activity_main.xml`` to add a Join Button (the newChat button tag was already in the file):
-
-```xml
-        <Button
-            android:id="@+id/button3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="newChat"
-            android:text="@string/new_chat" />
-
-        <Button
-            android:id="@+id/button4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="joinChat"
-            android:text="@string/join" />
-```
-
-### MainActivity.java
-
-Having added the Join button, we add the click handler to invoke the ``JoinChatActivity`` on clicking.
-
-```java
-    // called when the user presses the join chat button
-    public void joinChat(View view) {
-        Intent intent = new Intent(this, JoinChatActivity.class);
+    public void onJoined(String moniker) {
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("MONIKER", moniker);
         startActivity(intent);
     }
 ```
+
+
 
 ### Build, Run and Test 
 
