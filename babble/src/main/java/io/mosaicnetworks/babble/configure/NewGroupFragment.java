@@ -1,6 +1,7 @@
 package io.mosaicnetworks.babble.configure;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
@@ -60,7 +61,12 @@ public class NewGroupFragment extends Fragment {
                 }
         );
 
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
         EditText edit = (EditText) view.findViewById(R.id.editText);
+        edit.setText(sharedPref.getString("moniker", "Me"));
+
         edit.requestFocus();
 
         InputMethodManager imgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -92,6 +98,15 @@ public class NewGroupFragment extends Fragment {
             displayOkAlertDialog(R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             return;
         }
+
+        // Store moniker entered
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("moniker", moniker);
+        editor.commit();
+
 
         babbleService.start();
         mListener.onStartedNew(moniker);

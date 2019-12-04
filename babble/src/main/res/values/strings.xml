@@ -19,6 +19,7 @@
     <string name="loading_title">Please wait...</string>
     <string name="loading_message">Fetching peers list from host</string>
     <string name="ok_button">OK</string>
+    <string name="preference_file_key">babbleandroid</string>
     <string name="babble_init_fail_title">Failed to start Babble</string>
     <string name="babble_init_fail_message">Please try again in a few seconds!\n\nIf this message keeps appearing, please check your WiFi connection</string>
 </resources>
