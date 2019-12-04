@@ -3,6 +3,7 @@ package io.mosaicnetworks.babble.configure;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
@@ -72,7 +73,14 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
                 }
         );
 
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+        EditText edithost = (EditText) view.findViewById(R.id.editHost);
+        edithost.setText(sharedPref.getString("host", "192.168.1.21"));
+
         EditText edit = (EditText) view.findViewById(R.id.editMoniker);
+        edit.setText(sharedPref.getString("moniker", "Me"));
         edit.requestFocus();
 
         InputMethodManager imgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -99,6 +107,16 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
             displayOkAlertDialog(R.string.no_hostname_alert_title, R.string.no_hostname_alert_message);
             return;
         }
+
+        // Store moniker and host entered
+        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("moniker", mMoniker);
+        editor.putString("host", peerIP);
+        editor.commit();
+
 
         getPeers(peerIP);
     }
