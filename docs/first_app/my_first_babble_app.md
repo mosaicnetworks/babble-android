@@ -810,7 +810,8 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
     private MessagesListAdapter<Message> mAdapter;
     private String mMoniker;
-    private final MessagingService mMessagingService = MessagingService.getInstance();
+    private final MessagingService mMessagingService = 
+                                            MessagingService.getInstance();
     private Integer mMessageIndex = 0;
 
     @Override
@@ -824,8 +825,11 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         initialiseAdapter();
         mMessagingService.registerObserver(this);
 
-        if (mMessagingService.getState()!= BabbleService.State.RUNNING_WITH_DISCOVERY) {
-            Toast.makeText(this, "Unable to advertise peers", Toast.LENGTH_LONG).show();
+        if (mMessagingService.getState()!= 
+                        BabbleService.State.RUNNING_WITH_DISCOVERY) {
+            Toast.makeText(this, 
+                        "Unable to advertise peers", 
+                        Toast.LENGTH_LONG).show();
         }
     }
 
@@ -840,7 +844,8 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         input.setInputListener(new MessageInput.InputListener() {
             @Override
             public boolean onSubmit(CharSequence input) {
-                mMessagingService.submitTx(new Message(input.toString(), mMoniker).toBabbleTx());
+                mMessagingService.submitTx(
+                    new Message(input.toString(), mMoniker).toBabbleTx());
                 return true;
             }
         });
@@ -849,7 +854,8 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
     @Override
     public void stateUpdated() {
 
-        final List<Message> newMessages = mMessagingService.state.getMessagesFromIndex(mMessageIndex);
+        final List<Message> newMessages = 
+                mMessagingService.state.getMessagesFromIndex(mMessageIndex);
 
         runOnUiThread(new Runnable() {
             @Override
