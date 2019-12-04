@@ -63,7 +63,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_join_group, container, false);
-        final View joinGroupButton = view.findViewById(R.id.buttonJoin);
+        final View joinGroupButton = view.findViewById(R.id.button_join);
         joinGroupButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -74,12 +74,12 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         );
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
-                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
-        EditText edithost = (EditText) view.findViewById(R.id.editHost);
+        EditText edithost = (EditText) view.findViewById(R.id.edit_host);
         edithost.setText(sharedPref.getString("host", "192.168.1.21"));
 
-        EditText edit = (EditText) view.findViewById(R.id.editMoniker);
+        EditText edit = (EditText) view.findViewById(R.id.edit_moniker);
         edit.setText(sharedPref.getString("moniker", "Me"));
         edit.requestFocus();
 
@@ -93,7 +93,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
     // called when the user presses the join button
     public void joinGroup(View view) {
         //get moniker
-        EditText editText = view.findViewById(R.id.editMoniker);
+        EditText editText = view.findViewById(R.id.edit_moniker);
         mMoniker = editText.getText().toString();
         if (mMoniker.isEmpty()) {
             displayOkAlertDialog(R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
@@ -101,7 +101,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         }
 
         //get peer IP address
-        EditText editIP = view.findViewById(R.id.editHost);
+        EditText editIP = view.findViewById(R.id.edit_host);
         final String peerIP = editIP.getText().toString();
         if (peerIP.isEmpty()) {
             displayOkAlertDialog(R.string.no_hostname_alert_title, R.string.no_hostname_alert_message);
@@ -110,7 +110,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
         // Store moniker and host entered
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
-                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("moniker", mMoniker);

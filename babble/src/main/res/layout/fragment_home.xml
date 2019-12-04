@@ -7,9 +7,11 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/button_constraint_layout">
 
         <LinearLayout
+            android:id="@+id/button_linear_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -25,14 +27,14 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/new_group_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="newGroup"
                 android:text="@string/new_group" />
 
             <Button
-                android:id="@+id/button4"
+                android:id="@+id/join_group_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="joinGroup"

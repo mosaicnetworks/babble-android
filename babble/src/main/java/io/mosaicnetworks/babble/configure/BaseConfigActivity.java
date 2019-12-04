@@ -22,6 +22,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     private HomeFragment mHomeFragment;
     private NewGroupFragment mNewGroupFragment;
     private JoinGroupFragment mJoinGroupFragment;
+    public static final String PREFERENCE_FILE_KEY = "babbleandroid";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

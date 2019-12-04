@@ -51,7 +51,7 @@ public class NewGroupFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         final View view = inflater.inflate(R.layout.fragment_new_group, container, false);
-        final View newGroupButton = view.findViewById(R.id.button);
+        final View newGroupButton = view.findViewById(R.id.button_start);
         newGroupButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -62,9 +62,9 @@ public class NewGroupFragment extends Fragment {
         );
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
-                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
-        EditText edit = (EditText) view.findViewById(R.id.editText);
+        EditText edit = (EditText) view.findViewById(R.id.edit_moniker);
         edit.setText(sharedPref.getString("moniker", "Me"));
 
         edit.requestFocus();
@@ -80,8 +80,8 @@ public class NewGroupFragment extends Fragment {
         //TODO: check this is safe
         BabbleService<?> babbleService = mListener.getBabbleService();
         //get moniker
-        EditText editText = view.findViewById(R.id.editText);
-        String moniker = editText.getText().toString();
+        EditText editMoniker = view.findViewById(R.id.edit_moniker);
+        String moniker = editMoniker.getText().toString();
         if (moniker.isEmpty()) {
             displayOkAlertDialog(R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
             return;
@@ -101,7 +101,7 @@ public class NewGroupFragment extends Fragment {
 
         // Store moniker entered
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
-                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("moniker", moniker);
