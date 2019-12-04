@@ -41,6 +41,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
     private KeyPair mKeyPair = new KeyPair();
     private BabbleNode mBabbleNode;
     private BabbleState mBabbleState;
+    private final BabbleConfig mNodeConfig;
 
     /**
      * The underlying app state, to which babble transactions are applied
@@ -56,6 +57,18 @@ public abstract class BabbleService<AppState extends BabbleState> {
     public BabbleService(AppState babbleState) {
         mBabbleState = babbleState;
         state = babbleState; //TODO: this is just mirroring mBabbleState
+        mNodeConfig = new BabbleConfig.Builder().build();
+    }
+
+    /**
+     * Constructor with config parameter
+     * @param babbleState the underlying app state, to which babble transactions are applied
+     * @param nodeConfig the node configuration
+     */
+    public BabbleService(AppState babbleState, BabbleConfig nodeConfig) {
+        mBabbleState = babbleState;
+        state = babbleState; //TODO: this is just mirroring mBabbleState
+        mNodeConfig = nodeConfig;
     }
 
     /**
@@ -129,7 +142,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
                         return stateHash;
                     }
                 },
-                new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
+                mNodeConfig);
 
         mBabbleState.reset();
         mState = State.CONFIGURED;

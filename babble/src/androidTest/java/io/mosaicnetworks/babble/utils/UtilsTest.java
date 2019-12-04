@@ -19,7 +19,7 @@ public class UtilsTest {
     @Test
     public void getIpAddrTest() {
 
-        Context appContext = InstrumentationRegistry.getTargetContext();
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
         String ipAddr = Utils.getIPAddr(appContext);
 

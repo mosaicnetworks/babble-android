@@ -29,7 +29,7 @@ public class HttpPeerDiscoveryTest {
     public void integrationTest() throws IOException, InterruptedException {
 
         final CountDownLatch lock = new CountDownLatch(1);
-        final Context appContext = InstrumentationRegistry.getTargetContext();
+        final Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
         class MockPeersProvider implements PeersProvider {
 

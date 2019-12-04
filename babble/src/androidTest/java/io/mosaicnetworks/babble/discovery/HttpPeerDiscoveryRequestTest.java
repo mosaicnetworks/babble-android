@@ -29,7 +29,7 @@ public class HttpPeerDiscoveryRequestTest {
     @Test
     public void requestCurrentPeersTest() throws IOException, InterruptedException {
 
-        final Context appContext = InstrumentationRegistry.getTargetContext();
+        final Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         final CountDownLatch lock = new CountDownLatch(1);
         final String peersJSON = "[{\"NetAddr\":\"localhost:6666\",\"PubKeyHex\":\"0X04362B55F78A2614DC1B5FD3AC90A3162E213CC0F07925AC99E420722CDF3C656AE7BB88A0FEDF01DDD8669E159F9DC20CC5F253AC11F8B5AC2E10A30D0654873B\",\"Moniker\":\"mosaic\"}]\n";
 
@@ -82,7 +82,7 @@ public class HttpPeerDiscoveryRequestTest {
 
         final int requestTimeout = 100;
         final int testTimeout = 3000;
-        final Context appContext = InstrumentationRegistry.getTargetContext();
+        final Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
         final CountDownLatch lock = new CountDownLatch(1);
 
