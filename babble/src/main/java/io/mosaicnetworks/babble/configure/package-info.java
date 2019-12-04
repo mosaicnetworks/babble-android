@@ -1,4 +1,4 @@
 /**
- * io.mosaicnetworks.babble.configure contains utils for configuring a babble node.
+ * io.mosaicnetworks.babble.configure contains
  */
 package io.mosaicnetworks.babble.configure;
