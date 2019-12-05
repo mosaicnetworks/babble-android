@@ -67,7 +67,7 @@ public class AppState implements BabbleState {
         List<Message> messages = new ArrayList<>(numMessages);
 
         for (int i = 0; i < numMessages; i++) {
-            messages.add(Message.fromBabbleTx(mState.get(index)));
+            messages.add(Message.fromBabbleTx(mState.get(index + i)));
         }
 
         return messages;
