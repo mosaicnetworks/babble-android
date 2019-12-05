@@ -21,7 +21,6 @@ public class Utils {
     public static String getIPAddr(Context context) {
         WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
-        Log.d("asdfgh", ip);
         return ip;
     }
 }
