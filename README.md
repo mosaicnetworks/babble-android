@@ -24,8 +24,8 @@ and start coding!
 ## Library structure
 
 At the core of the library is the BabbleNode class. This is a
-wrapper around our [golang](https://github.com/mosaicnetworks/babble)
-implementation of Babble. However we don't recommend you use this class
+wrapper around our [golang implementation of Babble](https://github.com/mosaicnetworks/babble).
+However we don't recommend you use this class
 directly (not initially anyway). We've included a number of ancillary
 classes in the library, which can be used as scaffolding so that you can
 focus on building your app logic. These components can easily be swapped
@@ -33,7 +33,7 @@ out with your own custom implementations later on.
 
 The scaffolding architecture is shown below.
 
-![alt text](https://github.com/mosaicnetworks/babble-android/pics/android-architecture.svg "Scaffold app architecture")
+![alt text](https://github.com/mosaicnetworks/babble-android/blob/master/pics/android-architecture.svg "Scaffold app architecture")
 
 There are five classes which you will need to
 implement, these will either extend classes or implement interfaces from
