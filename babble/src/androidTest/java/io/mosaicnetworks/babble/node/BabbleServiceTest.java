@@ -6,11 +6,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.test.BuildConfig;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -110,5 +113,23 @@ public class BabbleServiceTest {
 
         assertNotNull(rcvdTx);
         assertTrue(Arrays.equals(sentBytes, rcvdTx));
+    }
+
+    @Test
+    public void getPeersTest() {
+
+        final TestService testService = new TestService();
+
+        testService.configureNew("alice", "localhost");
+        testService.start();
+
+        List<Peer> currentPeers = testService.getCurrentPeers();
+        assertEquals(1, currentPeers.size());
+        assertEquals("alice", currentPeers.get(0).moniker);
+
+        List<Peer> genesisPeers = testService.getGenesisPeers();
+        assertEquals(1, genesisPeers.size());
+        assertEquals("alice", currentPeers.get(0).moniker);
+
     }
 }

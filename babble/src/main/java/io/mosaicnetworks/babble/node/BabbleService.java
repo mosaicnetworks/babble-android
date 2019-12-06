@@ -1,7 +1,10 @@
 package io.mosaicnetworks.babble.node;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
@@ -36,6 +39,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * The default discovery port. This can be overridden when configuring the service
      */
     public static final int DEFAULT_DISCOVERY_PORT = 8988;
+    private final static Gson mGson = new Gson();
     private final List<ServiceObserver> mObservers = new ArrayList<>();
     private State mState = State.UNCONFIGURED;
     private KeyPair mKeyPair = new KeyPair();
@@ -208,6 +212,36 @@ public abstract class BabbleService<AppState extends BabbleState> {
         }
         mBabbleNode.submitTx(tx.toBytes());
     }
+
+    /**
+     * Get the genesis peers set
+     * @return a list of the genesis peers
+     */
+    public List<Peer> getGenesisPeers() {
+        if (!(mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY)) {
+            throw new IllegalStateException("Cannot get peers when the service isn't running");
+        }
+
+        Peer[] peers = mGson.fromJson(mBabbleNode.getGenesisPeers(), Peer[].class);
+
+        return new ArrayList<>(Arrays.asList(peers));
+    }
+
+    /**
+     * Get the current peers set
+     * @return a list of the current peers
+     */
+    public List<Peer> getCurrentPeers() {
+        if (!(mState==State.RUNNING || mState==State.RUNNING_WITH_DISCOVERY)) {
+            throw new IllegalStateException("Cannot get peers when the service isn't running");
+        }
+
+        Peer[] peers = mGson.fromJson(mBabbleNode.getCurrentPeers(), Peer[].class);
+
+        return new ArrayList<>(Arrays.asList(peers));
+    }
+
+
 
     /**
      * Get the public key
