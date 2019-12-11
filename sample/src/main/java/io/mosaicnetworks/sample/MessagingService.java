@@ -1,5 +1,8 @@
 package io.mosaicnetworks.sample;
 
+import android.media.audiofx.DynamicsProcessing;
+
+import io.mosaicnetworks.babble.node.BabbleConfig;
 import io.mosaicnetworks.babble.node.BabbleService;
 
 /**
@@ -23,7 +26,7 @@ public final class MessagingService extends BabbleService<AppState> {
     }
 
     private MessagingService() {
-        super(new AppState());
+        super(new AppState(), new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
     }
 }
 

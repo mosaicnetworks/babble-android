@@ -1,5 +1,7 @@
 package io.mosaicnetworks.babble.node;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -61,6 +63,7 @@ public final class BabbleNode implements PeersProvider {
 
         MobileConfig mobileConfig = new MobileConfig(
                 babbleConfig.heartbeat,
+                babbleConfig.slowHeartbeat,
                 babbleConfig.tcpTimeout,
                 babbleConfig.maxPool,
                 babbleConfig.cacheSize,

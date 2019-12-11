@@ -23,6 +23,7 @@ public final class BabbleConfig {
     public static final class Builder {
 
         private int mHeartbeat = 10;
+        private int mSlowHeartbeat = 10;
         private boolean mStore = false;
         private String mLogLevel = "error";
         private int mTcpTimeout = 1000;
@@ -38,6 +39,17 @@ public final class BabbleConfig {
          */
         public Builder heartbeat(int heartbeat) {
             mHeartbeat = heartbeat;
+            return this;
+        }
+
+        /**
+         * Set the slow-heartbeat
+         * @param slowHeartbeat interval between node syncing in milliseconds when there is nothing
+         *                      to gossip about
+         * @return modified builder
+         */
+        public Builder slowHeartbeat(int slowHeartbeat) {
+            mSlowHeartbeat = slowHeartbeat;
             return this;
         }
 
@@ -139,9 +151,14 @@ public final class BabbleConfig {
     }
 
     /**
-     * Interval between node syncing in milliseconds
+     * Interval between node syncing in milliseconds when there is something to gossip about
      */
     public final int heartbeat;  //heartbeat in milliseconds
+
+    /**
+     * Interval between node syncing in milliseconds when there is nothing to gossip about
+     */
+    public final int slowHeartbeat;  //heartbeat in milliseconds
 
     /**
      * Store the blockchain data on disk
@@ -180,6 +197,7 @@ public final class BabbleConfig {
 
     private BabbleConfig(Builder builder) {
         heartbeat = builder.mHeartbeat;
+        slowHeartbeat = builder.mSlowHeartbeat;
         store = builder.mStore;
         logLevel = builder.mLogLevel;
         tcpTimeout = builder.mTcpTimeout;
