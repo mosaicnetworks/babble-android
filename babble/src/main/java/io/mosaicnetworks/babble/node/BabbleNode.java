@@ -85,7 +85,25 @@ public final class BabbleNode implements PeersProvider {
                         String strJson = new String(blockBytes, Charset.forName("UTF-8"));
                         try {
                             Block block = Block.fromJson(strJson);
-                            return txConsumer.onReceiveTransactions(block.body.transactions);
+
+                            // Apply all regular transactions
+                            byte[] stateHash = txConsumer.onReceiveTransactions(block.body.transactions);
+
+                            // Accept all internal transactions, and populate receipts.
+                            InternalTransactionReceipt[] itr= new InternalTransactionReceipt[block.body.internalTransactions.length];
+                            for(int i=0; i< block.body.internalTransactions.length; i++){
+                                itr[i] = block.body.internalTransactions[i].AsAccepted();
+                            }
+
+                            // Set block stateHash and receipts
+                            block.body.stateHash = stateHash;
+                            block.body.internalTransactionReceipts = itr;
+
+                            // Encode and return block
+                            String processedBlock = block.toJson();
+                            System.out.println("Processed Block " + processedBlock);
+                            return processedBlock.getBytes();
+
                         } catch (JsonSyntaxException ex) {
                             return null;
                         }
