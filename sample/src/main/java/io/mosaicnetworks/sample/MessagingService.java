@@ -26,7 +26,7 @@ public final class MessagingService extends BabbleService<ChatState> {
     }
 
     private MessagingService() {
-        super(new ChatState(), new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
+        super(new ChatState(), new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.INFO).build());
     }
 }
 

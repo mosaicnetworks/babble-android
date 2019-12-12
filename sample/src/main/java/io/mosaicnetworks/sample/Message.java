@@ -1,10 +1,12 @@
 package io.mosaicnetworks.sample;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.IUser;
 
+import java.text.DateFormat;
 import java.util.Date;
 
 import io.mosaicnetworks.babble.node.BabbleTx;
@@ -16,7 +18,8 @@ import io.mosaicnetworks.babble.node.BabbleTx;
  */
 public final class Message implements BabbleTx, IMessage {
 
-    private final static Gson gson = new Gson();
+    private final static Gson gson =  new GsonBuilder()
+   .setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
     /**
      * This class implements the {@link IUser} interface which is required by the message adapter

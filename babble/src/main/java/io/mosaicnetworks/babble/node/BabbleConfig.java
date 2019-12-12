@@ -22,8 +22,8 @@ public final class BabbleConfig {
      */
     public static final class Builder {
 
-        private int mHeartbeat = 10;
-        private int mSlowHeartbeat = 10;
+        private int mHeartbeat = 20;
+        private int mSlowHeartbeat = 200;
         private boolean mStore = false;
         private String mLogLevel = "error";
         private int mTcpTimeout = 1000;

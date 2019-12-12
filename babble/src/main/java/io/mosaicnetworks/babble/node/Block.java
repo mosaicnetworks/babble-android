@@ -40,7 +40,7 @@ public final class Block {
         public byte[][] transactions = new byte[][]{};
 
         @SerializedName("InternalTransactions")
-        public final InternalTransaction[] internalTransactions = new InternalTransaction[]{};
+        public InternalTransaction[] internalTransactions = new InternalTransaction[]{};
 
         @SerializedName("InternalTransactionReceipts")
         public InternalTransactionReceipt[] internalTransactionReceipts = new InternalTransactionReceipt[]{};

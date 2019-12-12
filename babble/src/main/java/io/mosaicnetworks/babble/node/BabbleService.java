@@ -135,7 +135,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
 
         mBabbleNode = BabbleNode.createWithConfig(genesisPeers, currentPeers,
                 mKeyPair.privateKey, inetAddress,
-                babblingPort, moniker, new BlockConsumer() {
+                babblingPort, moniker,
+                new BlockConsumer() {
                     @Override
                     public Block onReceiveBlock(Block block) {
                         Block processedBlock = mBabbleState.processBlock(block);

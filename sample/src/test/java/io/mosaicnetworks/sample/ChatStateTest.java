@@ -6,11 +6,12 @@ import java.util.List;
 
 import io.mosaicnetworks.babble.node.BabbleTx;
 import io.mosaicnetworks.babble.node.Block;
+import io.mosaicnetworks.babble.node.InternalTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class AppStateTest {
+public class ChatStateTest {
 
     @Test
     public void getMessagesIndexTooBigTest() {

@@ -19,6 +19,4 @@ public interface BabbleState {
      */
     void reset();
 
-    //byte[] getStateHash();
-
 }

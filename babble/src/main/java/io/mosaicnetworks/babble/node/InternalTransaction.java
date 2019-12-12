@@ -28,24 +28,19 @@ public final class InternalTransaction {
                 }).create();
     }
 
-    public enum TransactionType {
-        PEER_ADD,
-        PEER_REMOVE
-    }
-
     public static final class InternalTransactionBody {
         @SerializedName("Type")
-        public final TransactionType type = TransactionType.PEER_ADD;
+        public int type = 0;
 
         @SerializedName("Peer")
-        public final Peer peer = null;
+        public Peer peer = null;
     }
 
     @SerializedName("Body")
-    public final InternalTransactionBody body = new InternalTransactionBody();
+    public InternalTransactionBody body = new InternalTransactionBody();
 
     @SerializedName("Signature")
-    public final String signature = null;
+    public String signature = null;
 
     public final InternalTransactionReceipt AsAccepted() {
         return new InternalTransactionReceipt(this, true);
