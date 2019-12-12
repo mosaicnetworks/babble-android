@@ -1,5 +1,7 @@
 package io.mosaicnetworks.sample;
 
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.IUser;
 
@@ -8,11 +10,13 @@ import java.util.Date;
 import io.mosaicnetworks.babble.node.BabbleTx;
 
 /**
- * A message class for the UI side defined as a message author, the text and the time of the
- * message. This class implements the {@link IMessage} interface, which is required to display
- * messages in the adapter from the same library.
+ * A chat message class that implements the {@link IMessage} interface, which is required to display
+ * messages in the adapter from the same library, and BabbleTx which is required to serialize
+ * messages for Babble.
  */
-public final class Message implements IMessage {
+public final class Message implements BabbleTx, IMessage {
+
+    private final static Gson gson = new Gson();
 
     /**
      * This class implements the {@link IUser} interface which is required by the message adapter
@@ -42,9 +46,14 @@ public final class Message implements IMessage {
         }
     }
 
-    private final String mText;
-    private final String mAuthor;
-    private final Date mDate;
+    @SerializedName("text")
+    public final String text;
+
+    @SerializedName("author")
+    public final String author;
+
+    @SerializedName("date")
+    public final Date date;
 
     /**
      * Constructor
@@ -52,48 +61,49 @@ public final class Message implements IMessage {
      * @param author the message author
      */
     public Message(String text, String author) {
-        mText = text;
-        mAuthor = author;
-        mDate = new Date();
+        this.text = text;
+        this.author = author;
+        this.date = new Date();
     }
 
     /**
-     * Construct a {@link Message} from a {@link ChatTx}. A {@link Message} instance is created from the
-     * {@link ChatTx#from} and {@link ChatTx#text} attributes
-     * @param chatTx the chat transaction
-     * @return the message
+     * Factory for constructing a {@link Message} from JSON
+     * @param txJson
+     * @return
      */
-    public static Message fromChatTx(ChatTx chatTx) {
-        return new Message(chatTx.text, chatTx.from);
+    public static Message fromJson(String txJson) {
+        return gson.fromJson(txJson, Message.class);
     }
 
-    /**
-     * Construct a {@link ChatTx} from a {@link Message} using the message text and author
-     * attributes
-     * @return the chat transaction
-     */
-    public ChatTx toChatTx() {
-        return new ChatTx(mAuthor, mText);
-    }
-
+    // Implement IMessage
     @Override
     public String getId() {
-        return mAuthor;
+        return this.author;
     }
 
     @Override
     public String getText() {
-        return mText;
+        return this.text;
     }
 
     @Override
     public Author getUser() {
-        return new Author(mAuthor);
+        return new Author(this.author);
     }
 
     @Override
     public Date getCreatedAt() {
-        return mDate;
+        return this.date;
+    }
+
+    // Implement BabbleTx
+    /**
+     * Export to bytes. Converts to JSON {@link String}, then converts to a {@link byte} array
+     * @return byte array
+     */
+    @Override
+    public byte[] toBytes() {
+        return gson.toJson(this).getBytes();
     }
 
 }

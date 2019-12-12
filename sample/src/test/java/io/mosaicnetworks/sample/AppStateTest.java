@@ -42,9 +42,9 @@ public class AppStateTest {
 
         ChatState chatState = new ChatState();
 
-        ChatTx chatTx = new ChatTx("alice", "hello camille, we need to talk!");
-        byte[][] txs = new byte[1][];
-        txs[0] = chatTx.toBytes();
+        byte[][] txs = {
+                new Message("hello camille, we need to talk!","alice" ).toBytes()
+        };
         Block block = new Block();
         block.body.transactions = txs;
         chatState.processBlock(block);
@@ -61,16 +61,16 @@ public class AppStateTest {
 
         ChatState chatState = new ChatState();
 
-        ChatTx chatTx = new ChatTx("alice", "hello camille, we need to talk!");
-        byte[][] txs = new byte[1][];
-        txs[0] = chatTx.toBytes();
+        byte[][] txs = {
+                new Message("hello camille, we need to talk!", "alice").toBytes()
+        };
         Block block = new Block();
         block.body.transactions = txs;
         chatState.processBlock(block);
 
-        ChatTx chatTx2 = new ChatTx("camille", "hi alice, sure!");
-        byte[][] txs2 = new byte[1][];
-        txs2[0] = chatTx2.toBytes();
+        byte[][] txs2 = {
+                new Message( "hi alice, sure!", "camille").toBytes()
+        };
         Block block2 = new Block();
         block2.body.transactions = txs2;
         chatState.processBlock(block2);
@@ -90,9 +90,10 @@ public class AppStateTest {
 
         ChatState chatState = new ChatState();
 
-        ChatTx chatTx = new ChatTx("alice", "hello camille, we need to talk!");
-        byte[][] txs = new byte[1][];
-        txs[0] = chatTx.toBytes();
+
+        byte[][] txs = {
+                new Message("hello camille, we need to talk!", "alice" ).toBytes()
+        };
         Block block = new Block();
         block.body.transactions = txs;
         chatState.processBlock(block);

@@ -19,7 +19,7 @@ import io.mosaicnetworks.babble.node.InternalTransactionReceipt;
 public class ChatState implements BabbleState {
 
     private byte[] mStateHash = new byte[0];
-    private final Map<Integer, ChatTx> mState = new HashMap<>();
+    private final Map<Integer, Message> mState = new HashMap<>();
     private Integer mNextIndex = 0;
 
     @Override
@@ -28,15 +28,15 @@ public class ChatState implements BabbleState {
         for (byte[] rawTx:block.body.transactions) {
             String tx = new String(rawTx, StandardCharsets.UTF_8);
 
-            ChatTx chatTx;
+            Message msg;
             try {
-                chatTx = ChatTx.fromJson(tx);
+                msg = Message.fromJson(tx);
             } catch (JsonSyntaxException ex) {
                 //skip any malformed transactions
                 continue;
             }
 
-            mState.put(mNextIndex, chatTx);
+            mState.put(mNextIndex, msg);
             mNextIndex++;
         }
 
@@ -79,7 +79,7 @@ public class ChatState implements BabbleState {
         List<Message> messages = new ArrayList<>(numMessages);
 
         for (int i = 0; i < numMessages; i++) {
-            messages.add(Message.fromChatTx(mState.get(index + i)));
+            messages.add(mState.get(index + i));
         }
 
         return messages;
