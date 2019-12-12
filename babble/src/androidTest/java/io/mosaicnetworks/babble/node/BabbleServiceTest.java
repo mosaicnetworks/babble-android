@@ -25,9 +25,10 @@ public class BabbleServiceTest {
         private byte[] mLastTx;
 
         @Override
-        public byte[] applyTransactions(byte[][] transactions) {
-            mLastTx = transactions[0];
-            return new byte[0];
+        public Block processBlock(Block block) {
+            mLastTx = block.body.transactions[0];
+            block.body.stateHash = new byte[0];
+            return block;
         }
 
         @Override

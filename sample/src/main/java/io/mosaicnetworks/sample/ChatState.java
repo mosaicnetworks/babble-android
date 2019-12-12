@@ -9,36 +9,48 @@ import java.util.List;
 import java.util.Map;
 
 import io.mosaicnetworks.babble.node.BabbleState;
+import io.mosaicnetworks.babble.node.Block;
+import io.mosaicnetworks.babble.node.InternalTransactionReceipt;
 
 /**
  * The core state of the App. The state is passed to the service during service construction. Public
  * methods in this class will be accessible to observers of the service.
  */
-public class AppState implements BabbleState {
+public class ChatState implements BabbleState {
 
     private byte[] mStateHash = new byte[0];
-    private final Map<Integer, BabbleTx> mState = new HashMap<>();
+    private final Map<Integer, ChatTx> mState = new HashMap<>();
     private Integer mNextIndex = 0;
 
     @Override
-    public byte[] applyTransactions(byte[][] transactions) {
-        for (byte[] rawTx:transactions) {
+    public Block processBlock(Block block) {
+        // Process regular transactions
+        for (byte[] rawTx:block.body.transactions) {
             String tx = new String(rawTx, StandardCharsets.UTF_8);
 
-            BabbleTx babbleTx;
+            ChatTx chatTx;
             try {
-                babbleTx = BabbleTx.fromJson(tx);
+                chatTx = ChatTx.fromJson(tx);
             } catch (JsonSyntaxException ex) {
                 //skip any malformed transactions
                 continue;
             }
 
-            mState.put(mNextIndex, babbleTx);
+            mState.put(mNextIndex, chatTx);
             mNextIndex++;
         }
 
-        updateStateHash();
-        return mStateHash;
+        // Accept all internal transactions, and populate receipts.
+        InternalTransactionReceipt[] itr = new InternalTransactionReceipt[block.body.internalTransactions.length];
+        for(int i=0; i< block.body.internalTransactions.length; i++){
+            itr[i] = block.body.internalTransactions[i].AsAccepted();
+        }
+
+        // Set block stateHash and receipts
+        block.body.stateHash = mStateHash;
+        block.body.internalTransactionReceipts = itr;
+
+        return block;
     }
 
     @Override
@@ -67,7 +79,7 @@ public class AppState implements BabbleState {
         List<Message> messages = new ArrayList<>(numMessages);
 
         for (int i = 0; i < numMessages; i++) {
-            messages.add(Message.fromBabbleTx(mState.get(index + i)));
+            messages.add(Message.fromChatTx(mState.get(index + i)));
         }
 
         return messages;

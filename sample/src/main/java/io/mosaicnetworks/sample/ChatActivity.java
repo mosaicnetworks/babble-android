@@ -52,7 +52,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         input.setInputListener(new MessageInput.InputListener() {
             @Override
             public boolean onSubmit(CharSequence input) {
-                mMessagingService.submitTx(new Message(input.toString(), mMoniker).toBabbleTx());
+                mMessagingService.submitTx(new Message(input.toString(), mMoniker).toChatTx());
                 return true;
             }
         });

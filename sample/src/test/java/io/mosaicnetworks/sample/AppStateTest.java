@@ -4,6 +4,9 @@ import org.junit.Test;
 
 import java.util.List;
 
+import io.mosaicnetworks.babble.node.BabbleTx;
+import io.mosaicnetworks.babble.node.Block;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -12,9 +15,9 @@ public class AppStateTest {
     @Test
     public void getMessagesIndexTooBigTest() {
 
-        AppState appState = new AppState();
+        ChatState chatState = new ChatState();
 
-        List<Message> messageList = appState.getMessagesFromIndex(0);
+        List<Message> messageList = chatState.getMessagesFromIndex(0);
 
         assertTrue(messageList.isEmpty());
     }
@@ -22,7 +25,7 @@ public class AppStateTest {
     @Test
     public void getMessagesNegativeIndexTest() {
 
-        AppState appState = new AppState();
+        ChatState appState = new ChatState();
 
         try {
             List<Message> messageList = appState.getMessagesFromIndex(-5);
@@ -37,14 +40,16 @@ public class AppStateTest {
     @Test
     public void applyMessageTest() {
 
-        AppState appState = new AppState();
+        ChatState chatState = new ChatState();
 
-        BabbleTx babbleTx = new BabbleTx("alice", "hello camille, we need to talk!");
+        ChatTx chatTx = new ChatTx("alice", "hello camille, we need to talk!");
         byte[][] txs = new byte[1][];
-        txs[0] = babbleTx.toBytes();
-        appState.applyTransactions(txs);
+        txs[0] = chatTx.toBytes();
+        Block block = new Block();
+        block.body.transactions = txs;
+        chatState.processBlock(block);
 
-        List<Message> messages = appState.getMessagesFromIndex(0);
+        List<Message> messages = chatState.getMessagesFromIndex(0);
 
         assertEquals(1, messages.size());
         assertEquals("alice", messages.get(0).getUser().getName());
@@ -54,20 +59,23 @@ public class AppStateTest {
     @Test
     public void applyTwoMessageTest() {
 
-        AppState appState = new AppState();
+        ChatState chatState = new ChatState();
 
-        BabbleTx babbleTx = new BabbleTx("alice", "hello camille, we need to talk!");
+        ChatTx chatTx = new ChatTx("alice", "hello camille, we need to talk!");
         byte[][] txs = new byte[1][];
-        txs[0] = babbleTx.toBytes();
-        appState.applyTransactions(txs);
+        txs[0] = chatTx.toBytes();
+        Block block = new Block();
+        block.body.transactions = txs;
+        chatState.processBlock(block);
 
-        BabbleTx babbleTx2 = new BabbleTx("camille", "hi alice, sure!");
+        ChatTx chatTx2 = new ChatTx("camille", "hi alice, sure!");
         byte[][] txs2 = new byte[1][];
-        txs2[0] = babbleTx2.toBytes();
-        appState.applyTransactions(txs2);
+        txs2[0] = chatTx2.toBytes();
+        Block block2 = new Block();
+        block2.body.transactions = txs2;
+        chatState.processBlock(block2);
 
-
-        List<Message> messages = appState.getMessagesFromIndex(0);
+        List<Message> messages = chatState.getMessagesFromIndex(0);
 
         assertEquals(2, messages.size());
         assertEquals("alice", messages.get(0).getUser().getName());
@@ -80,18 +88,19 @@ public class AppStateTest {
     @Test
     public void resetTest() {
 
-        AppState appState = new AppState();
+        ChatState chatState = new ChatState();
 
-        BabbleTx babbleTx = new BabbleTx("alice", "hello camille, we need to talk!");
+        ChatTx chatTx = new ChatTx("alice", "hello camille, we need to talk!");
         byte[][] txs = new byte[1][];
-        txs[0] = babbleTx.toBytes();
-        appState.applyTransactions(txs);
+        txs[0] = chatTx.toBytes();
+        Block block = new Block();
+        block.body.transactions = txs;
+        chatState.processBlock(block);
 
-        appState.reset();
+        chatState.reset();
 
-        List<Message> messages = appState.getMessagesFromIndex(0);
+        List<Message> messages = chatState.getMessagesFromIndex(0);
 
         assertEquals(0, messages.size());
-
     }
 }

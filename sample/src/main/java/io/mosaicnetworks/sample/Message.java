@@ -5,6 +5,8 @@ import com.stfalcon.chatkit.commons.models.IUser;
 
 import java.util.Date;
 
+import io.mosaicnetworks.babble.node.BabbleTx;
+
 /**
  * A message class for the UI side defined as a message author, the text and the time of the
  * message. This class implements the {@link IMessage} interface, which is required to display
@@ -56,22 +58,22 @@ public final class Message implements IMessage {
     }
 
     /**
-     * Construct a {@link Message} from a {@link BabbleTx}. A {@link Message} instance is created from the
-     * {@link BabbleTx#from} and {@link BabbleTx#text} attributes
-     * @param babbleTx the babble transaction
+     * Construct a {@link Message} from a {@link ChatTx}. A {@link Message} instance is created from the
+     * {@link ChatTx#from} and {@link ChatTx#text} attributes
+     * @param chatTx the chat transaction
      * @return the message
      */
-    public static Message fromBabbleTx(BabbleTx babbleTx) {
-        return new Message(babbleTx.text, babbleTx.from);
+    public static Message fromChatTx(ChatTx chatTx) {
+        return new Message(chatTx.text, chatTx.from);
     }
 
     /**
-     * Construct a {@link BabbleTx} from a {@link Message} using the message text and author
+     * Construct a {@link ChatTx} from a {@link Message} using the message text and author
      * attributes
-     * @return the babble transaction
+     * @return the chat transaction
      */
-    public BabbleTx toBabbleTx() {
-        return new BabbleTx(mAuthor, mText);
+    public ChatTx toChatTx() {
+        return new ChatTx(mAuthor, mText);
     }
 
     @Override

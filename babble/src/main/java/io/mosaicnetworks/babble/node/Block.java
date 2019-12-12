@@ -13,7 +13,7 @@ import com.google.gson.annotations.SerializedName;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-final class Block {
+public final class Block {
 
     private final static Gson mCustomGson;
 
@@ -37,7 +37,7 @@ final class Block {
         public byte[] stateHash = new byte[]{};
 
         @SerializedName("Transactions")
-        public final byte[][] transactions = new byte[][]{};
+        public byte[][] transactions = new byte[][]{};
 
         @SerializedName("InternalTransactions")
         public final InternalTransaction[] internalTransactions = new InternalTransaction[]{};

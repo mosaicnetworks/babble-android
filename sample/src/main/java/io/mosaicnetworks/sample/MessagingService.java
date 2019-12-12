@@ -7,9 +7,9 @@ import io.mosaicnetworks.babble.node.BabbleService;
 
 /**
  * This is a singleton which provides a Messaging service. It extends the {@link BabbleService}
- * class providing the base class with the {@link AppState} and implementing a singleton pattern
+ * class providing the base class with the {@link ChatState} and implementing a singleton pattern
  */
-public final class MessagingService extends BabbleService<AppState> {
+public final class MessagingService extends BabbleService<ChatState> {
 
     private static MessagingService INSTANCE;
 
@@ -26,7 +26,7 @@ public final class MessagingService extends BabbleService<AppState> {
     }
 
     private MessagingService() {
-        super(new AppState(), new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
+        super(new ChatState(), new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
     }
 }
 

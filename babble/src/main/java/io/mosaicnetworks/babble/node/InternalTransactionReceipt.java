@@ -14,7 +14,7 @@ import java.lang.reflect.Type;
 
 import io.mosaicnetworks.babble.discovery.Peer;
 
-final class InternalTransactionReceipt {
+public final class InternalTransactionReceipt {
     private final static Gson mCustomGson;
 
     static {

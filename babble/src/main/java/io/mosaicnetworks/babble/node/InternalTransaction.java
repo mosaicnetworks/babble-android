@@ -16,7 +16,7 @@ import java.util.Map;
 
 import io.mosaicnetworks.babble.discovery.Peer;
 
-final class InternalTransaction {
+public final class InternalTransaction {
     private final static Gson mCustomGson;
 
     static {

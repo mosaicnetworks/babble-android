@@ -7,11 +7,11 @@ package io.mosaicnetworks.babble.node;
 public interface BabbleState {
 
     /**
-     * Called when a new set of transactions have passed through consensus
-     * @param transactions array of raw transactions
-     * @return state hash
+     * Called when a block is committed by Babble
+     * @param block
+     * @return processed block (with state-hash and InternalTransactionReceipts)
      */
-    byte[] applyTransactions(byte[][] transactions);
+    Block processBlock(Block block);
 
     /**
      * Called when the node is reconfigured, at which point the state should be reset to some

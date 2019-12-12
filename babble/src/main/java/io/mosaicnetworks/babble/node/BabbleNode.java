@@ -1,7 +1,5 @@
 package io.mosaicnetworks.babble.node;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -32,14 +30,14 @@ public final class BabbleNode implements PeersProvider {
      * @param inetAddress ip address for the node to bind to
      * @param port the port number to bind to
      * @param moniker node moniker
-     * @param txConsumer the object which will receive the transactions
+     * @param blockConsumer the object which will receive the transactions
      * @return
      */
     public static BabbleNode create(List<Peer> genesisPeers, List<Peer> currentPeers,
                                     String privateKeyHex, String inetAddress,
-                                    int port, String moniker, TxConsumer txConsumer) {
+                                    int port, String moniker, BlockConsumer blockConsumer) {
 
-        return createWithConfig(genesisPeers, currentPeers, privateKeyHex, inetAddress, port, moniker, txConsumer,
+        return createWithConfig(genesisPeers, currentPeers, privateKeyHex, inetAddress, port, moniker, blockConsumer,
                 new BabbleConfig.Builder().build());
     }
 
@@ -51,14 +49,14 @@ public final class BabbleNode implements PeersProvider {
      * @param inetAddress ip address for the node to bind to
      * @param port the port number to bind to
      * @param moniker node moniker
-     * @param txConsumer the object which will receive the transactions
+     * @param blockConsumer the object which will receive the transactions
      * @param babbleConfig custom configuration
      * @return
      */
     public static BabbleNode createWithConfig(List<Peer> genesisPeers, List<Peer> currentPeers,
                                               String privateKeyHex,
                                               String inetAddress, int port, String moniker,
-                                              final TxConsumer txConsumer,
+                                              final BlockConsumer blockConsumer,
                                               BabbleConfig babbleConfig) {
 
         MobileConfig mobileConfig = new MobileConfig(
@@ -84,25 +82,14 @@ public final class BabbleNode implements PeersProvider {
                     public byte[] onCommit(final byte[] blockBytes) {
                         String strJson = new String(blockBytes, Charset.forName("UTF-8"));
                         try {
-                            Block block = Block.fromJson(strJson);
+                            Block incomingBlock = Block.fromJson(strJson);
 
-                            // Apply all regular transactions
-                            byte[] stateHash = txConsumer.onReceiveTransactions(block.body.transactions);
-
-                            // Accept all internal transactions, and populate receipts.
-                            InternalTransactionReceipt[] itr= new InternalTransactionReceipt[block.body.internalTransactions.length];
-                            for(int i=0; i< block.body.internalTransactions.length; i++){
-                                itr[i] = block.body.internalTransactions[i].AsAccepted();
-                            }
-
-                            // Set block stateHash and receipts
-                            block.body.stateHash = stateHash;
-                            block.body.internalTransactionReceipts = itr;
+                            Block processedBlock = blockConsumer.onReceiveBlock(incomingBlock);
 
                             // Encode and return block
-                            String processedBlock = block.toJson();
+                            String jsonProcessedBlock = processedBlock.toJson();
                             System.out.println("Processed Block " + processedBlock);
-                            return processedBlock.getBytes();
+                            return jsonProcessedBlock.getBytes();
 
                         } catch (JsonSyntaxException ex) {
                             return null;

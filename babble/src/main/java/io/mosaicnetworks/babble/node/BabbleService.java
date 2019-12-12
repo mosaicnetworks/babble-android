@@ -135,15 +135,12 @@ public abstract class BabbleService<AppState extends BabbleState> {
 
         mBabbleNode = BabbleNode.createWithConfig(genesisPeers, currentPeers,
                 mKeyPair.privateKey, inetAddress,
-                babblingPort, moniker, new TxConsumer() {
+                babblingPort, moniker, new BlockConsumer() {
                     @Override
-                    public byte[] onReceiveTransactions(byte[][] transactions) {
-
-                        byte[] stateHash = mBabbleState.applyTransactions(transactions);
-
+                    public Block onReceiveBlock(Block block) {
+                        Block processedBlock = mBabbleState.processBlock(block);
                         notifyObservers();
-
-                        return stateHash;
+                        return processedBlock;
                     }
                 },
                 mNodeConfig);
