@@ -69,7 +69,8 @@ public final class BabbleNode implements PeersProvider {
                 babbleConfig.enableFastSync,
                 babbleConfig.store,
                 babbleConfig.logLevel,
-                moniker
+                moniker,
+                babbleConfig.suspendLimit
         );
 
         Node node = Mobile.new_(

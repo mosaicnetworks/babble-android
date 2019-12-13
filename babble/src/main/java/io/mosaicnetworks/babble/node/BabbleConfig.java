@@ -14,7 +14,8 @@ public final class BabbleConfig {
         WARN,
         ERROR,
         FATAL,
-        PANIC
+        PANIC,
+        TRACE,
     }
 
     /**
@@ -23,7 +24,7 @@ public final class BabbleConfig {
     public static final class Builder {
 
         private int mHeartbeat = 20;
-        private int mSlowHeartbeat = 200;
+        private int mSlowHeartbeat = 20;
         private boolean mStore = false;
         private String mLogLevel = "error";
         private int mTcpTimeout = 1000;
@@ -31,6 +32,7 @@ public final class BabbleConfig {
         private int mCacheSize = 50000;
         private int mSyncLimit = 1000;
         private boolean mEnableFastSync = false;
+        private int mSuspendLimit = 300;
 
         /**
          * Set the heartbeat
@@ -88,6 +90,9 @@ public final class BabbleConfig {
                 case PANIC:
                     mLogLevel = "panic";
                     break;
+                case TRACE:
+                    mLogLevel = "trace";
+                    break;
             }
 
             return this;
@@ -130,6 +135,17 @@ public final class BabbleConfig {
          */
         public Builder syncLimit(int syncLimit) {
             mSyncLimit = syncLimit;
+            return this;
+        }
+
+        /**
+         * Set the suspend limit
+         * @param suspendLimit the number of undetermined-events that causes the babble node to be
+         *                     suspended
+         * @return modified builder
+         */
+        public Builder suspendLimit(int suspendLimit) {
+            mSuspendLimit = suspendLimit;
             return this;
         }
 
@@ -195,6 +211,11 @@ public final class BabbleConfig {
      */
     public final Boolean enableFastSync;  //enable fast sync
 
+    /**
+     * The number of undetermined-events that causes the babble node to be suspended
+     */
+    public final int suspendLimit;
+
     private BabbleConfig(Builder builder) {
         heartbeat = builder.mHeartbeat;
         slowHeartbeat = builder.mSlowHeartbeat;
@@ -205,6 +226,7 @@ public final class BabbleConfig {
         cacheSize = builder.mCacheSize;
         syncLimit = builder.mSyncLimit;
         enableFastSync = builder.mEnableFastSync;
+        suspendLimit = builder.mSuspendLimit;
     }
 
 
