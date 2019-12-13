@@ -22,7 +22,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
     private MessagesListAdapter<Message> mAdapter;
     private String mMoniker;
-    private final MessagingService mMessagingService = MessagingService.getInstance();
+    private final MessagingService mMessagingService = MessagingService.getInstance(this);
     private Integer mMessageIndex = 0;
 
     @Override

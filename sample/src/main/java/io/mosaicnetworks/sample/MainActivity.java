@@ -9,7 +9,7 @@ public class MainActivity extends BaseConfigActivity {
 
     @Override
     public BabbleService getBabbleService() {
-        return MessagingService.getInstance();
+        return MessagingService.getInstance(this);
     }
 
     @Override
