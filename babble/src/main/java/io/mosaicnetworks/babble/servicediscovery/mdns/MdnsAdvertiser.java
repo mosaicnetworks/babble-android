@@ -30,7 +30,7 @@ public class MdnsAdvertiser {
         mNsdManager.unregisterService(mRegistrationListener);
     }
 
-    public void initializeRegistrationListener() {
+    private void initializeRegistrationListener() {
         mRegistrationListener = new NsdManager.RegistrationListener()  {
 
             @Override

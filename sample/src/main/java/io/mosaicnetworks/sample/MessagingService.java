@@ -13,7 +13,7 @@ public final class MessagingService extends BabbleService<AppState> {
 
     private static MessagingService INSTANCE;
     private MdnsAdvertiser mMdnsAdvertiser;
-    private Context mContext;
+    private Context mAppContext;
 
     /**
      * Factory for the {@link MessagingService}
@@ -21,22 +21,22 @@ public final class MessagingService extends BabbleService<AppState> {
      */
     public static MessagingService getInstance(Context context) {
         if (INSTANCE==null) {
-            INSTANCE = new MessagingService(context);
+            INSTANCE = new MessagingService(context.getApplicationContext());
         }
 
         return INSTANCE;
     }
 
-    private MessagingService(Context context) {
+    private MessagingService(Context appContext) {
         super(new AppState());
-        mContext = context;
+        mAppContext = appContext;
     }
 
     @Override
     protected void onStarted() {
         super.onStarted();
         mMdnsAdvertiser = new MdnsAdvertiser("BabbleService", 8988);
-        mMdnsAdvertiser.advertise(mContext);
+        mMdnsAdvertiser.advertise(mAppContext);
     }
 
     @Override
