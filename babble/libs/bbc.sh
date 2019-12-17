@@ -1,3 +1,4 @@
+#!/bin/bash
 # build babble core (bbc)
 set -e
 
