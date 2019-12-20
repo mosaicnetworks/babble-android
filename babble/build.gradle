@@ -9,13 +9,13 @@ apply plugin: 'com.jfrog.bintray'
 //##################################################################################################
 // babble core configuration
 
-//def babbleCoreVersion = "0.5.9"
-//def repository = "https://github.com/mosaicnetworks/babble/releases/download"
-//def protocol = "https"
+def babbleCoreVersion = "0.6.0"
+def repository = "https://github.com/mosaicnetworks/babble/releases/download"
+def protocol = "https"
 
-def babbleCoreVersion = "6df6909b74d954c93d90ae60b27cdda029369d5b"
-def repository = System.properties['user.home'] + "/go/src/github.com/mosaicnetworks/babble/build/distmobile"
-def protocol = "file"
+// def babbleCoreVersion = "6df6909b74d954c93d90ae60b27cdda029369d5b"
+// def repository = "~/gowork/src/github.com/mosaicnetworks/babble/build/distmobile"
+// def protocol = "file"
 
 //##################################################################################################
 
