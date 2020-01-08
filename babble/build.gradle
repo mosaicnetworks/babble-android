@@ -109,7 +109,7 @@ android {
 
     sourceSets {
         main {
-            jniLibs.srcDirs = ['libs/jni']
+            jniLibs.srcDirs = ["libs/babble-core/$babbleCoreVersion/jni"]
         }
     }
 
