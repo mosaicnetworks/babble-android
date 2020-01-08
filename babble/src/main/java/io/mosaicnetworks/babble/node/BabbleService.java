@@ -1,6 +1,8 @@
 package io.mosaicnetworks.babble.node;
 
 import com.google.gson.Gson;
+import android.content.Context;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,6 +48,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
     private BabbleNode mBabbleNode;
     private BabbleState mBabbleState;
     private final BabbleConfig mNodeConfig;
+    private String mConfigDir;
+    private String mSubConfigDir = "config";
 
     /**
      * The underlying app state, to which babble transactions are applied
@@ -58,10 +62,12 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * Constructor
      * @param babbleState the underlying app state, to which babble transactions are applied
      */
-    public BabbleService(AppState babbleState) {
+    public BabbleService(AppState babbleState, Context context) {
         mBabbleState = babbleState;
         state = babbleState; //TODO: this is just mirroring mBabbleState
         mNodeConfig = new BabbleConfig.Builder().build();
+        mConfigDir = context.getApplicationContext().getFilesDir().toString();
+        Log.d("BabbleService", "ConfigDir: "+mConfigDir);
     }
 
     /**
@@ -69,10 +75,12 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * @param babbleState the underlying app state, to which babble transactions are applied
      * @param nodeConfig the node configuration
      */
-    public BabbleService(AppState babbleState, BabbleConfig nodeConfig) {
+    public BabbleService(AppState babbleState, BabbleConfig nodeConfig, Context context) {
         mBabbleState = babbleState;
         state = babbleState; //TODO: this is just mirroring mBabbleState
         mNodeConfig = nodeConfig;
+        mConfigDir = context.getApplicationContext().getFilesDir().toString();
+        Log.d("BabbleService", "ConfigDir: "+mConfigDir);
     }
 
     /**
@@ -96,7 +104,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
     public void configureNew(String moniker, String inetAddress, int babblingPort, int discoveryPort) {
         List<Peer> genesisPeers = new ArrayList<>();
         genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
-        List<Peer> currentPeers = genesisPeers;
+        List<Peer> currentPeers = new ArrayList<>();
+        currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
 
         configure(genesisPeers, currentPeers, moniker, inetAddress, babblingPort, discoveryPort);
     }
@@ -144,7 +153,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
                         return processedBlock;
                     }
                 },
-                mNodeConfig);
+                mNodeConfig, mConfigDir, mSubConfigDir);
 
         mBabbleState.reset();
         mState = State.CONFIGURED;

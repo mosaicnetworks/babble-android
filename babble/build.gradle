@@ -9,13 +9,13 @@ apply plugin: 'com.jfrog.bintray'
 //##################################################################################################
 // babble core configuration
 
-def babbleCoreVersion = "0.6.0"
-def repository = "https://github.com/mosaicnetworks/babble/releases/download"
-def protocol = "https"
+// def babbleCoreVersion = "0.6.0"
+// def repository = "https://github.com/mosaicnetworks/babble/releases/download"
+// def protocol = "https"
 
-// def babbleCoreVersion = "6df6909b74d954c93d90ae60b27cdda029369d5b"
-// def repository = "~/gowork/src/github.com/mosaicnetworks/babble/build/distmobile"
-// def protocol = "file"
+ def babbleCoreVersion = "0.6.0"
+ def repository = "/home/jon/go/src/github.com/mosaicnetworks/babble/build/distmobile"
+ def protocol = "file"
 
 //##################################################################################################
 
@@ -144,6 +144,8 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'com.moandjiezana.toml:toml4j:0.7.2'
+    implementation 'commons-io:commons-io:2.6'
 }
 
 artifacts {

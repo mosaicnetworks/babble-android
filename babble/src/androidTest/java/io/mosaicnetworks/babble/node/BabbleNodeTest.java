@@ -3,6 +3,7 @@ package io.mosaicnetworks.babble.node;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import android.util.Log;
 import androidx.test.rule.GrantPermissionRule;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,7 +60,7 @@ public class BabbleNodeTest {
         };
 
         BabbleNode babbleNode = BabbleNode.create(peers, peers, privateKeyHex, "localhost",
-                6666, "camille", blockConsumer);
+                6666, "camille", blockConsumer, InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir().toString(), "test");
 
         babbleNode.run();
         babbleNode.submitTx(sendBytes);
@@ -100,7 +101,7 @@ public class BabbleNodeTest {
         };
 
         BabbleNode babbleNodeOne = BabbleNode.create(peers, peers, nodeOnePrivateKeyHex, "localhost",
-                6666, "camille", nodeOneBlockConsumer);
+                6666, "camille", nodeOneBlockConsumer, InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir().toString(), "test");
 
         babbleNodeOne.run();
 
@@ -126,7 +127,7 @@ public class BabbleNodeTest {
         };
 
         BabbleNode babbleNodeTwo = BabbleNode.create(peers, peers, nodeTwoPrivateKeyHex, "localhost",
-                6667, "alice", nodeTwoBlockConsumer);
+                6667, "alice", nodeTwoBlockConsumer, InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir().toString(), "test");
 
         babbleNodeTwo.run();
 
@@ -176,7 +177,7 @@ public class BabbleNodeTest {
         };
 
         BabbleNode babbleNodeOne = BabbleNode.create(peers, peers, nodeOnePrivateKeyHex, "localhost",
-                6666, "camille", nodeOneBlockConsumer);
+                6666, "camille", nodeOneBlockConsumer, InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir().toString(), "test");
 
         babbleNodeOne.run();
 
@@ -202,7 +203,7 @@ public class BabbleNodeTest {
         };
 
         BabbleNode babbleNodeTwo = BabbleNode.create(peers, peers, nodeTwoPrivateKeyHex, "localhost",
-                6667, "alice", nodeTwoBlockConsumer);
+                6667, "alice", nodeTwoBlockConsumer, InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir().toString(), "test");
 
         babbleNodeTwo.run();
 
@@ -228,7 +229,7 @@ public class BabbleNodeTest {
         };
 
         BabbleNode babbleNodeThree = BabbleNode.create(peers, peers, nodeThreePrivateKeyHex, "localhost",
-                6668, "monet", nodeThreeBlockConsumer);
+                6668, "monet", nodeThreeBlockConsumer, InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir().toString(), "test");
 
         babbleNodeThree.run();
 

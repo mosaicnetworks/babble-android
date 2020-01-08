@@ -15,7 +15,7 @@ public final class BabbleConfig {
         ERROR,
         FATAL,
         PANIC,
-        TRACE,
+        TRACE
     }
 
     /**
@@ -23,8 +23,8 @@ public final class BabbleConfig {
      */
     public static final class Builder {
 
-        private int mHeartbeat = 100;
-        private int mSlowHeartbeat = 100;
+        private int mHeartbeat = 10;
+        private int mSlowHeartbeat = 10;
         private boolean mStore = false;
         private String mLogLevel = "error";
         private int mTcpTimeout = 1000;
@@ -32,7 +32,38 @@ public final class BabbleConfig {
         private int mCacheSize = 50000;
         private int mSyncLimit = 1000;
         private boolean mEnableFastSync = false;
-        private int mSuspendLimit = 300;
+        private String mDatabaseDir = "";     //db
+        private boolean mBootstrap = false;   //bootstrap
+        private String mServiceListen = "";   //service-listen
+        private String mJoinTimeout = "20s";  //join_timeout
+        private boolean mMaintenanceMode = false;  //maintenance-mode
+        private int mSuspendLimit = 300;      //suspend-limit
+        private boolean mLoadPeers = true;    //loadpeers
+        private boolean mNoService = true;    //no-service
+
+
+
+        /**
+         * Set the Database Directory
+         * @param databaseDir the location of the badger DB database
+         * @return modified builder
+         */
+        public Builder databaseDir(String databaseDir) {
+            mDatabaseDir = databaseDir;
+            return this;
+        }
+
+
+        /**
+         * Turn on bootstrap
+         * @param bootstrap bootstrap from the badger DB if available
+         * @return modified builder
+         */
+        public Builder bootstrap(boolean bootstrap) {
+            mBootstrap = bootstrap;
+            return this;
+        }
+
 
         /**
          * Set the heartbeat
@@ -139,15 +170,75 @@ public final class BabbleConfig {
         }
 
         /**
-         * Set the suspend limit
-         * @param suspendLimit the number of undetermined-events that causes the babble node to be
-         *                     suspended
+         * Set the Service Listen Address. N.B. this is not required if noService is set to true
+         * @param serviceListen the address and port where the service listens
+         * @return modified builder
+         */
+        public Builder serviceListen(String serviceListen) {
+            mServiceListen = serviceListen;
+            return this;
+        }
+
+
+        /**
+         * Set the timeout for Join Requests
+         * @param joinTimeout the timeout for join requests. You need to include a unit. e.g. "20s" for 20 seconds
+         * @return modified builder
+         */
+        public Builder joinTimeout(String joinTimeout) {
+            mJoinTimeout = joinTimeout;
+            return this;
+        }
+
+
+        /**
+         * Specify Maintenance Mode
+         * @param maintenanceMode open babble in maintenance mode
+         * @return modified builder
+         */
+        public Builder maintenanceMode(boolean maintenanceMode) {
+            mMaintenanceMode = maintenanceMode;
+            return this;
+        }
+
+
+        /**
+         * Specify Suspend Limit for undetermined events
+         * @param suspendLimit the number of undetermined events required to trigger suspension
          * @return modified builder
          */
         public Builder suspendLimit(int suspendLimit) {
-            mSuspendLimit = suspendLimit;
+            mSuspendLimit =  suspendLimit;
             return this;
         }
+
+
+
+        /**
+         * Specified whether babble loads peers from a file. This should always be true
+         * @param loadPeers open peers from a file
+         * @return modified builder
+         */
+        public Builder loadPeers(boolean loadPeers) {
+            mLoadPeers = loadPeers;
+            return this;
+        }
+
+
+        /**
+         * Disables the babble service. This should always be true
+         * @param noService disable babble service
+         * @return modified builder
+         */
+        public Builder noService(boolean noService) {
+            mNoService = noService;
+            return this;
+        }
+
+
+
+
+
 
         /*
         //temporarily disable method
@@ -206,15 +297,42 @@ public final class BabbleConfig {
      */
     public final int syncLimit;  //max Events per sync
 
+
+    /**
+     * Bootstrap Babble from database
+     */
+    public final boolean bootstrap;   //bootstrap
+    /**
+     * Address to babble service listens to
+     */
+    public final String serviceListen;   //service-listen
+    /**
+     * Timeout for Join Requests
+     */
+    public final String joinTimeout;  //join_timeout
+    /**
+     * Set to true to enable Maintenance Mode to start Babble in a non-gossiping
+     * suspended state.
+     */
+    public final boolean maintenanceMode;  //maintenance-mode
+    /**
+     * Number of undetermined events to trigger a suspend state
+     */
+    public final int suspendLimit;      //suspend-limit
+    /**
+     * Enable loading of peers from a file
+     */
+    public final boolean loadPeers;    //loadpeers
+    /**
+     * Disable the babble service
+     */
+    public final boolean noService;    //no-service
+
+
     /**
      * Enable fast sync
      */
     public final Boolean enableFastSync;  //enable fast sync
-
-    /**
-     * The number of undetermined-events that causes the babble node to be suspended
-     */
-    public final int suspendLimit;
 
     private BabbleConfig(Builder builder) {
         heartbeat = builder.mHeartbeat;
@@ -226,7 +344,13 @@ public final class BabbleConfig {
         cacheSize = builder.mCacheSize;
         syncLimit = builder.mSyncLimit;
         enableFastSync = builder.mEnableFastSync;
+        bootstrap = builder.mBootstrap;
+        serviceListen = builder.mServiceListen;
+        joinTimeout= builder.mJoinTimeout;
+        maintenanceMode = builder.mMaintenanceMode;
         suspendLimit = builder.mSuspendLimit;
+        loadPeers = builder.mLoadPeers;
+        noService = builder.mNoService;
     }
 
 

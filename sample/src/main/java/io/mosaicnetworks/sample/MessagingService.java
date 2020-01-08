@@ -1,5 +1,6 @@
 package io.mosaicnetworks.sample;
 
+import android.content.Context;
 import android.media.audiofx.DynamicsProcessing;
 
 import io.mosaicnetworks.babble.node.BabbleConfig;
@@ -17,16 +18,16 @@ public final class MessagingService extends BabbleService<ChatState> {
      * Factory for the {@link MessagingService}
      * @return a messaging service
      */
-    public static MessagingService getInstance() {
+    public static MessagingService getInstance(Context context) {
         if (INSTANCE==null) {
-            INSTANCE = new MessagingService();
+            INSTANCE = new MessagingService(context);
         }
 
         return INSTANCE;
     }
 
-    private MessagingService() {
-        super(new ChatState(), new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.TRACE).build());
+    private MessagingService(Context context) {
+        super(new ChatState(), new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.TRACE).build(), context);
     }
 }
 

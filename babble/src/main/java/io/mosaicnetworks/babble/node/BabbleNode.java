@@ -1,5 +1,7 @@
 package io.mosaicnetworks.babble.node;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -31,14 +33,17 @@ public final class BabbleNode implements PeersProvider {
      * @param port the port number to bind to
      * @param moniker node moniker
      * @param blockConsumer the object which will receive the transactions
-     * @return
+     * @param configDir the root babble configuration folder
+     * @param subConfigDir the folder within configDir for this configuration
+     * @return a babble node object
      */
     public static BabbleNode create(List<Peer> genesisPeers, List<Peer> currentPeers,
                                     String privateKeyHex, String inetAddress,
-                                    int port, String moniker, BlockConsumer blockConsumer) {
+                                    int port, String moniker, BlockConsumer blockConsumer, String configDir,
+                                    String subConfigDir) {
 
         return createWithConfig(genesisPeers, currentPeers, privateKeyHex, inetAddress, port, moniker, blockConsumer,
-                new BabbleConfig.Builder().build());
+                new BabbleConfig.Builder().build(), configDir, subConfigDir);
     }
 
     /**
@@ -51,33 +56,36 @@ public final class BabbleNode implements PeersProvider {
      * @param moniker node moniker
      * @param blockConsumer the object which will receive the transactions
      * @param babbleConfig custom configuration
-     * @return
+     * @param configDir the root babble configuration folder
+     * @param subConfigDir the folder within configDir for this configuration
+     * @return a babble node object
      */
     public static BabbleNode createWithConfig(List<Peer> genesisPeers, List<Peer> currentPeers,
                                               String privateKeyHex,
                                               String inetAddress, int port, String moniker,
                                               final BlockConsumer blockConsumer,
-                                              BabbleConfig babbleConfig) {
+                                              BabbleConfig babbleConfig,
+                                              String configDir,
+                                              String subConfigDir) {
 
-        MobileConfig mobileConfig = new MobileConfig(
-                babbleConfig.heartbeat,
-                babbleConfig.slowHeartbeat,
-                babbleConfig.tcpTimeout,
-                babbleConfig.maxPool,
-                babbleConfig.cacheSize,
-                babbleConfig.syncLimit,
-                babbleConfig.enableFastSync,
-                babbleConfig.store,
-                babbleConfig.logLevel,
-                moniker,
-                babbleConfig.suspendLimit
-        );
+
+        // babble.toml
+        BabbleConfigDir babbleConfigDir = new BabbleConfigDir(configDir);
+        String fullPath = babbleConfigDir.WriteBabbleTomlFiles(babbleConfig, subConfigDir, inetAddress, port, moniker);
+
+        // peers files
+        babbleConfigDir.WritePeersJsonFiles(fullPath,  genesisPeers, currentPeers);
+
+        // private key
+        babbleConfigDir.WritePrivateKey(fullPath, privateKeyHex);
+
+        Log.d("fullPath", fullPath);
 
         Node node = Mobile.new_(
-                privateKeyHex,
-                inetAddress + ":" + port,
-                mGson.toJson(currentPeers),
-                mGson.toJson(genesisPeers),
+       //         privateKeyHex,
+       //         inetAddress + ":" + port,
+       //         mGson.toJson(currentPeers),
+       //         mGson.toJson(genesisPeers),
                 new mobile.CommitHandler() {
                     @Override
                     public byte[] onCommit(final byte[] blockBytes) {
@@ -108,8 +116,8 @@ public final class BabbleNode implements PeersProvider {
 
                         throw new IllegalArgumentException(msg);
                     }
-                },
-                mobileConfig);
+                }, fullPath);
+               // mobileConfig);
 
         // If mobile ExceptionHandler isn't called then mNode should not be null, however
         // just in case...
