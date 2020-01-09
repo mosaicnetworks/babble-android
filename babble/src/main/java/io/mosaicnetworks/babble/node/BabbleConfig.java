@@ -23,6 +23,9 @@ public final class BabbleConfig {
      */
     public static final class Builder {
 
+// NB these defaults are tested in BabbleConfigTest.java allDefaultConfigTest()
+// If you change these values, you must change the values in that file.
+
         private int mHeartbeat = 10;
         private int mSlowHeartbeat = 10;
         private boolean mStore = false;
