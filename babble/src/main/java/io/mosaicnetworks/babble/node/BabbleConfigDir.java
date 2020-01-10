@@ -1,7 +1,10 @@
 package io.mosaicnetworks.babble.node;
 
 
-import android.util.Log;
+// import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.moandjiezana.toml.TomlWriter;
@@ -11,8 +14,13 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -23,16 +31,16 @@ import io.mosaicnetworks.babble.discovery.Peer;
 
 public class BabbleConfigDir {
 
-    public final String BABBLE_ROOTDIR = "babble";
-    public final String DB_SUBDIR = "badger_db";
-    public final String BABBLE_TOML = "babble.toml";
-    public final String PEERS_JSON = "peers.json";
-    public final String PEERS_GENESIS_JSON = "peers.genesis.json";
-    public final String PRIV_KEY = "priv_key";
+    public final static String BABBLE_ROOTDIR = "babble";
+    public final static  String DB_SUBDIR = "badger_db";
+    public final static  String BABBLE_TOML = "babble.toml";
+    public final static  String PEERS_JSON = "peers.json";
+    public final static  String PEERS_GENESIS_JSON = "peers.genesis.json";
+    public final static  String PRIV_KEY = "priv_key";
 
     private String rootDir;
     private String tomlDir = "";
-    private String[] directories;
+    private ArrayList<String> directories;
 
     /**
      * Create an object to manage multiple Babble Configs
@@ -42,24 +50,22 @@ public class BabbleConfigDir {
         this.rootDir = storageDir;
 
 
-        Log.i("BabbleConfigDir", "ConfigDir: "+storageDir);
+//        Log.i("BabbleConfigDir", "ConfigDir: "+storageDir);
 
         File babbleDir = new File(this.rootDir, BABBLE_ROOTDIR);
+        this.directories = new ArrayList<String>();
         if(babbleDir.exists()) {
             // Popualate directories with the subfolders that are configured
-            this.directories = babbleDir.list(new FilenameFilter(){
-                @Override
-                public boolean accept(File current, String name) {
-                    return new File(current, name).isDirectory();
-                }
-            });
-
-
+            Collections.addAll(this.directories,
+                babbleDir.list(new FilenameFilter(){
+                    @Override
+                    public boolean accept(File current, String name) {
+                        return new File(current, name).isDirectory();
+                    }
+                }));
         } else { // First run, so we create the root dir - clearly no subdirs yet
             babbleDir.mkdirs();
-            this.directories = new String[0];
         }
-
     }
 
     /**
@@ -68,9 +74,7 @@ public class BabbleConfigDir {
      * @return returns true if it already exists
      */
     boolean CheckDirectory(String subConfigDir) {
-        List<String> list = Arrays.asList(this.directories);
-
-        return list.contains(subConfigDir);
+        return this.directories.contains(subConfigDir);
     }
 
 
@@ -98,7 +102,7 @@ public class BabbleConfigDir {
         fileWriter.write(privateKeyHex);
         fileWriter.close();
         } catch (Exception e) {
-            Log.e("WritePrivateKey", e.toString());
+            // Log.e("WritePrivateKey", e.toString());
         }
     }
 
@@ -113,13 +117,13 @@ public class BabbleConfigDir {
         Gson gson = new Gson();
         try {
 
-            Log.i("WritePeersJsonFiles", "JSON "+gson.toJson(currentPeers));
+         //   Log.i("WritePeersJsonFiles", "JSON "+gson.toJson(currentPeers));
 
             FileWriter fileWriter = new FileWriter(new File(targetDir, PEERS_JSON));
             gson.toJson(currentPeers, fileWriter);
             fileWriter.close();
         } catch (Exception e) {
-            Log.e("WritePeersJsonFiles", e.toString());
+         //   Log.e("WritePeersJsonFiles", e.toString());
         }
 
         try {
@@ -127,7 +131,7 @@ public class BabbleConfigDir {
             gson.toJson(genesisPeers, fileWriter);
             fileWriter.close();
         } catch (Exception e) {
-            Log.e("WritePeersJsonFiles", e.toString());
+         //   Log.e("WritePeersJsonFiles", e.toString());
         }
     }
 
@@ -148,9 +152,8 @@ public class BabbleConfigDir {
         tomlDir = this.rootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir;
         File babbleDir = new File(tomlDir, DB_SUBDIR);
         if(! babbleDir.exists()) {
-            Log.i("BabbleConfigDir", "Creating "+DB_SUBDIR);
+            // Log.i("BabbleConfigDir", "Creating "+DB_SUBDIR);
             babbleDir.mkdirs();
-            this.directories = new String[0];
         }
 
         babble.put("datadir",tomlDir) ;
@@ -185,9 +188,13 @@ public class BabbleConfigDir {
             tomlWriter.write(babble, new File(tomlDir, BABBLE_TOML));
         } catch (Exception e) {
             //TODO catch this
-            Log.e(" WriteBabbleTomlFiles", e.toString());
+            // Log.e(" WriteBabbleTomlFiles", e.toString());
         }
 
+
+        if (! this.CheckDirectory(subConfigDir)) {
+            this.directories.add(subConfigDir);
+        }
         return tomlDir;
 
     }
