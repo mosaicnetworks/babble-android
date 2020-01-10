@@ -1,6 +1,7 @@
 package io.mosaicnetworks.babble.node;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,7 +12,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import io.mosaicnetworks.babble.discovery.Peer;
-import io.mosaicnetworks.babble.test.BuildConfig;
+// import io.mosaicnetworks.babble.test.BuildConfig;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -44,14 +45,14 @@ public class BabbleServiceTest {
     private static class TestService extends BabbleService<TestState> {
 
         TestService() {
-            super(new TestState());
+            super(new TestState(), InstrumentationRegistry.getInstrumentation().getTargetContext());
         }
     }
 
     private static class TestServiceWithConfig extends BabbleService<TestState> {
 
         TestServiceWithConfig() {
-            super(new TestState(), new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build());
+            super(new TestState(), new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build(), InstrumentationRegistry.getInstrumentation().getTargetContext());
         }
     }
 
