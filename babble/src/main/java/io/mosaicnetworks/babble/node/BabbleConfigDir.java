@@ -170,7 +170,7 @@ public class BabbleConfigDir {
         babble.put("heartbeat", babbleConfig.heartbeat+"ms");
         babble.put("slow-heartbeat", babbleConfig.slowHeartbeat+"ms");
         babble.put("max-pool", babbleConfig.maxPool);
-        babble.put("timeout", babbleConfig.tcpTimeout);
+        babble.put("timeout", babbleConfig.tcpTimeout+"ms");
         babble.put("join_timeout", babbleConfig.joinTimeout);
         babble.put("sync-limit", babbleConfig.syncLimit);
         babble.put("fast-sync", babbleConfig.enableFastSync);
