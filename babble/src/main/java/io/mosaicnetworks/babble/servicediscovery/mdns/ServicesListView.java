@@ -2,6 +2,7 @@ package io.mosaicnetworks.babble.servicediscovery.mdns;
 
 import android.content.Context;
 import android.net.nsd.NsdServiceInfo;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -14,7 +15,9 @@ import java.util.List;
 
 public class ServicesListView extends RecyclerView {
 
-    private List<NsdServiceInfo> mServiceInfoList = new ArrayList<>();
+    private List<NsdDiscoveredService> mServiceInfoList = new ArrayList<>();
+    private ServiceSelectedListener mServiceSelectedListener;
+    private MdnsDiscovery mMdnsDiscovery;
 
     public ServicesListView(Context context) {
         super(context);
@@ -31,26 +34,54 @@ public class ServicesListView extends RecyclerView {
         initialize(context);
     }
 
-    private void initialize(Context context) {
-
-
+    private void initialize(final Context context) {
 
         setLayoutManager(new LinearLayoutManager(context));
 
-        ServicesListAdapter adapter = new ServicesListAdapter(context, mServiceInfoList);
+        final ServicesListAdapter adapter = new ServicesListAdapter(context, mServiceInfoList);
         adapter.setClickListener(new ServicesListAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                //do nothing
+                adapter.getItem(position);
+                mMdnsDiscovery.resolveService(adapter.getItem(position), new MdnsDiscovery.ResolutionListener() {
+                    @Override
+                    public void onServiceResolved(final NsdServiceInfo service) {
+                        Handler mainHandler = new Handler(context.getMainLooper());
+
+                        Runnable myRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                mServiceSelectedListener.onServiceSelected(service.getHost().getHostAddress());
+                            }
+                        };
+                        mainHandler.post(myRunnable);
+
+                    }
+
+                    @Override
+                    public void onResolveFailed() {
+                        //do nothing
+                    }
+                });
+
             }
         });
 
         setAdapter(adapter);
 
-        MdnsDiscovery mdnsDiscovery = new MdnsDiscovery(context, mServiceInfoList, new MdnsDiscovery.ServiceDiscoveryListener() {
+        mMdnsDiscovery = new MdnsDiscovery(context, mServiceInfoList, new MdnsDiscovery.ServiceDiscoveryListener() {
             @Override
             public void onServiceListUpdated() {
-                getAdapter().notifyDataSetChanged();
+
+                Handler mainHandler = new Handler(context.getMainLooper());
+
+                Runnable myRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        getAdapter().notifyDataSetChanged();
+                    }
+                };
+                mainHandler.post(myRunnable);
             }
 
             @Override
@@ -59,7 +90,15 @@ public class ServicesListView extends RecyclerView {
             }
         });
 
-        mdnsDiscovery.discoverServices();
+        mMdnsDiscovery.discoverServices();
+    }
+
+    public interface ServiceSelectedListener {
+        void onServiceSelected(String host);
+    }
+
+    public void setServiceSelectedListener(ServiceSelectedListener serviceSelectedListener) {
+        mServiceSelectedListener = serviceSelectedListener;
     }
 
 }

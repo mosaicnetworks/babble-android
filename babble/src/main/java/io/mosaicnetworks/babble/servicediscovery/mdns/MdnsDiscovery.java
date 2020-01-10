@@ -10,7 +10,7 @@ import java.util.List;
 public class MdnsDiscovery {
 
     private static final String TAG = "MdnsDiscovery";
-    private final List<NsdServiceInfo> mDiscoveredServices;
+    private final List<NsdDiscoveredService> mDiscoveredServices;
     private NsdManager mNsdManager;
     private NsdManager.ResolveListener mResolveListener;
     private NsdManager.DiscoveryListener mDiscoveryListener;
@@ -25,7 +25,7 @@ public class MdnsDiscovery {
         void onResolveFailed();
     }
 
-    public MdnsDiscovery(Context context, List<NsdServiceInfo> discoveredServices,
+    public MdnsDiscovery(Context context, List<NsdDiscoveredService> discoveredServices,
                          ServiceDiscoveryListener serviceDiscoveryListener) {
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
         mDiscoveredServices = discoveredServices;
@@ -43,14 +43,20 @@ public class MdnsDiscovery {
 
                 if (serviceInfo.getServiceType().equals(MdnsAdvertiser.SERVICE_TYPE)) {
                     Log.d(TAG, "Service discovery success" + serviceInfo);
-                    mDiscoveredServices.add(serviceInfo);
+
+                    NsdDiscoveredService discoveredService = new NsdDiscoveredService(serviceInfo);
+
+                    if (!mDiscoveredServices.contains(discoveredService)) {
+                        mDiscoveredServices.add(discoveredService);
+                    }
+
                     serviceDiscoveryListener.onServiceListUpdated();
                 }
             }
             @Override
             public void onServiceLost(NsdServiceInfo serviceInfo) {
                 Log.e(TAG, "service lost" + serviceInfo);
-                mDiscoveredServices.remove(serviceInfo);
+                mDiscoveredServices.remove(new NsdDiscoveredService(serviceInfo));
                 serviceDiscoveryListener.onServiceListUpdated();
             }
             @Override
@@ -85,20 +91,18 @@ public class MdnsDiscovery {
     }
 
     public void discoverServices() {
-        //#############
-        NsdServiceInfo nsdServiceInfo = new NsdServiceInfo();
-        nsdServiceInfo.setServiceName("bob");
-        nsdServiceInfo.setServiceType(MdnsAdvertiser.SERVICE_TYPE);
-        mDiscoveryListener.onServiceFound(nsdServiceInfo);
-        //#############
 
         mNsdManager.discoverServices(
                 MdnsAdvertiser.SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
     }
 
-    public void resolveService(NsdServiceInfo serviceInfo, ResolutionListener resolutionListener) {
+    public void resolveService(NsdDiscoveredService serviceInfo, ResolutionListener resolutionListener) {
         initializeResolveListener(resolutionListener);
-        mNsdManager.resolveService(serviceInfo, mResolveListener);
+
+        NsdServiceInfo nsdServiceInfo = new NsdServiceInfo();
+        nsdServiceInfo.setServiceType(serviceInfo.getServiceType());
+        nsdServiceInfo.setServiceName(serviceInfo.getServiceName());
+        mNsdManager.resolveService(nsdServiceInfo, mResolveListener);
     }
 
     public void stopDiscovery() {

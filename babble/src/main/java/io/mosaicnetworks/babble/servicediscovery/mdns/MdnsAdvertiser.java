@@ -6,7 +6,7 @@ import android.net.nsd.NsdServiceInfo;
 
 public class MdnsAdvertiser {
 
-    public static final String SERVICE_TYPE = "_bdp.tcp."; //Babble Discovery Protocol!
+    public static final String SERVICE_TYPE = "_http._tcp.";
     private NsdManager mNsdManager;
     private NsdManager.RegistrationListener mRegistrationListener;
     public String serviceName;

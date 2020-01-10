@@ -31,11 +31,11 @@ public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapte
         }
     }
 
-    private List<NsdServiceInfo> mData;
+    private List<NsdDiscoveredService> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    public ServicesListAdapter(Context context, List<NsdServiceInfo> data) {
+    public ServicesListAdapter(Context context, List<NsdDiscoveredService> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -66,7 +66,7 @@ public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapte
     }
 
     // convenience method for getting data at click position
-    public Object getItem(int id) {
+    public NsdDiscoveredService getItem(int id) {
         return mData.get(id);
     }
 
