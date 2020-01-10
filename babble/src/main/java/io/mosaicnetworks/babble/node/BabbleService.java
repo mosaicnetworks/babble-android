@@ -180,6 +180,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
         } catch (IOException ex) {
             //Probably the port is in use, we'll continue without the discovery service
         }
+
+        onStarted();
     }
 
     /**
@@ -206,6 +208,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
                 }
             }
         });
+
+        onStopped();
     }
 
     /**
@@ -265,6 +269,10 @@ public abstract class BabbleService<AppState extends BabbleState> {
     public State getState() {
         return mState;
     }
+
+    protected void onStarted() {}
+
+    protected void onStopped() {}
 
     /**
      * Register an observer

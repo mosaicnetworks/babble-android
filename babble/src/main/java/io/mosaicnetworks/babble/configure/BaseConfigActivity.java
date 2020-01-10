@@ -21,7 +21,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     private FragmentManager mFragmentManager;
     private HomeFragment mHomeFragment;
     private NewGroupFragment mNewGroupFragment;
-    private JoinGroupFragment mJoinGroupFragment;
+    private JoinGroupMdnsFragment mJoinGroupMdnsFragment;
     public static final String PREFERENCE_FILE_KEY = "babbleandroid";
 
     @Override
@@ -62,8 +62,8 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
 
     // called when the user presses the join button
     public void joinGroup(View view) {
-        mJoinGroupFragment = JoinGroupFragment.newInstance();
-        replaceFragment(mJoinGroupFragment);
+        mJoinGroupMdnsFragment = JoinGroupMdnsFragment.newInstance();
+        replaceFragment(mJoinGroupMdnsFragment);
     }
 
     @Override

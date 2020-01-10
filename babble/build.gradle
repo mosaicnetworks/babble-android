@@ -14,7 +14,7 @@ apply plugin: 'com.jfrog.bintray'
 // def protocol = "https"
 
  def babbleCoreVersion = "4afeb9f3b20e92835f2049c1365c6342c1a89994"
- def repository = "~/go/src/github.com/mosaicnetworks/babble/build/distmobile"
+ def repository = System.properties['user.home'] + "/go/src/github.com/mosaicnetworks/babble/build/distmobile"
  def protocol = "file"
 
 //##################################################################################################
@@ -40,6 +40,8 @@ task getBabbleCore {
         versionDirectoryFile.mkdirs()
 
         if (protocol=="file") {
+
+            print("Attempting to copy from $fileZipLoc\n")
             copy {
                 from fileZipLoc
                 into "$versionDirectory/tmp"
@@ -80,6 +82,7 @@ task getBabbleCore {
             from "$versionDirectory/tmp/git.version"
             into "$versionDirectory"
         }
+
 
         delete {
             delete "$versionDirectory/tmp"
