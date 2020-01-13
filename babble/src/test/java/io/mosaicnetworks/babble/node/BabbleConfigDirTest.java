@@ -108,4 +108,20 @@ public class BabbleConfigDirTest {
     }
 
 
+    @Test
+    public void getRandomSubConfigDir() {
+
+     try {
+         String dir = temporaryFolder.newFolder().getAbsolutePath();
+//            System.out.println(dir);
+
+         BabbleConfigDir babbleConfigDir = new BabbleConfigDir(dir);
+         String uuid = babbleConfigDir.GetRandomSubConfigDir();
+         assertEquals(uuid.length(), 36);
+     }
+     catch (Exception e)
+        {
+
+        }
+    }
 }

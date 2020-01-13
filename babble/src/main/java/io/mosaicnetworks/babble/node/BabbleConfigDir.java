@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.HashMap;
-
-
+import java.util.UUID;
 
 
 import io.mosaicnetworks.babble.discovery.Peer;
@@ -76,6 +75,13 @@ public class BabbleConfigDir {
     boolean CheckDirectory(String subConfigDir) {
         return this.directories.contains(subConfigDir);
     }
+
+
+    public String GetRandomSubConfigDir() {
+        UUID uuid = UUID.randomUUID();
+        return uuid.toString();
+    }
+
 
 
     boolean DeleteDirectory(String subConfigDir) {
@@ -142,8 +148,6 @@ public class BabbleConfigDir {
          * @return the composite path where the babble.toml file was written
          */
     String WriteBabbleTomlFiles(BabbleConfig babbleConfig, String subConfigDir, String inetAddress, int port, String moniker) {
-
-
 
         TomlWriter tomlWriter = new TomlWriter();
         Map<String, Object> map = new HashMap<>();
