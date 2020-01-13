@@ -2,7 +2,6 @@ package io.mosaicnetworks.sample;
 
 import android.content.Context;
 
-import android.media.audiofx.DynamicsProcessing;
 import io.mosaicnetworks.babble.node.BabbleConfig;
 
 import io.mosaicnetworks.babble.node.BabbleService;
