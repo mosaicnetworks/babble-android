@@ -52,7 +52,7 @@ public class BabbleServiceTest {
     private static class TestServiceWithConfig extends BabbleService<TestState> {
 
         TestServiceWithConfig() {
-            super(new TestState(), new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.DEBUG).build(), InstrumentationRegistry.getInstrumentation().getTargetContext());
+            super(new TestState(), new NodeConfig.Builder().logLevel(NodeConfig.LogLevel.DEBUG).build(), InstrumentationRegistry.getInstrumentation().getTargetContext());
         }
     }
 

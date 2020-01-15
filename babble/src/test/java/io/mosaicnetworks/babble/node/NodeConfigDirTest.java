@@ -7,7 +7,6 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import io.mosaicnetworks.babble.discovery.Peer;
 
@@ -15,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class BabbleConfigDirTest {
+public class NodeConfigDirTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -25,14 +24,14 @@ public class BabbleConfigDirTest {
 
         String dir = temporaryFolder.toString();
 
-        BabbleConfigDir babbleConfigDir = new BabbleConfigDir(dir);
+        ConfigManager configManager = new ConfigManager(dir);
 
 
-        File file = new File(dir, BabbleConfigDir.BABBLE_ROOTDIR);
+        File file = new File(dir, ConfigManager.BABBLE_ROOTDIR);
     // Check Babble configuration Root folder exists
         assertTrue(file.exists());
     // Verify a folder we did not create does not exist
-        assertFalse(babbleConfigDir.CheckDirectory("doesnotexist"));
+        assertFalse(configManager.CheckDirectory("doesnotexist"));
     }
 
 
@@ -44,24 +43,24 @@ public class BabbleConfigDirTest {
             String dir = temporaryFolder.newFolder().getAbsolutePath();
 //            System.out.println(dir);
 
-            BabbleConfigDir babbleConfigDir = new BabbleConfigDir(dir);
+            ConfigManager configManager = new ConfigManager(dir);
 
-            File file = new File(dir, BabbleConfigDir.BABBLE_ROOTDIR);
+            File file = new File(dir, ConfigManager.BABBLE_ROOTDIR);
             // Check Babble configuration Root folder exists
             assertTrue(file.exists());
 
             // Create a config and write the toml file.
 
             String subConfigDir = "unittestconfig";
-            assertFalse(babbleConfigDir.CheckDirectory(subConfigDir)); // Should not exist yet
+            assertFalse(configManager.CheckDirectory(subConfigDir)); // Should not exist yet
 
 
-            BabbleConfig babbleConfig = new BabbleConfig.Builder()
+            NodeConfig nodeConfig = new NodeConfig.Builder()
                     .cacheSize(12)
-                    .logLevel(BabbleConfig.LogLevel.ERROR)
+                    .logLevel(NodeConfig.LogLevel.ERROR)
                     .build();
 
-            String targetDir = babbleConfigDir.WriteBabbleTomlFiles(babbleConfig, subConfigDir, "127.0.0.1",
+            String targetDir = configManager.WriteBabbleTomlFiles(nodeConfig, subConfigDir, "127.0.0.1",
                     6666, "unittest");
 
             System.out.println(targetDir);
@@ -73,15 +72,15 @@ public class BabbleConfigDirTest {
                 System.out.println(pathname);
             }
 // END List File
-//            System.out.println(babbleConfigDir.directories.get(0));
+//            System.out.println(configManager.directories.get(0));
 
-            assertTrue(babbleConfigDir.CheckDirectory(subConfigDir));
+            assertTrue(configManager.CheckDirectory(subConfigDir));
 
-            File configFile = new File(targetDir, BabbleConfigDir.BABBLE_TOML);
+            File configFile = new File(targetDir, ConfigManager.BABBLE_TOML);
             assertTrue(configFile.exists());
 
-            babbleConfigDir.WritePrivateKey(targetDir, "DummyPrivateKey");
-            configFile = new File(targetDir, BabbleConfigDir.PRIV_KEY);
+            configManager.WritePrivateKey(targetDir, "DummyPrivateKey");
+            configFile = new File(targetDir, ConfigManager.PRIV_KEY);
             assertTrue(configFile.exists());
 
     //        void WritePrivateKey(String targetDir, String privateKeyHex)
@@ -94,10 +93,10 @@ public class BabbleConfigDirTest {
             peers.add(peer);
 
 
-            babbleConfigDir.WritePeersJsonFiles(targetDir,peers, peers);
-            configFile = new File(targetDir, BabbleConfigDir.PEERS_GENESIS_JSON);
+            configManager.WritePeersJsonFiles(targetDir,peers, peers);
+            configFile = new File(targetDir, ConfigManager.PEERS_GENESIS_JSON);
             assertTrue(configFile.exists());
-            configFile = new File(targetDir, BabbleConfigDir.PEERS_JSON);
+            configFile = new File(targetDir, ConfigManager.PEERS_JSON);
             assertTrue(configFile.exists());
 
         }
@@ -115,8 +114,8 @@ public class BabbleConfigDirTest {
          String dir = temporaryFolder.newFolder().getAbsolutePath();
 //            System.out.println(dir);
 
-         BabbleConfigDir babbleConfigDir = new BabbleConfigDir(dir);
-         String uuid = babbleConfigDir.GetRandomSubConfigDir();
+         ConfigManager configManager = new ConfigManager(dir);
+         String uuid = configManager.GetRandomSubConfigDir();
          assertEquals(uuid.length(), 36);
      }
      catch (Exception e)

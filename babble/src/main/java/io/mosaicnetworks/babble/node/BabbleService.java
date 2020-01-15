@@ -47,7 +47,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
     private KeyPair mKeyPair = new KeyPair();
     private BabbleNode mBabbleNode;
     private BabbleState mBabbleState;
-    private final BabbleConfig mNodeConfig;
+    private final NodeConfig mNodeConfig;
     private String mConfigDir;
     private String mSubConfigDir = "config";
 
@@ -65,7 +65,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
     public BabbleService(AppState babbleState, Context context) {
         mBabbleState = babbleState;
         state = babbleState; //TODO: this is just mirroring mBabbleState
-        mNodeConfig = new BabbleConfig.Builder().build();
+        mNodeConfig = new NodeConfig.Builder().build();
         mConfigDir = context.getApplicationContext().getFilesDir().toString();
         Log.d("BabbleService", "ConfigDir: "+mConfigDir);
     }
@@ -75,7 +75,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * @param babbleState the underlying app state, to which babble transactions are applied
      * @param nodeConfig the node configuration
      */
-    public BabbleService(AppState babbleState, BabbleConfig nodeConfig, Context context) {
+    public BabbleService(AppState babbleState, NodeConfig nodeConfig, Context context) {
         mBabbleState = babbleState;
         state = babbleState; //TODO: this is just mirroring mBabbleState
         mNodeConfig = nodeConfig;

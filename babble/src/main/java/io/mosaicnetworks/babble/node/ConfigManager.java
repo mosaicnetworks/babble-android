@@ -3,9 +3,6 @@ package io.mosaicnetworks.babble.node;
 
 // import android.util.Log;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.google.gson.Gson;
 import com.moandjiezana.toml.TomlWriter;
 
@@ -15,12 +12,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.UUID;
@@ -28,7 +21,7 @@ import java.util.UUID;
 
 import io.mosaicnetworks.babble.discovery.Peer;
 
-public class BabbleConfigDir {
+public class ConfigManager {
 
     public final static String BABBLE_ROOTDIR = "babble";
     public final static  String DB_SUBDIR = "badger_db";
@@ -45,11 +38,11 @@ public class BabbleConfigDir {
      * Create an object to manage multiple Babble Configs
      * @param storageDir the root of the babble storage. Likely to be context.getFilesDir() or context.getExternalFilesDir().
      */
-    public BabbleConfigDir(String storageDir) {
+    public ConfigManager(String storageDir) {
         this.rootDir = storageDir;
 
 
-//        Log.i("BabbleConfigDir", "ConfigDir: "+storageDir);
+//        Log.i("ConfigManager", "ConfigDir: "+storageDir);
 
         File babbleDir = new File(this.rootDir, BABBLE_ROOTDIR);
         this.directories = new ArrayList<String>();
@@ -143,11 +136,11 @@ public class BabbleConfigDir {
 
         /**
          * Write Babble Config to disk ready for Babble to use
-         * @param babbleConfig is the babble configuration object
+         * @param nodeConfig is the babble configuration object
          * @param subConfigDir is the subfolder of the babble Subfolder of the local storage as passed to the constructor
          * @return the composite path where the babble.toml file was written
          */
-    String WriteBabbleTomlFiles(BabbleConfig babbleConfig, String subConfigDir, String inetAddress, int port, String moniker) {
+    String WriteBabbleTomlFiles(NodeConfig nodeConfig, String subConfigDir, String inetAddress, int port, String moniker) {
 
         TomlWriter tomlWriter = new TomlWriter();
         Map<String, Object> map = new HashMap<>();
@@ -156,35 +149,35 @@ public class BabbleConfigDir {
         tomlDir = this.rootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir;
         File babbleDir = new File(tomlDir, DB_SUBDIR);
         if(! babbleDir.exists()) {
-            // Log.i("BabbleConfigDir", "Creating "+DB_SUBDIR);
+            // Log.i("ConfigManager", "Creating "+DB_SUBDIR);
             babbleDir.mkdirs();
         }
 
         babble.put("datadir",tomlDir) ;
         babble.put("db",  tomlDir+File.separator+DB_SUBDIR) ;
 
-        babble.put("log", babbleConfig.logLevel);
+        babble.put("log", nodeConfig.logLevel);
         babble.put("listen", inetAddress+":"+port);
         babble.put("advertise", inetAddress+":"+port);
-        babble.put("no-service", babbleConfig.noService);
+        babble.put("no-service", nodeConfig.noService);
 
-        if (! babbleConfig.serviceListen.equals("")) {  // Only set if set
-            babble.put("service-listen", babbleConfig.serviceListen);
+        if (! nodeConfig.serviceListen.equals("")) {  // Only set if set
+            babble.put("service-listen", nodeConfig.serviceListen);
         }
-        babble.put("heartbeat", babbleConfig.heartbeat+"ms");
-        babble.put("slow-heartbeat", babbleConfig.slowHeartbeat+"ms");
-        babble.put("max-pool", babbleConfig.maxPool);
-        babble.put("timeout", babbleConfig.tcpTimeout+"ms");
-        babble.put("join_timeout", babbleConfig.joinTimeout);
-        babble.put("sync-limit", babbleConfig.syncLimit);
-        babble.put("fast-sync", babbleConfig.enableFastSync);
-        babble.put("store", babbleConfig.store);
-        babble.put("cache-size", babbleConfig.cacheSize);
-        babble.put("bootstrap", babbleConfig.bootstrap);
-        babble.put("maintenance-mode", babbleConfig.maintenanceMode);
-        babble.put("suspend-limit", babbleConfig.suspendLimit);
+        babble.put("heartbeat", nodeConfig.heartbeat+"ms");
+        babble.put("slow-heartbeat", nodeConfig.slowHeartbeat+"ms");
+        babble.put("max-pool", nodeConfig.maxPool);
+        babble.put("timeout", nodeConfig.tcpTimeout+"ms");
+        babble.put("join_timeout", nodeConfig.joinTimeout);
+        babble.put("sync-limit", nodeConfig.syncLimit);
+        babble.put("fast-sync", nodeConfig.enableFastSync);
+        babble.put("store", nodeConfig.store);
+        babble.put("cache-size", nodeConfig.cacheSize);
+        babble.put("bootstrap", nodeConfig.bootstrap);
+        babble.put("maintenance-mode", nodeConfig.maintenanceMode);
+        babble.put("suspend-limit", nodeConfig.suspendLimit);
         babble.put("moniker", moniker);
-        babble.put("loadpeers", babbleConfig.loadPeers);
+        babble.put("loadpeers", nodeConfig.loadPeers);
 
         map.put("Babble", babble);
 

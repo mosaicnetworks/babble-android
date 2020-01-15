@@ -3,7 +3,7 @@ package io.mosaicnetworks.babble.node;
 /**
  * An immutable class which holds the configuration passed to a node during it's construction
  */
-public final class BabbleConfig {
+public final class NodeConfig {
 
     /**
      * The level at which the node should log
@@ -253,10 +253,10 @@ public final class BabbleConfig {
 
         /**
          * Builds the config object
-         * @return the built {@link BabbleConfig}
+         * @return the built {@link NodeConfig}
          */
-        public BabbleConfig build() {
-            return new BabbleConfig(this);
+        public NodeConfig build() {
+            return new NodeConfig(this);
         }
     }
 
@@ -337,7 +337,7 @@ public final class BabbleConfig {
      */
     public final Boolean enableFastSync;  //enable fast sync
 
-    private BabbleConfig(Builder builder) {
+    private NodeConfig(Builder builder) {
         heartbeat = builder.mHeartbeat;
         slowHeartbeat = builder.mSlowHeartbeat;
         store = builder.mStore;

@@ -12,7 +12,6 @@ import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.PeersProvider;
 import mobile.Mobile;
 import mobile.Node;
-import mobile.MobileConfig;
 
 /**
  * This is the core Babble node. It can be used directly or alternatively the {@link BabbleService}
@@ -43,7 +42,7 @@ public final class BabbleNode implements PeersProvider {
                                     String subConfigDir) {
 
         return createWithConfig(genesisPeers, currentPeers, privateKeyHex, inetAddress, port, moniker, blockConsumer,
-                new BabbleConfig.Builder().build(), configDir, subConfigDir);
+                new NodeConfig.Builder().build(), configDir, subConfigDir);
     }
 
     /**
@@ -55,7 +54,7 @@ public final class BabbleNode implements PeersProvider {
      * @param port the port number to bind to
      * @param moniker node moniker
      * @param blockConsumer the object which will receive the transactions
-     * @param babbleConfig custom configuration
+     * @param nodeConfig custom configuration
      * @param configDir the root babble configuration folder
      * @param subConfigDir the folder within configDir for this configuration
      * @return a babble node object
@@ -64,20 +63,20 @@ public final class BabbleNode implements PeersProvider {
                                               String privateKeyHex,
                                               String inetAddress, int port, String moniker,
                                               final BlockConsumer blockConsumer,
-                                              BabbleConfig babbleConfig,
+                                              NodeConfig nodeConfig,
                                               String configDir,
                                               String subConfigDir) {
 
 
         // babble.toml
-        BabbleConfigDir babbleConfigDir = new BabbleConfigDir(configDir);
-        String fullPath = babbleConfigDir.WriteBabbleTomlFiles(babbleConfig, subConfigDir, inetAddress, port, moniker);
+        ConfigManager configManager = new ConfigManager(configDir);
+        String fullPath = configManager.WriteBabbleTomlFiles(nodeConfig, subConfigDir, inetAddress, port, moniker);
 
         // peers files
-        babbleConfigDir.WritePeersJsonFiles(fullPath,  genesisPeers, currentPeers);
+        configManager.WritePeersJsonFiles(fullPath,  genesisPeers, currentPeers);
 
         // private key
-        babbleConfigDir.WritePrivateKey(fullPath, privateKeyHex);
+        configManager.WritePrivateKey(fullPath, privateKeyHex);
 
         Log.d("fullPath", fullPath);
 

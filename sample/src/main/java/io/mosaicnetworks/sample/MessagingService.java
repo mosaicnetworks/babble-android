@@ -2,7 +2,7 @@ package io.mosaicnetworks.sample;
 
 import android.content.Context;
 
-import io.mosaicnetworks.babble.node.BabbleConfig;
+import io.mosaicnetworks.babble.node.NodeConfig;
 
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser;
@@ -32,7 +32,7 @@ public final class MessagingService extends BabbleService<ChatState> {
     }
 
     private MessagingService(Context context) {
-        super(new ChatState(), new BabbleConfig.Builder().logLevel(BabbleConfig.LogLevel.TRACE).build(), context);
+        super(new ChatState(), new NodeConfig.Builder().logLevel(NodeConfig.LogLevel.TRACE).build(), context);
 
         mAppContext = context;
     }
