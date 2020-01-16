@@ -23,6 +23,8 @@ import io.mosaicnetworks.babble.discovery.Peer;
 
 public class ConfigManager {
 
+
+
     public final static String BABBLE_ROOTDIR = "babble";
     public final static  String DB_SUBDIR = "badger_db";
     public final static  String BABBLE_TOML = "babble.toml";
@@ -30,25 +32,28 @@ public class ConfigManager {
     public final static  String PEERS_GENESIS_JSON = "peers.genesis.json";
     public final static  String PRIV_KEY = "priv_key";
 
-    private String rootDir;
-    private String tomlDir = "";
-    private ArrayList<String> directories;
+    private String mRootDir;
+    private String mTomlDir = "";
+    private final String mAppId;
+
+
+    private ArrayList<String> mDirectories;
 
     /**
      * Create an object to manage multiple Babble Configs
      * @param storageDir the root of the babble storage. Likely to be context.getFilesDir() or context.getExternalFilesDir().
      */
-    public ConfigManager(String storageDir) {
-        this.rootDir = storageDir;
-
+    public ConfigManager(String storageDir, String appID) {
+        mRootDir = storageDir;
+        mAppId = appID;
 
 //        Log.i("ConfigManager", "ConfigDir: "+storageDir);
 
-        File babbleDir = new File(this.rootDir, BABBLE_ROOTDIR);
-        this.directories = new ArrayList<String>();
+        File babbleDir = new File(this.mRootDir, BABBLE_ROOTDIR);
+        this.mDirectories = new ArrayList<String>();
         if(babbleDir.exists()) {
-            // Popualate directories with the subfolders that are configured
-            Collections.addAll(this.directories,
+            // Popualate mDirectories with the subfolders that are configured
+            Collections.addAll(this.mDirectories,
                 babbleDir.list(new FilenameFilter(){
                     @Override
                     public boolean accept(File current, String name) {
@@ -66,8 +71,17 @@ public class ConfigManager {
      * @return returns true if it already exists
      */
     boolean CheckDirectory(String subConfigDir) {
-        return this.directories.contains(subConfigDir);
+        return this.mDirectories.contains(subConfigDir);
     }
+
+    /**
+     * Gets a list of the configuration folders available to this app
+     * @return An ArrayList<String> of the folder names with no path
+     */
+    public ArrayList<String> getmDirectories() {
+        return mDirectories;
+    }
+
 
 
     public String GetRandomSubConfigDir() {
@@ -82,7 +96,7 @@ public class ConfigManager {
             return false;
         }
 
-        File dir = new File(this.rootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir);
+        File dir = new File(this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir);
 
         return FileUtils.deleteQuietly(dir);
     }
@@ -146,15 +160,15 @@ public class ConfigManager {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> babble = new HashMap<>();
 
-        tomlDir = this.rootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir;
-        File babbleDir = new File(tomlDir, DB_SUBDIR);
+        mTomlDir = this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir;
+        File babbleDir = new File(mTomlDir, DB_SUBDIR);
         if(! babbleDir.exists()) {
             // Log.i("ConfigManager", "Creating "+DB_SUBDIR);
             babbleDir.mkdirs();
         }
 
-        babble.put("datadir",tomlDir) ;
-        babble.put("db",  tomlDir+File.separator+DB_SUBDIR) ;
+        babble.put("datadir", mTomlDir) ;
+        babble.put("db",  mTomlDir +File.separator+DB_SUBDIR) ;
 
         babble.put("log", nodeConfig.logLevel);
         babble.put("listen", inetAddress+":"+port);
@@ -182,7 +196,7 @@ public class ConfigManager {
         map.put("Babble", babble);
 
         try {
-            tomlWriter.write(babble, new File(tomlDir, BABBLE_TOML));
+            tomlWriter.write(babble, new File(mTomlDir, BABBLE_TOML));
         } catch (Exception e) {
             //TODO catch this
             // Log.e(" WriteBabbleTomlFiles", e.toString());
@@ -190,9 +204,9 @@ public class ConfigManager {
 
 
         if (! this.CheckDirectory(subConfigDir)) {
-            this.directories.add(subConfigDir);
+            this.mDirectories.add(subConfigDir);
         }
-        return tomlDir;
+        return mTomlDir;
 
     }
 

@@ -13,6 +13,9 @@ import io.mosaicnetworks.babble.discovery.PeersProvider;
 import mobile.Mobile;
 import mobile.Node;
 
+
+
+
 /**
  * This is the core Babble node. It can be used directly or alternatively the {@link BabbleService}
  * class can be used to offer the same functionality wrapped up as a service. After creating the
@@ -20,6 +23,10 @@ import mobile.Node;
  */
 public final class BabbleNode implements PeersProvider {
 
+
+    public enum ConfigFolderBackupPolicy  {DELETE, SINGLE_BACKUP, COMPLETE_BACKUP, ABORT}
+
+    private static ConfigFolderBackupPolicy mConfigFolderBackupPolicy = ConfigFolderBackupPolicy.SINGLE_BACKUP;
     private final static Gson mGson = new Gson();
     private final Node mNode;
 
@@ -34,15 +41,17 @@ public final class BabbleNode implements PeersProvider {
      * @param blockConsumer the object which will receive the transactions
      * @param configDir the root babble configuration folder
      * @param subConfigDir the folder within configDir for this configuration
+     * @param configFolderBackupPolicy sets the behaviour for when creating / joining an extant network
+     * @param appId a unique identifier for this app, may be FQDN but does not have to be. Used for discovery filtering
      * @return a babble node object
      */
     public static BabbleNode create(List<Peer> genesisPeers, List<Peer> currentPeers,
                                     String privateKeyHex, String inetAddress,
                                     int port, String moniker, BlockConsumer blockConsumer, String configDir,
-                                    String subConfigDir) {
+                                    String subConfigDir, ConfigFolderBackupPolicy configFolderBackupPolicy, String appId) {
 
         return createWithConfig(genesisPeers, currentPeers, privateKeyHex, inetAddress, port, moniker, blockConsumer,
-                new NodeConfig.Builder().build(), configDir, subConfigDir);
+                new NodeConfig.Builder().build(), configDir, subConfigDir, configFolderBackupPolicy, appId);
     }
 
     /**
@@ -57,6 +66,8 @@ public final class BabbleNode implements PeersProvider {
      * @param nodeConfig custom configuration
      * @param configDir the root babble configuration folder
      * @param subConfigDir the folder within configDir for this configuration
+     * @param configFolderBackupPolicy sets the behaviour for when creating / joining an extant network
+     * @param appId a unique identifier for this app, may be FQDN but does not have to be. Used for discovery filtering
      * @return a babble node object
      */
     public static BabbleNode createWithConfig(List<Peer> genesisPeers, List<Peer> currentPeers,
@@ -65,17 +76,20 @@ public final class BabbleNode implements PeersProvider {
                                               final BlockConsumer blockConsumer,
                                               NodeConfig nodeConfig,
                                               String configDir,
-                                              String subConfigDir) {
+                                              String subConfigDir,
+                                              ConfigFolderBackupPolicy configFolderBackupPolicy,
+                                              String appId) {
 
 
+        mConfigFolderBackupPolicy = configFolderBackupPolicy ;
         // babble.toml
-        ConfigManager configManager = new ConfigManager(configDir);
+        ConfigManager configManager = new ConfigManager(configDir, appId);
         String fullPath = configManager.WriteBabbleTomlFiles(nodeConfig, subConfigDir, inetAddress, port, moniker);
 
         // peers files
         configManager.WritePeersJsonFiles(fullPath,  genesisPeers, currentPeers);
 
-        // private key
+        // private key -- does not overwrite
         configManager.WritePrivateKey(fullPath, privateKeyHex);
 
         Log.d("fullPath", fullPath);

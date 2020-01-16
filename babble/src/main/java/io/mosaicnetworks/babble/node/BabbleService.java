@@ -50,6 +50,11 @@ public abstract class BabbleService<AppState extends BabbleState> {
     private final NodeConfig mNodeConfig;
     private String mConfigDir;
     private String mSubConfigDir = "config";
+    // defaults to single backup as a generally safe option
+    private BabbleNode.ConfigFolderBackupPolicy mConfigFolderBackupPolicy = BabbleNode.ConfigFolderBackupPolicy.SINGLE_BACKUP;
+    private String mAppId; // Set by default in the construct to the App Package Name
+
+
 
     /**
      * The underlying app state, to which babble transactions are applied
@@ -67,6 +72,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
         state = babbleState; //TODO: this is just mirroring mBabbleState
         mNodeConfig = new NodeConfig.Builder().build();
         mConfigDir = context.getApplicationContext().getFilesDir().toString();
+        mAppId = context.getApplicationContext().getPackageName();
         Log.d("BabbleService", "ConfigDir: "+mConfigDir);
     }
 
@@ -80,6 +86,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
         state = babbleState; //TODO: this is just mirroring mBabbleState
         mNodeConfig = nodeConfig;
         mConfigDir = context.getApplicationContext().getFilesDir().toString();
+        mAppId = context.getApplicationContext().getPackageName();
         Log.d("BabbleService", "ConfigDir: "+mConfigDir);
     }
 
@@ -92,6 +99,19 @@ public abstract class BabbleService<AppState extends BabbleState> {
     public void configureNew(String moniker, String inetAddress) {
         configureNew(moniker, inetAddress, DEFAULT_BABBLING_PORT, DEFAULT_DISCOVERY_PORT);
     }
+
+
+
+    /**
+     * Configure the service to create an archive group
+     * @param moniker node moniker
+     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
+     * @throws IllegalStateException if the service is currently running
+     */
+    public void configureArchive(String moniker, String inetAddress) {
+        configureNew(moniker, inetAddress, DEFAULT_BABBLING_PORT, DEFAULT_DISCOVERY_PORT);
+    }
+
 
     /**
      * Configure the service to create a new group, overriding the default ports
@@ -153,7 +173,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
                         return processedBlock;
                     }
                 },
-                mNodeConfig, mConfigDir, mSubConfigDir);
+                mNodeConfig, mConfigDir, mSubConfigDir, mConfigFolderBackupPolicy, mAppId);
 
         mBabbleState.reset();
         mState = State.CONFIGURED;
@@ -299,5 +319,44 @@ public abstract class BabbleService<AppState extends BabbleState> {
             observer.stateUpdated();
         }
     }
+
+
+    // Getters and Setters for some global config options
+
+    /**
+     * Gets the unique app id used to identify the babble app. Set by default to the Application
+     * FQDN in the constructor, but can be overridden with setAppId
+     * @return  the app ID
+     */
+    public String getAppId() {
+        return mAppId;
+    }
+
+    /**
+     * Sets the unique app id used to identify the babble app. Set by default to the Application
+     * FQDN in the constructor
+     * @param appId the App ID
+     */
+    public void setAppId(String appId) {
+        this.mAppId = appId;
+    }
+
+
+    /**
+     * Gets the policy for backing up the config and store from previous invocations
+     * @return  the policy as the enum type BabbleNode.ConfigFolderBackupPolicy
+     */
+    public BabbleNode.ConfigFolderBackupPolicy getConfigFolderBackupPolicy() {
+        return mConfigFolderBackupPolicy;
+    }
+
+    /**
+     * sets the policy for backing up the config and store from previous invocations
+     * @param  mConfigFolderBackupPolicy is the policy as the enum type BabbleNode.ConfigFolderBackupPolicy
+     */
+    public void setConfigFolderBackupPolicy(BabbleNode.ConfigFolderBackupPolicy mConfigFolderBackupPolicy) {
+        this.mConfigFolderBackupPolicy = mConfigFolderBackupPolicy;
+    }
+
 
 }
