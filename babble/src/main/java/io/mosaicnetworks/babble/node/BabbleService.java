@@ -96,7 +96,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public void configureNew(String moniker, String inetAddress) {
+    public void configureNew(String moniker, String inetAddress)  throws CannotStartBabbleNodeException {
         configureNew(moniker, inetAddress, DEFAULT_BABBLING_PORT, DEFAULT_DISCOVERY_PORT);
     }
 
@@ -108,8 +108,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public void configureArchive(String moniker, String inetAddress) {
-        configureNew(moniker, inetAddress, DEFAULT_BABBLING_PORT, DEFAULT_DISCOVERY_PORT);
+    public void configureArchive(String moniker, String inetAddress)  throws CannotStartBabbleNodeException {
+        configureArchive(moniker, inetAddress, DEFAULT_BABBLING_PORT, DEFAULT_DISCOVERY_PORT);
     }
 
 
@@ -121,14 +121,34 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * @param discoveryPort the port used by the {@link HttpPeerDiscoveryServer}
      * @throws IllegalStateException if the service is currently running
      */
-    public void configureNew(String moniker, String inetAddress, int babblingPort, int discoveryPort) {
+    public void configureNew(String moniker, String inetAddress, int babblingPort, int discoveryPort) throws CannotStartBabbleNodeException{
         List<Peer> genesisPeers = new ArrayList<>();
         genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
         List<Peer> currentPeers = new ArrayList<>();
         currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
 
-        configure(genesisPeers, currentPeers, moniker, inetAddress, babblingPort, discoveryPort);
+        configure(genesisPeers, currentPeers, moniker, inetAddress, babblingPort, discoveryPort, false);
     }
+
+
+
+    /**
+     *Configure the service to create an archive group, overriding the default ports
+     * @param moniker node moniker
+     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
+     * @param babblingPort the port used for Babble consesnsus
+     * @param discoveryPort the port used by the {@link HttpPeerDiscoveryServer}
+     * @throws IllegalStateException if the service is currently running
+     */
+    public void configureArchive(String moniker, String inetAddress, int babblingPort, int discoveryPort) throws CannotStartBabbleNodeException{
+        List<Peer> genesisPeers = new ArrayList<>();
+        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
+        List<Peer> currentPeers = new ArrayList<>();
+        currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
+
+        configure(genesisPeers, currentPeers, moniker, inetAddress, babblingPort, discoveryPort, true);
+    }
+
 
     /**
      * Configure the service to join an existing group using the default ports
@@ -138,8 +158,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public void configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress) {
-        configure(genesisPeers, currentPeers, moniker, inetAddress, DEFAULT_BABBLING_PORT, DEFAULT_DISCOVERY_PORT);
+    public void configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress) throws CannotStartBabbleNodeException {
+        configure(genesisPeers, currentPeers, moniker, inetAddress, DEFAULT_BABBLING_PORT, DEFAULT_DISCOVERY_PORT, false);
     }
 
     /**
@@ -152,11 +172,11 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * @param discoveryPort the port used by the {@link HttpPeerDiscoveryServer}
      * @throws IllegalStateException if the service is currently running
      */
-    public void configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress, int babblingPort, int discoveryPort) {
-        configure(genesisPeers, currentPeers, moniker, inetAddress, babblingPort, discoveryPort);
+    public void configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress, int babblingPort, int discoveryPort) throws CannotStartBabbleNodeException{
+        configure(genesisPeers, currentPeers, moniker, inetAddress, babblingPort, discoveryPort, false);
     }
 
-    private void configure(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress, int babblingPort, int discoveryPort) {
+    private void configure(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress, int babblingPort, int discoveryPort, boolean isArchive) throws CannotStartBabbleNodeException {
 
         if (mState == State.RUNNING || mState == State.RUNNING_WITH_DISCOVERY) {
             throw new IllegalStateException("Cannot configure while the service is running");

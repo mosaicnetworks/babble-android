@@ -213,6 +213,23 @@ public class ConfigManager {
         File babbleDir = new File(mTomlDir, DB_SUBDIR);
         if (babbleDir.exists()){
             // We have a clash.
+            switch (mConfigFolderBackupPolicy) {
+                case ABORT:
+
+                    break;
+
+                case COMPLETE_BACKUP:
+
+                    break;
+
+                case DELETE:
+
+                    break;
+
+                case SINGLE_BACKUP:
+
+                    break;
+            }
 
         } else{
             // Log.i("ConfigManager", "Creating "+DB_SUBDIR);

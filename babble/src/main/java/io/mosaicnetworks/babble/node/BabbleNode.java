@@ -48,7 +48,7 @@ public final class BabbleNode implements PeersProvider {
     public static BabbleNode create(List<Peer> genesisPeers, List<Peer> currentPeers,
                                     String privateKeyHex, String inetAddress,
                                     int port, String moniker, BlockConsumer blockConsumer, String configDir,
-                                    String subConfigDir, ConfigFolderBackupPolicy configFolderBackupPolicy, String appId) {
+                                    String subConfigDir, ConfigFolderBackupPolicy configFolderBackupPolicy, String appId) throws CannotStartBabbleNodeException {
 
         return createWithConfig(genesisPeers, currentPeers, privateKeyHex, inetAddress, port, moniker, blockConsumer,
                 new NodeConfig.Builder().build(), configDir, subConfigDir, configFolderBackupPolicy, appId);
@@ -78,21 +78,29 @@ public final class BabbleNode implements PeersProvider {
                                               String configDir,
                                               String subConfigDir,
                                               ConfigFolderBackupPolicy configFolderBackupPolicy,
-                                              String appId) {
+                                              String appId) throws CannotStartBabbleNodeException {
 
 
         mConfigFolderBackupPolicy = configFolderBackupPolicy ;
-        // babble.toml
-        ConfigManager configManager = new ConfigManager(configDir, appId, mConfigFolderBackupPolicy);
-        String fullPath = configManager.WriteBabbleTomlFiles(nodeConfig, subConfigDir, inetAddress, port, moniker);
 
-        // peers files
-        configManager.WritePeersJsonFiles(fullPath,  genesisPeers, currentPeers);
+        String fullPath;
+            // babble.toml
+        try {
+            ConfigManager configManager = new ConfigManager(configDir, appId, mConfigFolderBackupPolicy);
+            fullPath = configManager.WriteBabbleTomlFiles(nodeConfig, subConfigDir, inetAddress, port, moniker);
 
-        // private key -- does not overwrite
-        configManager.WritePrivateKey(fullPath, privateKeyHex);
+            // peers files
+            configManager.WritePeersJsonFiles(fullPath, genesisPeers, currentPeers);
 
-        Log.d("fullPath", fullPath);
+            // private key -- does not overwrite
+            configManager.WritePrivateKey(fullPath, privateKeyHex);
+
+            Log.d("fullPath", fullPath);
+        } catch (Exception e)
+        {
+            // re-reraise exception e
+            throw new CannotStartBabbleNodeException(e.getMessage());
+        }
 
         Node node = Mobile.new_(
        //         privateKeyHex,

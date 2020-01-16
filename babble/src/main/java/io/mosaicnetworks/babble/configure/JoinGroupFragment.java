@@ -21,6 +21,7 @@ import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.utils.Utils;
 
 
@@ -158,7 +159,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
         try {
             babbleService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(getContext()));
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException| CannotStartBabbleNodeException ex) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port - in which case

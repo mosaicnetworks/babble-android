@@ -14,6 +14,7 @@ import android.widget.EditText;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.utils.Utils;
 
 
@@ -90,7 +91,7 @@ public class NewGroupFragment extends Fragment {
         //MessagingService messagingService = MessagingService.getInstance();
         try {
             babbleService.configureNew(moniker, Utils.getIPAddr(getContext()));
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException | CannotStartBabbleNodeException ex) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port - in which case
