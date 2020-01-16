@@ -115,7 +115,7 @@ public class NodeConfigDirTest {
 //            System.out.println(dir);
 
          ConfigManager configManager = new ConfigManager(dir);
-         String uuid = configManager.GetRandomSubConfigDir();
+         String uuid = configManager.GetUniqueId();
          assertEquals(uuid.length(), 36);
      }
      catch (Exception e)

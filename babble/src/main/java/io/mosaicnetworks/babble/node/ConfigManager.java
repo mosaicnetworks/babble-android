@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -23,8 +24,6 @@ import io.mosaicnetworks.babble.discovery.Peer;
 
 public class ConfigManager {
 
-
-
     public final static String BABBLE_ROOTDIR = "babble";
     public final static  String DB_SUBDIR = "badger_db";
     public final static  String BABBLE_TOML = "babble.toml";
@@ -32,34 +31,49 @@ public class ConfigManager {
     public final static  String PEERS_GENESIS_JSON = "peers.genesis.json";
     public final static  String PRIV_KEY = "priv_key";
 
+    // This constant determines how long the unique ID as part of a
+    private final static int UniqueIdLength = 16;
+
+
     private String mRootDir;
     private String mTomlDir = "";
     private final String mAppId;
+    private final BabbleNode.ConfigFolderBackupPolicy mConfigFolderBackupPolicy;
 
 
-    private ArrayList<String> mDirectories;
+    private ArrayList<ConfigFolder> mDirectories;
 
     /**
      * Create an object to manage multiple Babble Configs
      * @param storageDir the root of the babble storage. Likely to be context.getFilesDir() or context.getExternalFilesDir().
      */
-    public ConfigManager(String storageDir, String appID) {
+    public ConfigManager(String storageDir, String appID, BabbleNode.ConfigFolderBackupPolicy configFolderBackupPolicy) {
         mRootDir = storageDir;
         mAppId = appID;
+        mConfigFolderBackupPolicy = configFolderBackupPolicy;
 
 //        Log.i("ConfigManager", "ConfigDir: "+storageDir);
 
         File babbleDir = new File(this.mRootDir, BABBLE_ROOTDIR);
-        this.mDirectories = new ArrayList<String>();
+
+        ArrayList<String> directories = new ArrayList<String>();
+        mDirectories = new ArrayList<ConfigFolder>();
+
         if(babbleDir.exists()) {
-            // Popualate mDirectories with the subfolders that are configured
-            Collections.addAll(this.mDirectories,
+            // Find subfolders that are configured
+            Collections.addAll(directories,
                 babbleDir.list(new FilenameFilter(){
                     @Override
                     public boolean accept(File current, String name) {
                         return new File(current, name).isDirectory();
                     }
                 }));
+
+            // Popualate mDirectories with the results
+            for (String s : directories) {
+                AddConfigFolderToList(s);
+            }
+
         } else { // First run, so we create the root dir - clearly no subdirs yet
             babbleDir.mkdirs();
         }
@@ -71,22 +85,54 @@ public class ConfigManager {
      * @return returns true if it already exists
      */
     boolean CheckDirectory(String subConfigDir) {
-        return this.mDirectories.contains(subConfigDir);
+        for (ConfigFolder f : mDirectories) {
+            if (f.FolderName.equals(subConfigDir)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
      * Gets a list of the configuration folders available to this app
      * @return An ArrayList<String> of the folder names with no path
      */
-    public ArrayList<String> getmDirectories() {
+    public ArrayList<ConfigFolder> getDirectories() {
         return mDirectories;
     }
 
 
-
-    public String GetRandomSubConfigDir() {
+    /**
+     * Function to generate a string to render the config name unique.
+     * @return a hex string
+     */
+    public String GetUniqueId() {
         UUID uuid = UUID.randomUUID();
-        return uuid.toString();
+        return uuid.toString().replaceAll("-", "");
+    }
+
+
+    /**
+     * The folder name is composite with the parts separated by underscores.
+     * The first part is the appId as set in BabbleService, which may or may not be the FQDN
+     * The 2nd part is a unique id as generated in GetUniqueId. Currently this is 16 characters
+     * The 3rd part is a narrative description field with spaces converted to minus signs and
+     * input limit to spaces, letters and numbers only.
+     * @param networkDescription contains a human readable description for this network.
+     * @return a unique folder name
+     */
+    public String GetCompositeConfigDir(String networkDescription) {
+
+        String unique = GetUniqueId();
+        String trimmedUnique = unique.length() >= UniqueIdLength
+                ? unique.substring(unique.length() - UniqueIdLength)
+                : unique ;
+
+
+
+        String compositeDir = mAppId + "_" + trimmedUnique + "_"+ConfigFolder.EncodeDescription(networkDescription)+"_";
+        return compositeDir;
     }
 
 
@@ -160,9 +206,15 @@ public class ConfigManager {
         Map<String, Object> map = new HashMap<>();
         Map<String, Object> babble = new HashMap<>();
 
-        mTomlDir = this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir;
+
+        String compositeName = GetCompositeConfigDir(subConfigDir);
+
+        mTomlDir = this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + compositeName;
         File babbleDir = new File(mTomlDir, DB_SUBDIR);
-        if(! babbleDir.exists()) {
+        if (babbleDir.exists()){
+            // We have a clash.
+
+        } else{
             // Log.i("ConfigManager", "Creating "+DB_SUBDIR);
             babbleDir.mkdirs();
         }
@@ -204,7 +256,7 @@ public class ConfigManager {
 
 
         if (! this.CheckDirectory(subConfigDir)) {
-            this.mDirectories.add(subConfigDir);
+            AddConfigFolderToList(subConfigDir);
         }
         return mTomlDir;
 
@@ -212,8 +264,17 @@ public class ConfigManager {
 
 
 
-
-
+    private void AddConfigFolderToList(String folderName ) {
+        try
+        {
+            ConfigFolder configFolder = new ConfigFolder(folderName);
+            mDirectories.add(configFolder);
+        }
+                        catch (Exception e)
+        {
+            // Do nothing, but swallow e
+        }
+    }
 
 
 }

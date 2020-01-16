@@ -83,7 +83,7 @@ public final class BabbleNode implements PeersProvider {
 
         mConfigFolderBackupPolicy = configFolderBackupPolicy ;
         // babble.toml
-        ConfigManager configManager = new ConfigManager(configDir, appId);
+        ConfigManager configManager = new ConfigManager(configDir, appId, mConfigFolderBackupPolicy);
         String fullPath = configManager.WriteBabbleTomlFiles(nodeConfig, subConfigDir, inetAddress, port, moniker);
 
         // peers files
