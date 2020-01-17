@@ -88,7 +88,7 @@ public final class BabbleNode implements PeersProvider {
         try {
             ConfigManager configManager = new ConfigManager(configDir, appId, mConfigFolderBackupPolicy);
             fullPath = configManager.WriteBabbleTomlFiles(nodeConfig, subConfigDir, inetAddress, port, moniker);
-
+            Log.d("createWithConfig","Wrote TOML file");
             // peers files
             configManager.WritePeersJsonFiles(fullPath, genesisPeers, currentPeers);
 

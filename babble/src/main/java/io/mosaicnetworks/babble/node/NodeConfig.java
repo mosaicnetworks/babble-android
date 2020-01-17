@@ -28,7 +28,7 @@ public final class NodeConfig {
 
         private int mHeartbeat = 10;
         private int mSlowHeartbeat = 10;
-        private boolean mStore = false;
+        private boolean mStore = true;
         private String mLogLevel = "error";
         private int mTcpTimeout = 1000;
         private int mMaxPool = 2;

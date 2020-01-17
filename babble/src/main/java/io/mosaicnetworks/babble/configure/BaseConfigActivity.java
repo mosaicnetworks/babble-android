@@ -74,4 +74,9 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
 
     @Override
     public abstract void onStartedNew(String moniker);
+
+    @Override
+    public abstract void onArchiveLoaded(String moniker);
+
+
 }

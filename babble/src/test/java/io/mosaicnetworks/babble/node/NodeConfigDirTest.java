@@ -24,7 +24,7 @@ public class NodeConfigDirTest {
 
         String dir = temporaryFolder.toString();
 
-        ConfigManager configManager = new ConfigManager(dir);
+        ConfigManager configManager = new ConfigManager(dir, "io.mosaicnetworks.tests", BabbleNode.ConfigFolderBackupPolicy.DELETE);
 
 
         File file = new File(dir, ConfigManager.BABBLE_ROOTDIR);
@@ -36,14 +36,14 @@ public class NodeConfigDirTest {
 
 
     @Test
-    public void writeConfigTest() throws IOException
+    public void writeConfigTest() throws IOException,CannotStartBabbleNodeException
     {
         try
         {
             String dir = temporaryFolder.newFolder().getAbsolutePath();
 //            System.out.println(dir);
 
-            ConfigManager configManager = new ConfigManager(dir);
+            ConfigManager configManager = new ConfigManager(dir, "io.mosaicnetworks.tests", BabbleNode.ConfigFolderBackupPolicy.DELETE);
 
             File file = new File(dir, ConfigManager.BABBLE_ROOTDIR);
             // Check Babble configuration Root folder exists
@@ -59,6 +59,7 @@ public class NodeConfigDirTest {
                     .cacheSize(12)
                     .logLevel(NodeConfig.LogLevel.ERROR)
                     .build();
+
 
             String targetDir = configManager.WriteBabbleTomlFiles(nodeConfig, subConfigDir, "127.0.0.1",
                     6666, "unittest");
@@ -102,7 +103,7 @@ public class NodeConfigDirTest {
         }
         finally
         {
-            temporaryFolder.delete();
+       //     temporaryFolder.delete();
         }
     }
 
@@ -114,7 +115,7 @@ public class NodeConfigDirTest {
          String dir = temporaryFolder.newFolder().getAbsolutePath();
 //            System.out.println(dir);
 
-         ConfigManager configManager = new ConfigManager(dir);
+         ConfigManager configManager = new ConfigManager(dir, "io.mosaicnetworks.tests", BabbleNode.ConfigFolderBackupPolicy.DELETE);
          String uuid = configManager.GetUniqueId();
          assertEquals(uuid.length(), 36);
      }

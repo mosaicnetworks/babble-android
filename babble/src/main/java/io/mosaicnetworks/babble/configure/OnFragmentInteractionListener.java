@@ -31,4 +31,11 @@ public interface OnFragmentInteractionListener {
      */
     void onStartedNew(String moniker);
 
+
+    /**
+     * This method will be called when the {@link BabbleService} has loaded an archive group
+     * @param moniker the moniker as chosen previous by the user. //TODO - do we need this
+     */
+    void onArchiveLoaded(String moniker);
+
 }

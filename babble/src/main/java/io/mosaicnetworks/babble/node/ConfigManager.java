@@ -1,7 +1,7 @@
 package io.mosaicnetworks.babble.node;
 
 
-// import android.util.Log;
+ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.moandjiezana.toml.TomlWriter;
@@ -55,25 +55,10 @@ public class ConfigManager {
 //        Log.i("ConfigManager", "ConfigDir: "+storageDir);
 
         File babbleDir = new File(this.mRootDir, BABBLE_ROOTDIR);
-
-        ArrayList<String> directories = new ArrayList<String>();
         mDirectories = new ArrayList<ConfigFolder>();
 
         if(babbleDir.exists()) {
-            // Find subfolders that are configured
-            Collections.addAll(directories,
-                babbleDir.list(new FilenameFilter(){
-                    @Override
-                    public boolean accept(File current, String name) {
-                        return new File(current, name).isDirectory();
-                    }
-                }));
-
-            // Popualate mDirectories with the results
-            for (String s : directories) {
-                AddConfigFolderToList(s);
-            }
-
+            PopulateDirectories(babbleDir);
         } else { // First run, so we create the root dir - clearly no subdirs yet
             babbleDir.mkdirs();
         }
@@ -109,7 +94,8 @@ public class ConfigManager {
      */
     public String GetUniqueId() {
         UUID uuid = UUID.randomUUID();
-        return uuid.toString().replaceAll("-", "");
+      //   return uuid.toString().replaceAll("-", "");
+        return uuid.toString().replaceAll("[^A]", "A");
     }
 
 
@@ -138,7 +124,10 @@ public class ConfigManager {
 
 
     boolean DeleteDirectory(String subConfigDir) {
+        Log.d("DeleteDirectory", subConfigDir);
+
         if ( ! this.CheckDirectory(subConfigDir)) { // Doesn't exist
+            Log.e("DeleteDirectory !Exists", subConfigDir);
             return false;
         }
 
@@ -176,13 +165,13 @@ public class ConfigManager {
         Gson gson = new Gson();
         try {
 
-         //   Log.i("WritePeersJsonFiles", "JSON "+gson.toJson(currentPeers));
+            Log.i("WritePeersJsonFiles", "JSON "+gson.toJson(currentPeers));
 
             FileWriter fileWriter = new FileWriter(new File(targetDir, PEERS_JSON));
             gson.toJson(currentPeers, fileWriter);
             fileWriter.close();
         } catch (Exception e) {
-         //   Log.e("WritePeersJsonFiles", e.toString());
+            Log.e("WritePeersJsonFiles", e.toString());
         }
 
         try {
@@ -190,7 +179,7 @@ public class ConfigManager {
             gson.toJson(genesisPeers, fileWriter);
             fileWriter.close();
         } catch (Exception e) {
-         //   Log.e("WritePeersJsonFiles", e.toString());
+            Log.e("WritePeersJsonFiles", e.toString());
         }
     }
 
@@ -200,7 +189,7 @@ public class ConfigManager {
          * @param subConfigDir is the subfolder of the babble Subfolder of the local storage as passed to the constructor
          * @return the composite path where the babble.toml file was written
          */
-    String WriteBabbleTomlFiles(NodeConfig nodeConfig, String subConfigDir, String inetAddress, int port, String moniker) {
+    String WriteBabbleTomlFiles(NodeConfig nodeConfig, String subConfigDir, String inetAddress, int port, String moniker) throws CannotStartBabbleNodeException{
 
         TomlWriter tomlWriter = new TomlWriter();
         Map<String, Object> map = new HashMap<>();
@@ -215,19 +204,17 @@ public class ConfigManager {
             // We have a clash.
             switch (mConfigFolderBackupPolicy) {
                 case ABORT:
-
-                    break;
+                    throw new CannotStartBabbleNodeException("Config Folder already exists and we have ABORT policy");
 
                 case COMPLETE_BACKUP:
-
+                case SINGLE_BACKUP:
+                    // Rename
+                    BackupOldConfigs(compositeName);
+                    babbleDir.mkdirs();
                     break;
 
                 case DELETE:
-
-                    break;
-
-                case SINGLE_BACKUP:
-
+                    DeleteDirectory(subConfigDir);
                     break;
             }
 
@@ -292,6 +279,89 @@ public class ConfigManager {
             // Do nothing, but swallow e
         }
     }
+
+
+    private void RenameConfigFolder(String oldSubConfigDir, int newSuffix) throws CannotStartBabbleNodeException{
+        File oldFile = new File(this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir);
+        File newFile = new File(this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir+Integer.toString(newSuffix));
+
+
+        Log.d("Rename ", oldFile.getAbsolutePath());
+        Log.d("Rename ", newFile.getAbsolutePath());
+
+
+        if (!(oldFile.renameTo(newFile))) {
+            Log.d("Rename ","Fails");
+            throw new CannotStartBabbleNodeException("Cannot backup the old configuration folder");
+        }
+
+
+
+
+    }
+
+
+    private void BackupOldConfigs(String compositeName) throws CannotStartBabbleNodeException
+    {
+        ArrayList<String> suffix = new ArrayList<String>();
+
+        String newest = "";
+        int newestInt = 0;
+
+
+        if (mConfigFolderBackupPolicy == BabbleNode.ConfigFolderBackupPolicy.SINGLE_BACKUP) {
+
+            Log.d("BackupOldConfigs SINGLE", compositeName);
+            for (ConfigFolder f : mDirectories) {
+                if ((f.IsBackup) && (f.FolderName.startsWith(compositeName))) {
+                    DeleteDirectory(f.FolderName);
+                }
+            }
+
+            RenameConfigFolder(compositeName,1);
+
+        } else  // MULTIPLE_BACKUP
+        {
+            Log.d("BackupOldConfigs MULT", compositeName);
+            for (ConfigFolder f : mDirectories) {
+                if ((f.IsBackup) && (f.FolderName.startsWith(compositeName))) {
+                    if (newestInt < f.BackUpVersion) {
+                        newestInt = f.BackUpVersion;
+                        newest = f.FolderName;
+                    }
+                }
+            }
+
+            RenameConfigFolder(compositeName,newestInt + 1);
+
+        }
+
+        Log.d("BackupOldConfigs POP", compositeName);
+        PopulateDirectories(new File(this.mRootDir, BABBLE_ROOTDIR));
+
+    }
+
+
+
+    void PopulateDirectories(File babbleDir)
+    {
+        ArrayList<String> directories = new ArrayList<String>();
+        mDirectories = new ArrayList<ConfigFolder>();
+
+        Collections.addAll(directories,
+                babbleDir.list(new FilenameFilter(){
+                    @Override
+                    public boolean accept(File current, String name) {
+                        return new File(current, name).isDirectory();
+                    }
+                }));
+
+        // Popualate mDirectories with the results
+        for (String s : directories) {
+            AddConfigFolderToList(s);
+        }
+    }
+
 
 
 }

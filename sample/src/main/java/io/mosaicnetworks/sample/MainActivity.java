@@ -25,4 +25,15 @@ public class MainActivity extends BaseConfigActivity {
         intent.putExtra("MONIKER", moniker);
         startActivity(intent);
     }
+
+
+    @Override
+    public void onArchiveLoaded(String moniker) {
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("MONIKER", moniker);
+        intent.putExtra("ARCHIVE", true);  //TODO this needs to be handled in ChatActivity
+        startActivity(intent);
+    }
+
+
 }
