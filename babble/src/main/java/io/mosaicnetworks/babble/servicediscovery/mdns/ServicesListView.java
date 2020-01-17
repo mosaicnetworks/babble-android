@@ -1,17 +1,22 @@
 package io.mosaicnetworks.babble.servicediscovery.mdns;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.nsd.NsdServiceInfo;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.mosaicnetworks.babble.R;
 
 public class ServicesListView extends RecyclerView {
 
@@ -51,7 +56,7 @@ public class ServicesListView extends RecyclerView {
                         Runnable myRunnable = new Runnable() {
                             @Override
                             public void run() {
-                                mServiceSelectedListener.onServiceSelected(service.getHost().getHostAddress());
+                                mServiceSelectedListener.onServiceSelected(service);
                             }
                         };
                         mainHandler.post(myRunnable);
@@ -89,12 +94,18 @@ public class ServicesListView extends RecyclerView {
                 //do nothing
             }
         });
+    }
 
+    public void startDiscovery() {
         mMdnsDiscovery.discoverServices();
     }
 
+    public void stopDiscovery() {
+        mMdnsDiscovery.stopDiscovery();
+    }
+
     public interface ServiceSelectedListener {
-        void onServiceSelected(String host);
+        void onServiceSelected(NsdServiceInfo nsdServiceInfo);
     }
 
     public void setServiceSelectedListener(ServiceSelectedListener serviceSelectedListener) {

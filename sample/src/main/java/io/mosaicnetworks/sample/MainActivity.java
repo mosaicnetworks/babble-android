@@ -26,7 +26,6 @@ public class MainActivity extends BaseConfigActivity {
         startActivity(intent);
     }
 
-
     @Override
     public void onArchiveLoaded(String moniker) {
         Intent intent = new Intent(this, ChatActivity.class);
@@ -34,6 +33,4 @@ public class MainActivity extends BaseConfigActivity {
         intent.putExtra("ARCHIVE", true);  //TODO this needs to be handled in ChatActivity
         startActivity(intent);
     }
-
-
 }
