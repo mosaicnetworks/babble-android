@@ -3,6 +3,7 @@ package io.mosaicnetworks.sample;
 import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import com.stfalcon.chatkit.messages.MessageInput;
@@ -24,6 +25,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
     private String mMoniker;
     private final MessagingService mMessagingService = MessagingService.getInstance(this);
     private Integer mMessageIndex = 0;
+    private boolean mArchiveMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
         Intent intent = getIntent();
         mMoniker = intent.getStringExtra("MONIKER");
+        mArchiveMode = intent.getBooleanExtra("ARCHIVE_MODE", false);
 
         initialiseAdapter();
         mMessagingService.registerObserver(this);
@@ -48,14 +51,17 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         mMessagesList.setAdapter(mAdapter);
 
         MessageInput input = findViewById(R.id.input);
-
-        input.setInputListener(new MessageInput.InputListener() {
-            @Override
-            public boolean onSubmit(CharSequence input) {
-                mMessagingService.submitTx(new Message(input.toString(), mMoniker));
-                return true;
-            }
-        });
+        if (mArchiveMode) {
+            input.setVisibility(View.GONE);
+        } else {
+            input.setInputListener(new MessageInput.InputListener() {
+                @Override
+                public boolean onSubmit(CharSequence input) {
+                    mMessagingService.submitTx(new Message(input.toString(), mMoniker));
+                    return true;
+                }
+            });
+        }
     }
 
     /**

@@ -16,6 +16,7 @@ public class MainActivity extends BaseConfigActivity {
     public void onJoined(String moniker) {
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("MONIKER", moniker);
+        intent.putExtra("ARCHIVE_MODE", false);
         startActivity(intent);
     }
 
@@ -23,6 +24,7 @@ public class MainActivity extends BaseConfigActivity {
     public void onStartedNew(String moniker) {
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("MONIKER", moniker);
+        intent.putExtra("ARCHIVE_MODE", false);
         startActivity(intent);
     }
 
@@ -30,7 +32,7 @@ public class MainActivity extends BaseConfigActivity {
     public void onArchiveLoaded(String moniker) {
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("MONIKER", moniker);
-        intent.putExtra("ARCHIVE", true);  //TODO this needs to be handled in ChatActivity
+        intent.putExtra("ARCHIVE_MODE", true);
         startActivity(intent);
     }
 }
