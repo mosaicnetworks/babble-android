@@ -6,14 +6,13 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
-import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
+
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 
 import java.util.List;
 
@@ -22,16 +21,10 @@ import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.servicediscovery.mdns.ServicesListView;
 import io.mosaicnetworks.babble.utils.Utils;
 
-
-/**
- * This fragment enables the user to configure the {@link BabbleService} to join an existing group.
- * Activities that contain this fragment must implement the {@link OnFragmentInteractionListener}
- * interface to handle interaction events. Use the {@link JoinGroupMdnsFragment#newInstance} factory
- * method to create an instance of this fragment.
- */
-public class JoinGroupMdnsFragment extends Fragment implements ResponseListener {
+public class HomeMdnsFragment extends Fragment implements ResponseListener {
 
     private OnFragmentInteractionListener mListener;
     private ProgressDialog mLoadingDialog;
@@ -39,10 +32,9 @@ public class JoinGroupMdnsFragment extends Fragment implements ResponseListener 
     private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
-    private NsdServiceInfo mNsdServiceInfo;
+    private ServicesListView mServiceListView;
 
-    public JoinGroupMdnsFragment(NsdServiceInfo nsdServiceInfo) {
-        mNsdServiceInfo = nsdServiceInfo;
+    public HomeMdnsFragment() {
         // Required empty public constructor
     }
 
@@ -50,10 +42,10 @@ public class JoinGroupMdnsFragment extends Fragment implements ResponseListener 
      * Use this factory method to create a new instance of
      * this fragment.
      *
-     * @return A new instance of fragment JoinGroupMdnsFragment.
+     * @return A new instance of fragment HomeMdnsFragment.
      */
-    public static JoinGroupMdnsFragment newInstance(NsdServiceInfo nsdServiceInfo) {
-        return new JoinGroupMdnsFragment(nsdServiceInfo);
+    public static HomeMdnsFragment newInstance() {
+        return new HomeMdnsFragment();
     }
 
     @Override
@@ -65,55 +57,26 @@ public class JoinGroupMdnsFragment extends Fragment implements ResponseListener 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_join_group_mdns, container, false);
-        final View joinGroupButton = view.findViewById(R.id.button_join);
-        joinGroupButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        joinGroup(view);
-                    }
-                }
-        );
+        final View view = inflater.inflate(R.layout.fragment_home_mdns, container, false);
+
+        mServiceListView = view.findViewById(R.id.servicesListView);
+        mServiceListView.setServiceSelectedListener(new ServicesListView.ServiceSelectedListener() {
+            @Override
+            public void onServiceSelected(NsdServiceInfo serviceInfo) {
+                mListener.onServiceSelected(serviceInfo);
+            }
+        });
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
-        EditText edit = (EditText) view.findViewById(R.id.edit_moniker);
-        edit.setText(sharedPref.getString("moniker", "Me"));
-        edit.requestFocus();
-
-        InputMethodManager imgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
+        mMoniker = sharedPref.getString("moniker", "Me");
 
         return view;
-
     }
 
-    // called when the user presses the join button
-    public void joinGroup(View view) {
-        //get moniker
-        EditText editText = view.findViewById(R.id.edit_moniker);
-        mMoniker = editText.getText().toString();
-        if (mMoniker.isEmpty()) {
-            displayOkAlertDialog(R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
-            return;
-        }
-
-        //get peer IP address
-        final String peerIP = mNsdServiceInfo.getHost().getHostAddress();
-
-        // Store moniker and host entered
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
-                BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("moniker", mMoniker);
-        editor.putString("host", peerIP);
-        editor.commit();
-
-
-        getPeers(peerIP);
+    private void joinGroup(String peerIp) {
+        getPeers(peerIp);
     }
 
     private void getPeers(final String peerIP) {
@@ -127,14 +90,14 @@ public class JoinGroupMdnsFragment extends Fragment implements ResponseListener 
                             mHttpCurrentPeerDiscoveryRequest =
                                     HttpPeerDiscoveryRequest.createCurrentPeersRequest(
                                             peerIP, BabbleService.DEFAULT_DISCOVERY_PORT,
-                                            JoinGroupMdnsFragment.this, getContext());
+                                            HomeMdnsFragment.this, getContext());
 
                             mHttpCurrentPeerDiscoveryRequest.send();
                         }
 
                         @Override
                         public void onFailure(Error error) {
-                            JoinGroupMdnsFragment.this.onFailure(error);
+                            HomeMdnsFragment.this.onFailure(error);
                         }
                     }, getContext());
         } catch (IllegalArgumentException ex) {
@@ -153,7 +116,7 @@ public class JoinGroupMdnsFragment extends Fragment implements ResponseListener 
 
         try {
             babbleService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(getContext()));
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalStateException ex) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port - in which case
@@ -199,7 +162,7 @@ public class JoinGroupMdnsFragment extends Fragment implements ResponseListener 
         mLoadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
-                cancelRequets();
+                cancelRequests();
             }});
     }
 
@@ -212,7 +175,7 @@ public class JoinGroupMdnsFragment extends Fragment implements ResponseListener 
         alertDialog.show();
     }
 
-    private void cancelRequets() {
+    private void cancelRequests() {
         if (mHttpCurrentPeerDiscoveryRequest!=null) {
             mHttpCurrentPeerDiscoveryRequest.cancel();
         }
@@ -240,10 +203,18 @@ public class JoinGroupMdnsFragment extends Fragment implements ResponseListener 
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mServiceListView.startDiscovery();
+    }
+
+    @Override
     public void onPause() {
-        //TODO: is this the right place to cancel the requests?
-        cancelRequets();
         super.onPause();
+
+        //TODO: is this the right place to cancel the requests?
+        cancelRequests();
+        mServiceListView.stopDiscovery();
     }
 
 }

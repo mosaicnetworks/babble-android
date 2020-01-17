@@ -25,4 +25,11 @@ public class MainActivity extends BaseConfigActivity {
         intent.putExtra("MONIKER", moniker);
         startActivity(intent);
     }
+
+    @Override
+    public void onArchiveSelected(String groupId) {
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("MONIKER", "archive");
+        startActivity(intent);
+    }
 }

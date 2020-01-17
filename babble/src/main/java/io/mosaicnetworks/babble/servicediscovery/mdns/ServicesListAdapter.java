@@ -21,7 +21,7 @@ public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapte
 
         ViewHolder(View itemView) {
             super(itemView);
-            genericTextView = itemView.findViewById(R.id.textView);
+            genericTextView = itemView.findViewById(R.id.serviceName);
             itemView.setOnClickListener(this);
         }
 

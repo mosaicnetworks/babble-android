@@ -1,5 +1,7 @@
 package io.mosaicnetworks.babble.configure;
 
+import android.net.nsd.NsdServiceInfo;
+
 import io.mosaicnetworks.babble.node.BabbleService;
 
 /**
@@ -30,5 +32,9 @@ public interface OnFragmentInteractionListener {
      * @param moniker the moniker chosen by the user
      */
     void onStartedNew(String moniker);
+
+    void onServiceSelected(NsdServiceInfo serviceInfo);
+
+    void onArchiveSelected(String groupId);
 
 }

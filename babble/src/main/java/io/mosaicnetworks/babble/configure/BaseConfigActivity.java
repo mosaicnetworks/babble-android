@@ -1,5 +1,6 @@
 package io.mosaicnetworks.babble.configure;
 
+import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -19,7 +20,7 @@ import io.mosaicnetworks.babble.node.BabbleService;
 public abstract class BaseConfigActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 
     private FragmentManager mFragmentManager;
-    private HomeFragment mHomeFragment;
+    private HomeTabsFragment mHomeFragment;
     private NewGroupFragment mNewGroupFragment;
     private JoinGroupMdnsFragment mJoinGroupMdnsFragment;
     public static final String PREFERENCE_FILE_KEY = "babbleandroid";
@@ -30,7 +31,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         setContentView(R.layout.activity_base_config);
 
         mFragmentManager = getSupportFragmentManager();
-        mHomeFragment = HomeFragment.newInstance();
+        mHomeFragment = HomeTabsFragment.newInstance();
 
         addFragment(mHomeFragment);
     }
@@ -62,8 +63,15 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
 
     // called when the user presses the join button
     public void joinGroup(View view) {
-        mJoinGroupMdnsFragment = JoinGroupMdnsFragment.newInstance();
+        //mJoinGroupMdnsFragment = JoinGroupMdnsFragment.newInstance();
+        //replaceFragment(mJoinGroupMdnsFragment);
+    }
+
+    @Override
+    public void onServiceSelected(NsdServiceInfo serviceInfo) {
+        mJoinGroupMdnsFragment = JoinGroupMdnsFragment.newInstance(serviceInfo);
         replaceFragment(mJoinGroupMdnsFragment);
+
     }
 
     @Override
@@ -74,4 +82,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
 
     @Override
     public abstract void onStartedNew(String moniker);
+
+    @Override
+    public abstract void onArchiveSelected(String groupId);
 }
