@@ -6,7 +6,7 @@ package io.mosaicnetworks.babble.node;
 import com.google.gson.Gson;
 import com.moandjiezana.toml.TomlWriter;
 
-import org.apache.commons.io.FileUtils;
+// import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -133,10 +133,23 @@ public class ConfigManager {
 
         File dir = new File(this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir);
 
-        return FileUtils.deleteQuietly(dir);
+        return deleteDir(dir);
     }
 
+    // delete directory and contents
+    boolean deleteDir(File file) {
+        try {
 
+            if (file.isDirectory())
+                for (String child : file.list())
+                    deleteDir(new File(file, child));
+            file.delete();  // delete child file or empty directory
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * Write Both Peers JSON files to the
