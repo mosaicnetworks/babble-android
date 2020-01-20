@@ -13,18 +13,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class ServicesListView extends RecyclerView {
 
     public interface ServicesListListener {
+
         void onServiceSelectedSuccess(NsdServiceInfo nsdServiceInfo);
+
         void onServiceSelectedFailure();
+
         void onDiscoveryStartFailure();
+
+        void onListEmptyStatusChange(boolean empty);
     }
 
     private List<NsdDiscoveredService> mServiceInfoList = new ArrayList<>();
     private ServicesListListener mServicesListListener;
     private MdnsDiscovery mMdnsDiscovery;
+    private boolean mPrevIsEmpty = true;
 
     public ServicesListView(Context context) {
         super(context);
@@ -80,6 +85,7 @@ public class ServicesListView extends RecyclerView {
             @Override
             public void onServiceListUpdated() {
 
+                // let the adapter know
                 Handler mainHandler = new Handler(context.getMainLooper());
 
                 Runnable myRunnable = new Runnable() {
@@ -89,6 +95,25 @@ public class ServicesListView extends RecyclerView {
                     }
                 };
                 mainHandler.post(myRunnable);
+
+                // if the service list info's empty status has changed, let the service listener
+                // know
+                final boolean curIsEmpty = mServiceInfoList.isEmpty();
+                if (mPrevIsEmpty ^ curIsEmpty) {
+                    //service list info's empty status has changed
+
+                    Runnable emptyStatus = new Runnable() {
+                        @Override
+                        public void run() {
+                            mServicesListListener.onListEmptyStatusChange(curIsEmpty);
+                        }
+                    };
+                    mainHandler.post(emptyStatus);
+
+                }
+
+                mPrevIsEmpty = curIsEmpty;
+
             }
 
             @Override

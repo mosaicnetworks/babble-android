@@ -25,4 +25,5 @@
     <string name="service_discovery_resolve_fail_message">Please try again in a few seconds!</string>
     <string name="service_discovery_start_fail_title">Failed to start mDNS discovery</string>
     <string name="service_discovery_start_fail_message">Please refresh to try again</string>
+    <string name="searching_services">Searching for services</string>
 </resources>

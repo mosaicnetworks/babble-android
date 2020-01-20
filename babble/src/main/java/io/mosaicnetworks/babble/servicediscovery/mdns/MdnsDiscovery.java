@@ -96,14 +96,14 @@ public class MdnsDiscovery {
                 MdnsAdvertiser.SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
 
         //###############
-        NsdServiceInfo dummyService = new NsdServiceInfo();
-        dummyService.setServiceName("Amazing chat");
-        dummyService.setServiceType(MdnsAdvertiser.SERVICE_TYPE);
-        mDiscoveryListener.onServiceFound(dummyService);
+        //NsdServiceInfo dummyService = new NsdServiceInfo();
+        //dummyService.setServiceName("Amazing chat");
+        //dummyService.setServiceType(MdnsAdvertiser.SERVICE_TYPE);
+        //mDiscoveryListener.onServiceFound(dummyService);
 
-        dummyService.setServiceName("Office chat");
-        dummyService.setServiceType(MdnsAdvertiser.SERVICE_TYPE);
-        mDiscoveryListener.onServiceFound(dummyService);
+        //dummyService.setServiceName("Office chat");
+        //dummyService.setServiceType(MdnsAdvertiser.SERVICE_TYPE);
+        //mDiscoveryListener.onServiceFound(dummyService);
         //###############
     }
 
