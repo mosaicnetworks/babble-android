@@ -1,27 +1,29 @@
 package io.mosaicnetworks.babble.servicediscovery.mdns;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.net.nsd.NsdServiceInfo;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.mosaicnetworks.babble.R;
 
 public class ServicesListView extends RecyclerView {
 
+    public interface ServicesListListener {
+        void onServiceSelectedSuccess(NsdServiceInfo nsdServiceInfo);
+        void onServiceSelectedFailure();
+        void onDiscoveryStartFailure();
+    }
+
     private List<NsdDiscoveredService> mServiceInfoList = new ArrayList<>();
-    private ServiceSelectedListener mServiceSelectedListener;
+    private ServicesListListener mServicesListListener;
     private MdnsDiscovery mMdnsDiscovery;
 
     public ServicesListView(Context context) {
@@ -56,7 +58,7 @@ public class ServicesListView extends RecyclerView {
                         Runnable myRunnable = new Runnable() {
                             @Override
                             public void run() {
-                                mServiceSelectedListener.onServiceSelected(service);
+                                mServicesListListener.onServiceSelectedSuccess(service);
                             }
                         };
                         mainHandler.post(myRunnable);
@@ -65,7 +67,7 @@ public class ServicesListView extends RecyclerView {
 
                     @Override
                     public void onResolveFailed() {
-                        //do nothing
+                        mServicesListListener.onServiceSelectedFailure();
                     }
                 });
 
@@ -91,25 +93,18 @@ public class ServicesListView extends RecyclerView {
 
             @Override
             public void onStartDiscoveryFailed() {
-                //do nothing
+                mServicesListListener.onDiscoveryStartFailure();
             }
         });
     }
 
-    public void startDiscovery() {
+    public void startDiscovery(ServicesListListener servicesListListener) {
+        mServicesListListener = servicesListListener;
         mMdnsDiscovery.discoverServices();
     }
 
     public void stopDiscovery() {
         mMdnsDiscovery.stopDiscovery();
-    }
-
-    public interface ServiceSelectedListener {
-        void onServiceSelected(NsdServiceInfo nsdServiceInfo);
-    }
-
-    public void setServiceSelectedListener(ServiceSelectedListener serviceSelectedListener) {
-        mServiceSelectedListener = serviceSelectedListener;
     }
 
 }

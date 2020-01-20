@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
@@ -61,12 +62,6 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
         final View view = inflater.inflate(R.layout.fragment_home_mdns, container, false);
 
         mServiceListView = view.findViewById(R.id.servicesListView);
-        mServiceListView.setServiceSelectedListener(new ServicesListView.ServiceSelectedListener() {
-            @Override
-            public void onServiceSelected(NsdServiceInfo serviceInfo) {
-                mListener.onServiceSelected(serviceInfo);
-            }
-        });
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
@@ -206,7 +201,23 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
     @Override
     public void onResume() {
         super.onResume();
-        mServiceListView.startDiscovery();
+        mServiceListView.startDiscovery(new ServicesListView.ServicesListListener() {
+
+            @Override
+            public void onServiceSelectedSuccess(NsdServiceInfo nsdServiceInfo) {
+                mListener.onServiceSelected(nsdServiceInfo);
+            }
+
+            @Override
+            public void onServiceSelectedFailure() {
+                displayOkAlertDialog(R.string.service_discovery_resolve_fail_title, R.string.service_discovery_resolve_fail_message);
+            }
+
+            @Override
+            public void onDiscoveryStartFailure() {
+                displayOkAlertDialog(R.string.service_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
+            }
+        });
     }
 
     @Override
