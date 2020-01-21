@@ -9,7 +9,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
@@ -35,7 +36,8 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
     private ServicesListView mServiceListView;
-    private ProgressBar mProgressView;
+    private LinearLayout mLinearLayoutServiceSearch;
+    private TextView mTextViewDiscoveryFailed;
 
     public HomeMdnsFragment() {
         // Required empty public constructor
@@ -63,7 +65,8 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
         final View view = inflater.inflate(R.layout.fragment_home_mdns, container, false);
 
         mServiceListView = view.findViewById(R.id.servicesListView);
-        mProgressView = view.findViewById(R.id.progressBar);
+        mLinearLayoutServiceSearch = view.findViewById(R.id.linearLayout_service_search);
+        mTextViewDiscoveryFailed = view.findViewById(R.id.textView_discovery_failed);
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
@@ -203,6 +206,7 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
     @Override
     public void onResume() {
         super.onResume();
+
         mServiceListView.startDiscovery(new ServicesListView.ServicesListListener() {
 
             @Override
@@ -218,26 +222,33 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
             @Override
             public void onDiscoveryStartFailure() {
                 displayOkAlertDialog(R.string.service_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
+
+                mLinearLayoutServiceSearch.setVisibility(View.GONE);
+                mTextViewDiscoveryFailed.setVisibility(View.VISIBLE);
+                mServiceListView.setVisibility(View.GONE);
             }
 
             @Override
             public void onListEmptyStatusChange(boolean empty) {
                 if (empty) {
-                    mProgressView.setVisibility(View.VISIBLE);
+                    mLinearLayoutServiceSearch.setVisibility(View.VISIBLE);
                     mServiceListView.setVisibility(View.GONE);
                 } else {
-                    mProgressView.setVisibility(View.GONE);
+                    mLinearLayoutServiceSearch.setVisibility(View.GONE);
                     mServiceListView.setVisibility(View.VISIBLE);
                 }
-
-
             }
         });
     }
 
     @Override
     public void onPause() {
+
         super.onPause();
+
+        mServiceListView.setVisibility(View.GONE);
+        mLinearLayoutServiceSearch.setVisibility(View.VISIBLE);
+        mTextViewDiscoveryFailed.setVisibility(View.GONE);
 
         //TODO: is this the right place to cancel the requests?
         cancelRequests();

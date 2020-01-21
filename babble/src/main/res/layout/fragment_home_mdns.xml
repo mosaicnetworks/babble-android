@@ -12,13 +12,14 @@
         android:visibility="gone" />
 
     <LinearLayout
+        android:id="@+id/linearLayout_service_search"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical">
 
         <ProgressBar
-            android:id="@+id/progressBar"
+            android:id="@+id/progressBar_service_search"
             style="?android:attr/progressBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
@@ -30,5 +31,13 @@
             android:text="@string/searching_services"
             android:textAlignment="center" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView_discovery_failed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/discovery_start_failed"
+        android:textAlignment="center"
+        android:visibility="gone"/>
 
 </LinearLayout>

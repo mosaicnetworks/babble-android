@@ -14,6 +14,7 @@ public class MdnsDiscovery {
     private NsdManager mNsdManager;
     private NsdManager.ResolveListener mResolveListener;
     private NsdManager.DiscoveryListener mDiscoveryListener;
+    private boolean mDiscoveryActive = false;
 
     public interface ServiceDiscoveryListener {
         void onServiceListUpdated();
@@ -37,6 +38,7 @@ public class MdnsDiscovery {
             @Override
             public void onDiscoveryStarted(String regType) {
                 Log.d(TAG, "Service discovery started");
+                mDiscoveryActive = true;
             }
             @Override
             public void onServiceFound(NsdServiceInfo serviceInfo) {
@@ -62,6 +64,9 @@ public class MdnsDiscovery {
             @Override
             public void onDiscoveryStopped(String serviceType) {
                 Log.i(TAG, "Discovery stopped: " + serviceType);
+                mDiscoveryActive = false;
+                mDiscoveredServices.clear();
+                serviceDiscoveryListener.onServiceListUpdated();
             }
             @Override
             public void onStartDiscoveryFailed(String serviceType, int errorCode) {
@@ -95,16 +100,6 @@ public class MdnsDiscovery {
         mNsdManager.discoverServices(
                 MdnsAdvertiser.SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
 
-        //###############
-        //NsdServiceInfo dummyService = new NsdServiceInfo();
-        //dummyService.setServiceName("Amazing chat");
-        //dummyService.setServiceType(MdnsAdvertiser.SERVICE_TYPE);
-        //mDiscoveryListener.onServiceFound(dummyService);
-
-        //dummyService.setServiceName("Office chat");
-        //dummyService.setServiceType(MdnsAdvertiser.SERVICE_TYPE);
-        //mDiscoveryListener.onServiceFound(dummyService);
-        //###############
     }
 
     public void resolveService(NsdDiscoveredService serviceInfo, ResolutionListener resolutionListener) {
@@ -117,6 +112,8 @@ public class MdnsDiscovery {
     }
 
     public void stopDiscovery() {
-        mNsdManager.stopServiceDiscovery(mDiscoveryListener);
+        if (mDiscoveryActive) {
+            mNsdManager.stopServiceDiscovery(mDiscoveryListener);
+        }
     }
 }
