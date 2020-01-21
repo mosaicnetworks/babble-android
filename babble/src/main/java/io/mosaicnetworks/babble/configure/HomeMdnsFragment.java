@@ -11,10 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.List;
 
@@ -37,7 +39,8 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
     private List<Peer> mGenesisPeers;
     private ServicesListView mServiceListView;
     private LinearLayout mLinearLayoutServiceSearch;
-    private TextView mTextViewDiscoveryFailed;
+    private SwipeRefreshLayout mSwipeRefreshDiscoveryFailed;
+    private SwipeRefreshLayout mSwipeRefreshServicesDisplaying;
 
     public HomeMdnsFragment() {
         // Required empty public constructor
@@ -66,7 +69,40 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
 
         mServiceListView = view.findViewById(R.id.servicesListView);
         mLinearLayoutServiceSearch = view.findViewById(R.id.linearLayout_service_search);
-        mTextViewDiscoveryFailed = view.findViewById(R.id.textView_discovery_failed);
+        mSwipeRefreshDiscoveryFailed = view.findViewById(R.id.swiperefresh_discovery_failed);
+        mSwipeRefreshServicesDisplaying = view.findViewById(R.id.swiperefresh_services_displaying);
+
+        mSwipeRefreshDiscoveryFailed.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+
+                        mLinearLayoutServiceSearch.setVisibility(View.VISIBLE);
+                        mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
+                        mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
+
+                        startDiscovery();
+
+                        if (mSwipeRefreshDiscoveryFailed.isRefreshing()) {
+                            mSwipeRefreshDiscoveryFailed.setRefreshing(false);
+                        }
+                    }
+                }
+        );
+
+        mSwipeRefreshServicesDisplaying.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+
+                        //do nothing ;)
+
+                        if (mSwipeRefreshServicesDisplaying.isRefreshing()) {
+                            mSwipeRefreshServicesDisplaying.setRefreshing(false);
+                        }
+                    }
+                }
+        );
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
@@ -203,10 +239,7 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
         mListener = null;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
+    private void startDiscovery() {
         mServiceListView.startDiscovery(new ServicesListView.ServicesListListener() {
 
             @Override
@@ -224,21 +257,30 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
                 displayOkAlertDialog(R.string.service_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
 
                 mLinearLayoutServiceSearch.setVisibility(View.GONE);
-                mTextViewDiscoveryFailed.setVisibility(View.VISIBLE);
-                mServiceListView.setVisibility(View.GONE);
+                mSwipeRefreshDiscoveryFailed.setVisibility(View.VISIBLE);
+                mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
             }
 
             @Override
             public void onListEmptyStatusChange(boolean empty) {
                 if (empty) {
                     mLinearLayoutServiceSearch.setVisibility(View.VISIBLE);
-                    mServiceListView.setVisibility(View.GONE);
+                    mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
+                    mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
                 } else {
                     mLinearLayoutServiceSearch.setVisibility(View.GONE);
-                    mServiceListView.setVisibility(View.VISIBLE);
+                    mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
+                    mSwipeRefreshServicesDisplaying.setVisibility(View.VISIBLE);
                 }
             }
         });
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        startDiscovery();
     }
 
     @Override
@@ -246,9 +288,9 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
 
         super.onPause();
 
-        mServiceListView.setVisibility(View.GONE);
         mLinearLayoutServiceSearch.setVisibility(View.VISIBLE);
-        mTextViewDiscoveryFailed.setVisibility(View.GONE);
+        mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
+        mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
 
         //TODO: is this the right place to cancel the requests?
         cancelRequests();

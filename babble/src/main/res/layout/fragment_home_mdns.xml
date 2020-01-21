@@ -5,11 +5,18 @@
     android:gravity="center"
     android:layout_height="match_parent">
 
-    <io.mosaicnetworks.babble.servicediscovery.mdns.ServicesListView
-        android:id="@+id/servicesListView"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swiperefresh_services_displaying"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone" />
+        android:visibility="gone" >
+
+        <io.mosaicnetworks.babble.servicediscovery.mdns.ServicesListView
+            android:id="@+id/servicesListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout_service_search"
@@ -32,12 +39,30 @@
             android:textAlignment="center" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/textView_discovery_failed"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swiperefresh_discovery_failed"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/discovery_start_failed"
-        android:textAlignment="center"
-        android:visibility="gone"/>
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <TextView
+                android:gravity="center"
+                android:id="@+id/textView_discovery_failed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/discovery_start_failed"
+                android:textAlignment="center" />
+
+        </ScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+
 
 </LinearLayout>
