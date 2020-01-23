@@ -10,22 +10,22 @@ Prerequisites
 We will assume that you have installed Android Studio, an Android SDK with API
 version 29 and Android NDK. If you use a previous API version, the ``create 
 activity`` items in these instructions will use AppCompat instead of 
-AndroidX[#androidx]_, leading to incompatibilities with the pasted source code.
+AndroidX [#androidx]_, leading to incompatibilities with the pasted source code.
 The babble node itself is compatible with AppCompat, but converting the sample
 to use AppCompat is beyond the scope of this article.
 
 This tutorial is going to assume deployment to a physical Android device. Thus
-you will need an Android device (minimum API version 19[#androiddevice]) with 
+you will need an Android device (minimum API version 19 [#androiddevice]_) with 
 the developer options turned on, debugging enabled, and a suitable USB cable. 
 You could use the android emulator, but that is beyond the scope of this
 article.
 
-[#androidx]: You can read more about AndroidX here: [https://android-developers.googleblog.com/2018/05/hello-world-androidx.html](https://android-developers.googleblog.com/2018/05/hello-world-androidx.html) 
+.. [#androidx] You can read more about AndroidX here: [https://android-developers.googleblog.com/2018/05/hello-world-androidx.html](https://android-developers.googleblog.com/2018/05/hello-world-androidx.html) 
 
-[#androiddevice]: API version 19 is Android 4.4 (KitKat). In May 3.8% of devices
-were using version 18 or lower. Android 4.4 was released in 2013. Whilst it 
-would be possible to code support for earlier versions, the existing code uses
-Android features introduced in Android 4.4.
+.. [#androiddevice] API version 19 is Android 4.4 (KitKat). In May 3.8% of devices
+   were using version 18 or lower. Android 4.4 was released in 2013. Whilst it 
+   would be possible to code support for earlier versions, the existing code uses
+   Android features introduced in Android 4.4.
 
 Our First Minimal App
 +++++++++++++++++++++
@@ -263,15 +263,17 @@ the hood. Press logcat, as highlighted in gray in the screenshot above. Then
 type ``yippee`` in the search box at the top of that window to filter the logs.
 You should have a freshly generated private key in there. 
 
-This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage1) [#stage1]
+This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage1) [#stage1]_
 
-[#stage1]: This code is the stage1 branch at https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage1
+.. [#stage1] This code is the stage1 branch at 
+   https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage1
 
 The downloadable version of the project has *Mosaic Networks* icons, rather than 
 the default Android ones. You can customise the icons using
-[Android Studio Image Asset Studio](https://developer.android.com/studio/write/image-asset-studio).[#imageasset] 
+[Android Studio Image Asset Studio](https://developer.android.com/studio/write/image-asset-studio). [#imageasset]_ 
 
-[#imageasset]: [Android Studio Image Asset Studio](https://developer.android.com/studio/write/image-asset-studio) is described here: https://developer.android.com/studio/write/image-asset-studio
+.. [#imageasset] [Android Studio Image Asset Studio](https://developer.android.com/studio/write/image-asset-studio) 
+   is described here: https://developer.android.com/studio/write/image-asset-studio
 
 Our First Babble Blockchain
 +++++++++++++++++++++++++++
@@ -284,7 +286,7 @@ babble node.
 Currently our application launches the activity ``MainActivity`` which calls the
 key pair generation code in it's ``onCreate`` method. 
 
-In the Sample App [#sampleapp] that we are working towards, the MainActivity
+In the Sample App [#sampleapp]_ that we are working towards, the MainActivity
 Screen presents the user with a choice of "**New**" or "**Join**". **New**
 starts a new babble network with your device as the sole peer. **Join** lets you
 specify the address of an existing network, pull down the configuration for that
@@ -293,8 +295,9 @@ network and request to join it.
 As **New** is standalone functionality, and **Join** requires **New** be 
 implemented to function, we will implement **New** first.
 
-[#sampleapp]: The sample app is part of the ``babble-android`` library and is 
-available from the [GitHub repo](https://github.com/mosaicnetworks/babble-android)
+.. [#sampleapp] The sample app is part of the ``babble-android`` library and is 
+   available from the 
+   [GitHub repo](https://github.com/mosaicnetworks/babble-android)
 
 Main Activity
 -------------
@@ -654,9 +657,10 @@ class from whom ``MainActivity`` inherits. We just need to wire in the
 We define a MessagingService using the ``getBabbleService()`` function. This 
 boilerplate class wraps BabbleService from the babble-android library. 
 
-This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2) [#stage2]
+This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2) [#stage2]_
 
-[#stage2]: This code is the stage2 branch at https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2
+.. [#stage2] This code is the stage2 branch at
+   https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2
 
 Interacting with Babble
 +++++++++++++++++++++++
@@ -847,9 +851,10 @@ and send messages to yourself as below:
 
   First Chat
 
-This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3) [#stage3]
+This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3) [#stage3]_
 
-[#stage3]: This code is the stage3 branch at https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3
+.. [#stage3] This code is the stage3 branch at
+   https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3
 
 Joining
 +++++++
@@ -888,6 +893,7 @@ on one and join with the other:
 
   Stage 4 Tablet
 
-This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4) [#stage4]
+This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4) [#stage4]_
 
-[#stage4]: This code is the stage4 branch at https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4
+.. [#stage4] This code is the stage4 branch at
+   https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4
