@@ -1,0 +1,413 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Usage &#8212; Babble 0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Babble Consensus" href="consensus.html" />
+    <link rel="prev" title="API" href="api.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/babblelogo2.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">Babble</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=mosaicnetworks&repo=babble&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to Babble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#docker">Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manual-setup">Manual Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#babble-executable">Babble Executable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stats-blocks-and-logs">Stats, blocks and Logs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="consensus.html">Babble Consensus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="blockchain.html">From Hashgraph to Blockchain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="state_machine.html">Node State-Machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fastsync.html">FastSync</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_membership.html">Dynamic Membership</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">&lt;no title&gt;</a><ul>
+      <li>Previous: <a href="api.html" title="previous chapter">API</a></li>
+      <li>Next: <a href="consensus.html" title="next chapter">Babble Consensus</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="usage">
+<span id="id1"></span><h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<p>In this section we will guide you through deploying an application on top of
+Babble. Babble comes with the Dummy application which is used in this
+demonstration. It is a simple chat application where participants write
+messages on a channel and Babble guarantees that everyone sees the same
+messages in the same order.</p>
+<div class="section" id="docker">
+<h2>Docker<a class="headerlink" href="#docker" title="Permalink to this headline">¶</a></h2>
+<p>We have provided a series of scripts to bootstrap a demo. Let us first use the
+easy method to view the demo and then we will take a closer look at what is
+happening behind the scenes.</p>
+<p>Make sure you have <a class="reference external" href="https://docker.com">Docker</a> installed.</p>
+<p>The demo will pull Docker images from our <a class="reference external" href="https://hub.docker.com/u/mosaicnetworks/">official public Docker registry</a></p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>[...]/babble$ cd demo
+[...]/babble/demo$ make
+</pre></div>
+</div>
+<p>Once the testnet is started, a script is automatically launched to monitor
+consensus figures:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">consensus_events</span><span class="p">:</span><span class="mi">180</span> <span class="n">consensus_transactions</span><span class="p">:</span><span class="mi">40</span> <span class="n">events_per_second</span><span class="p">:</span><span class="mf">0.00</span> <span class="nb">id</span><span class="p">:</span><span class="mi">1</span> <span class="n">last_block_index</span><span class="p">:</span><span class="mi">3</span> <span class="n">last_consensus_round</span><span class="p">:</span><span class="mi">17</span> <span class="n">num_peers</span><span class="p">:</span><span class="mi">3</span> <span class="n">round_events</span><span class="p">:</span><span class="mi">7</span> <span class="n">rounds_per_second</span><span class="p">:</span><span class="mf">0.00</span> <span class="n">state</span><span class="p">:</span><span class="n">Babbling</span> <span class="n">sync_rate</span><span class="p">:</span><span class="mf">1.00</span> <span class="n">transaction_pool</span><span class="p">:</span><span class="mi">0</span> <span class="n">undetermined_events</span><span class="p">:</span><span class="mi">18</span>
+<span class="n">consensus_events</span><span class="p">:</span><span class="mi">180</span> <span class="n">consensus_transactions</span><span class="p">:</span><span class="mi">40</span> <span class="n">events_per_second</span><span class="p">:</span><span class="mf">0.00</span> <span class="nb">id</span><span class="p">:</span><span class="mi">3</span> <span class="n">last_block_index</span><span class="p">:</span><span class="mi">3</span> <span class="n">last_consensus_round</span><span class="p">:</span><span class="mi">17</span> <span class="n">num_peers</span><span class="p">:</span><span class="mi">3</span> <span class="n">round_events</span><span class="p">:</span><span class="mi">7</span> <span class="n">rounds_per_second</span><span class="p">:</span><span class="mf">0.00</span> <span class="n">state</span><span class="p">:</span><span class="n">Babbling</span> <span class="n">sync_rate</span><span class="p">:</span><span class="mf">1.00</span> <span class="n">transaction_pool</span><span class="p">:</span><span class="mi">0</span> <span class="n">undetermined_events</span><span class="p">:</span><span class="mi">20</span>
+<span class="n">consensus_events</span><span class="p">:</span><span class="mi">180</span> <span class="n">consensus_transactions</span><span class="p">:</span><span class="mi">40</span> <span class="n">events_per_second</span><span class="p">:</span><span class="mf">0.00</span> <span class="nb">id</span><span class="p">:</span><span class="mi">2</span> <span class="n">last_block_index</span><span class="p">:</span><span class="mi">3</span> <span class="n">last_consensus_round</span><span class="p">:</span><span class="mi">17</span> <span class="n">num_peers</span><span class="p">:</span><span class="mi">3</span> <span class="n">round_events</span><span class="p">:</span><span class="mi">7</span> <span class="n">rounds_per_second</span><span class="p">:</span><span class="mf">0.00</span> <span class="n">state</span><span class="p">:</span><span class="n">Babbling</span> <span class="n">sync_rate</span><span class="p">:</span><span class="mf">1.00</span> <span class="n">transaction_pool</span><span class="p">:</span><span class="mi">0</span> <span class="n">undetermined_events</span><span class="p">:</span><span class="mi">21</span>
+<span class="n">consensus_events</span><span class="p">:</span><span class="mi">180</span> <span class="n">consensus_transactions</span><span class="p">:</span><span class="mi">40</span> <span class="n">events_per_second</span><span class="p">:</span><span class="mf">0.00</span> <span class="nb">id</span><span class="p">:</span><span class="mi">0</span> <span class="n">last_block_index</span><span class="p">:</span><span class="mi">3</span> <span class="n">last_consensus_round</span><span class="p">:</span><span class="mi">17</span> <span class="n">num_peers</span><span class="p">:</span><span class="mi">3</span> <span class="n">round_events</span><span class="p">:</span><span class="mi">7</span> <span class="n">rounds_per_second</span><span class="p">:</span><span class="mf">0.00</span> <span class="n">state</span><span class="p">:</span><span class="n">Babbling</span> <span class="n">sync_rate</span><span class="p">:</span><span class="mf">1.00</span> <span class="n">transaction_pool</span><span class="p">:</span><span class="mi">0</span> <span class="n">undetermined_events</span><span class="p">:</span><span class="mi">20</span>
+</pre></div>
+</div>
+<p>Running <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">ps</span> <span class="pre">-a</span></code> will show you that 9 docker containers have
+been launched:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>[...]/babble/demo$ docker ps -a
+CONTAINER ID        IMAGE                    COMMAND                  CREATED             STATUS              PORTS                   NAMES
+ba80ef275f22        mosaicnetworks/watcher   &quot;/watch.sh&quot;              48 seconds ago      Up 7 seconds                                watcher
+4620ed62a67d        mosaicnetworks/dummy     &quot;dummy &#39;--name=client&quot;   49 seconds ago      Up 48 seconds       1339/tcp                client4
+847ea77bd7fc        mosaicnetworks/babble    &quot;babble run --cache_s&quot;   50 seconds ago      Up 49 seconds       80/tcp, 1337-1338/tcp   node4
+11df03bf9690        mosaicnetworks/dummy     &quot;dummy &#39;--name=client&quot;   51 seconds ago      Up 50 seconds       1339/tcp                client3
+00af002747ca        mosaicnetworks/babble    &quot;babble run --cache_s&quot;   52 seconds ago      Up 50 seconds       80/tcp, 1337-1338/tcp   node3
+b2011d3d65bb        mosaicnetworks/dummy     &quot;dummy &#39;--name=client&quot;   53 seconds ago      Up 51 seconds       1339/tcp                client2
+e953b50bc1db        mosaicnetworks/babble    &quot;babble run --cache_s&quot;   53 seconds ago      Up 52 seconds       80/tcp, 1337-1338/tcp   node2
+0c9dd65de193        mosaicnetworks/dummy     &quot;dummy &#39;--name=client&quot;   54 seconds ago      Up 53 seconds       1339/tcp                client1
+d1f4e5008d4d        mosaicnetworks/babble    &quot;babble run --cache_s&quot;   55 seconds ago      Up 54 seconds       80/tcp, 1337-1338/tcp   node1
+</pre></div>
+</div>
+<p>Indeed, each node is comprised of an App and a Babble node (cf Design section).
+The <code class="docutils literal notranslate"><span class="pre">watcher</span></code> container monitors consensus figures.</p>
+<p>Run the <code class="docutils literal notranslate"><span class="pre">demo</span></code> script to play with the <code class="docutils literal notranslate"><span class="pre">Dummy</span> <span class="pre">App</span></code> which is a simple chat
+application powered by the Babble consensus platform:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>[...]/babble/demo$ make demo
+</pre></div>
+</div>
+<img alt="../_images/demo.png" src="../_images/demo.png" />
+<p>Finally, stop the testnet:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>[...]/babble/demo$ make stop
+</pre></div>
+</div>
+</div>
+<div class="section" id="manual-setup">
+<h2>Manual Setup<a class="headerlink" href="#manual-setup" title="Permalink to this headline">¶</a></h2>
+<p>The above scripts hide a lot of the work required for setting up a Babble
+network. They generate the configuration files automatically, copy them to the
+right places and launch the nodes in Docker containers. We recommend looking at
+these scripts closely to understand how the demo works. Here, we will attempt
+to explain the individual steps that take place behind the scenes.</p>
+<div class="section" id="configuration">
+<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h3>
+<p>Babble reads configuration from the directory specified by the <code class="docutils literal notranslate"><span class="pre">datadir</span></code> flag
+which defaults to <code class="docutils literal notranslate"><span class="pre">~/.babble</span></code> on UNIX systems. This directory should contain
+the following files:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">priv_key</span></code>    : The private key of the validator runnning the node.</li>
+<li><code class="docutils literal notranslate"><span class="pre">peers.json</span></code>  : The current validator-set.</li>
+<li><code class="docutils literal notranslate"><span class="pre">genesis.peers.json</span></code> : (optional, default peers.json) The initial
+validator-set of the network.</li>
+</ul>
+</div></blockquote>
+<div class="section" id="keys">
+<h4>Keys<a class="headerlink" href="#keys" title="Permalink to this headline">¶</a></h4>
+<p>Every participant has a cryptographic key-pair that it uses to encrypt, sign
+and verify messages. The private key is secret but the public key is used by
+other nodes to verify messages signed with the private key.</p>
+<p>The encryption scheme used by Babble is ECDSA with the secp256k1 curve (like
+Bitcoin and Ethereum).</p>
+<p>Babble’s <code class="docutils literal notranslate"><span class="pre">keygen</span></code> command can be used to generate key-pairs in the
+appropriate format.</p>
+</div>
+<div class="section" id="peers">
+<h4>Peers<a class="headerlink" href="#peers" title="Permalink to this headline">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">peers.json</span></code> and <code class="docutils literal notranslate"><span class="pre">genesis.peers.json</span></code> are used to determine the current and
+initial validator-sets of a network.</p>
+<p><code class="docutils literal notranslate"><span class="pre">genesis.peers.json</span></code> corresponds to the initial validator-set; the one that
+the hashgraph was started with. If <code class="docutils literal notranslate"><span class="pre">genesis.peers.json</span></code> is not provided,
+Babble will use <code class="docutils literal notranslate"><span class="pre">peers.json</span></code> as the genesis validator-set.</p>
+<p><code class="docutils literal notranslate"><span class="pre">peers.json</span></code> corresponds to the current validator-set. These are the nodes
+that are allowed to record new Events in the hashgraph, and who will gossip
+among each other.</p>
+<p><code class="docutils literal notranslate"><span class="pre">peers.json</span></code> and <code class="docutils literal notranslate"><span class="pre">gensesis.peers.json</span></code> are not necessarily equal because
+the <a class="reference internal" href="dynamic_membership.html#dynamic-membership"><span class="std std-ref">dynamic membership protocol</span></a> enables new nodes to
+join or leave a live Babble network dynamically. It is important for a joining
+node to know the initial validator-set in order to replay and verify the
+hashgraph up to the point where it joins.</p>
+<p>It is possible to start a Babble network with just a single node, or with a
+predefined validator-set composed of multiple nodes.</p>
+<p>In the latter case, someone, or some process, needs to aggregate the public
+keys and network addresses of all participants into a single file
+(<code class="docutils literal notranslate"><span class="pre">peers.genesisjson</span></code>), and ensure that everyone has a copy of this file. It is
+left to the user to derive a scheme to produce the configuration files but the
+docker demo scripts are a good place to start.</p>
+</div>
+<div class="section" id="example">
+<h4>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
+<p>Let us say I want to participate in a Babble network. I am going to start by
+running <code class="docutils literal notranslate"><span class="pre">babble</span> <span class="pre">keygen</span></code> to create a key-pair:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">babble</span> <span class="n">keygen</span>
+<span class="n">Your</span> <span class="n">private</span> <span class="n">key</span> <span class="n">has</span> <span class="n">been</span> <span class="n">saved</span> <span class="n">to</span><span class="p">:</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="p">[</span><span class="n">user</span><span class="p">]</span><span class="o">/.</span><span class="n">babble</span><span class="o">/</span><span class="n">priv_key</span>
+<span class="n">Your</span> <span class="n">public</span> <span class="n">key</span> <span class="n">has</span> <span class="n">been</span> <span class="n">saved</span> <span class="n">to</span><span class="p">:</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="p">[</span><span class="n">user</span><span class="p">]</span><span class="o">/.</span><span class="n">babble</span><span class="o">/</span><span class="n">key</span><span class="o">.</span><span class="n">pub</span>
+</pre></div>
+</div>
+<p>Next, I am going to copy the public key (key.pub) and communicate it to whoever
+is responsible for producing the peers.json file. At the same time, I will tell
+them that I am going to be listening on 172.77.5.2:1337. You may also optionally
+supply a moniker for each node, which is far more readable than a
+public key address.</p>
+<p>Suppose three other people do the same thing. The resulting peers.json file
+could look something like this:</p>
+<div class="code json highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="p">{</span>
+     <span class="s2">&quot;NetAddr&quot;</span><span class="p">:</span><span class="s2">&quot;172.77.5.1:1337&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;PubKeyHex&quot;</span><span class="p">:</span><span class="s2">&quot;0x0471AEE3CAE4E8442D37C9F5481FB32C4531511988652DF923B79ED4ED992021183D31E0F6FBFE96D89B6D03D7250292DFECD4FC414D83A5C38FA3FAD0D8572864&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;Moniker&quot;</span><span class="p">:</span><span class="s2">&quot;node1&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+     <span class="s2">&quot;NetAddr&quot;</span><span class="p">:</span><span class="s2">&quot;172.77.5.2:1337&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;PubKeyHex&quot;</span><span class="p">:</span><span class="s2">&quot;0x045E034D73C849756AE7B6515CA60D96A5A911B13A4D8B45BC0E0B02EDB45009DF6CCC074EEB6F7C6795740F993664EDEE970F8A717C89344F8437F412BDF0D17C&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;Moniker&quot;</span><span class="p">:</span><span class="s2">&quot;node2&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+     <span class="s2">&quot;NetAddr&quot;</span><span class="p">:</span><span class="s2">&quot;172.77.5.3:1337&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;PubKeyHex&quot;</span><span class="p">:</span><span class="s2">&quot;0x047CCCD40D90B331C64CE27911D3A31AF7DC16C1EA6D570FDC2120920663E0A678D7B5D0C19B6A77FEA829F8198F4F487B68206B93B7AD17D7C49CA7E0164D0033&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;Moniker&quot;</span><span class="p">:</span><span class="s2">&quot;node3&quot;</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+     <span class="s2">&quot;NetAddr&quot;</span><span class="p">:</span><span class="s2">&quot;172.77.5.4:1337&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;PubKeyHex&quot;</span><span class="p">:</span><span class="s2">&quot;0x0406CB5043E7337700E3B154993C872B1C61A84B1A739528C4A10135A3D64939C094B4A999BD21C3D5E9E9ECF15B202414F073795C9483B2F51ADA7EE59EB5EAC4&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;Moniker&quot;</span><span class="p">:</span><span class="s2">&quot;node4&quot;</span>
+  <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Now everyone is going to take a copy of this peers.json file and put it in a
+folder together with the priv_key file they generated in the previous step.
+That is the folder that they need to specify as the datadir when they run
+Babble.</p>
+</div>
+</div>
+</div>
+<div class="section" id="babble-executable">
+<h2>Babble Executable<a class="headerlink" href="#babble-executable" title="Permalink to this headline">¶</a></h2>
+<p>Let us take a look at the help provided by the Babble CLI:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Run</span> <span class="n">node</span>
+
+<span class="n">Usage</span><span class="p">:</span>
+  <span class="n">babble</span> <span class="n">run</span> <span class="p">[</span><span class="n">flags</span><span class="p">]</span>
+
+<span class="n">Flags</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">a</span><span class="p">,</span> <span class="o">--</span><span class="n">advertise</span> <span class="n">string</span>        <span class="n">Advertise</span> <span class="n">IP</span><span class="p">:</span><span class="n">Port</span> <span class="k">for</span> <span class="n">babble</span> <span class="n">node</span>
+      <span class="o">--</span><span class="n">bootstrap</span>               <span class="n">Load</span> <span class="kn">from</span> <span class="nn">database</span>
+      <span class="o">--</span><span class="n">cache</span><span class="o">-</span><span class="n">size</span> <span class="nb">int</span>          <span class="n">Number</span> <span class="n">of</span> <span class="n">items</span> <span class="ow">in</span> <span class="n">LRU</span> <span class="n">caches</span> <span class="p">(</span><span class="n">default</span> <span class="mi">5000</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">c</span><span class="p">,</span> <span class="o">--</span><span class="n">client</span><span class="o">-</span><span class="n">connect</span> <span class="n">string</span>   <span class="n">IP</span><span class="p">:</span><span class="n">Port</span> <span class="n">to</span> <span class="n">connect</span> <span class="n">to</span> <span class="n">client</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;127.0.0.1:1339&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">datadir</span> <span class="n">string</span>          <span class="n">Top</span><span class="o">-</span><span class="n">level</span> <span class="n">directory</span> <span class="k">for</span> <span class="n">configuration</span> <span class="ow">and</span> <span class="n">data</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;/home/martin/.babble&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">db</span> <span class="n">string</span>               <span class="n">Dabatabase</span> <span class="n">directory</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;/home/martin/.babble/badger_db&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">fast</span><span class="o">-</span><span class="n">sync</span>               <span class="n">Enable</span> <span class="n">FastSync</span>
+      <span class="o">--</span><span class="n">heartbeat</span> <span class="n">duration</span>      <span class="n">Time</span> <span class="n">between</span> <span class="n">gossips</span> <span class="p">(</span><span class="n">default</span> <span class="mi">10</span><span class="n">ms</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>                    <span class="n">help</span> <span class="k">for</span> <span class="n">run</span>
+  <span class="o">-</span><span class="n">j</span><span class="p">,</span> <span class="o">--</span><span class="n">join</span><span class="o">-</span><span class="n">timeout</span> <span class="n">duration</span>   <span class="n">Join</span> <span class="n">Timeout</span> <span class="p">(</span><span class="n">default</span> <span class="mi">10</span><span class="n">s</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">l</span><span class="p">,</span> <span class="o">--</span><span class="n">listen</span> <span class="n">string</span>           <span class="n">Listen</span> <span class="n">IP</span><span class="p">:</span><span class="n">Port</span> <span class="k">for</span> <span class="n">babble</span> <span class="n">node</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;127.0.0.1:1337&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">log</span> <span class="n">string</span>              <span class="n">debug</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">warn</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">fatal</span><span class="p">,</span> <span class="n">panic</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;debug&quot;</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">R</span><span class="p">,</span> <span class="o">--</span><span class="n">maintenance</span><span class="o">-</span><span class="n">mode</span>        <span class="n">Start</span> <span class="n">Babble</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">suspended</span> <span class="p">(</span><span class="n">non</span><span class="o">-</span><span class="n">gossipping</span><span class="p">)</span> <span class="n">state</span>
+      <span class="o">--</span><span class="nb">max</span><span class="o">-</span><span class="n">pool</span> <span class="nb">int</span>            <span class="n">Connection</span> <span class="n">pool</span> <span class="n">size</span> <span class="nb">max</span> <span class="p">(</span><span class="n">default</span> <span class="mi">2</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">moniker</span> <span class="n">string</span>          <span class="n">Optional</span> <span class="n">name</span>
+  <span class="o">-</span><span class="n">p</span><span class="p">,</span> <span class="o">--</span><span class="n">proxy</span><span class="o">-</span><span class="n">listen</span> <span class="n">string</span>     <span class="n">Listen</span> <span class="n">IP</span><span class="p">:</span><span class="n">Port</span> <span class="k">for</span> <span class="n">babble</span> <span class="n">proxy</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;127.0.0.1:1338&quot;</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">s</span><span class="p">,</span> <span class="o">--</span><span class="n">service</span><span class="o">-</span><span class="n">listen</span> <span class="n">string</span>   <span class="n">Listen</span> <span class="n">IP</span><span class="p">:</span><span class="n">Port</span> <span class="k">for</span> <span class="n">HTTP</span> <span class="n">service</span> <span class="p">(</span><span class="n">default</span> <span class="s2">&quot;127.0.0.1:8000&quot;</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">standalone</span>              <span class="n">Do</span> <span class="ow">not</span> <span class="n">create</span> <span class="n">a</span> <span class="n">proxy</span>
+      <span class="o">--</span><span class="n">store</span>                   <span class="n">Use</span> <span class="n">badgerDB</span> <span class="n">instead</span> <span class="n">of</span> <span class="ow">in</span><span class="o">-</span><span class="n">mem</span> <span class="n">DB</span>
+      <span class="o">--</span><span class="n">suspend</span><span class="o">-</span><span class="n">limit</span> <span class="nb">int</span>       <span class="n">Limit</span> <span class="n">of</span> <span class="n">undetermined</span> <span class="n">events</span> <span class="n">before</span> <span class="n">entering</span> <span class="n">suspended</span> <span class="n">state</span> <span class="p">(</span><span class="n">default</span> <span class="mi">300</span><span class="p">)</span>
+      <span class="o">--</span><span class="n">sync</span><span class="o">-</span><span class="n">limit</span> <span class="nb">int</span>          <span class="n">Max</span> <span class="n">number</span> <span class="n">of</span> <span class="n">events</span> <span class="k">for</span> <span class="n">sync</span> <span class="p">(</span><span class="n">default</span> <span class="mi">1000</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">t</span><span class="p">,</span> <span class="o">--</span><span class="n">timeout</span> <span class="n">duration</span>        <span class="n">TCP</span> <span class="n">Timeout</span> <span class="p">(</span><span class="n">default</span> <span class="mi">1</span><span class="n">s</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">listen</span></code> flag controls the local address:port where this node gossips with
+other nodes. If the node is running behind some kind of NAT, it is possilbe to
+advertise a different address with the <code class="docutils literal notranslate"><span class="pre">advertise</span></code> flag. If <code class="docutils literal notranslate"><span class="pre">advertise</span></code> is
+not  specified, the node defaults to using the <code class="docutils literal notranslate"><span class="pre">listen</span></code> address. By default
+<code class="docutils literal notranslate"><span class="pre">listen</span></code> is <code class="docutils literal notranslate"><span class="pre">127.0.0.1:1337</span></code>, meaning that Babble will bind to the loopback
+addresse on the local machine.</p>
+<p>As we explained in the architecture section, each Babble node works in
+conjunction with an application for which it orders transactions. When Babble
+and the application are connected by a TCP interface, we specify two other
+endpoints:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">proxy-listen</span></code>  : where Babble listens for transactions from the App</li>
+<li><code class="docutils literal notranslate"><span class="pre">client-connect</span></code> : where the App listens for transactions from Babble</li>
+</ul>
+</div></blockquote>
+<p>We can also specify where Babble exposes its HTTP API providing information on
+the Hashgraph and Blockchain data store. This is controlled by the optional
+<code class="docutils literal notranslate"><span class="pre">service-listen</span></code> flag.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">fast-sync</span></code> parameter determines whether or not the node will attempt to
+fast-forward to the tip of the hashgraph, or download and replay the entire
+hashgraph from start. More on this in <a class="reference internal" href="fastsync.html#fastsync"><span class="std std-ref">fast-sync</span></a></p>
+<p>We can choose to run Babble with a database backend or only with an in-memory
+cache. With the <code class="docutils literal notranslate"><span class="pre">store</span></code> flag set, Babble will look for a database file in
+<code class="docutils literal notranslate"><span class="pre">datadir</span></code>/babdger_db or in the path specified by <code class="docutils literal notranslate"><span class="pre">db</span></code>. If the database
+already exists, and the <code class="docutils literal notranslate"><span class="pre">--boostrap</span></code> flag is set, the node will load the
+database and bootstrap itself to a state consistent with the database and it
+will be able to proceed with the consensus algorithm from there. If the database
+does not exist yet, or the <code class="docutils literal notranslate"><span class="pre">--bootstrap</span></code> flag is not set, a new one will be
+created and the node will start from a clean state.</p>
+<p>The node can also be started in <code class="docutils literal notranslate"><span class="pre">maintenance-mode</span></code> with the homonymous flag.
+The node is started normally but goes straight into the <code class="docutils literal notranslate"><span class="pre">Suspended</span></code> state,
+where it still  responds to sync-requests, and service API requests, but does
+not produce or insert new Events in the underlying hashgraph. The <code class="docutils literal notranslate"><span class="pre">Suspended</span></code>
+state is also triggered automatically when more than <code class="docutils literal notranslate"><span class="pre">suspend-limit</span></code>
+undetermined-events were created since last starting the node. This is a
+safeguard against runaway conditions when a network does not have a strong
+majority and produces undetermined-events ad infinitum.</p>
+<p>Here is how the Docker demo starts Babble nodes together wth the Dummy
+application:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>for i in $(seq 1 $N)
+do
+    docker run -d --name=client$i --net=babblenet --ip=172.77.10.$i -it mosaicnetworks/dummy:latest \
+    --name=&quot;client $i&quot; \
+    --client-listen=&quot;172.77.10.$i:1339&quot; \
+    --proxy-connect=&quot;172.77.5.$i:1338&quot; \
+    --discard \
+    --log=&quot;debug&quot;
+done
+
+for i in $(seq 1 $N)
+do
+    docker create --name=node$i --net=babblenet --ip=172.77.5.$i mosaicnetworks/babble:latest run \
+    --heartbeat=100ms \
+    --moniker=&quot;node$i&quot; \
+    --cache-size=50000 \
+    --listen=&quot;172.77.5.$i:1337&quot; \
+    --proxy-listen=&quot;172.77.5.$i:1338&quot; \
+    --client-connect=&quot;172.77.10.$i:1339&quot; \
+    --service-listen=&quot;172.77.5.$i:80&quot; \
+    --sync-limit=500 \
+    --fast-sync=$FASTSYNC \
+    --store \
+    --log=&quot;debug&quot;
+
+    docker cp $MPWD/conf/node$i node$i:/.babble
+    docker start node$i
+done
+</pre></div>
+</div>
+</div>
+<div class="section" id="stats-blocks-and-logs">
+<h2>Stats, blocks and Logs<a class="headerlink" href="#stats-blocks-and-logs" title="Permalink to this headline">¶</a></h2>
+<p>Once a node is up and running, we can call the <code class="docutils literal notranslate"><span class="pre">stats</span></code> endpoint exposed
+by the HTTP service:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">s</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">172.77</span><span class="o">.</span><span class="mf">5.1</span><span class="p">:</span><span class="mi">80</span><span class="o">/</span><span class="n">stats</span>
+</pre></div>
+</div>
+<p>Or request to see a specific block:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">s</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="mf">172.77</span><span class="o">.</span><span class="mf">5.1</span><span class="p">:</span><span class="mi">80</span><span class="o">/</span><span class="n">block</span><span class="o">/</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>Or we can look at the logs produced by Babble:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">logs</span> <span class="n">node1</span>
+</pre></div>
+</div>
+<p>We can look at the current state of docker containers:</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">ps</span> <span class="o">--</span><span class="nb">all</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2017, Mosaic Networks.
+      
+      |
+      <a href="../_sources/core/usage.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

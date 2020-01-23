@@ -1,0 +1,290 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>FastSync &#8212; Babble 0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dynamic Membership" href="dynamic_membership.html" />
+    <link rel="prev" title="Node State-Machine" href="state_machine.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/babblelogo2.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">Babble</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=mosaicnetworks&repo=babble&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to Babble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="consensus.html">Babble Consensus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="blockchain.html">From Hashgraph to Blockchain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="state_machine.html">Node State-Machine</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">FastSync</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#frames">Frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#roots">Roots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fastforward">FastForward</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#snapshot-restore">Snapshot/Restore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#improvements-and-further-work">Improvements and Further Work</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_membership.html">Dynamic Membership</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">&lt;no title&gt;</a><ul>
+      <li>Previous: <a href="state_machine.html" title="previous chapter">Node State-Machine</a></li>
+      <li>Next: <a href="dynamic_membership.html" title="next chapter">Dynamic Membership</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="fastsync">
+<span id="id1"></span><h1>FastSync<a class="headerlink" href="#fastsync" title="Permalink to this headline">¶</a></h1>
+<p>FastSync is an element of the Babble protocol which enables nodes to catch up
+with other nodes without downloading and processing the entire history of
+gossip (Hashgraph + Blockchain). It is important in the context of mobile ad
+hoc networks where users dynamically create or join groups, and where limited
+computing resources call for periodic pruning of the underlying data store. The
+solution relies on linking snapshots of the application state to independent
+and self-contained sections of the Hashgraph, called Frames. A node that fell
+back too far may fast-forward straight to the latest snapshot, initialize a new
+Hashgraph from the corresponding Frame, and get up to speed with the other
+nodes without downloading and processing all the transactions it missed. Of
+course, the protocol maintains the BFT properties of the base algorithm by
+packaging relevant data in signed blocks; here again we see the benefits of
+using a blockchain mapping on top of Hashgraph. Although implementing the
+Snapshot/Restore functionality puts extra strain on the application developer,
+it remains entirely optional; FastSync can be activated or deactivated via
+configuration.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<img alt="../_images/fastsync.png" src="../_images/fastsync.png" />
+<p>The Babble node is implemented as a state-machine where the possible states
+are: <strong>Babbling</strong>, <strong>CatchingUp</strong>, <strong>Joining</strong>, <strong>Leaving</strong>, and <strong>Shutdown</strong>.
+When a node is started and belongs to the current validator-set, it will either
+enter the <strong>Babbling</strong> state, or the <strong>CatchingUp</strong> state, depending on whether
+the <strong>fast-sync</strong> flag was passed to Babble.</p>
+<p>In the <strong>CatchingUp</strong> state, a node determines the best node to fast-sync from
+(the node which has the longest hashgraph) and attempts to fast-forward to
+their last consensus snapshot, until the operation succeeds. Hence, FastSync
+introduces a new type of command in the communication protocol: <em>FastForward</em>.</p>
+<p>Upon receiving a FastForwardRequest, a node must respond with the last
+consensus snapshot, as well as the corresponding Hashgraph section (the Frame)
+and Block. With this information, and having verified the Block signatures
+against the other items as well as the known validator set, the requesting node
+attempts to reset its Hashgraph from the Frame, and restore the application
+from the snapshot. The difficulty resides in defining what is meant by <em>last
+consensus</em> snapshot, and how to package enough information in the Frames as to
+form a base for a new/pruned Hashgraph.</p>
+</div>
+<div class="section" id="frames">
+<h2>Frames<a class="headerlink" href="#frames" title="Permalink to this headline">¶</a></h2>
+<p>Frames are self-contained sections of the Hashgraph. They are composed of
+FrameEvents which wrap regular Hashgraph Events along with precomputed values
+for Round, Witness, and LamportTimestamp. Usually, these values would be
+calculated by every node locally but since FrameEvents belong to Blocks, which
+eventually collect enough signatures (&gt;1/3), they can be used directly.
+Basically, Frames form a valid foundation for a new Hashgraph, such that
+gossip-about-gossip routines are not discontinued, while earlier records of the
+gossip history are ignored.</p>
+<div class="code go highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span> <span class="n">Frame</span> <span class="n">struct</span> <span class="p">{</span>
+    <span class="n">Round</span>    <span class="nb">int</span> <span class="o">//</span><span class="n">RoundReceived</span>
+    <span class="n">Peers</span>    <span class="p">[]</span><span class="o">*</span><span class="n">peers</span><span class="o">.</span><span class="n">Peer</span>
+    <span class="n">Roots</span>    <span class="nb">map</span><span class="p">[</span><span class="n">string</span><span class="p">]</span><span class="o">*</span><span class="n">Root</span>
+    <span class="n">Events</span>   <span class="p">[]</span><span class="o">*</span><span class="n">FrameEvent</span>         <span class="o">//</span><span class="n">Events</span> <span class="k">with</span> <span class="n">RoundReceived</span> <span class="o">=</span> <span class="n">Round</span>
+    <span class="n">PeerSets</span> <span class="nb">map</span><span class="p">[</span><span class="nb">int</span><span class="p">][]</span><span class="o">*</span><span class="n">peers</span><span class="o">.</span><span class="n">Peer</span> <span class="o">//</span><span class="p">[</span><span class="nb">round</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="n">Peers</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A Frame corresponds to a Hashgraph consensus round. Indeed, the consensus
+algorithm commits Events in batches, which we map onto Frames, and finally onto
+a Blockchain. This is an evolution of the previously defined <a class="reference internal" href="blockchain.html#blockchain"><span class="std std-ref">blockchain
+mapping</span></a>. Block headers now contain a Frame hash. As we will see
+later, this is useful for security. The Events in a Frame are the Events of the
+corresponding batch, in consensus order.</p>
+<img alt="../_images/dag_frames_bx.png" src="../_images/dag_frames_bx.png" />
+</div>
+<div class="section" id="roots">
+<h2>Roots<a class="headerlink" href="#roots" title="Permalink to this headline">¶</a></h2>
+<p>Frames also contain Roots, with a certain number of past FrameEvents for each
+particpant. Intuitively, “replanting” a Hashgraph requires deep enough roots.
+The Hashgraph is an interlinked chain of Events, where each Event contains two
+references to anterior Events (SelfParent and OtherParent). Upon inserting an
+Event in the Hashgraph, we check that its references point to existing Events
+(Events that are already in the Hashgraph) and that at least the SelfParent
+reference is not empty. This is partially illustrated in the following picture
+where Event A2 cannot be inserted because its references are unknown.</p>
+<img alt="../_images/roots_0.png" src="../_images/roots_0.png" />
+<p>If, when resetting from a Frame, we only used the Events associated with the
+corresponding round-received, we would quickly run into a situation where
+future Events reference unknown/older Events, and fail to be inserted. Hence,
+we need to package a “history” of past Events in the Frame, as a base layer for
+resetting the Hashgraph; this is contained in the Roots.</p>
+<p>What matters is that every participant computes the same Roots, and that Roots
+contain sufficient information to keep inserting Events in a Reset hashgraph
+and compute a consensus order.</p>
+<p>As of today, the number of FrameEvents in each Root (the root depth) is
+hard-coded to 10, to avoid nodes from using different values, which would
+result in different Blocks, and forks (partitions).</p>
+<p>Note that there is still a possibility for an Event’s OtherParent to refer to
+an Event “below” the Frame. This is possible due to the asynchronous nature of
+the gossip routines, but is an unlikely scenario. The Frame design tries to
+find a compromise between the size and the amount of useful information they
+contain. A root depth of 10 offers a high-enough probability of success.</p>
+</div>
+<div class="section" id="fastforward">
+<h2>FastForward<a class="headerlink" href="#fastforward" title="Permalink to this headline">¶</a></h2>
+<p>Frames may be used to initialize or reset a Hashgraph to a clean state, with
+indexes, rounds, blocks, etc., corresponding to a capture of a live run, such
+that further Events may be inserted and processed independently of past Events.
+Hashgraph Frames are loosely analogous to IFrames in video encoding, which
+enable fast-forwarding to any point in the video.</p>
+<p>To avoid being tricked into fast-forwarding to an invalid state, the protocol
+ties Frames to the corresponding Blockchain by including Frame hashes in
+affiliated Block headers. A <em>FastForwardResponse</em> includes a Block and a Frame,
+such that, upon receiving these objects, the requester may check the Frame hash
+against the Block header, and count the Block signatures against the <strong>known</strong>
+set of validators, before resetting the Hashgraph from the Frame.</p>
+<p>Note the importance for the requester to be aware of the validator set of the
+Hashgraph it wishes to sync with; it is fundamental when it comes to verifying
+a Block. With a dynamic validator set, however, an additional mechanism will be
+necessary to securely track changes to the validator set.</p>
+</div>
+<div class="section" id="snapshot-restore">
+<h2>Snapshot/Restore<a class="headerlink" href="#snapshot-restore" title="Permalink to this headline">¶</a></h2>
+<p>It is one thing to catch-up with the Hashgraph and Blockchain, but nodes also
+need to catch-up with the application state. we extended the Proxy interface
+with methods to retrieve and restore snapshots.</p>
+<div class="code go highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span> <span class="n">AppProxy</span> <span class="n">interface</span> <span class="p">{</span>
+  <span class="n">SubmitCh</span><span class="p">()</span> <span class="n">chan</span> <span class="p">[]</span><span class="n">byte</span>
+  <span class="n">CommitBlock</span><span class="p">(</span><span class="n">block</span> <span class="n">hashgraph</span><span class="o">.</span><span class="n">Block</span><span class="p">)</span> <span class="p">(</span><span class="n">CommitResponse</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+  <span class="n">GetSnapshot</span><span class="p">(</span><span class="n">blockIndex</span> <span class="nb">int</span><span class="p">)</span> <span class="p">([]</span><span class="n">byte</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+  <span class="n">Restore</span><span class="p">(</span><span class="n">snapshot</span> <span class="p">[]</span><span class="n">byte</span><span class="p">)</span> <span class="n">error</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Since snapshots are raw byte arrays, it is up to the application layer to
+define what the snapshots represent, how they are encoded, and how they may be
+used to restore the application to a particular state. The <em>GetSnapshot</em> method
+takes a <em>blockIndex</em> parameter, which implies that the application should keep
+track of snapshots for every committed block. As the protocol evolves, we will
+likely link this to a <em>FrameRate</em> parameter to reduce the overhead on the
+application caused by the need to take all these snapshots.</p>
+<p>So together with a Frame and the corresponding Block, a FastForward request
+comes with a snapshot of the application for the node to restore the
+application to the corresponding state. If the snapshot was incorrect, the node
+will immediately diverge from the main chain because it will obtain different
+state hashes upon committing new blocks.</p>
+</div>
+<div class="section" id="improvements-and-further-work">
+<h2>Improvements and Further Work<a class="headerlink" href="#improvements-and-further-work" title="Permalink to this headline">¶</a></h2>
+<p>The protocol is not entirely watertight yet; there are edge cases that could
+quickly lead to forks and diverging nodes.</p>
+<p>1) Although it is unlikely, Events above the Frame that reference parents from
+“below” the Frame. These Events will fail to be inserted into the Hashgraph,
+and the node would stop making progress.</p>
+<p>2) The snapshot is not directly linked to the Blockchain, only indirectly
+through resulting StateHashes.</p>
+<p>Both these issues could be addressed with a general retry mechanism, whereby
+the FastForward method is made atomic by working on a temporary copy of the
+Hashgraph. If an error or a fork are detected, try to FastSync again from
+another Frame. This requires further work and design on fork detection and
+self-healing protocols.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2017, Mosaic Networks.
+      
+      |
+      <a href="../_sources/core/fastsync.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

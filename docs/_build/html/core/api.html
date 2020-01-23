@@ -1,0 +1,365 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>API &#8212; Babble 0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Usage" href="usage.html" />
+    <link rel="prev" title="Design" href="design.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/babblelogo2.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">Babble</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=mosaicnetworks&repo=babble&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to Babble</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#inmem">Inmem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#socket">Socket</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="consensus.html">Babble Consensus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="blockchain.html">From Hashgraph to Blockchain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="state_machine.html">Node State-Machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fastsync.html">FastSync</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_membership.html">Dynamic Membership</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">&lt;no title&gt;</a><ul>
+      <li>Previous: <a href="design.html" title="previous chapter">Design</a></li>
+      <li>Next: <a href="usage.html" title="next chapter">Usage</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="api">
+<span id="id1"></span><h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<p>As mentioned in the <a class="reference internal" href="design.html#design"><span class="std std-ref">Design</span></a> section, Babble communicates with the App
+through an <code class="docutils literal notranslate"><span class="pre">AppProxy</span></code> interface, which exposes three methods for Babble to
+call the App. Here we explain how to implement this API.</p>
+<p><strong>Note</strong>: The Snapshot and Restore methods of the API are still work in
+progress. They are necessary for the <a class="reference internal" href="fastsync.html#fastsync"><span class="std std-ref">FastSync</span></a> protocol which is not
+completely ready yet. It is safe to just implement stubs for these methods.</p>
+<div class="section" id="inmem">
+<h2>Inmem<a class="headerlink" href="#inmem" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">InmemProxy</span></code> uses native callback handlers to enable Babble to call
+methods on the App directly. Applications need only implement the
+<code class="docutils literal notranslate"><span class="pre">ProxyHandler</span></code> interface and pass that to an <code class="docutils literal notranslate"><span class="pre">InmemProxy</span></code>.</p>
+<p>Here is a quick example of how to use Babble as an in-memory engine (in the
+same process as your handler):</p>
+<div class="code go highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+  <span class="s2">&quot;github.com/mosaicnetworks/babble/src/babble&quot;</span>
+  <span class="s2">&quot;github.com/mosaicnetworks/babble/src/crypto&quot;</span>
+  <span class="s2">&quot;github.com/mosaicnetworks/babble/src/hashgraph&quot;</span>
+  <span class="s2">&quot;github.com/mosaicnetworks/babble/src/proxy/inmem&quot;</span>
+<span class="p">)</span>
+
+<span class="o">//</span> <span class="n">Implements</span> <span class="n">proxy</span><span class="o">.</span><span class="n">ProxyHandler</span> <span class="n">interface</span>
+<span class="nb">type</span> <span class="n">Handler</span> <span class="n">struct</span> <span class="p">{</span>
+  <span class="n">stateHash</span> <span class="p">[]</span><span class="n">byte</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">Called</span> <span class="n">when</span> <span class="n">a</span> <span class="n">new</span> <span class="n">block</span> <span class="ow">is</span> <span class="n">committed</span> <span class="n">by</span> <span class="n">Babble</span><span class="o">.</span> <span class="n">This</span> <span class="n">particular</span> <span class="n">example</span>
+<span class="o">//</span> <span class="n">just</span> <span class="n">computes</span> <span class="n">the</span> <span class="n">stateHash</span> <span class="n">incrementaly</span> <span class="k">with</span> <span class="n">incoming</span> <span class="n">blocks</span><span class="p">,</span> <span class="ow">and</span> <span class="n">accepts</span>
+<span class="o">//</span> <span class="nb">all</span> <span class="n">InternalTransactions</span>
+<span class="n">func</span> <span class="p">(</span><span class="n">h</span> <span class="o">*</span><span class="n">Handler</span><span class="p">)</span> <span class="n">CommitHandler</span><span class="p">(</span><span class="n">block</span> <span class="n">hashgraph</span><span class="o">.</span><span class="n">Block</span><span class="p">)</span> <span class="p">(</span><span class="n">stateHash</span> <span class="p">[]</span><span class="n">byte</span><span class="p">,</span> <span class="n">err</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nb">hash</span> <span class="p">:</span><span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">stateHash</span>
+
+  <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">tx</span> <span class="p">:</span><span class="o">=</span> <span class="nb">range</span> <span class="n">block</span><span class="o">.</span><span class="n">Transactions</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nb">hash</span> <span class="o">=</span> <span class="n">crypto</span><span class="o">.</span><span class="n">SimpleHashFromTwoHashes</span><span class="p">(</span><span class="nb">hash</span><span class="p">,</span> <span class="n">crypto</span><span class="o">.</span><span class="n">SHA256</span><span class="p">(</span><span class="n">tx</span><span class="p">))</span>
+  <span class="p">}</span>
+
+  <span class="n">h</span><span class="o">.</span><span class="n">stateHash</span> <span class="o">=</span> <span class="nb">hash</span>
+
+  <span class="n">receipts</span> <span class="p">:</span><span class="o">=</span> <span class="p">[]</span><span class="n">hashgraph</span><span class="o">.</span><span class="n">InternalTransactionReceipt</span><span class="p">{}</span>
+  <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">it</span> <span class="p">:</span><span class="o">=</span> <span class="nb">range</span> <span class="n">block</span><span class="o">.</span><span class="n">InternalTransactions</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">r</span> <span class="p">:</span><span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">AsAccepted</span><span class="p">()</span>
+    <span class="n">receipts</span> <span class="o">=</span> <span class="n">append</span><span class="p">(</span><span class="n">receipts</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="n">response</span> <span class="p">:</span><span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">CommitResponse</span><span class="p">{</span>
+    <span class="n">StateHash</span><span class="p">:</span>                   <span class="n">h</span><span class="o">.</span><span class="n">stateHash</span><span class="p">,</span>
+    <span class="n">InternalTransactionReceipts</span><span class="p">:</span> <span class="n">receipts</span><span class="p">,</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="n">response</span><span class="p">,</span> <span class="n">nil</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">Called</span> <span class="n">when</span> <span class="n">syncing</span> <span class="k">with</span> <span class="n">the</span> <span class="n">network</span>
+<span class="n">func</span> <span class="p">(</span><span class="n">h</span> <span class="o">*</span><span class="n">Handler</span><span class="p">)</span> <span class="n">SnapshotHandler</span><span class="p">(</span><span class="n">blockIndex</span> <span class="nb">int</span><span class="p">)</span> <span class="p">(</span><span class="n">snapshot</span> <span class="p">[]</span><span class="n">byte</span><span class="p">,</span> <span class="n">err</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">[]</span><span class="n">byte</span><span class="p">{},</span> <span class="n">nil</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">Called</span> <span class="n">when</span> <span class="n">syncing</span> <span class="k">with</span> <span class="n">the</span> <span class="n">network</span>
+<span class="n">func</span> <span class="p">(</span><span class="n">h</span> <span class="o">*</span><span class="n">Handler</span><span class="p">)</span> <span class="n">RestoreHandler</span><span class="p">(</span><span class="n">snapshot</span> <span class="p">[]</span><span class="n">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">stateHash</span> <span class="p">[]</span><span class="n">byte</span><span class="p">,</span> <span class="n">err</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">[]</span><span class="n">byte</span><span class="p">{},</span> <span class="n">nil</span>
+<span class="p">}</span>
+
+<span class="n">func</span> <span class="n">NewHandler</span><span class="p">()</span> <span class="o">*</span><span class="n">Handler</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="o">&amp;</span><span class="n">Handler</span><span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="n">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+
+  <span class="n">config</span> <span class="p">:</span><span class="o">=</span> <span class="n">babble</span><span class="o">.</span><span class="n">NewDefaultConfig</span><span class="p">()</span>
+
+  <span class="o">//</span> <span class="n">To</span> <span class="n">use</span> <span class="n">babble</span> <span class="k">as</span> <span class="n">an</span> <span class="n">internal</span> <span class="n">engine</span> <span class="n">we</span> <span class="n">use</span> <span class="n">InmemProxy</span><span class="o">.</span>
+  <span class="n">proxy</span> <span class="p">:</span><span class="o">=</span> <span class="n">inmem</span><span class="o">.</span><span class="n">NewInmemProxy</span><span class="p">(</span><span class="n">NewHandler</span><span class="p">(),</span> <span class="n">config</span><span class="o">.</span><span class="n">Logger</span><span class="p">)</span>
+
+  <span class="n">config</span><span class="o">.</span><span class="n">Proxy</span> <span class="o">=</span> <span class="n">proxy</span>
+
+  <span class="o">//</span> <span class="n">Create</span> <span class="n">the</span> <span class="n">engine</span> <span class="k">with</span> <span class="n">the</span> <span class="n">provided</span> <span class="n">config</span>
+  <span class="n">engine</span> <span class="p">:</span><span class="o">=</span> <span class="n">babble</span><span class="o">.</span><span class="n">NewBabble</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+  <span class="o">//</span> <span class="n">Initialize</span> <span class="n">the</span> <span class="n">engine</span>
+  <span class="k">if</span> <span class="n">err</span> <span class="p">:</span><span class="o">=</span> <span class="n">engine</span><span class="o">.</span><span class="n">Init</span><span class="p">();</span> <span class="n">err</span> <span class="o">!=</span> <span class="n">nil</span> <span class="p">{</span>
+    <span class="n">panic</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="o">//</span> <span class="n">Submit</span> <span class="n">a</span> <span class="n">transaction</span> <span class="n">directly</span> <span class="n">through</span> <span class="n">the</span> <span class="n">Proxy</span>
+  <span class="n">go</span> <span class="n">func</span><span class="p">()</span> <span class="p">{</span> <span class="n">proxy</span><span class="o">.</span><span class="n">SubmitTx</span><span class="p">([]</span><span class="n">byte</span><span class="p">(</span><span class="s2">&quot;some content&quot;</span><span class="p">))</span> <span class="p">}()</span>
+
+  <span class="o">//</span> <span class="n">This</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">blocking</span> <span class="n">call</span>
+  <span class="n">engine</span><span class="o">.</span><span class="n">Run</span><span class="p">()</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="socket">
+<h2>Socket<a class="headerlink" href="#socket" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">SocketProxy</span></code> is simply a TCP server that accepts <cite>SubmitTx</cite> requests,
+and calls remote methods on the App through a JSON-RPC interface. The App is
+therefore expected to implement its own component to send out SubmitTx requests
+through TCP, and receive JSON-RPC messages from the remote Babble node.</p>
+<p>The advantage of using a TCP interface is that it provides the freedom to
+implement the application in any programming language. The specification of the
+JSON-RPC interface is provided below, but here is an example of how to use our
+Go implementation, <code class="docutils literal notranslate"><span class="pre">SocketBabbleProxy</span></code>, to connect to a remote Babble node.</p>
+<p>Assuming there is a Babble node running with its proxy listening on
+<code class="docutils literal notranslate"><span class="pre">127.0.0.1:1338</span></code> and configured to speak to an App at <code class="docutils literal notranslate"><span class="pre">127.0.0.1:1339</span></code>
+(these are the default values):</p>
+<div class="code go highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+  <span class="s2">&quot;time&quot;</span>
+
+  <span class="s2">&quot;github.com/mosaicnetworks/babble/src/crypto&quot;</span>
+  <span class="s2">&quot;github.com/mosaicnetworks/babble/src/hashgraph&quot;</span>
+  <span class="s2">&quot;github.com/mosaicnetworks/babble/src/proxy/socket/babble&quot;</span>
+<span class="p">)</span>
+
+<span class="o">//</span> <span class="n">Implements</span> <span class="n">proxy</span><span class="o">.</span><span class="n">ProxyHandler</span> <span class="n">interface</span>
+<span class="nb">type</span> <span class="n">Handler</span> <span class="n">struct</span> <span class="p">{</span>
+  <span class="n">stateHash</span> <span class="p">[]</span><span class="n">byte</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">Called</span> <span class="n">when</span> <span class="n">a</span> <span class="n">new</span> <span class="n">block</span> <span class="ow">is</span> <span class="n">comming</span><span class="o">.</span> <span class="n">This</span> <span class="n">particular</span> <span class="n">example</span> <span class="n">just</span> <span class="n">computes</span>
+<span class="o">//</span> <span class="n">the</span> <span class="n">stateHash</span> <span class="n">incrementaly</span> <span class="k">with</span> <span class="n">incoming</span> <span class="n">blocks</span>
+<span class="n">func</span> <span class="p">(</span><span class="n">h</span> <span class="o">*</span><span class="n">Handler</span><span class="p">)</span> <span class="n">CommitHandler</span><span class="p">(</span><span class="n">block</span> <span class="n">hashgraph</span><span class="o">.</span><span class="n">Block</span><span class="p">)</span> <span class="p">(</span><span class="n">stateHash</span> <span class="p">[]</span><span class="n">byte</span><span class="p">,</span> <span class="n">err</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nb">hash</span> <span class="p">:</span><span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">stateHash</span>
+
+  <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">tx</span> <span class="p">:</span><span class="o">=</span> <span class="nb">range</span> <span class="n">block</span><span class="o">.</span><span class="n">Transactions</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nb">hash</span> <span class="o">=</span> <span class="n">crypto</span><span class="o">.</span><span class="n">SimpleHashFromTwoHashes</span><span class="p">(</span><span class="nb">hash</span><span class="p">,</span> <span class="n">crypto</span><span class="o">.</span><span class="n">SHA256</span><span class="p">(</span><span class="n">tx</span><span class="p">))</span>
+  <span class="p">}</span>
+
+  <span class="n">h</span><span class="o">.</span><span class="n">stateHash</span> <span class="o">=</span> <span class="nb">hash</span>
+
+  <span class="n">receipts</span> <span class="p">:</span><span class="o">=</span> <span class="p">[]</span><span class="n">hashgraph</span><span class="o">.</span><span class="n">InternalTransactionReceipt</span><span class="p">{}</span>
+  <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">it</span> <span class="p">:</span><span class="o">=</span> <span class="nb">range</span> <span class="n">block</span><span class="o">.</span><span class="n">InternalTransactions</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">r</span> <span class="p">:</span><span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">AsAccepted</span><span class="p">()</span>
+    <span class="n">receipts</span> <span class="o">=</span> <span class="n">append</span><span class="p">(</span><span class="n">receipts</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="n">response</span> <span class="p">:</span><span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">CommitResponse</span><span class="p">{</span>
+    <span class="n">StateHash</span><span class="p">:</span>                   <span class="n">h</span><span class="o">.</span><span class="n">stateHash</span><span class="p">,</span>
+    <span class="n">InternalTransactionReceipts</span><span class="p">:</span> <span class="n">receipts</span><span class="p">,</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="n">response</span><span class="p">,</span> <span class="n">nil</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">Called</span> <span class="n">when</span> <span class="n">syncing</span> <span class="k">with</span> <span class="n">the</span> <span class="n">network</span>
+<span class="n">func</span> <span class="p">(</span><span class="n">h</span> <span class="o">*</span><span class="n">Handler</span><span class="p">)</span> <span class="n">SnapshotHandler</span><span class="p">(</span><span class="n">blockIndex</span> <span class="nb">int</span><span class="p">)</span> <span class="p">(</span><span class="n">snapshot</span> <span class="p">[]</span><span class="n">byte</span><span class="p">,</span> <span class="n">err</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">[]</span><span class="n">byte</span><span class="p">{},</span> <span class="n">nil</span>
+<span class="p">}</span>
+
+<span class="o">//</span> <span class="n">Called</span> <span class="n">when</span> <span class="n">syncing</span> <span class="k">with</span> <span class="n">the</span> <span class="n">network</span>
+<span class="n">func</span> <span class="p">(</span><span class="n">h</span> <span class="o">*</span><span class="n">Handler</span><span class="p">)</span> <span class="n">RestoreHandler</span><span class="p">(</span><span class="n">snapshot</span> <span class="p">[]</span><span class="n">byte</span><span class="p">)</span> <span class="p">(</span><span class="n">stateHash</span> <span class="p">[]</span><span class="n">byte</span><span class="p">,</span> <span class="n">err</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">[]</span><span class="n">byte</span><span class="p">{},</span> <span class="n">nil</span>
+<span class="p">}</span>
+
+<span class="n">func</span> <span class="n">NewHandler</span><span class="p">()</span> <span class="o">*</span><span class="n">Handler</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="o">&amp;</span><span class="n">Handler</span><span class="p">{}</span>
+<span class="p">}</span>
+
+<span class="n">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+  <span class="o">//</span> <span class="n">Connect</span> <span class="n">to</span> <span class="n">the</span> <span class="n">babble</span> <span class="n">proxy</span> <span class="n">at</span> <span class="p">:</span><span class="mi">1338</span> <span class="ow">and</span> <span class="n">listen</span> <span class="n">on</span> <span class="p">:</span><span class="mf">1339.</span>
+  <span class="o">//</span> <span class="n">The</span> <span class="n">Handler</span> <span class="n">ties</span> <span class="n">back</span> <span class="n">to</span> <span class="n">the</span> <span class="n">application</span> <span class="n">state</span><span class="o">.</span>
+  <span class="n">proxy</span><span class="p">,</span> <span class="n">err</span> <span class="p">:</span><span class="o">=</span> <span class="n">babble</span><span class="o">.</span><span class="n">NewSocketBabbleProxy</span><span class="p">(</span><span class="s2">&quot;127.0.0.1:1338&quot;</span><span class="p">,</span> <span class="s2">&quot;127.0.0.1:1339&quot;</span><span class="p">,</span> <span class="n">NewHandler</span><span class="p">(),</span> <span class="mi">1</span><span class="o">*</span><span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="p">,</span> <span class="n">nil</span><span class="p">)</span>
+      <span class="o">//</span> <span class="n">Verify</span> <span class="n">that</span> <span class="n">it</span> <span class="n">can</span> <span class="n">listen</span>
+  <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="n">nil</span> <span class="p">{</span>
+    <span class="n">panic</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="o">//</span> <span class="n">Verify</span> <span class="n">that</span> <span class="n">it</span> <span class="n">can</span> <span class="n">connect</span> <span class="ow">and</span> <span class="n">submit</span> <span class="n">a</span> <span class="n">transaction</span>
+  <span class="k">if</span> <span class="n">err</span> <span class="p">:</span><span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">SubmitTx</span><span class="p">([]</span><span class="n">byte</span><span class="p">(</span><span class="s2">&quot;some content&quot;</span><span class="p">));</span> <span class="n">err</span> <span class="o">!=</span> <span class="n">nil</span> <span class="p">{</span>
+    <span class="n">panic</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="o">//</span> <span class="n">Wait</span> <span class="n">indefinitly</span>
+  <span class="k">for</span> <span class="p">{</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">Sleep</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Example SubmitTx request (from App to Babble):</p>
+<div class="code http highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">request</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span><span class="s2">&quot;Babble.SubmitTx&quot;</span><span class="p">,</span><span class="s2">&quot;params&quot;</span><span class="p">:[</span><span class="s2">&quot;Y2xpZW50IDE6IGhlbGxv&quot;</span><span class="p">],</span><span class="s2">&quot;id&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">}</span>
+<span class="n">response</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="s2">&quot;result&quot;</span><span class="p">:</span><span class="n">true</span><span class="p">,</span><span class="s2">&quot;error&quot;</span><span class="p">:</span><span class="n">null</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that the Proxy API is <strong>not</strong> over HTTP; It is raw JSON over TCP. Here is
+an example of how to make a SubmitTx request manually:</p>
+<div class="code go highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">printf</span> <span class="s2">&quot;{</span><span class="se">\&quot;</span><span class="s2">method</span><span class="se">\&quot;</span><span class="s2">:</span><span class="se">\&quot;</span><span class="s2">Babble.SubmitTx</span><span class="se">\&quot;</span><span class="s2">,</span><span class="se">\&quot;</span><span class="s2">params</span><span class="se">\&quot;</span><span class="s2">:[</span><span class="se">\&quot;</span><span class="s2">Y2xpZW50IDE6IGhlbGxv</span><span class="se">\&quot;</span><span class="s2">],</span><span class="se">\&quot;</span><span class="s2">id</span><span class="se">\&quot;</span><span class="s2">:0}&quot;</span> <span class="o">|</span> <span class="n">nc</span> <span class="o">-</span><span class="n">v</span>  <span class="mf">172.77</span><span class="o">.</span><span class="mf">5.1</span> <span class="mi">1338</span>
+</pre></div>
+</div>
+<p>Example CommitBlock request (from Babble to App):</p>
+<div class="code http highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">request</span><span class="p">:</span>
+      <span class="p">{</span>
+          <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;State.CommitBlock&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;params&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="p">{</span>
+              <span class="s2">&quot;Body&quot;</span><span class="p">:</span> <span class="p">{</span>
+                  <span class="s2">&quot;Index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="s2">&quot;RoundReceived&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+                  <span class="s2">&quot;StateHash&quot;</span><span class="p">:</span> <span class="n">null</span><span class="p">,</span>
+                  <span class="s2">&quot;FrameHash&quot;</span><span class="p">:</span> <span class="s2">&quot;gdwRCdwxoyLUyzzRK6N31rlJFBJu5By/vDk5gSQHJHQ=&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;Transactions&quot;</span><span class="p">:</span> <span class="p">[</span>
+                  <span class="s2">&quot;Tm9kZTEgVHg5&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;Tm9kZTEgVHgx&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;Tm9kZTEgVHgy&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;Tm9kZTEgVHgz&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;Tm9kZTEgVHg0&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;Tm9kZTEgVHg1&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;Tm9kZTEgVHg2&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;Tm9kZTEgVHg3&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;Tm9kZTEgVHg4&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;Tm9kZTEgVHgxMA==&quot;</span>
+                  <span class="p">]</span>
+              <span class="p">},</span>
+              <span class="s2">&quot;Signatures&quot;</span><span class="p">:</span> <span class="p">{}</span>
+              <span class="p">}</span>
+          <span class="p">],</span>
+          <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">0</span>
+      <span class="p">}</span>
+
+<span class="n">response</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="s2">&quot;result&quot;</span><span class="p">:{</span><span class="s2">&quot;Hash&quot;</span><span class="p">:</span><span class="s2">&quot;6SKQataObI6oSY5n6mvf1swZR3T4Tek+C8yJmGijF00=&quot;</span><span class="p">},</span><span class="s2">&quot;error&quot;</span><span class="p">:</span><span class="n">null</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>The content of the request’s “params” is the JSON representation of a Block
+with a RoundReceived of 7 and 10 transactions. The transactions themselves are
+base64 string encodings.</p>
+<p>The response’s Hash value is the base64 representation of the application’s
+State-hash resulting from processing the block’s transaction sequentially.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2017, Mosaic Networks.
+      
+      |
+      <a href="../_sources/core/api.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
