@@ -59,7 +59,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#our-first-minimal-app">Our First Minimal App</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#our-first-babble-app">Our First Babble App</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#our-first-babble-blockchain">Our First Babble Blockchain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#our-first-babble-network">Our First Babble Network</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#some-explanations">Some Explanations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#interacting-with-babble">Interacting with Babble</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#joining">Joining</a></li>
@@ -112,7 +112,7 @@
 version 29 and Android NDK. If you use a previous API version, the <code class="docutils literal notranslate"><span class="pre">create</span>
 <span class="pre">activity</span></code> items in these instructions will use AppCompat instead of
 AndroidX <a class="footnote-reference" href="#androidx" id="id1">[1]</a>, leading to incompatibilities with the pasted source code.
-The babble node itself is compatible with AppCompat, but converting the sample
+The Babble node itself is compatible with AppCompat, but converting the sample
 to use AppCompat is beyond the scope of this article.</p>
 <p>This tutorial is going to assume deployment to a physical Android device. Thus
 you will need an Android device (minimum API version 19 <a class="footnote-reference" href="#androiddevice" id="id2">[2]</a>) with
@@ -122,37 +122,38 @@ article.</p>
 <table class="docutils footnote" frame="void" id="androidx" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>You can read more about AndroidX here: [<a class="reference external" href="https://android-developers.googleblog.com/2018/05/hello-world-androidx.html](https://android-developers.googleblog.com/2018/05/hello-world-androidx.html">https://android-developers.googleblog.com/2018/05/hello-world-androidx.html](https://android-developers.googleblog.com/2018/05/hello-world-androidx.html</a>)</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>You can read more about AndroidX
+<a class="reference external" href="https://android-developers.googleblog.com/2018/05/hello-world-androidx.html">here</a>.</td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="androiddevice" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>API version 19 is Android 4.4 (KitKat). In May 3.8% of devices
-were using version 18 or lower. Android 4.4 was released in 2013. Whilst it
-would be possible to code support for earlier versions, the existing code uses
-Android features introduced in Android 4.4.</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>API version 19 is Android 4.4 (KitKat). In May 2019, 3.8% of
+devices were using version 18 or lower. Android 4.4 was released in 2013.
+Whilst it would be possible to code support for earlier versions, the
+existing code uses Android features introduced in Android 4.4.</td></tr>
 </tbody>
 </table>
 </div>
 <div class="section" id="our-first-minimal-app">
 <h2>Our First Minimal App<a class="headerlink" href="#our-first-minimal-app" title="Permalink to this headline">¶</a></h2>
-<p>First up we will create a minimal app to test our environment and prove that we
+<p>First up, we will create a minimal app to test our environment and prove that we
 have loaded the <code class="docutils literal notranslate"><span class="pre">babble-android</span></code> library correctly. Fire up Android Studio and
 select <code class="docutils literal notranslate"><span class="pre">File/New</span> <span class="pre">Project</span></code>. You are asked to choose a project template.</p>
-<div class="figure" id="id10">
+<div class="figure" id="id5">
 <img alt="../_images/create_new_project.png" src="../_images/create_new_project.png" />
 <p class="caption"><span class="caption-text">Create New Project Screen</span></p>
 </div>
 <p>Choose <strong>Empty Activity</strong> from the <strong>Phone and Tablet</strong> tab, and click <strong>Next</strong>.</p>
-<div class="figure" id="id11">
+<div class="figure" id="id6">
 <img alt="../_images/new_project_options.png" src="../_images/new_project_options.png" />
 <p class="caption"><span class="caption-text">New Project Options</span></p>
 </div>
 <p>The options here should be self-explanatory. We would recommend not using spaces
-in the Package Name or the Save Location. Do not set the Minimum API Level below
-19. Click <strong>Finish</strong>.</p>
-<div class="figure" id="id12">
+in the <strong>Package name</strong> or the <strong>Save location</strong>. Do not set the Minimum API
+level below 19. Click <strong>Finish</strong>.</p>
+<div class="figure" id="id7">
 <img alt="../_images/empty_android_studio.png" src="../_images/empty_android_studio.png" />
 <p class="caption"><span class="caption-text">Initial Android Studio</span></p>
 </div>
@@ -162,7 +163,7 @@ something like above.</p>
 <p class="first admonition-title">Note</p>
 <p class="last">the screen will change a few seconds after opening when the initial gradle
 scripts complete. The status bar at the bottom of the window should tell you
-this is happening.*</p>
+this is happening.</p>
 </div>
 <div class="section" id="running-the-app">
 <h3>Running the App<a class="headerlink" href="#running-the-app" title="Permalink to this headline">¶</a></h3>
@@ -174,22 +175,37 @@ List of devices attached
 </pre></div>
 </div>
 <p>The command <code class="docutils literal notranslate"><span class="pre">adb</span> <span class="pre">kill-server</span></code> will reset this connection.</p>
-<p>If you can see a device listed, go back to Android Studio. and in the top right
+<p>If you can see a device listed, go back to Android Studio and in the top right
 is a target device dropdown. Select your device from the list.</p>
-<div class="figure" id="id13">
+<div class="figure" id="id8">
 <img alt="../_images/device_selection.png" src="../_images/device_selection.png" />
 <p class="caption"><span class="caption-text">Select Device</span></p>
 </div>
 <p>If you cannot find your device in the list, the
 <code class="docutils literal notranslate"><span class="pre">Troubleshoot</span> <span class="pre">device</span> <span class="pre">connections</span></code> option on that menu should help.</p>
 <p>Then press that little green triangle to the right of the dropdown device menu.
-Gradle then builds the app, which is then installed onto the physical android
-device that you selected. The whole process took about 20 seconds on my laptop
-(feel free to buy me a quicker one).</p>
-<div class="figure" id="id14">
+Gradle builds the app, which is then installed onto the physical Android device
+that you selected. The whole process took about 20 seconds on my laptop (feel
+free to buy me a quicker one).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><div class="first last figure" id="id9">
 <img alt="../_images/mobile_step_1.png" src="../_images/mobile_step_1.png" />
 <p class="caption"><span class="caption-text">First App Screenshot</span></p>
 </div>
+</td>
+<td><div class="first last figure" id="id10">
+<img alt="../_images/default_icon.png" src="../_images/default_icon.png" />
+<p class="caption"><span class="caption-text">First App Icon</span></p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
 <p>If you look on the device, you should find the app installed, as on the right
 above.</p>
 <p>Congratulations, you have an app. Now onto Babble…</p>
@@ -204,7 +220,7 @@ library instance.</p>
 <h3>Integrating the Babble-Android Library<a class="headerlink" href="#integrating-the-babble-android-library" title="Permalink to this headline">¶</a></h3>
 <p>The library is hosted in <strong>jcenter</strong>. To make it available, we need to amend
 some gradle scripts.</p>
-<div class="figure" id="id15">
+<div class="figure" id="id11">
 <img alt="../_images/gradle_scripts.png" src="../_images/gradle_scripts.png" />
 <p class="caption"><span class="caption-text">Gradle Scripts</span></p>
 </div>
@@ -256,9 +272,9 @@ in the screenshot above.</p>
 </pre></div>
 </div>
 <p>Next we need to amend the app <code class="docutils literal notranslate"><span class="pre">build.gradle</span></code> (it is below the Project
-<code class="docutils literal notranslate"><span class="pre">build.gradle</span></code> in the screenshot above. We add an implementation line to the
+<code class="docutils literal notranslate"><span class="pre">build.gradle</span></code> in the screenshot above). We add an implementation line to the
 bottom dependencies section.</p>
-<div class="code highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">implementation</span> <span class="s1">&#39;io.mosaicnetworks:babble:0.1.0&#39;</span>
+<div class="code highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">implementation</span> <span class="s1">&#39;io.mosaicnetworks:babble:0.2.1&#39;</span>
 </pre></div>
 </div>
 <p>This leaves us with this full file:</p>
@@ -295,7 +311,7 @@ bottom dependencies section.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="figure" id="id16">
+<div class="figure" id="id12">
 <img alt="../_images/sync_message.png" src="../_images/sync_message.png" />
 <p class="caption"><span class="caption-text">Sync Message</span></p>
 </div>
@@ -304,12 +320,12 @@ bottom dependencies section.</p>
 <h3>Using the Library<a class="headerlink" href="#using-the-library" title="Permalink to this headline">¶</a></h3>
 <p>The library should now be included in the project. So lets use it! Open
 <code class="docutils literal notranslate"><span class="pre">MainActivity.java</span></code> as below:</p>
-<div class="figure" id="id17">
+<div class="figure" id="id13">
 <img alt="../_images/main_activity.png" src="../_images/main_activity.png" />
 <p class="caption"><span class="caption-text">Main Activity</span></p>
 </div>
 <p>Add the lines below underneath the last import statement. The lines will appear
-greyed out, as the import is not yet used. As well as babble we are importing
+greyed out, as the import is not yet used. As well as Babble we are importing
 the <code class="docutils literal notranslate"><span class="pre">Log</span></code> package to write to the Android logs.</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">io.mosaicnetworks.babble.node.KeyPair</span><span class="p">;</span>
 <span class="kn">import</span> <span class="nn">android.util.Log</span><span class="p">;</span>
@@ -322,7 +338,7 @@ the <code class="docutils literal notranslate"><span class="pre">Log</span></cod
 </div>
 <p>This code generates a key pair and writes the private code to the logs.</p>
 <p>Save all the files and run your app.</p>
-<div class="figure" id="id18">
+<div class="figure" id="id14">
 <img alt="../_images/logcat.png" src="../_images/logcat.png" />
 <p class="caption"><span class="caption-text">LogCat</span></p>
 </div>
@@ -330,37 +346,27 @@ the <code class="docutils literal notranslate"><span class="pre">Log</span></cod
 the hood. Press logcat, as highlighted in gray in the screenshot above. Then
 type <code class="docutils literal notranslate"><span class="pre">yippee</span></code> in the search box at the top of that window to filter the logs.
 You should have a freshly generated private key in there.</p>
-<p>This project at this stage is available from github from [here](<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage1">https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage1</a>) <a class="footnote-reference" href="#stage1" id="id3">[3]</a></p>
-<table class="docutils footnote" frame="void" id="stage1" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>This code is the stage1 branch at
-<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage1">https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage1</a></td></tr>
-</tbody>
-</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The project at this stage is available from github from
+<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage1">the stage1 branch of the tutorial repo</a>.</p>
+</div>
 <p>The downloadable version of the project has <em>Mosaic Networks</em> icons, rather than
 the default Android ones. You can customise the icons using
-[Android Studio Image Asset Studio](<a class="reference external" href="https://developer.android.com/studio/write/image-asset-studio">https://developer.android.com/studio/write/image-asset-studio</a>). <a class="footnote-reference" href="#imageasset" id="id4">[4]</a></p>
-<table class="docutils footnote" frame="void" id="imageasset" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id4">[4]</a></td><td>[Android Studio Image Asset Studio](<a class="reference external" href="https://developer.android.com/studio/write/image-asset-studio">https://developer.android.com/studio/write/image-asset-studio</a>)
-is described here: <a class="reference external" href="https://developer.android.com/studio/write/image-asset-studio">https://developer.android.com/studio/write/image-asset-studio</a></td></tr>
-</tbody>
-</table>
+<a class="reference external" href="(https://developer.android.com/studio/write/image-asset-studio">Android Studio Image Asset Studio</a>.</p>
 </div>
 </div>
-<div class="section" id="our-first-babble-blockchain">
-<h2>Our First Babble Blockchain<a class="headerlink" href="#our-first-babble-blockchain" title="Permalink to this headline">¶</a></h2>
-<p>Now we have access to the babble library from within our app, the next stage is
-to start a babble network. We will start with a single node. But before we can
-start babble we need to add some UI elements to allow us to interact with our
+<div class="section" id="our-first-babble-network">
+<h2>Our First Babble Network<a class="headerlink" href="#our-first-babble-network" title="Permalink to this headline">¶</a></h2>
+<p>Now we have access to the Babble library from within our app, the next stage is
+to start a Babble network. We will start with a single node. But before we can
+start Babble we need to add some UI elements to allow us to interact with our
 babble node.</p>
 <p>Currently our application launches the activity <code class="docutils literal notranslate"><span class="pre">MainActivity</span></code> which calls the
 key pair generation code in it’s <code class="docutils literal notranslate"><span class="pre">onCreate</span></code> method.</p>
-<p>In the Sample App <a class="footnote-reference" href="#sampleapp" id="id5">[5]</a> that we are working towards, the MainActivity
+<p>In the Sample App <a class="footnote-reference" href="#sampleapp" id="id3">[3]</a> that we are working towards, the MainActivity
 Screen presents the user with a choice of “<strong>New</strong>” or “<strong>Join</strong>”. <strong>New</strong>
-starts a new babble network with your device as the sole peer. <strong>Join</strong> lets you
+starts a new Babble network with your device as the sole peer. <strong>Join</strong> lets you
 specify the address of an existing network, pull down the configuration for that
 network and request to join it.</p>
 <p>As <strong>New</strong> is standalone functionality, and <strong>Join</strong> requires <strong>New</strong> be
@@ -368,9 +374,9 @@ implemented to function, we will implement <strong>New</strong> first.</p>
 <table class="docutils footnote" frame="void" id="sampleapp" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id5">[5]</a></td><td>The sample app is part of the <code class="docutils literal notranslate"><span class="pre">babble-android</span></code> library and is
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>The sample app is part of the <code class="docutils literal notranslate"><span class="pre">babble-android</span></code> library and is
 available from the
-[GitHub repo](<a class="reference external" href="https://github.com/mosaicnetworks/babble-android">https://github.com/mosaicnetworks/babble-android</a>)</td></tr>
+<a class="reference external" href="https://github.com/mosaicnetworks/babble-android">GitHub repo</a>.</td></tr>
 </tbody>
 </table>
 <div class="section" id="main-activity">
@@ -415,12 +421,12 @@ following:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>We have removed our key generation in the onCreate method. Instead
+<p>We have removed our key generation in the onCreate method. Instead,
 <code class="docutils literal notranslate"><span class="pre">MainActivity</span></code> now extends <code class="docutils literal notranslate"><span class="pre">BaseConfigActivity</span></code>. The <code class="docutils literal notranslate"><span class="pre">BaseConfigActivity</span></code>
 provides screens to create <strong>New</strong> and to <strong>Join</strong> networks. We just need to
 define the callback event handlers for each case. The further processing is
-identical in both cases - both result in your babble node being started and
-in a babble network – the only difference is the number of nodes.</p>
+identical in both cases - both result in your Babble node being started and
+in a Babble network – the only difference is the number of nodes.</p>
 <p>If you want more control over the network joining screens, the branches with
 0.2.1 suffices in the github repo have a worked version using activities
 external to the <code class="docutils literal notranslate"><span class="pre">babble-android</span></code> library.</p>
@@ -672,7 +678,7 @@ to access it.</p>
 <p>If you start the app through Android Studio, and look at the logcat output
 (filtered to just our app), after pressing the New button, entering a Moniker
 and pressing the Join button, you should see something like below:</p>
-<div class="figure" id="id19">
+<div class="figure" id="id15">
 <img alt="../_images/logcat_babble.png" src="../_images/logcat_babble.png" />
 <p class="caption"><span class="caption-text">First Babble LogCat</span></p>
 </div>
@@ -697,26 +703,23 @@ and running.</p>
 <h2>Some Explanations<a class="headerlink" href="#some-explanations" title="Permalink to this headline">¶</a></h2>
 <p>We have just added a lot of code, which is all co-dependent. Now we have a
 babble invocation in place, we can pause to explain what just happened there.</p>
-<p>The configuration of a babble node is handled by the <code class="docutils literal notranslate"><span class="pre">BaseConfigActivity</span></code>
+<p>The configuration of a Babble node is handled by the <code class="docutils literal notranslate"><span class="pre">BaseConfigActivity</span></code>
 class from whom <code class="docutils literal notranslate"><span class="pre">MainActivity</span></code> inherits. We just need to wire in the
 <code class="docutils literal notranslate"><span class="pre">ChatActivity</span></code> to take over once we have a Babble network.</p>
-<p>We define a MessagingService using the <code class="docutils literal notranslate"><span class="pre">getBabbleService()</span></code> function. This
-boilerplate class wraps BabbleService from the babble-android library.</p>
-<p>This project at this stage is available from github from [here](<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2">https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2</a>) <a class="footnote-reference" href="#stage2" id="id6">[6]</a></p>
-<table class="docutils footnote" frame="void" id="stage2" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id6">[6]</a></td><td>This code is the stage2 branch at
-<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2">https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2</a></td></tr>
-</tbody>
-</table>
+<p>We define a <code class="docutils literal notranslate"><span class="pre">MessagingService</span></code> using the <code class="docutils literal notranslate"><span class="pre">getBabbleService()</span></code> function. This
+boilerplate class wraps <code class="docutils literal notranslate"><span class="pre">BabbleService</span></code> from the babble-android library.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The project at this stage is available from
+<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2">the stage2 branch of the tutorial repo</a>.</p>
+</div>
 </div>
 <div class="section" id="interacting-with-babble">
 <h2>Interacting with Babble<a class="headerlink" href="#interacting-with-babble" title="Permalink to this headline">¶</a></h2>
 <p>The next stage is to make Babble usable. To do that we need to work on the
 <code class="docutils literal notranslate"><span class="pre">ChatActivity</span></code> so it sends and receives messages from Babble.</p>
 <p>First up we need a UI. We are going to use
-[ChatKit](<a class="reference external" href="https://github.com/stfalcon-studio/ChatKit">https://github.com/stfalcon-studio/ChatKit</a>) rather than reinvent the
+<a class="reference external" href="https://github.com/stfalcon-studio/ChatKit">ChatKit</a> rather than reinvent the
 wheel.</p>
 <div class="section" id="activity-chat-xml">
 <h3>activity_chat.xml<a class="headerlink" href="#activity-chat-xml" title="Permalink to this headline">¶</a></h3>
@@ -879,30 +882,26 @@ the code changes above.</p>
 <h3>Build, Run and Test<a class="headerlink" href="#build-run-and-test" title="Permalink to this headline">¶</a></h3>
 <p>Build your app and run it. You should now be able to start a chat with yourself
 and send messages to yourself as below:</p>
-<div class="figure" id="id20">
-<img alt="../_images/first_chat.png" src="../_images/first_chat.png" />
+<div class="figure" id="id16">
+<a class="reference internal image-reference" href="../_images/first_chat.png"><img alt="../_images/first_chat.png" src="../_images/first_chat.png" style="width: 80%;" /></a>
 <p class="caption"><span class="caption-text">First Chat</span></p>
 </div>
-<p>This project at this stage is available from github from [here](<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3">https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3</a>) <a class="footnote-reference" href="#stage3" id="id7">[7]</a></p>
-<table class="docutils footnote" frame="void" id="stage3" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id7">[7]</a></td><td>This code is the stage3 branch at
-<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3">https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3</a></td></tr>
-</tbody>
-</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The project at this stage is available from
+<a class="reference external" href="(https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3">the stage3 branch of the tutorial repo</a>.</p>
+</div>
 </div>
 </div>
 <div class="section" id="joining">
 <h2>Joining<a class="headerlink" href="#joining" title="Permalink to this headline">¶</a></h2>
 <p>Thus far, we have been dealing with a single node, which kind of misses the
-whole point of having a blockchain. So this section remedies this. We will add a
-new button the MainActivity to Join an existing blockchain. This will require
-discovering the network - we will just enter an IP address for the moment -
-although more complex schemes would be used in a production environment.</p>
-<p>In the previous version (0.2.1) of Babble-Android, the explanation for joining
-was over 400 lines of markdown text (plus screenshots). As of 0.2.2, it is just
-to add 3 lines of code (shown in context below) to <code class="docutils literal notranslate"><span class="pre">MainActivity.java</span></code></p>
+whole point of using distributed consensus. This section remedies this. We will
+add a new button in the <code class="docutils literal notranslate"><span class="pre">MainActivity</span></code> to <strong>Join</strong> an existing network. This
+will require discovering the network; we will enter the IP address of an
+existing node, but more sophisticated service-discovery schemes would be used in
+a production environment.</p>
+<p>Add the following three lines of code to <code class="docutils literal notranslate"><span class="pre">MainActivity.java</span></code>:</p>
 <div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@Override</span>
 <span class="n">public</span> <span class="n">void</span> <span class="n">onJoined</span><span class="p">(</span><span class="n">String</span> <span class="n">moniker</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Intent</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">ChatActivity</span><span class="o">.</span><span class="n">class</span><span class="p">);</span>
@@ -911,26 +910,23 @@ to add 3 lines of code (shown in context below) to <code class="docutils literal
 <span class="p">}</span>
 </pre></div>
 </div>
-<div class="section" id="id8">
-<h3>Build, Run and Test<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Build, Run and Test<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p>Build your app and run it on 2 devices. You should now be able to start a chat
 on one and join with the other:</p>
-<div class="figure" id="id21">
-<img alt="../_images/stage_4.png" src="../_images/stage_4.png" />
+<div class="figure" id="id17">
+<a class="reference internal image-reference" href="../_images/stage_4.png"><img alt="../_images/stage_4.png" src="../_images/stage_4.png" style="width: 80%;" /></a>
 <p class="caption"><span class="caption-text">Stage 4 Phone</span></p>
 </div>
-<div class="figure" id="id22">
-<img alt="../_images/stage_4_tab.png" src="../_images/stage_4_tab.png" />
+<div class="figure" id="id18">
+<a class="reference internal image-reference" href="../_images/stage_4_tab.png"><img alt="../_images/stage_4_tab.png" src="../_images/stage_4_tab.png" style="width: 80%;" /></a>
 <p class="caption"><span class="caption-text">Stage 4 Tablet</span></p>
 </div>
-<p>This project at this stage is available from github from [here](<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4">https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4</a>) <a class="footnote-reference" href="#stage4" id="id9">[8]</a></p>
-<table class="docutils footnote" frame="void" id="stage4" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id9">[8]</a></td><td>This code is the stage4 branch at
-<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4">https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4</a></td></tr>
-</tbody>
-</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The project at this stage is available on
+<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4">the stage4 branch of the tutoral repo</a>.</p>
+</div>
 </div>
 </div>
 </div>

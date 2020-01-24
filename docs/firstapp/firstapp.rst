@@ -11,7 +11,7 @@ We will assume that you have installed Android Studio, an Android SDK with API
 version 29 and Android NDK. If you use a previous API version, the ``create 
 activity`` items in these instructions will use AppCompat instead of 
 AndroidX [#androidx]_, leading to incompatibilities with the pasted source code.
-The babble node itself is compatible with AppCompat, but converting the sample
+The Babble node itself is compatible with AppCompat, but converting the sample
 to use AppCompat is beyond the scope of this article.
 
 This tutorial is going to assume deployment to a physical Android device. Thus
@@ -20,17 +20,18 @@ the developer options turned on, debugging enabled, and a suitable USB cable.
 You could use the android emulator, but that is beyond the scope of this
 article.
 
-.. [#androidx] You can read more about AndroidX here: [https://android-developers.googleblog.com/2018/05/hello-world-androidx.html](https://android-developers.googleblog.com/2018/05/hello-world-androidx.html) 
+.. [#androidx] You can read more about AndroidX 
+   `here <https://android-developers.googleblog.com/2018/05/hello-world-androidx.html>`_. 
 
-.. [#androiddevice] API version 19 is Android 4.4 (KitKat). In May 3.8% of devices
-   were using version 18 or lower. Android 4.4 was released in 2013. Whilst it 
-   would be possible to code support for earlier versions, the existing code uses
-   Android features introduced in Android 4.4.
+.. [#androiddevice] API version 19 is Android 4.4 (KitKat). In May 2019, 3.8% of
+   devices were using version 18 or lower. Android 4.4 was released in 2013. 
+   Whilst it would be possible to code support for earlier versions, the 
+   existing code uses Android features introduced in Android 4.4.
 
 Our First Minimal App
 +++++++++++++++++++++
 
-First up we will create a minimal app to test our environment and prove that we
+First up, we will create a minimal app to test our environment and prove that we
 have loaded the ``babble-android`` library correctly. Fire up Android Studio and
 select ``File/New Project``. You are asked to choose a project template.
 
@@ -45,10 +46,10 @@ Choose **Empty Activity** from the **Phone and Tablet** tab, and click **Next**.
   New Project Options
 
 The options here should be self-explanatory. We would recommend not using spaces
-in the Package Name or the Save Location. Do not set the Minimum API Level below
-19. Click **Finish**.
+in the **Package name** or the **Save location**. Do not set the Minimum API 
+level below 19. Click **Finish**.
 
-.. figure:: screenshots/empty_android_studio.png
+.. figure:: screenshots/empty_android_studio.png 
 
   Initial Android Studio
 
@@ -59,7 +60,7 @@ something like above.
 
   the screen will change a few seconds after opening when the initial gradle
   scripts complete. The status bar at the bottom of the window should tell you
-  this is happening.*
+  this is happening.
 
 Running the App
 ---------------
@@ -76,25 +77,31 @@ that the Android Debug Bridge (**adb**) can see the device.
 
 The command ``adb kill-server`` will reset this connection. 
 
-If you can see a device listed, go back to Android Studio. and in the top right
+If you can see a device listed, go back to Android Studio and in the top right
 is a target device dropdown. Select your device from the list. 
 
 .. figure:: screenshots/device_selection.png
 
-   Select Device
+  Select Device
 
 If you cannot find your device in the list, the 
 ``Troubleshoot device connections`` option on that menu should help.
 
 Then press that little green triangle to the right of the dropdown device menu.
-Gradle then builds the app, which is then installed onto the physical android
-device that you selected. The whole process took about 20 seconds on my laptop
-(feel free to buy me a quicker one). 
+Gradle builds the app, which is then installed onto the physical Android device
+that you selected. The whole process took about 20 seconds on my laptop (feel
+free to buy me a quicker one). 
 
-.. figure:: screenshots/mobile_step_1.png
+.. list-table::
 
-   First App Screenshot
-  
+    * - .. figure:: screenshots/mobile_step_1.png
+
+            First App Screenshot
+
+      - .. figure:: screenshots/default_icon.png
+
+            First App Icon
+
 If you look on the device, you should find the app installed, as on the right
 above.
 
@@ -122,7 +129,7 @@ in the screenshot above.
  
 We then add the 3 line ``maven`` instruction as below:
 
-.. code:: 
+.. code::
 
     allprojects {
         repositories {
@@ -170,12 +177,12 @@ Which leaves the entire file looking like this:
     }
    
 Next we need to amend the app ``build.gradle`` (it is below the Project 
-``build.gradle`` in the screenshot above. We add an implementation line to the 
+``build.gradle`` in the screenshot above). We add an implementation line to the 
 bottom dependencies section.
 
-.. code:: 
+.. code::
 
-    implementation 'io.mosaicnetworks:babble:0.1.0'
+    implementation 'io.mosaicnetworks:babble:0.2.1'
 
 
 This leaves us with this full file:
@@ -214,9 +221,9 @@ This leaves us with this full file:
       androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     }
 
-.. figure:: screenshots/sync_message.png 
+.. figure:: screenshots/sync_message.png
 
-   Sync Message
+    Sync Message
 
 .. note:
   
@@ -234,7 +241,7 @@ The library should now be included in the project. So lets use it! Open
   Main Activity
 
 Add the lines below underneath the last import statement. The lines will appear
-greyed out, as the import is not yet used. As well as babble we are importing 
+greyed out, as the import is not yet used. As well as Babble we are importing 
 the ``Log`` package to write to the Android logs. 
 
 .. code:: java
@@ -263,24 +270,21 @@ the hood. Press logcat, as highlighted in gray in the screenshot above. Then
 type ``yippee`` in the search box at the top of that window to filter the logs.
 You should have a freshly generated private key in there. 
 
-This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage1) [#stage1]_
+.. note::
 
-.. [#stage1] This code is the stage1 branch at 
-   https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage1
+    The project at this stage is available from github from 
+    `the stage1 branch of the tutorial repo <https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage1>`_.
 
 The downloadable version of the project has *Mosaic Networks* icons, rather than 
 the default Android ones. You can customise the icons using
-[Android Studio Image Asset Studio](https://developer.android.com/studio/write/image-asset-studio). [#imageasset]_ 
+`Android Studio Image Asset Studio <(https://developer.android.com/studio/write/image-asset-studio>`_. 
 
-.. [#imageasset] [Android Studio Image Asset Studio](https://developer.android.com/studio/write/image-asset-studio) 
-   is described here: https://developer.android.com/studio/write/image-asset-studio
+Our First Babble Network
+++++++++++++++++++++++++
 
-Our First Babble Blockchain
-+++++++++++++++++++++++++++
-
-Now we have access to the babble library from within our app, the next stage is
-to start a babble network. We will start with a single node. But before we can 
-start babble we need to add some UI elements to allow us to interact with our
+Now we have access to the Babble library from within our app, the next stage is
+to start a Babble network. We will start with a single node. But before we can 
+start Babble we need to add some UI elements to allow us to interact with our
 babble node. 
 
 Currently our application launches the activity ``MainActivity`` which calls the
@@ -288,7 +292,7 @@ key pair generation code in it's ``onCreate`` method.
 
 In the Sample App [#sampleapp]_ that we are working towards, the MainActivity
 Screen presents the user with a choice of "**New**" or "**Join**". **New**
-starts a new babble network with your device as the sole peer. **Join** lets you
+starts a new Babble network with your device as the sole peer. **Join** lets you
 specify the address of an existing network, pull down the configuration for that
 network and request to join it.
 
@@ -297,7 +301,7 @@ implemented to function, we will implement **New** first.
 
 .. [#sampleapp] The sample app is part of the ``babble-android`` library and is 
    available from the 
-   [GitHub repo](https://github.com/mosaicnetworks/babble-android)
+   `GitHub repo <https://github.com/mosaicnetworks/babble-android>`_.
 
 Main Activity
 -------------
@@ -344,12 +348,12 @@ following:
         
     }
 
-We have removed our key generation in the onCreate method. Instead
+We have removed our key generation in the onCreate method. Instead,
 ``MainActivity`` now extends ``BaseConfigActivity``. The ``BaseConfigActivity``
 provides screens to create **New** and to **Join** networks. We just need to
 define the callback event handlers for each case. The further processing is
-identical in both cases - both result in your babble node being started and
-in a babble network -- the only difference is the number of nodes. 
+identical in both cases - both result in your Babble node being started and
+in a Babble network -- the only difference is the number of nodes. 
 
 If you want more control over the network joining screens, the branches with
 0.2.1 suffices in the github repo have a worked version using activities
@@ -650,17 +654,17 @@ Some Explanations
 We have just added a lot of code, which is all co-dependent. Now we have a 
 babble invocation in place, we can pause to explain what just happened there. 
 
-The configuration of a babble node is handled by the ``BaseConfigActivity`` 
+The configuration of a Babble node is handled by the ``BaseConfigActivity`` 
 class from whom ``MainActivity`` inherits. We just need to wire in the 
 ``ChatActivity`` to take over once we have a Babble network.  
 
-We define a MessagingService using the ``getBabbleService()`` function. This 
-boilerplate class wraps BabbleService from the babble-android library. 
+We define a ``MessagingService`` using the ``getBabbleService()`` function. This 
+boilerplate class wraps ``BabbleService`` from the babble-android library. 
 
-This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2) [#stage2]_
+.. note::
 
-.. [#stage2] This code is the stage2 branch at
-   https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2
+    The project at this stage is available from 
+    `the stage2 branch of the tutorial repo <https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2>`_.
 
 Interacting with Babble
 +++++++++++++++++++++++
@@ -669,7 +673,7 @@ The next stage is to make Babble usable. To do that we need to work on the
 ``ChatActivity`` so it sends and receives messages from Babble. 
 
 First up we need a UI. We are going to use
-[ChatKit](https://github.com/stfalcon-studio/ChatKit) rather than reinvent the
+`ChatKit <https://github.com/stfalcon-studio/ChatKit>`_ rather than reinvent the
 wheel. 
 
 activity_chat.xml
@@ -848,26 +852,26 @@ Build your app and run it. You should now be able to start a chat with yourself
 and send messages to yourself as below:
 
 .. figure:: screenshots/first_chat.png 
+    :width: 80%
 
-  First Chat
+    First Chat
 
-This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3) [#stage3]_
+.. note::
 
-.. [#stage3] This code is the stage3 branch at
-   https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3
+    The project at this stage is available from
+    `the stage3 branch of the tutorial repo <(https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3>`_.
 
 Joining
 +++++++
 
 Thus far, we have been dealing with a single node, which kind of misses the
-whole point of having a blockchain. So this section remedies this. We will add a
-new button the MainActivity to Join an existing blockchain. This will require
-discovering the network - we will just enter an IP address for the moment - 
-although more complex schemes would be used in a production environment.
+whole point of using distributed consensus. This section remedies this. We will
+add a new button in the ``MainActivity`` to **Join** an existing network. This
+will require discovering the network; we will enter the IP address of an
+existing node, but more sophisticated service-discovery schemes would be used in
+a production environment.
 
-In the previous version (0.2.1) of Babble-Android, the explanation for joining
-was over 400 lines of markdown text (plus screenshots). As of 0.2.2, it is just
-to add 3 lines of code (shown in context below) to ``MainActivity.java``
+Add the following three lines of code to ``MainActivity.java``:
 
 .. code:: java
 
@@ -886,14 +890,16 @@ Build your app and run it on 2 devices. You should now be able to start a chat
 on one and join with the other:
 
 .. figure:: screenshots/stage_4.png 
+    :width: 80%
 
-  Stage 4 Phone
+    Stage 4 Phone
   
 .. figure:: screenshots/stage_4_tab.png 
+    :width: 80%
 
-  Stage 4 Tablet
+    Stage 4 Tablet
 
-This project at this stage is available from github from [here](https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4) [#stage4]_
+.. note::
 
-.. [#stage4] This code is the stage4 branch at
-   https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4
+    The project at this stage is available on
+    `the stage4 branch of the tutoral repo <https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4>`_.
