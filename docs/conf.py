@@ -45,7 +45,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Babble'
+project = u'Babble Android'
 copyright = u'2017, Mosaic Networks'
 author = u'Mosaic Networks'
 
@@ -156,7 +156,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Babble.tex', u'Babble Documentation',
+    (master_doc, 'BabbleAndroid.tex', u'Babble Android Documentation',
      u'Mosaic Networks', 'manual'),
 ]
 
@@ -166,7 +166,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'babble', u'Babble Documentation',
+    (master_doc, 'babble Android', u'Babble Android Documentation',
      [author], 1)
 ]
 
@@ -177,7 +177,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Babble', u'Babble Documentation',
+    (master_doc, 'Babble Android', u'Babble Android Documentation',
      author, 'Mosaic Networks ltd', 'Modular Blockchain Software',
      'Miscellaneous'),
 ]

@@ -833,7 +833,6 @@ Replace all of the file ``ChatActivity.java`` with the code below:
         }
     }
 
-
 strings.xml
 -----------
 
