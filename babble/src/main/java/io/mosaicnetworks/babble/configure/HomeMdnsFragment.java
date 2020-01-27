@@ -114,10 +114,12 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
     }
 
     private void joinGroup(String peerIp) {
+        //TODO: not used
         getPeers(peerIp);
     }
 
     private void getPeers(final String peerIP) {
+        //TODO: not used
         /*
         try {
             mHttpGenesisPeerDiscoveryRequest = HttpPeerDiscoveryRequest.createGenesisPeersRequest(peerIP,

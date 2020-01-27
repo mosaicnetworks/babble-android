@@ -140,8 +140,8 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress) throws CannotStartBabbleNodeException {
-        return configure(genesisPeers, currentPeers, "TODO-GROUP-NAME", moniker, inetAddress, DEFAULT_BABBLING_PORT, false); //TODO: group name
+    public String configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress) throws CannotStartBabbleNodeException {
+        return configure(genesisPeers, currentPeers, groupName, moniker, inetAddress, DEFAULT_BABBLING_PORT, false);
     }
 
     /**
@@ -154,8 +154,8 @@ public final class ConfigManager {
      * //@param discoveryPort the port used by the {HttpPeerDiscoveryServer} //TODO: deal with discovery
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException{
-        return configure(genesisPeers, currentPeers, "TODO-GROUP-NAME", moniker, inetAddress, babblingPort, false); //TODO: group name
+    public String configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException{
+        return configure(genesisPeers, currentPeers, groupName, moniker, inetAddress, babblingPort, false); //TODO: group name
     }
 
     private String configure(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName,
