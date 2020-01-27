@@ -39,7 +39,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         initialiseAdapter();
         mMessagingService.registerObserver(this);
 
-        if (mMessagingService.getState()!= BabbleService.State.RUNNING_WITH_DISCOVERY) {
+        if (!mMessagingService.isAdvertising()) {
             Toast.makeText(this, "Unable to advertise peers", Toast.LENGTH_LONG).show();
         }
     }

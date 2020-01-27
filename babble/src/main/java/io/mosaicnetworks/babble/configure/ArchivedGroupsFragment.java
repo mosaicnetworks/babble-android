@@ -72,7 +72,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
         String configDir = mConfigManager.getRootDir() + File.separator + ConfigManager.BABBLE_ROOTDIR + File.separator + configDirectory.directoryName; //TODO: clean up!
         Log.d("MY-TAG", "Config directory name: " + configDir);
         BabbleService<?> babbleService = mListener.getBabbleService();
-        babbleService.start(configDir);
+        babbleService.start(configDir, configDir); //TODO: need to NOT advertise mDNS
         mListener.onArchiveLoaded(""); //TODO: fix moniker
     }
 

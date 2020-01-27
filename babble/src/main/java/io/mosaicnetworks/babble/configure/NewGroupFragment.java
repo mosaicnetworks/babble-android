@@ -125,7 +125,7 @@ public class NewGroupFragment extends Fragment {
         editor.putString("moniker", moniker);
         editor.commit();
 
-        babbleService.start(configDirectory);
+        babbleService.start(configDirectory, groupName);
         mListener.onStartedNew(moniker);
 
     }

@@ -20,6 +20,7 @@ public final class MessagingService extends BabbleService<ChatState> {
     private Context mAppContext;
     private HttpPeerDiscoveryServer mHttpPeerDiscoveryServer;
     private int mDiscoveryPort = 8988;
+    private boolean mAdvertising = false;
 
     /**
      * Factory for the {@link MessagingService}
@@ -41,14 +42,17 @@ public final class MessagingService extends BabbleService<ChatState> {
 
     @Override
     protected void onStarted() {
+        //TODO: should this be part of the base service?
         //TODO: collisions - add UUID?
         super.onStarted();
         mMdnsAdvertiser = new MdnsAdvertiser(mGroupName, mDiscoveryPort);
-        mMdnsAdvertiser.advertise(mAppContext);
+
 
         mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(mDiscoveryPort, mBabbleNode);
         try {
             mHttpPeerDiscoveryServer.start();
+            mMdnsAdvertiser.advertise(mAppContext); // start mDNS advertising if server started
+            mAdvertising = true;
         } catch (IOException ex) {
             //Probably the port is in use, we'll continue without the discovery service
         }
@@ -57,11 +61,22 @@ public final class MessagingService extends BabbleService<ChatState> {
     @Override
     protected void onStopped() {
         super.onStopped();
-        mMdnsAdvertiser.stopAdvertising();
-        mMdnsAdvertiser = null;
+        if (mMdnsAdvertiser != null) {
+            mMdnsAdvertiser.stopAdvertising();
+            mMdnsAdvertiser = null;
+        }
 
-        mHttpPeerDiscoveryServer.stop();
-        mHttpPeerDiscoveryServer = null;
+        if (mHttpPeerDiscoveryServer != null) {
+            mHttpPeerDiscoveryServer.stop();
+            mHttpPeerDiscoveryServer = null;
+        }
+
+        mAdvertising = false;
+    }
+
+    public boolean isAdvertising() {
+        return mAdvertising;
+
     }
 }
 
