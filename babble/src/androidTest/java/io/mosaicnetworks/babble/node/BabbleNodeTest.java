@@ -26,6 +26,7 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class BabbleNodeTest {
 
+    /*
     @Rule public GrantPermissionRule mRuntimePermissionRule = GrantPermissionRule.grant(
             android.Manifest.permission.INTERNET);
 
@@ -248,4 +249,6 @@ public class BabbleNodeTest {
         assertArrayEquals(sendBytes, nodeTwoRcvBytes);
         assertArrayEquals(sendBytes, nodeThreeRcvBytes);
     }
+
+     */
 }

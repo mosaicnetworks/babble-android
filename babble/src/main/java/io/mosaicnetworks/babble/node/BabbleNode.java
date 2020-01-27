@@ -1,20 +1,12 @@
 package io.mosaicnetworks.babble.node;
 
-import android.util.Log;
-
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import java.nio.charset.Charset;
-import java.util.List;
 
-import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.PeersProvider;
 import mobile.Mobile;
 import mobile.Node;
-
-
-
 
 /**
  * This is the core Babble node. It can be used directly or alternatively the {@link BabbleService}
@@ -23,90 +15,11 @@ import mobile.Node;
  */
 public final class BabbleNode implements PeersProvider {
 
-
-    public enum ConfigFolderBackupPolicy  {DELETE, SINGLE_BACKUP, COMPLETE_BACKUP, ABORT}
-
-    private static ConfigFolderBackupPolicy mConfigFolderBackupPolicy = ConfigFolderBackupPolicy.SINGLE_BACKUP;
-    private final static Gson mGson = new Gson();
     private final Node mNode;
 
-    /**
-     * Create a node with default config
-     * @param genesisPeers list of genesis peers
-     * @param currentPeers list of current peers
-     * @param privateKeyHex private key as produced by the {@link KeyPair} class
-     * @param inetAddress ip address for the node to bind to
-     * @param port the port number to bind to
-     * @param moniker node moniker
-     * @param blockConsumer the object which will receive the transactions
-     * @param configDir the root babble configuration folder
-     * @param subConfigDir the folder within configDir for this configuration
-     * @param configFolderBackupPolicy sets the behaviour for when creating / joining an extant network
-     * @param appId a unique identifier for this app, may be FQDN but does not have to be. Used for discovery filtering
-     * @return a babble node object
-     */
-    public static BabbleNode create(List<Peer> genesisPeers, List<Peer> currentPeers,
-                                    String privateKeyHex, String inetAddress,
-                                    int port, String moniker, BlockConsumer blockConsumer, String configDir,
-                                    String subConfigDir, ConfigFolderBackupPolicy configFolderBackupPolicy, String appId) throws CannotStartBabbleNodeException {
-
-        return createWithConfig(genesisPeers, currentPeers, privateKeyHex, inetAddress, port, moniker, blockConsumer,
-                new NodeConfig.Builder().build(), configDir, subConfigDir, configFolderBackupPolicy, appId);
-    }
-
-    /**
-     * Create a node with custom config
-     * @param genesisPeers list of genesis peers
-     * @param currentPeers list of current peers
-     * @param privateKeyHex private key as produced by the {@link KeyPair} class
-     * @param inetAddress ip address for the node to bind to
-     * @param port the port number to bind to
-     * @param moniker node moniker
-     * @param blockConsumer the object which will receive the transactions
-     * @param nodeConfig custom configuration
-     * @param configDir the root babble configuration folder
-     * @param subConfigDir the folder within configDir for this configuration
-     * @param configFolderBackupPolicy sets the behaviour for when creating / joining an extant network
-     * @param appId a unique identifier for this app, may be FQDN but does not have to be. Used for discovery filtering
-     * @return a babble node object
-     */
-    public static BabbleNode createWithConfig(List<Peer> genesisPeers, List<Peer> currentPeers,
-                                              String privateKeyHex,
-                                              String inetAddress, int port, String moniker,
-                                              final BlockConsumer blockConsumer,
-                                              NodeConfig nodeConfig,
-                                              String configDir,
-                                              String subConfigDir,
-                                              ConfigFolderBackupPolicy configFolderBackupPolicy,
-                                              String appId) throws CannotStartBabbleNodeException {
-
-
-        mConfigFolderBackupPolicy = configFolderBackupPolicy ;
-
-        String fullPath;
-            // babble.toml
-        try {
-            ConfigManager configManager = new ConfigManager(configDir, appId, mConfigFolderBackupPolicy);
-            fullPath = configManager.WriteBabbleTomlFiles(nodeConfig, subConfigDir, inetAddress, port, moniker);
-            Log.d("createWithConfig","Wrote TOML file");
-            // peers files
-            configManager.WritePeersJsonFiles(fullPath, genesisPeers, currentPeers);
-
-            // private key -- does not overwrite
-            configManager.WritePrivateKey(fullPath, privateKeyHex);
-
-            Log.d("fullPath", fullPath);
-        } catch (Exception e)
-        {
-            // re-reraise exception e
-            throw new CannotStartBabbleNodeException(e.getMessage());
-        }
+    public static BabbleNode create(final BlockConsumer blockConsumer, String configDir) {
 
         Node node = Mobile.new_(
-       //         privateKeyHex,
-       //         inetAddress + ":" + port,
-       //         mGson.toJson(currentPeers),
-       //         mGson.toJson(genesisPeers),
                 new mobile.CommitHandler() {
                     @Override
                     public byte[] onCommit(final byte[] blockBytes) {
@@ -137,8 +50,7 @@ public final class BabbleNode implements PeersProvider {
 
                         throw new IllegalArgumentException(msg);
                     }
-                }, fullPath);
-               // mobileConfig);
+                }, configDir);
 
         // If mobile ExceptionHandler isn't called then mNode should not be null, however
         // just in case...

@@ -26,6 +26,7 @@ import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
+import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.servicediscovery.mdns.ServicesListView;
 import io.mosaicnetworks.babble.utils.Utils;
 
@@ -117,6 +118,7 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
     }
 
     private void getPeers(final String peerIP) {
+        /*
         try {
             mHttpGenesisPeerDiscoveryRequest = HttpPeerDiscoveryRequest.createGenesisPeersRequest(peerIP,
                     BabbleService.DEFAULT_DISCOVERY_PORT, new ResponseListener() {
@@ -142,30 +144,16 @@ public class HomeMdnsFragment extends Fragment implements ResponseListener {
             return;
         }
 
+         */
+
         mLoadingDialog.show();
         mHttpGenesisPeerDiscoveryRequest.send();
     }
 
     @Override
     public void onReceivePeers(List<Peer> currentPeers) {
-        //TODO: check this is safe
-        BabbleService<?> babbleService = mListener.getBabbleService();
 
-        try {
-            babbleService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(getContext()));
-        } catch (IllegalStateException | CannotStartBabbleNodeException ex) {
-            //TODO: just catch IOException - this will mean the port is in use
-            //we'll assume this is caused by the node taking a while to leave a previous group,
-            //though it could be that another application is using the port - in which case
-            //we'll keep getting stuck here until the port is available!
-            mLoadingDialog.dismiss();
-            displayOkAlertDialog(R.string.babble_init_fail_title, R.string.babble_init_fail_message);
-            return;
-        }
 
-        mLoadingDialog.dismiss();
-        babbleService.start();
-        mListener.onJoined(mMoniker);
     }
 
     @Override

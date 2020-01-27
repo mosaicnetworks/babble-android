@@ -2,6 +2,9 @@ package io.mosaicnetworks.sample;
 
 import android.content.Context;
 
+import java.io.IOException;
+
+import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
 import io.mosaicnetworks.babble.node.NodeConfig;
 
 import io.mosaicnetworks.babble.node.BabbleService;
@@ -16,6 +19,9 @@ public final class MessagingService extends BabbleService<ChatState> {
     private static MessagingService INSTANCE;
     private MdnsAdvertiser mMdnsAdvertiser;
     private Context mAppContext;
+    private HttpPeerDiscoveryServer mHttpPeerDiscoveryServer;
+    public static final int DEFAULT_DISCOVERY_PORT = 8988;
+    private int mDiscoveryPort = DEFAULT_DISCOVERY_PORT;
 
     /**
      * Factory for the {@link MessagingService}
@@ -23,16 +29,15 @@ public final class MessagingService extends BabbleService<ChatState> {
      */
     public static MessagingService getInstance(Context context) {
         if (INSTANCE==null) {
-
             INSTANCE = new MessagingService(context.getApplicationContext());
-
         }
 
         return INSTANCE;
     }
 
     private MessagingService(Context context) {
-        super(new ChatState(), new NodeConfig.Builder().logLevel(NodeConfig.LogLevel.TRACE).build(), context);
+        //super(new ChatState(), new NodeConfig.Builder().logLevel(NodeConfig.LogLevel.TRACE).build(), context);
+        super(new ChatState(), context);
 
         mAppContext = context;
     }
@@ -42,6 +47,13 @@ public final class MessagingService extends BabbleService<ChatState> {
         super.onStarted();
         mMdnsAdvertiser = new MdnsAdvertiser("BabbleService", 8988);
         mMdnsAdvertiser.advertise(mAppContext);
+
+        mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(mDiscoveryPort, mBabbleNode);
+        try {
+            mHttpPeerDiscoveryServer.start();
+        } catch (IOException ex) {
+            //Probably the port is in use, we'll continue without the discovery service
+        }
     }
 
     @Override
@@ -49,6 +61,17 @@ public final class MessagingService extends BabbleService<ChatState> {
         super.onStopped();
         mMdnsAdvertiser.stopAdvertising();
         mMdnsAdvertiser = null;
+
+        mHttpPeerDiscoveryServer.stop();
+        mHttpPeerDiscoveryServer = null;
+    }
+
+    public int getDiscoveryPort() {
+        return mDiscoveryPort;
+    }
+
+    public void setDiscoveryPort(int discoveryPort) {
+        mDiscoveryPort = discoveryPort;
     }
 }
 

@@ -6,6 +6,8 @@ import android.os.Bundle;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AlertDialog;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import android.widget.EditText;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
+import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.utils.Utils;
 
 
@@ -80,6 +83,8 @@ public class NewGroupFragment extends Fragment {
     public void startGroup(View view) {
         //TODO: check this is safe
         BabbleService<?> babbleService = mListener.getBabbleService();
+
+        ConfigManager configManager = ConfigManager.getInstance(getContext().getApplicationContext());
         //get moniker
         EditText editMoniker = view.findViewById(R.id.edit_moniker);
         String moniker = editMoniker.getText().toString();
@@ -88,9 +93,11 @@ public class NewGroupFragment extends Fragment {
             return;
         }
 
-        //MessagingService messagingService = MessagingService.getInstance();
+        String configDirectory;
         try {
-            babbleService.configureNew(moniker, Utils.getIPAddr(getContext()));
+            configDirectory = configManager.configureNew(moniker, Utils.getIPAddr(getContext()));
+            Log.d("MY-TAG", "configDirectory: " + configDirectory);
+            //babbleService.configureNew(moniker, Utils.getIPAddr(getContext()));
         } catch (IllegalArgumentException | CannotStartBabbleNodeException ex) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
@@ -108,8 +115,7 @@ public class NewGroupFragment extends Fragment {
         editor.putString("moniker", moniker);
         editor.commit();
 
-
-        babbleService.start();
+        babbleService.start(configDirectory);
         mListener.onStartedNew(moniker);
 
     }

@@ -1,42 +1,39 @@
 package io.mosaicnetworks.babble.node;
 
-public class ConfigFolder {
+public final class ConfigDirectory {
 
-    public final String FolderName;
-    public final String AppId;
-    public final String UniqueId;
-    public final String Description;
-    public final boolean IsBackup;
+    public final String directoryName;
+    public final String appId;
+    public final String uniqueId;
+    public final String description;
+    public final boolean isBackup;
     public final int BackUpVersion;
 
-
     /**
-     * This constructor takes a folder name and parses it to populate the public final properties
+     * This constructor takes a directory name and parses it to populate the public final properties
      * of this class
-     * @param folderName the config foldername
-     * @throws IllegalArgumentException is thrown when the foldername is malformed
+     * @param directoryName the config directoryname
+     * @throws IllegalArgumentException is thrown when the directoryname is malformed
      */
-    public ConfigFolder(String folderName) throws IllegalArgumentException {
-        this.FolderName = folderName;
+    public ConfigDirectory(String directoryName) throws IllegalArgumentException {
+        this.directoryName = directoryName;
 
         String[] tempArray;
         String delimiter = "_";
 
-        tempArray = folderName.split(delimiter);
+        tempArray = directoryName.split(delimiter);
 
         if (tempArray.length < 3) {
             throw new IllegalArgumentException();
         }
 
-        this.AppId = tempArray[0];
-        this.UniqueId = tempArray[1];
-        this.Description = DecodeDescription(tempArray[2]);
-
-
+        appId = tempArray[0];
+        uniqueId = tempArray[1];
+        description = DecodeDescription(tempArray[2]);
 
         if (tempArray.length < 4) {
-            this.IsBackup = false;
-            this.BackUpVersion = 0;
+            isBackup = false;
+            BackUpVersion = 0;
             return;
         } else {
             int version;
@@ -44,16 +41,14 @@ public class ConfigFolder {
             try {
                 version = Integer.parseInt(tempArray[3]);
             } catch (Exception e) {
-                this.IsBackup = false;
-                this.BackUpVersion = 0;
-                return ;
+                isBackup = false;
+                BackUpVersion = 0;
+                return;
             }
-            this.BackUpVersion = version;
-            this.IsBackup = true;
+            BackUpVersion = version;
+            isBackup = true;
         }
     }
-
-
 
     /**
      * Encodes the description to make it filename safe. Spaces become minus signs, all other
@@ -73,8 +68,4 @@ public class ConfigFolder {
     public static String DecodeDescription(String description) {
         return description.replaceAll("-", " ");
     }
-
-
-
-
 }

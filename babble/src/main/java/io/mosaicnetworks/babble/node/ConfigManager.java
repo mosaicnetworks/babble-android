@@ -1,190 +1,246 @@
 package io.mosaicnetworks.babble.node;
 
-
- import android.util.Log;
+import android.content.Context;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.moandjiezana.toml.TomlWriter;
-
-// import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.UUID;
-
 
 import io.mosaicnetworks.babble.discovery.Peer;
 
-public class ConfigManager {
+public final class ConfigManager {
 
+    public enum ConfigDirectoryBackupPolicy  {DELETE, SINGLE_BACKUP, COMPLETE_BACKUP, ABORT}
+
+    /**
+     * The default babbling port. This can be overridden when configuring the service
+     */
+    public static final int DEFAULT_BABBLING_PORT = 6666;
     public final static String BABBLE_ROOTDIR = "babble";
-    public final static  String DB_SUBDIR = "badger_db";
-    public final static  String BABBLE_TOML = "babble.toml";
-    public final static  String PEERS_JSON = "peers.json";
-    public final static  String PEERS_GENESIS_JSON = "peers.genesis.json";
-    public final static  String PRIV_KEY = "priv_key";
+    public final static String DB_SUBDIR = "badger_db";
+    public final static String BABBLE_TOML = "babble.toml";
+    public final static String PEERS_JSON = "peers.json";
+    public final static String PEERS_GENESIS_JSON = "peers.genesis.json";
+    public final static String PRIV_KEY = "priv_key";
 
-    // This constant determines how long the unique ID as part of a
-    private final static int UniqueIdLength = 16;
+    // This constant determines the length of the unique ID
+    private final static int sUniqueIdLength = 16;
 
-
+    private static ConfigManager INSTANCE;
     private String mRootDir;
     private String mTomlDir = "";
     private final String mAppId;
-    private final BabbleNode.ConfigFolderBackupPolicy mConfigFolderBackupPolicy;
+    private ConfigDirectoryBackupPolicy mConfigDirectoryBackupPolicy = ConfigDirectoryBackupPolicy.SINGLE_BACKUP; //TODO: requires getter and setter
+    private ArrayList<ConfigDirectory> mDirectories = new ArrayList<>();
+    private KeyPair mKeyPair;
 
+    public static ConfigManager getInstance(Context context) {
+        if (INSTANCE==null) {
+            INSTANCE = new ConfigManager(context.getApplicationContext());
+        }
 
-    private ArrayList<ConfigFolder> mDirectories;
+        return INSTANCE;
+    }
 
     /**
      * Create an object to manage multiple Babble Configs
-     * @param storageDir the root of the babble storage. Likely to be context.getFilesDir() or context.getExternalFilesDir().
+     * @param appContext the application context
      */
-    public ConfigManager(String storageDir, String appID, BabbleNode.ConfigFolderBackupPolicy configFolderBackupPolicy) {
-        mRootDir = storageDir;
-        mAppId = appID;
-        mConfigFolderBackupPolicy = configFolderBackupPolicy;
-
-//        Log.i("ConfigManager", "ConfigDir: "+storageDir);
+    private ConfigManager(Context appContext) {
+        mRootDir = appContext.getFilesDir().toString();
+        mAppId = appContext.getPackageName();
+        mKeyPair = new KeyPair(); //TODO:  how should the key be handled??
 
         File babbleDir = new File(this.mRootDir, BABBLE_ROOTDIR);
-        mDirectories = new ArrayList<ConfigFolder>();
 
-        if(babbleDir.exists()) {
-            PopulateDirectories(babbleDir);
+        if (babbleDir.exists()) {
+            populateDirectories(babbleDir);
         } else { // First run, so we create the root dir - clearly no subdirs yet
             babbleDir.mkdirs();
         }
     }
 
+    //TODO: is this the best way to get the root directory?
+    public String getRootDir() {
+        return mRootDir;
+    }
+
+    //#######################################################
+    // NOTE: hacked out of the babble service
+
     /**
-     * Check if this configuration already exists
-     * @param subConfigDir is a subdirectory under the babble root
-     * @return returns true if it already exists
+     * Configure the service to create a new group using the default ports
+     * @param moniker node moniker
+     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
+     * @throws IllegalStateException if the service is currently running
      */
-    boolean CheckDirectory(String subConfigDir) {
-        for (ConfigFolder f : mDirectories) {
-            if (f.FolderName.equals(subConfigDir)) {
-                return true;
-            }
+    public String configureNew(String moniker, String inetAddress)  throws CannotStartBabbleNodeException {
+        return configureNew(moniker, inetAddress, DEFAULT_BABBLING_PORT);
+    }
+
+    /**
+     * Configure the service to create a new group, overriding the default ports
+     * @param moniker node moniker
+     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
+     * @param babblingPort the port used for Babble consesnsus
+     * //@param discoveryPort the port used by the HttpPeerDiscoveryServer //TODO: how to deal with this
+     * @throws IllegalStateException if the service is currently running
+     */
+    public String configureNew(String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException{
+        List<Peer> genesisPeers = new ArrayList<>();
+        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
+        List<Peer> currentPeers = new ArrayList<>();
+        currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
+
+        return configure(genesisPeers, currentPeers, moniker, inetAddress, babblingPort, false);
+    }
+
+    /**
+     * Configure the service to create an archive group
+     * @param moniker node moniker
+     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
+     * @throws IllegalStateException if the service is currently running
+     */
+    public String configureArchive(String moniker, String inetAddress)  throws CannotStartBabbleNodeException {
+        return configureArchive(moniker, inetAddress, DEFAULT_BABBLING_PORT);
+    }
+
+    /**
+     *Configure the service to create an archive group, overriding the default ports
+     * @param moniker node moniker
+     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
+     * @param babblingPort the port used for Babble consesnsus
+     * @throws IllegalStateException if the service is currently running
+     */
+    public String configureArchive(String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException{
+        List<Peer> genesisPeers = new ArrayList<>();
+        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
+        List<Peer> currentPeers = new ArrayList<>();
+        currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
+
+        return configure(genesisPeers, currentPeers, moniker, inetAddress, babblingPort, true);
+    }
+
+    /**
+     * Configure the service to join an existing group using the default ports
+     * @param genesisPeers list of genesis peers
+     * @param currentPeers list of current peers
+     * @param moniker node moniker
+     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
+     * @throws IllegalStateException if the service is currently running
+     */
+    public String configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress) throws CannotStartBabbleNodeException {
+        return configure(genesisPeers, currentPeers, moniker, inetAddress, DEFAULT_BABBLING_PORT, false);
+    }
+
+    /**
+     *
+     * @param genesisPeers list of genesis peers
+     * @param currentPeers list of current peers
+     * @param moniker node moniker
+     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
+     * @param babblingPort the port used for Babble consensus
+     * //@param discoveryPort the port used by the {HttpPeerDiscoveryServer} //TODO: deal with discovery
+     * @throws IllegalStateException if the service is currently running
+     */
+    public String configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException{
+        return configure(genesisPeers, currentPeers, moniker, inetAddress, babblingPort, false);
+    }
+
+    private String configure(List<Peer> genesisPeers, List<Peer> currentPeers, String moniker, String inetAddress, int babblingPort, boolean isArchive) throws CannotStartBabbleNodeException {
+
+        //#################
+        //TODO: need to pass a "Group name" - for now we'll assign some random name
+        Random ran = new Random();
+        int x = ran.nextInt(100000);
+        String subConfigDir = "Hard Coded Random Group Name " + x;
+        //#################
+
+        NodeConfig nodeConfig = new NodeConfig.Builder().build();
+
+        //TODO: is there a cleaner way of obtaining the path?
+        String fullPath = writeBabbleTomlFiles(nodeConfig, subConfigDir, inetAddress, babblingPort, moniker);
+        Log.d("MY-TAG", "Full Path:" + fullPath);
+
+        writePeersJsonFiles(fullPath, genesisPeers, currentPeers);
+
+        // private key -- does not overwrite
+        writePrivateKey(fullPath, mKeyPair.privateKey);
+
+        return fullPath;
+
+        /*
+        if (mState == BabbleService.State.RUNNING || mState == BabbleService.State.RUNNING_WITH_DISCOVERY) {
+            throw new IllegalStateException("Cannot configure while the service is running");
         }
+         */
 
-        return false;
+        /*
+        mBabbleNode = BabbleNode.createWithConfig(genesisPeers, currentPeers,
+                mKeyPair.privateKey, inetAddress,
+                babblingPort, moniker,
+                new BlockConsumer() {
+                    @Override
+                    public Block onReceiveBlock(Block block) {
+                        Block processedBlock = mBabbleState.processBlock(block);
+                        notifyObservers();
+                        return processedBlock;
+                    }
+                },
+                mNodeConfig, mConfigDir, mSubConfigDir, mConfigFolderBackupPolicy, mAppId);
+
+        mBabbleState.reset();
+        mState = State.CONFIGURED;
+         */
     }
+
+    //#######################################################
+
+
 
     /**
-     * Gets a list of the configuration folders available to this app
-     * @return An ArrayList<String> of the folder names with no path
-     */
-    public ArrayList<ConfigFolder> getDirectories() {
-        return mDirectories;
-    }
-
-
-    /**
-     * Function to generate a string to render the config name unique.
-     * @return a hex string
-     */
-    public String GetUniqueId() {
-        UUID uuid = UUID.randomUUID();
-      //   return uuid.toString().replaceAll("-", "");
-        return uuid.toString().replaceAll("[^A]", "A");
-    }
-
-
-    /**
-     * The folder name is composite with the parts separated by underscores.
-     * The first part is the appId as set in BabbleService, which may or may not be the FQDN
-     * The 2nd part is a unique id as generated in GetUniqueId. Currently this is 16 characters
-     * The 3rd part is a narrative description field with spaces converted to minus signs and
-     * input limit to spaces, letters and numbers only.
-     * @param networkDescription contains a human readable description for this network.
-     * @return a unique folder name
-     */
-    public String GetCompositeConfigDir(String networkDescription) {
-
-        String unique = GetUniqueId();
-        String trimmedUnique = unique.length() >= UniqueIdLength
-                ? unique.substring(unique.length() - UniqueIdLength)
-                : unique ;
-
-
-
-        String compositeDir = mAppId + "_" + trimmedUnique + "_"+ConfigFolder.EncodeDescription(networkDescription)+"_";
-        return compositeDir;
-    }
-
-
-
-    boolean DeleteDirectory(String subConfigDir) {
-        Log.d("DeleteDirectory", subConfigDir);
-
-        if ( ! this.CheckDirectory(subConfigDir)) { // Doesn't exist
-            Log.e("DeleteDirectory !Exists", subConfigDir);
-            return false;
-        }
-
-        File dir = new File(this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir);
-
-        return deleteDir(dir);
-    }
-
-    // delete directory and contents
-    boolean deleteDir(File file) {
-        try {
-
-            if (file.isDirectory())
-                for (String child : file.list())
-                    deleteDir(new File(file, child));
-            file.delete();  // delete child file or empty directory
-        } catch (Exception e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Write Both Peers JSON files to the
-     * @param targetDir is the directory that the peers files are to be written to.
+     * Write private key
+     * @param targetDir is the directory that the private key is to be written to.
      * @param privateKeyHex private key as produced by the {@link KeyPair} class
      */
-    void WritePrivateKey(String targetDir, String privateKeyHex) {
+    public void writePrivateKey(String targetDir, String privateKeyHex) {
         try {
-
-        FileWriter fileWriter = new FileWriter(new File(targetDir, PRIV_KEY) );
-        fileWriter.write(privateKeyHex);
-        fileWriter.close();
+            FileWriter fileWriter = new FileWriter(new File(targetDir, PRIV_KEY) );
+            fileWriter.write(privateKeyHex);
+            fileWriter.close();
         } catch (Exception e) {
-            // Log.e("WritePrivateKey", e.toString());
+            // Log.e("writePrivateKey", e.toString());
         }
     }
 
-
     /**
-     * Write Both Peers JSON files to the
+     * Write Both Peers JSON files
      * @param targetDir is the directory that the peers files are to be written to.
      * @param genesisPeers is the initial peer list for this network
      * @param currentPeers is the current peer list for this network
      */
-    void WritePeersJsonFiles(String targetDir, List<Peer> genesisPeers, List<Peer> currentPeers) {
+    public void writePeersJsonFiles(String targetDir, List<Peer> genesisPeers, List<Peer> currentPeers) {
         Gson gson = new Gson();
         try {
 
-            Log.i("WritePeersJsonFiles", "JSON "+gson.toJson(currentPeers));
+            Log.i("writePeersJsonFiles", "JSON " + gson.toJson(currentPeers));
 
             FileWriter fileWriter = new FileWriter(new File(targetDir, PEERS_JSON));
             gson.toJson(currentPeers, fileWriter);
             fileWriter.close();
         } catch (Exception e) {
-            Log.e("WritePeersJsonFiles", e.toString());
+            Log.e("writePeersJsonFiles", e.toString());
         }
 
         try {
@@ -192,65 +248,59 @@ public class ConfigManager {
             gson.toJson(genesisPeers, fileWriter);
             fileWriter.close();
         } catch (Exception e) {
-            Log.e("WritePeersJsonFiles", e.toString());
+            Log.e("writePeersJsonFiles", e.toString());
         }
     }
 
-        /**
-         * Write Babble Config to disk ready for Babble to use
-         * @param nodeConfig is the babble configuration object
-         * @param subConfigDir is the subfolder of the babble Subfolder of the local storage as passed to the constructor
-         * @return the composite path where the babble.toml file was written
-         */
-    String WriteBabbleTomlFiles(NodeConfig nodeConfig, String subConfigDir, String inetAddress, int port, String moniker) throws CannotStartBabbleNodeException{
+    /**
+     * Write Babble Config to disk ready for Babble to use
+     * @param nodeConfig is the babble configuration object
+     * @param subConfigDir is the sub-directory of the babble sub-directory of the local storage as passed to the constructor
+     * @return the composite path where the babble.toml file was written
+     */
+    public String writeBabbleTomlFiles(NodeConfig nodeConfig, String subConfigDir, String inetAddress, int port, String moniker) throws CannotStartBabbleNodeException{
 
-        TomlWriter tomlWriter = new TomlWriter();
-        Map<String, Object> map = new HashMap<>();
+        //TODO: add inetAddress, port and moniker to nodeConfig??
         Map<String, Object> babble = new HashMap<>();
 
-
-        String compositeName = GetCompositeConfigDir(subConfigDir);
+        String compositeName = getCompositeConfigDir(subConfigDir);
 
         mTomlDir = this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + compositeName;
         File babbleDir = new File(mTomlDir, DB_SUBDIR);
         if (babbleDir.exists()){
             // We have a clash.
-            switch (mConfigFolderBackupPolicy) {
+            switch (mConfigDirectoryBackupPolicy) {
                 case ABORT:
-                    throw new CannotStartBabbleNodeException("Config Folder already exists and we have ABORT policy");
-
+                    throw new CannotStartBabbleNodeException("Config directory already exists and we have ABORT policy");
                 case COMPLETE_BACKUP:
                 case SINGLE_BACKUP:
                     // Rename
-                    BackupOldConfigs(compositeName);
+                    backupOldConfigs(compositeName);
                     babbleDir.mkdirs();
                     break;
-
                 case DELETE:
-                    DeleteDirectory(subConfigDir);
+                    deleteDirectory(subConfigDir);
                     break;
             }
-
-        } else{
-            // Log.i("ConfigManager", "Creating "+DB_SUBDIR);
+        } else {
             babbleDir.mkdirs();
         }
 
         babble.put("datadir", mTomlDir) ;
-        babble.put("db",  mTomlDir +File.separator+DB_SUBDIR) ;
+        babble.put("db",  mTomlDir + File.separator + DB_SUBDIR) ;
 
         babble.put("log", nodeConfig.logLevel);
-        babble.put("listen", inetAddress+":"+port);
-        babble.put("advertise", inetAddress+":"+port);
+        babble.put("listen", inetAddress + ":" + port);
+        babble.put("advertise", inetAddress + ":" + port);
         babble.put("no-service", nodeConfig.noService);
 
-        if (! nodeConfig.serviceListen.equals("")) {  // Only set if set
+        if (!nodeConfig.serviceListen.equals("")) {  // Only set if set
             babble.put("service-listen", nodeConfig.serviceListen);
         }
-        babble.put("heartbeat", nodeConfig.heartbeat+"ms");
-        babble.put("slow-heartbeat", nodeConfig.slowHeartbeat+"ms");
+        babble.put("heartbeat", nodeConfig.heartbeat + "ms");
+        babble.put("slow-heartbeat", nodeConfig.slowHeartbeat + "ms");
         babble.put("max-pool", nodeConfig.maxPool);
-        babble.put("timeout", nodeConfig.tcpTimeout+"ms");
+        babble.put("timeout", nodeConfig.tcpTimeout + "ms");
         babble.put("join_timeout", nodeConfig.joinTimeout);
         babble.put("sync-limit", nodeConfig.syncLimit);
         babble.put("fast-sync", nodeConfig.enableFastSync);
@@ -262,104 +312,157 @@ public class ConfigManager {
         babble.put("moniker", moniker);
         babble.put("loadpeers", nodeConfig.loadPeers);
 
-        map.put("Babble", babble);
-
         try {
+            TomlWriter tomlWriter = new TomlWriter();
             tomlWriter.write(babble, new File(mTomlDir, BABBLE_TOML));
         } catch (Exception e) {
             //TODO catch this
-            // Log.e(" WriteBabbleTomlFiles", e.toString());
+            // Log.e(" writePeersJsonFiles", e.toString());
         }
 
-
-        if (! this.CheckDirectory(subConfigDir)) {
-            AddConfigFolderToList(subConfigDir);
+        if (!isExistingConfigDirectory(compositeName)) {
+            addConfigDirectoryToList(compositeName);
         }
         return mTomlDir;
-
     }
 
+    /**
+     * Gets a list of the configuration directories available to this app
+     * @return An ArrayList<String> of the directory names with no path
+     */
+    public ArrayList<ConfigDirectory> getDirectories() {
+        return mDirectories;
+    }
 
+    /**
+     * Function to generate a string to render the config name unique.
+     * @return a hex string
+     */
+    public String getUniqueId() {
+        UUID uuid = UUID.randomUUID();
+      //   return uuid.toString().replaceAll("-", "");
+        return uuid.toString().replaceAll("[^A]", "A");
+    }
 
-    private void AddConfigFolderToList(String folderName ) {
-        try
-        {
-            ConfigFolder configFolder = new ConfigFolder(folderName);
-            mDirectories.add(configFolder);
+    /**
+     * Check if this configuration already exists
+     * @param subConfigDir is a subdirectory under the babble root
+     * @return returns true if it already exists
+     */
+    private boolean isExistingConfigDirectory(String subConfigDir) {
+        for (ConfigDirectory d : mDirectories) {
+            if (d.directoryName.equals(subConfigDir)) {
+                return true;
+            }
         }
-                        catch (Exception e)
-        {
+        return false;
+    }
+
+    /**
+     * The directory name is composite with the parts separated by underscores.
+     * The first part is the appId as set in BabbleService, which may or may not be the FQDN
+     * The 2nd part is a unique id as generated in getUniqueId. Currently this is 16 characters
+     * The 3rd part is a narrative description field with spaces converted to minus signs and
+     * input limit to spaces, letters and numbers only.
+     * @param networkDescription contains a human readable description for this network.
+     * @return a unique directory name
+     */
+    private String getCompositeConfigDir(String networkDescription) {
+
+        String unique = getUniqueId();
+        String trimmedUnique = unique.length() >= sUniqueIdLength
+                ? unique.substring(unique.length() - sUniqueIdLength)
+                : unique;
+        
+        String compositeDir = mAppId + "_" + trimmedUnique + "_" + ConfigDirectory.EncodeDescription(networkDescription) + "_";
+        return compositeDir;
+    }
+
+    private boolean deleteDirectory(String subConfigDir) {
+        Log.d("deleteDirectory", subConfigDir);
+
+        if ( !isExistingConfigDirectory(subConfigDir)) { // Doesn't exist
+            Log.e("deleteDirectory !Exists", subConfigDir);
+            return false;
+        }
+
+        File dir = new File(this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir);
+
+        return deleteDir(dir);
+    }
+
+    // delete directory and contents
+    private boolean deleteDir(File file) {
+        try {
+            if (file.isDirectory())
+                for (String child : file.list())
+                    deleteDir(new File(file, child));
+            file.delete();  // delete child file or empty directory
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void addConfigDirectoryToList(String directoryName ) {
+        try {
+            ConfigDirectory configDirectory = new ConfigDirectory(directoryName);
+            mDirectories.add(configDirectory);
+        } catch (Exception e) {
             // Do nothing, but swallow e
         }
     }
-
-
-    private void RenameConfigFolder(String oldSubConfigDir, int newSuffix) throws CannotStartBabbleNodeException{
+    
+    private void renameConfigDirectory(String oldSubConfigDir, int newSuffix) throws CannotStartBabbleNodeException {
         File oldFile = new File(this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir);
-        File newFile = new File(this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir+Integer.toString(newSuffix));
-
-
+        File newFile = new File(this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir + Integer.toString(newSuffix));
+        
         Log.d("Rename ", oldFile.getAbsolutePath());
         Log.d("Rename ", newFile.getAbsolutePath());
-
-
+        
         if (!(oldFile.renameTo(newFile))) {
             Log.d("Rename ","Fails");
-            throw new CannotStartBabbleNodeException("Cannot backup the old configuration folder");
+            throw new CannotStartBabbleNodeException("Cannot backup the old configuration directory");
         }
-
-
-
-
     }
 
+    private void backupOldConfigs(String compositeName) throws CannotStartBabbleNodeException {
+        
+        if (mConfigDirectoryBackupPolicy == ConfigDirectoryBackupPolicy.SINGLE_BACKUP) {
 
-    private void BackupOldConfigs(String compositeName) throws CannotStartBabbleNodeException
-    {
-        ArrayList<String> suffix = new ArrayList<String>();
-
-        String newest = "";
-        int newestInt = 0;
-
-
-        if (mConfigFolderBackupPolicy == BabbleNode.ConfigFolderBackupPolicy.SINGLE_BACKUP) {
-
-            Log.d("BackupOldConfigs SINGLE", compositeName);
-            for (ConfigFolder f : mDirectories) {
-                if ((f.IsBackup) && (f.FolderName.startsWith(compositeName))) {
-                    DeleteDirectory(f.FolderName);
+            Log.d("backupOldConfigs SINGLE", compositeName);
+            for (ConfigDirectory d : mDirectories) {
+                if ((d.isBackup) && (d.directoryName.startsWith(compositeName))) {
+                    deleteDirectory(d.directoryName);
                 }
             }
 
-            RenameConfigFolder(compositeName,1);
+            renameConfigDirectory(compositeName,1);
 
-        } else  // MULTIPLE_BACKUP
-        {
-            Log.d("BackupOldConfigs MULT", compositeName);
-            for (ConfigFolder f : mDirectories) {
-                if ((f.IsBackup) && (f.FolderName.startsWith(compositeName))) {
-                    if (newestInt < f.BackUpVersion) {
-                        newestInt = f.BackUpVersion;
-                        newest = f.FolderName;
+        } else { 
+            // MULTIPLE_BACKUP
+            int newestInt = 0;
+            Log.d("backupOldConfigs MULT", compositeName);
+            for (ConfigDirectory d : mDirectories) {
+                if ((d.isBackup) && (d.directoryName.startsWith(compositeName))) {
+                    if (newestInt < d.BackUpVersion) {
+                        newestInt = d.BackUpVersion;
                     }
                 }
             }
 
-            RenameConfigFolder(compositeName,newestInt + 1);
-
+            renameConfigDirectory(compositeName,newestInt + 1);
         }
 
-        Log.d("BackupOldConfigs POP", compositeName);
-        PopulateDirectories(new File(this.mRootDir, BABBLE_ROOTDIR));
-
+        Log.d("backupOldConfigs POP", compositeName);
+        populateDirectories(new File(this.mRootDir, BABBLE_ROOTDIR));
     }
 
+    private void populateDirectories(File babbleDir) {
+        ArrayList<String> directories = new ArrayList<>();
 
-
-    void PopulateDirectories(File babbleDir)
-    {
-        ArrayList<String> directories = new ArrayList<String>();
-        mDirectories = new ArrayList<ConfigFolder>();
+        mDirectories = new ArrayList<>();
 
         Collections.addAll(directories,
                 babbleDir.list(new FilenameFilter(){
@@ -371,10 +474,7 @@ public class ConfigManager {
 
         // Popualate mDirectories with the results
         for (String s : directories) {
-            AddConfigFolderToList(s);
+            addConfigDirectoryToList(s);
         }
     }
-
-
-
 }

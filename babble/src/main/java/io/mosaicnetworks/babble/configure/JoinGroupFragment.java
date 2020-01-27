@@ -88,7 +88,6 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         imgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
 
         return view;
-
     }
 
     // called when the user presses the join button
@@ -123,6 +122,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
     }
 
     private void getPeers(final String peerIP) {
+        /*
         try {
             mHttpGenesisPeerDiscoveryRequest = HttpPeerDiscoveryRequest.createGenesisPeersRequest(peerIP,
                     BabbleService.DEFAULT_DISCOVERY_PORT, new ResponseListener() {
@@ -148,6 +148,8 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
             return;
         }
 
+         */
+
         mLoadingDialog.show();
         mHttpGenesisPeerDiscoveryRequest.send();
     }
@@ -157,6 +159,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         //TODO: check this is safe
         BabbleService<?> babbleService = mListener.getBabbleService();
 
+        /*
         try {
             babbleService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(getContext()));
         } catch (IllegalArgumentException| CannotStartBabbleNodeException ex) {
@@ -169,8 +172,10 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
             return;
         }
 
+
+         */
         mLoadingDialog.dismiss();
-        babbleService.start();
+        babbleService.start("FIX ME"); //TODO: fix this
         mListener.onJoined(mMoniker);
     }
 

@@ -1,5 +1,9 @@
 package io.mosaicnetworks.babble.node;
 
+import android.util.Log;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -14,26 +18,78 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class NodeConfigDirTest {
+public class ConfigManagerTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
-    public void simpleCreateTest() {
+    public void simpleCreateTest() throws CannotStartBabbleNodeException {
 
         String dir = temporaryFolder.toString();
 
-        ConfigManager configManager = new ConfigManager(dir, "io.mosaicnetworks.tests", BabbleNode.ConfigFolderBackupPolicy.DELETE);
+        //dir, "io.mosaicnetworks.tests", ConfigManager.ConfigDirectoryBackupPolicy.DELETE
+        ConfigManager configManager = ConfigManager.getInstance(InstrumentationRegistry.getInstrumentation().getTargetContext());
+
+        NodeConfig nodeConfig = new NodeConfig.Builder().build();
+
+        String directory = configManager.writeBabbleTomlFiles(nodeConfig,"subConfigDir", "0.0.0.0", 0, "alice");
+
+        Log.d("MY-TAG", "Root dir: " + InstrumentationRegistry.getInstrumentation().getTargetContext().getFilesDir().toString());
+        Log.d("MY-TAG", "Directory: " + directory);
+        Log.d("MY-TAG", "UniqueID: " + configManager.getUniqueId());
 
 
+        ArrayList<ConfigDirectory> configDirectories = configManager.getDirectories();
+        Log.d("MY-TAG", "Num config directories: " + configDirectories.size());
+
+        for (ConfigDirectory cd : configDirectories) {
+            Log.d("MY-TAG", "Loop");
+            Log.d("MY-TAG", cd.description);
+            Log.d("MY-TAG", cd.directoryName);
+        }
+
+
+
+        /*
         File file = new File(dir, ConfigManager.BABBLE_ROOTDIR);
-    // Check Babble configuration Root folder exists
+
+        // Check Babble configuration Root folder exists
         assertTrue(file.exists());
-    // Verify a folder we did not create does not exist
+
+        // Verify a folder we did not create does not exist
         assertFalse(configManager.CheckDirectory("doesnotexist"));
+         */
     }
 
+    @Test
+    public void simpleCheckTest() throws CannotStartBabbleNodeException {
+
+        ConfigManager configManager = ConfigManager.getInstance(InstrumentationRegistry.getInstrumentation().getTargetContext());
+        ArrayList<ConfigDirectory> configDirectories = configManager.getDirectories();
+
+        Log.d("MY-TAG", "Num config directories: " + configDirectories.size());
+
+        for (ConfigDirectory cd : configDirectories) {
+            Log.d("MY-TAG", "Loop");
+            Log.d("MY-TAG", cd.description);
+            Log.d("MY-TAG", cd.directoryName);
+        }
+
+
+        /*
+        File file = new File(dir, ConfigManager.BABBLE_ROOTDIR);
+
+        // Check Babble configuration Root folder exists
+        assertTrue(file.exists());
+
+        // Verify a folder we did not create does not exist
+        assertFalse(configManager.CheckDirectory("doesnotexist"));
+         */
+    }
+
+
+    /*
 
     @Test
     public void writeConfigTest() throws IOException,CannotStartBabbleNodeException
@@ -61,7 +117,7 @@ public class NodeConfigDirTest {
                     .build();
 
 
-            String targetDir = configManager.WriteBabbleTomlFiles(nodeConfig, subConfigDir, "127.0.0.1",
+            String targetDir = configManager.writeBabbleTomlFiles(nodeConfig, subConfigDir, "127.0.0.1",
                     6666, "unittest");
 
             System.out.println(targetDir);
@@ -80,7 +136,7 @@ public class NodeConfigDirTest {
             File configFile = new File(targetDir, ConfigManager.BABBLE_TOML);
             assertTrue(configFile.exists());
 
-            configManager.WritePrivateKey(targetDir, "DummyPrivateKey");
+            configManager.writePrivateKey(targetDir, "DummyPrivateKey");
             configFile = new File(targetDir, ConfigManager.PRIV_KEY);
             assertTrue(configFile.exists());
 
@@ -94,7 +150,7 @@ public class NodeConfigDirTest {
             peers.add(peer);
 
 
-            configManager.WritePeersJsonFiles(targetDir,peers, peers);
+            configManager.writePeersJsonFiles(targetDir,peers, peers);
             configFile = new File(targetDir, ConfigManager.PEERS_GENESIS_JSON);
             assertTrue(configFile.exists());
             configFile = new File(targetDir, ConfigManager.PEERS_JSON);
@@ -116,7 +172,7 @@ public class NodeConfigDirTest {
 //            System.out.println(dir);
 
          ConfigManager configManager = new ConfigManager(dir, "io.mosaicnetworks.tests", BabbleNode.ConfigFolderBackupPolicy.DELETE);
-         String uuid = configManager.GetUniqueId();
+         String uuid = configManager.getUniqueId();
          assertEquals(uuid.length(), 36);
      }
      catch (Exception e)
@@ -124,4 +180,6 @@ public class NodeConfigDirTest {
 
         }
     }
+
+     */
 }

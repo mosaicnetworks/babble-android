@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class BabbleServiceTest {
 
+    /*
     private static class TestState implements BabbleState {
 
         private byte[] mLastTx;
@@ -134,4 +135,6 @@ public class BabbleServiceTest {
         assertEquals("alice", currentPeers.get(0).moniker);
 
     }
+
+     */
 }

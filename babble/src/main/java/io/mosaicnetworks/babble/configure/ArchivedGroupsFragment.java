@@ -3,23 +3,24 @@ package io.mosaicnetworks.babble.configure;
 import android.content.Context;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.servicediscovery.mdns.NsdDiscoveredService;
-import io.mosaicnetworks.babble.servicediscovery.mdns.ServicesListAdapter;
+import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.node.ConfigDirectory;
+import io.mosaicnetworks.babble.node.ConfigManager;
 
 
 /**
@@ -32,7 +33,8 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     private OnFragmentInteractionListener mListener;
     private RecyclerView mRvArchivedGroups;
     private ArchivedGroupsAdapter mArchivedGroupsAdapter;
-    private List<String> mArchivedList = new ArrayList<>();
+    private List<ConfigDirectory> mArchivedList = new ArrayList<>();
+    private ConfigManager mConfigManager;
 
     public ArchivedGroupsFragment() {
     }
@@ -50,6 +52,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mConfigManager = ConfigManager.getInstance(getContext().getApplicationContext());
     }
 
     @Override
@@ -66,11 +69,13 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     }
 
     @Override
-    public void onItemClick(String groupId) {
+    public void onItemClick(ConfigDirectory configDirectory) {
 
-        //TODO: configure service??
-
-        mListener.onArchiveLoaded("");
+        String configDir = mConfigManager.getRootDir() + File.separator + ConfigManager.BABBLE_ROOTDIR + File.separator + configDirectory.directoryName; //TODO: clean up!
+        Log.d("MY-TAG", "Config directory name: " + configDir);
+        BabbleService<?> babbleService = mListener.getBabbleService();
+        babbleService.start(configDir);
+        mListener.onArchiveLoaded(""); //TODO: fix moniker
     }
 
     @Override
@@ -93,11 +98,14 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     @Override
     public void onStart() {
         super.onStart();
-
-        //TODO: get archive list
-        mArchivedList.add("Archived 1");
-        mArchivedList.add("Archived 2");
+        mArchivedList.addAll(mConfigManager.getDirectories());
         mArchivedGroupsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mArchivedList.clear();
     }
 }
 
@@ -119,11 +127,11 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
         }
     }
 
-    private List<String> mData;
+    private List<ConfigDirectory> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    public ArchivedGroupsAdapter(Context context, List<String> data) {
+    public ArchivedGroupsAdapter(Context context, List<ConfigDirectory> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -138,7 +146,7 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String serviceName = mData.get(position);
+        String serviceName = mData.get(position).description;
 
         holder.genericTextView.setText(serviceName);
     }
@@ -154,7 +162,7 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
     }
 
     // convenience method for getting data at click position
-    public String getItem(int id) {
+    public ConfigDirectory getItem(int id) {
         return mData.get(id);
     }
 
@@ -165,7 +173,7 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
 
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
-        void onItemClick(String groupId);
+        void onItemClick(ConfigDirectory configDirectory);
     }
 
 

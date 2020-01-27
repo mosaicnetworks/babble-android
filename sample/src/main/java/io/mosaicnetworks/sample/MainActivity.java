@@ -32,7 +32,7 @@ public class MainActivity extends BaseConfigActivity {
     public void onArchiveLoaded(String moniker) {
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("MONIKER", moniker);
-        intent.putExtra("ARCHIVE_MODE", true);
+        intent.putExtra("ARCHIVE_MODE", false); //TODO: change to true!
         startActivity(intent);
     }
 }
