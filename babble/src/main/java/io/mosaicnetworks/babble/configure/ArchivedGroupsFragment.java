@@ -58,7 +58,6 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         final View view = inflater.inflate(R.layout.fragment_archived_groups, container, false);
         mRvArchivedGroups = view.findViewById(R.id.rv_archived_groups);
         mRvArchivedGroups.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -70,7 +69,6 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
     @Override
     public void onItemClick(ConfigDirectory configDirectory) {
-
         String configDir = mConfigManager.getRootDir() + File.separator + ConfigManager.BABBLE_ROOTDIR + File.separator + configDirectory.directoryName; //TODO: clean up!
         Log.d("MY-TAG", "Config directory name: " + configDir);
         BabbleService<?> babbleService = mListener.getBabbleService();
@@ -103,9 +101,10 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
         mArchivedList.clear();
+        mArchivedGroupsAdapter.notifyDataSetChanged();
     }
 }
 

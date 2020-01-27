@@ -7,6 +7,8 @@
     <string name="new_group">New</string>
     <string name="no_moniker_alert_title">No moniker</string>
     <string name="no_moniker_alert_message">Please enter a moniker!</string>
+    <string name="no_group_name_alert_title">No group name</string>
+    <string name="no_group_name_alert_message">Please enter a group name!</string>
     <string name="no_hostname_alert_title">No hostname</string>
     <string name="no_hostname_alert_message">Please enter a hostname!</string>
     <string name="invalid_hostname_alert_title">Invalid hostname</string>
@@ -27,4 +29,5 @@
     <string name="service_discovery_start_fail_message">Please refresh to try again</string>
     <string name="searching_services">Searching for services</string>
     <string name="discovery_start_failed">Failed to start mDNS\nPlease refresh to try again</string>
+    <string name="group_name">Group name</string>
 </resources>

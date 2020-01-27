@@ -68,13 +68,14 @@ public class NewGroupFragment extends Fragment {
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
-        EditText edit = (EditText) view.findViewById(R.id.edit_moniker);
+        EditText edit = view.findViewById(R.id.edit_moniker);
         edit.setText(sharedPref.getString("moniker", "Me"));
 
-        edit.requestFocus();
+        EditText editGroup = view.findViewById(R.id.edit_group_name);
+        editGroup.requestFocus();
 
         InputMethodManager imgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
+        imgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); //TODO: fix potential NPE
 
         return view;
     }
@@ -85,6 +86,7 @@ public class NewGroupFragment extends Fragment {
         BabbleService<?> babbleService = mListener.getBabbleService();
 
         ConfigManager configManager = ConfigManager.getInstance(getContext().getApplicationContext());
+
         //get moniker
         EditText editMoniker = view.findViewById(R.id.edit_moniker);
         String moniker = editMoniker.getText().toString();
@@ -93,9 +95,17 @@ public class NewGroupFragment extends Fragment {
             return;
         }
 
+        //get group name
+        EditText editGroupName = view.findViewById(R.id.edit_group_name);
+        String groupName = editGroupName.getText().toString();
+        if (groupName.isEmpty()) {
+            displayOkAlertDialog(R.string.no_group_name_alert_title, R.string.no_group_name_alert_message);
+            return;
+        }
+
         String configDirectory;
         try {
-            configDirectory = configManager.configureNew(moniker, Utils.getIPAddr(getContext()));
+            configDirectory = configManager.configureNew(groupName, moniker, Utils.getIPAddr(getContext()));
             Log.d("MY-TAG", "configDirectory: " + configDirectory);
             //babbleService.configureNew(moniker, Utils.getIPAddr(getContext()));
         } catch (IllegalArgumentException | CannotStartBabbleNodeException ex) {
