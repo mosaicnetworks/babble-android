@@ -5,7 +5,6 @@ import android.content.Context;
 import java.io.IOException;
 
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
-import io.mosaicnetworks.babble.node.NodeConfig;
 
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser;
@@ -20,8 +19,7 @@ public final class MessagingService extends BabbleService<ChatState> {
     private MdnsAdvertiser mMdnsAdvertiser;
     private Context mAppContext;
     private HttpPeerDiscoveryServer mHttpPeerDiscoveryServer;
-    public static final int DEFAULT_DISCOVERY_PORT = 8988;
-    private int mDiscoveryPort = DEFAULT_DISCOVERY_PORT;
+    private int mDiscoveryPort = 8988;
 
     /**
      * Factory for the {@link MessagingService}
@@ -36,7 +34,6 @@ public final class MessagingService extends BabbleService<ChatState> {
     }
 
     private MessagingService(Context context) {
-        //super(new ChatState(), new NodeConfig.Builder().logLevel(NodeConfig.LogLevel.TRACE).build(), context);
         super(new ChatState(), context);
 
         mAppContext = context;
@@ -44,8 +41,9 @@ public final class MessagingService extends BabbleService<ChatState> {
 
     @Override
     protected void onStarted() {
+        //TODO: collisions - add UUID?
         super.onStarted();
-        mMdnsAdvertiser = new MdnsAdvertiser("BabbleService", 8988);
+        mMdnsAdvertiser = new MdnsAdvertiser(mGroupName, mDiscoveryPort);
         mMdnsAdvertiser.advertise(mAppContext);
 
         mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(mDiscoveryPort, mBabbleNode);
@@ -64,14 +62,6 @@ public final class MessagingService extends BabbleService<ChatState> {
 
         mHttpPeerDiscoveryServer.stop();
         mHttpPeerDiscoveryServer = null;
-    }
-
-    public int getDiscoveryPort() {
-        return mDiscoveryPort;
-    }
-
-    public void setDiscoveryPort(int discoveryPort) {
-        mDiscoveryPort = discoveryPort;
     }
 }
 

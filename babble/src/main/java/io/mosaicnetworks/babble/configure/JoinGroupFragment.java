@@ -175,7 +175,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
          */
         mLoadingDialog.dismiss();
-        babbleService.start("FIX ME"); //TODO: fix this
+        babbleService.start("FIX ME", "FIX ME"); //TODO: fix this
         mListener.onJoined(mMoniker);
     }
 

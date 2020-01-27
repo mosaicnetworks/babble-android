@@ -157,7 +157,7 @@ public class JoinGroupMdnsFragment extends Fragment implements ResponseListener 
 
         try {
             String configDir = configManager.configureJoin(mGenesisPeers, currentPeers, mNsdServiceInfo.getServiceName(), mMoniker, Utils.getIPAddr(getContext()));
-            babbleService.start(configDir);
+            babbleService.start(configDir, mNsdServiceInfo.getServiceName());
         } catch (IllegalStateException | CannotStartBabbleNodeException ex) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,

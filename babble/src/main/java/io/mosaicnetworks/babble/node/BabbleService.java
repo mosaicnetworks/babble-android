@@ -38,6 +38,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
     private BabbleState mBabbleState;
     private String mConfigDir;
     private String mSubConfigDir = "config";
+    protected String mGroupName;
 
     private String mAppId; // Set by default in the construct to the App Package Name
 
@@ -88,7 +89,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * Start the service
      * @throws IllegalStateException if the service is currently running or is unconfigured
      */
-    public void start(String configDirectory) {
+    public void start(String configDirectory, String groupName) {
         /*
         TODO: sort out this logic
         if (mState==State.UNCONFIGURED || mState==State.RUNNING ||
@@ -97,7 +98,6 @@ public abstract class BabbleService<AppState extends BabbleState> {
         }
 
          */
-
 
         mBabbleNode = BabbleNode.create(new BlockConsumer() {
                                             @Override
@@ -109,7 +109,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
                                             }
                                         }, configDirectory);
         mBabbleNode.run();
-        mState=State.RUNNING;
+        mState = State.RUNNING;
+        mGroupName = groupName;
 
         onStarted();
     }
@@ -129,6 +130,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
             public void onComplete() {
                 mBabbleNode=null;
                 mState = State.UNCONFIGURED;
+                mGroupName = null;
                 mBabbleState.reset();
 
                 if (listener!=null) {
