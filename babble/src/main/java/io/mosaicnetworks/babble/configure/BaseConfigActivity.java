@@ -71,7 +71,6 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     public void onServiceSelected(NsdServiceInfo serviceInfo) {
         mJoinGroupMdnsFragment = JoinGroupMdnsFragment.newInstance(serviceInfo);
         replaceFragment(mJoinGroupMdnsFragment);
-
     }
 
     @Override
