@@ -38,7 +38,7 @@ public final class ConfigManager {
     public final static String PRIV_KEY = "priv_key";
 
     // This constant determines the length of the unique ID
-    private final static int sUniqueIdLength = 16;
+    private final static int sUniqueIdLength = 12;
 
     private static ConfigManager INSTANCE;
     private String mRootDir;
@@ -111,28 +111,46 @@ public final class ConfigManager {
 
     /**
      * Configure the service to create an archive group
-     * @param moniker node moniker
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureArchive(String moniker, String inetAddress)  throws CannotStartBabbleNodeException {
-        return configureArchive(moniker, inetAddress, DEFAULT_BABBLING_PORT);
+    public String configureArchive(ConfigDirectory configDirectory,  String inetAddress)  throws CannotStartBabbleNodeException {
+        return configureArchive(configDirectory, inetAddress, DEFAULT_BABBLING_PORT);
     }
 
     /**
      *Configure the service to create an archive group, overriding the default ports
-     * @param moniker node moniker
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @param babblingPort the port used for Babble consensus
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureArchive(String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException{
-        List<Peer> genesisPeers = new ArrayList<>();
-        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
-        List<Peer> currentPeers = new ArrayList<>();
-        currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
+    public String configureArchive(ConfigDirectory configDirectory, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException{
 
-        return configure(genesisPeers, currentPeers, "TODO-GROUP-NAME", moniker, inetAddress, babblingPort, true); //TODO: group name
+        Log.i("configureArchive", configDirectory.directoryName);
+
+        setTomlDir(configDirectory.directoryName);
+
+        Log.i("configArchive:tomlDir", mTomlDir);
+        Log.i("configArchive:IP", inetAddress);
+
+
+        Map<String, Object> configChanges = new HashMap<>();
+        configChanges.put("maintenance-mode", true);
+        configChanges.put("listen", inetAddress + ":" + Integer.toString(babblingPort));
+        configChanges.put("advertise", inetAddress + ":" + Integer.toString(babblingPort));
+
+        String    moniker = AmendTomlSettings(configChanges);
+
+        Log.i("configArchive:moniker", moniker);
+
+        return mTomlDir;
+
+//        List<Peer> genesisPeers = new ArrayList<>();
+//        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
+//        List<Peer> currentPeers = new ArrayList<>();
+//        currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
+
+//        return configure(genesisPeers, currentPeers, "TODO-GROUP-NAME", moniker, inetAddress, babblingPort, true); //TODO: group name
     }
 
     /**
@@ -168,8 +186,9 @@ public final class ConfigManager {
         NodeConfig nodeConfig = new NodeConfig.Builder().build();
 
         //TODO: is there a cleaner way of obtaining the path?
+        // It is stored in mTomlDir which has getTomlDir and setTomlDir getter and setters
         String fullPath = writeBabbleTomlFiles(nodeConfig, groupName, inetAddress, babblingPort, moniker);
-        Log.d("MY-TAG", "Full Path:" + fullPath);
+        Log.d("ConfigManager.configure", "Full Path:" + fullPath);
 
 
 
@@ -335,6 +354,9 @@ public final class ConfigManager {
 
         try {
             WriteTomlFile(babble);
+
+            Log.i("WriteTomlFile", "Wrote toml file successfully");
+
         } catch (Exception e) {
             //TODO catch this
             // Log.e(" writePeersJsonFiles", e.toString());
@@ -359,6 +381,9 @@ public final class ConfigManager {
 
         Map<String, Object> configMap = toml.toMap();
 
+
+        Log.i("ReadTomlFile", "Read toml file successfully");
+
         return configMap;
     }
 
@@ -367,9 +392,13 @@ public final class ConfigManager {
      * @configHashMap A HashMap object containing the config data to be written the Toml File.
      */
     protected void  WriteTomlFile(Map<String, Object> configHashMap) throws Exception {
+        Log.i("WriteTomlFile", mTomlDir);
+
         try {
             TomlWriter tomlWriter = new TomlWriter();
             tomlWriter.write(configHashMap, new File(mTomlDir, BABBLE_TOML));
+
+            Log.i("WriteTomlFile", "Wrote toml file");
         } catch (Exception e) {
             //TODO catch this
             Log.e("WriteTomlFile", e.toString());
@@ -390,22 +419,31 @@ public final class ConfigManager {
         Map<String, Object> configMap = ReadTomlFile();
 
         for (Map.Entry<String,Object> entry : configHashMapChanges.entrySet()) {
+
+            Log.i("AmendTomlSettings", entry.getKey() + " = " + entry.getValue().toString()) ;
+
             if (
                 ( configMap.containsKey(entry.getKey())) &&
                         (configMap.get(entry.getKey()).equals(entry.getValue()))
             ) { continue ; }    // If key exists and value matches, there is nothing to do
             hasChanged = true;
+
+            Log.i("AmendTomlSettings:SET", entry.getKey() + " = " + entry.getValue().toString());
             configMap.put(entry.getKey(), entry.getValue());
         }
 
         if (hasChanged) {
             try {
                 WriteTomlFile(configMap);
+                Log.i("AmendTomlSettings", configMap.toString());
             } catch (Exception e)
             {
                 // Do nothing. Logged in WriteTomlFile
             }
+        } else {
+            Log.i("AmendTomlSettings", "No changes, no write");
         }
+
 
         if (configMap.containsKey("moniker"))
         {
@@ -434,8 +472,8 @@ public final class ConfigManager {
      */
     public String getUniqueId() {
         UUID uuid = UUID.randomUUID();
-      //   return uuid.toString().replaceAll("-", "");
-        return uuid.toString().replaceAll("[^A]", "A");
+        return uuid.toString().replaceAll("-", "");
+      //   return uuid.toString().replaceAll("[^A]", "A");
     }
 
     /**

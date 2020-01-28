@@ -23,6 +23,7 @@ import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
+import io.mosaicnetworks.babble.utils.Utils;
 
 
 /**
@@ -71,19 +72,25 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
     @Override
     public void onItemClick(ConfigDirectory configDirectory) {
-        mConfigManager.setTomlDir(configDirectory.directoryName);
-        String configDir = mConfigManager.getTomlDir();
 
-        Map<String, Object> configChanges = new HashMap<>();
 
-        configChanges.put("maintenance-mode", true);
+        Log.i("onItemClick", configDirectory.directoryName);
 
-        String moniker = mConfigManager.AmendTomlSettings(configChanges);
 
-        Log.d("MY-TAG", "Config directory name: " + configDir);
-        BabbleService<?> babbleService = mListener.getBabbleService();
-        babbleService.start(configDir, configDir); //TODO: need to NOT advertise mDNS
-        mListener.onArchiveLoaded(moniker);
+        try {
+            mConfigManager.configureArchive(configDirectory, Utils.getIPAddr(getContext()), ConfigManager.DEFAULT_BABBLING_PORT);
+
+        } catch (Exception e)
+        {
+            return; //TODO add some error handling here
+        }
+
+            String configDir = mConfigManager.getTomlDir();
+
+            Log.d("MY-TAG", "Config directory name: " + configDir);
+            BabbleService<?> babbleService = mListener.getBabbleService();
+            babbleService.start(configDir, configDir); //TODO: need to NOT advertise mDNS
+            mListener.onArchiveLoaded(""); //TODO pull this in
     }
 
     @Override

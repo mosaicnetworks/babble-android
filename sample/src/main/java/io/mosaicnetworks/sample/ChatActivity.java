@@ -3,6 +3,7 @@ package io.mosaicnetworks.sample;
 import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -32,12 +33,21 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        Log.i("ChatActivity", "onCreate");
+
         Intent intent = getIntent();
         mMoniker = intent.getStringExtra("MONIKER");
         mArchiveMode = intent.getBooleanExtra("ARCHIVE_MODE", false);
 
         initialiseAdapter();
         mMessagingService.registerObserver(this);
+
+        Log.i("ChatActivity", "registerObserver");
+
+        //TODO think about this horrible hack.
+        if (mArchiveMode) {
+            stateUpdated();
+        }
 
         if (!mMessagingService.isAdvertising()) {
             Toast.makeText(this, "Unable to advertise peers", Toast.LENGTH_LONG).show();
@@ -71,6 +81,8 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
      */
     @Override
     public void stateUpdated() {
+
+        Log.i("ChatActivity", "stateUpdated");
 
         final List<Message> newMessages = mMessagingService.state.getMessagesFromIndex(mMessageIndex);
 
