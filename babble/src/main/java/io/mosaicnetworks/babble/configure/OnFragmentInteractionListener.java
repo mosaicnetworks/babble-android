@@ -5,8 +5,7 @@ import android.net.nsd.NsdServiceInfo;
 import io.mosaicnetworks.babble.node.BabbleService;
 
 /**
- * This interface defines listeners for the {@link JoinGroupFragment} and {@link NewGroupFragment}
- * fragments
+ * This interface defines listeners for the join group and new group fragments
  */
 public interface OnFragmentInteractionListener {
 

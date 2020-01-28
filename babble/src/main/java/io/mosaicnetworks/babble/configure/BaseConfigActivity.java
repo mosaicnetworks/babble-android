@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.View;
 
 import io.mosaicnetworks.babble.R;
@@ -20,9 +21,9 @@ import io.mosaicnetworks.babble.node.BabbleService;
 public abstract class BaseConfigActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 
     private FragmentManager mFragmentManager;
-    private HomeTabsFragment mHomeFragment;
+    private TabsFragment mHomeFragment;
     private NewGroupFragment mNewGroupFragment;
-    private JoinGroupMdnsFragment mJoinGroupMdnsFragment;
+    private JoinGroupFragment mJoinGroupMdnsFragment;
     public static final String PREFERENCE_FILE_KEY = "babbleandroid";
 
     @Override
@@ -31,7 +32,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         setContentView(R.layout.activity_base_config);
 
         mFragmentManager = getSupportFragmentManager();
-        mHomeFragment = HomeTabsFragment.newInstance();
+        mHomeFragment = TabsFragment.newInstance();
 
         addFragment(mHomeFragment);
     }
@@ -55,21 +56,15 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         fragmentTransaction.commit();
     }
 
-    // called when the user presses the new button
+    // called when the user presses the new group (plus) button
     public void newGroup(View view) {
         mNewGroupFragment = NewGroupFragment.newInstance();
         replaceFragment(mNewGroupFragment);
     }
 
-    // called when the user presses the join button
-    public void joinGroup(View view) {
-        //mJoinGroupMdnsFragment = JoinGroupMdnsFragment.newInstance();
-        //replaceFragment(mJoinGroupMdnsFragment);
-    }
-
     @Override
     public void onServiceSelected(NsdServiceInfo serviceInfo) {
-        mJoinGroupMdnsFragment = JoinGroupMdnsFragment.newInstance(serviceInfo);
+        mJoinGroupMdnsFragment = JoinGroupFragment.newInstance(serviceInfo);
         replaceFragment(mJoinGroupMdnsFragment);
     }
 

@@ -30,4 +30,6 @@
     <string name="searching_services">Searching for services</string>
     <string name="discovery_start_failed">Failed to start mDNS\nPlease refresh to try again</string>
     <string name="group_name">Group name</string>
+    <string name="live_tab">LIVE</string>
+    <string name="archived_tab">ARCHIVED</string>
 </resources>
