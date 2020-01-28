@@ -72,9 +72,9 @@ public class TabsFragment extends Fragment {
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
 
                 switch (position) {
-                    case 0: tab.setText("LIVE");
+                    case 0: tab.setText(R.string.live_tab);
                         break;
-                    case 1: tab.setText("ARCHIVED");
+                    case 1: tab.setText(R.string.archived_tab);
                 }
 
             }}).attach();
