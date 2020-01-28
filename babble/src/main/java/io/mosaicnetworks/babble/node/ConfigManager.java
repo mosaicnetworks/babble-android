@@ -5,6 +5,9 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.moandjiezana.toml.TomlWriter;
+import com.moandjiezana.toml.Toml;
+
+
 
 import java.io.File;
 import java.io.FileWriter;
@@ -168,6 +171,9 @@ public final class ConfigManager {
         String fullPath = writeBabbleTomlFiles(nodeConfig, groupName, inetAddress, babblingPort, moniker);
         Log.d("MY-TAG", "Full Path:" + fullPath);
 
+
+
+
         writePeersJsonFiles(fullPath, genesisPeers, currentPeers);
 
         // private key -- does not overwrite
@@ -247,6 +253,26 @@ public final class ConfigManager {
         }
     }
 
+
+    /**
+     * Getter to get  the tomlDir to the full path to the folder containing the babble toml
+     * @return the full file path
+     */
+    public String getTomlDir() {
+        return mTomlDir;
+    }
+
+    /**
+     * Setter to set the tomlDir to the full path to the folder containing the babble toml
+      * @param compositeName the directory name for the config folder. NB this must be the composite version, not the human readable one.
+     */
+    public void setTomlDir(String compositeName) {
+        mTomlDir = this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + compositeName;
+        this.mTomlDir = mTomlDir;
+    }
+
+
+
     /**
      * Write Babble Config to disk ready for Babble to use
      * @param nodeConfig is the babble configuration object
@@ -259,8 +285,8 @@ public final class ConfigManager {
         Map<String, Object> babble = new HashMap<>();
 
         String compositeName = getCompositeConfigDir(subConfigDir);
+        setTomlDir(compositeName);
 
-        mTomlDir = this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + compositeName;
         File babbleDir = new File(mTomlDir, DB_SUBDIR);
         if (babbleDir.exists()){
             // We have a clash.
@@ -308,8 +334,7 @@ public final class ConfigManager {
         babble.put("loadpeers", nodeConfig.loadPeers);
 
         try {
-            TomlWriter tomlWriter = new TomlWriter();
-            tomlWriter.write(babble, new File(mTomlDir, BABBLE_TOML));
+            WriteTomlFile(babble);
         } catch (Exception e) {
             //TODO catch this
             // Log.e(" writePeersJsonFiles", e.toString());
@@ -320,6 +345,80 @@ public final class ConfigManager {
         }
         return mTomlDir;
     }
+
+
+    /**
+     * Loads the Babble Config TOML file. This function relies on mTomlDir being set.
+     * @return A HashMap object containing the data from the Toml File.
+     */
+
+    protected Map<String, Object> ReadTomlFile(){
+        File tomlFile =  new File(mTomlDir, BABBLE_TOML);
+
+        Toml toml = new Toml().read(tomlFile);
+
+        Map<String, Object> configMap = toml.toMap();
+
+        return configMap;
+    }
+
+    /**
+     * Writes the Babble Config TOML file. This function relies on mTomlDir being set.
+     * @configHashMap A HashMap object containing the config data to be written the Toml File.
+     */
+    protected void  WriteTomlFile(Map<String, Object> configHashMap) throws Exception {
+        try {
+            TomlWriter tomlWriter = new TomlWriter();
+            tomlWriter.write(configHashMap, new File(mTomlDir, BABBLE_TOML));
+        } catch (Exception e) {
+            //TODO catch this
+            Log.e("WriteTomlFile", e.toString());
+            throw e;
+        }
+
+    }
+
+
+    /**
+     * Amends the Babble Config TOML file. This function relies on mTomlDir being set.
+     * @configHashMapChanges A HashMap object containing the changed config data to be written the Toml File.
+     * @return the moniker from this config file
+     */
+    public String AmendTomlSettings(Map<String, Object> configHashMapChanges) {
+        boolean hasChanged = false;
+
+        Map<String, Object> configMap = ReadTomlFile();
+
+        for (Map.Entry<String,Object> entry : configHashMapChanges.entrySet()) {
+            if (
+                ( configMap.containsKey(entry.getKey())) &&
+                        (configMap.get(entry.getKey()).equals(entry.getValue()))
+            ) { continue ; }    // If key exists and value matches, there is nothing to do
+            hasChanged = true;
+            configMap.put(entry.getKey(), entry.getValue());
+        }
+
+        if (hasChanged) {
+            try {
+                WriteTomlFile(configMap);
+            } catch (Exception e)
+            {
+                // Do nothing. Logged in WriteTomlFile
+            }
+        }
+
+        if (configMap.containsKey("moniker"))
+        {
+            return configMap.get("moniker").toString();
+        }
+
+
+        return "";
+    }
+
+
+
+
 
     /**
      * Gets a list of the configuration directories available to this app

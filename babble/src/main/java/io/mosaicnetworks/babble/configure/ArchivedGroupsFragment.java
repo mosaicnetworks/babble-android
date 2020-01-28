@@ -15,7 +15,9 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
@@ -69,11 +71,19 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
     @Override
     public void onItemClick(ConfigDirectory configDirectory) {
-        String configDir = mConfigManager.getRootDir() + File.separator + ConfigManager.BABBLE_ROOTDIR + File.separator + configDirectory.directoryName; //TODO: clean up!
+        mConfigManager.setTomlDir(configDirectory.directoryName);
+        String configDir = mConfigManager.getTomlDir();
+
+        Map<String, Object> configChanges = new HashMap<>();
+
+        configChanges.put("maintenance-mode", true);
+
+        String moniker = mConfigManager.AmendTomlSettings(configChanges);
+
         Log.d("MY-TAG", "Config directory name: " + configDir);
         BabbleService<?> babbleService = mListener.getBabbleService();
         babbleService.start(configDir, configDir); //TODO: need to NOT advertise mDNS
-        mListener.onArchiveLoaded(""); //TODO: fix moniker
+        mListener.onArchiveLoaded(moniker);
     }
 
     @Override
