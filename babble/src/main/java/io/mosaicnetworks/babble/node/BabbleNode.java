@@ -1,5 +1,7 @@
 package io.mosaicnetworks.babble.node;
 
+import android.util.Log;
+
 import com.google.gson.JsonSyntaxException;
 
 import java.nio.charset.Charset;
@@ -19,6 +21,7 @@ public final class BabbleNode implements PeersProvider {
 
     public static BabbleNode create(final BlockConsumer blockConsumer, String configDir) {
 
+        Log.i("BabbleNode.create", configDir);
         Node node = Mobile.new_(
                 new mobile.CommitHandler() {
                     @Override

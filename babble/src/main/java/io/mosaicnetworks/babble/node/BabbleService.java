@@ -47,13 +47,14 @@ public abstract class BabbleService<AppState extends BabbleState> {
      */
     public void start(String configDirectory, String groupName) {
         if (mState==State.RUNNING) {
+            Log.e("BabbleService.start", "Service is already running");
             throw new IllegalStateException("Service is already running");
         }
 
         mBabbleNode = BabbleNode.create(new BlockConsumer() {
                                             @Override
                                             public Block onReceiveBlock(Block block) {
-                                                Log.d("MY-TAG", "Process block");
+                                                Log.i("ProcessBlock", "Process block");
                                                 Block processedBlock = state.processBlock(block);
                                                 notifyObservers();
                                                 return processedBlock;

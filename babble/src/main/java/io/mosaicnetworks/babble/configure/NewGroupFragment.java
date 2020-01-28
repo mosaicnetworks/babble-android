@@ -83,6 +83,8 @@ public class NewGroupFragment extends Fragment {
     // called when the user presses the start button
     public void startGroup(View view) {
         //TODO: check this is safe
+
+        Log.i("startGroup", "Staring Group ");
         BabbleService<?> babbleService = mListener.getBabbleService();
 
         ConfigManager configManager = ConfigManager.getInstance(getContext().getApplicationContext());
@@ -103,10 +105,14 @@ public class NewGroupFragment extends Fragment {
             return;
         }
 
+
+
+        Log.i("startGroup", "Staring Group " + groupName);
+
         String configDirectory;
         try {
             configDirectory = configManager.configureNew(groupName, moniker, Utils.getIPAddr(getContext()));
-            Log.d("MY-TAG", "configDirectory: " + configDirectory);
+            Log.i("startGroup", "configDirectory: " + configDirectory);
             //babbleService.configureNew(moniker, Utils.getIPAddr(getContext()));
         } catch (IllegalArgumentException | CannotStartBabbleNodeException ex) {
             //TODO: just catch IOException - this will mean the port is in use
@@ -116,6 +122,9 @@ public class NewGroupFragment extends Fragment {
             displayOkAlertDialog(R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             return;
         }
+
+        Log.i("startGroup", "configDirectory: " + configDirectory);
+
 
         // Store moniker entered
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
