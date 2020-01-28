@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -17,12 +16,12 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import io.mosaicnetworks.babble.R;
 
-public class HomeTabsFragment extends Fragment {
+public class TabsFragment extends Fragment {
 
     GroupCollectionAdapter groupCollectionAdapter;
     ViewPager2 viewPager;
 
-    public HomeTabsFragment() {
+    public TabsFragment() {
     }
 
     /**
@@ -31,8 +30,8 @@ public class HomeTabsFragment extends Fragment {
      *
      * @return A new instance of fragment HomeFragment.
      */
-    public static HomeTabsFragment newInstance() {
-        HomeTabsFragment fragment = new HomeTabsFragment();
+    public static TabsFragment newInstance() {
+        TabsFragment fragment = new TabsFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -47,7 +46,7 @@ public class HomeTabsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        return inflater.inflate(R.layout.fragment_home_tabs, container, false);
+        return inflater.inflate(R.layout.fragment_tabs, container, false);
     }
 
     @Override
@@ -91,12 +90,11 @@ public class HomeTabsFragment extends Fragment {
         public Fragment createFragment(int position) {
 
             switch (position) {
-                case 0: return new HomeMdnsFragment();
-                case 1: return new ArchivedGroupsFragment();
+                case 0: return MdnsDiscoveryFragment.newInstance();
+                case 1: return ArchivedGroupsFragment.newInstance();
             }
 
             return null;
-
         }
 
         @Override

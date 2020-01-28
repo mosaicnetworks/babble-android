@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
@@ -22,6 +23,7 @@ import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
+import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.utils.Utils;
 
 
@@ -39,8 +41,10 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
     private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
+    private NsdServiceInfo mNsdServiceInfo;
 
-    public JoinGroupFragment() {
+    public JoinGroupFragment(NsdServiceInfo nsdServiceInfo) {
+        mNsdServiceInfo = nsdServiceInfo;
         // Required empty public constructor
     }
 
@@ -50,8 +54,8 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
      *
      * @return A new instance of fragment JoinGroupFragment.
      */
-    public static JoinGroupFragment newInstance() {
-        return new JoinGroupFragment();
+    public static JoinGroupFragment newInstance(NsdServiceInfo nsdServiceInfo) {
+        return new JoinGroupFragment(nsdServiceInfo);
     }
 
     @Override
@@ -77,9 +81,6 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
-        EditText edithost = (EditText) view.findViewById(R.id.edit_host);
-        edithost.setText(sharedPref.getString("host", "192.168.1.21"));
-
         EditText edit = (EditText) view.findViewById(R.id.edit_moniker);
         edit.setText(sharedPref.getString("moniker", "Me"));
         edit.requestFocus();
@@ -88,6 +89,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         imgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
 
         return view;
+
     }
 
     // called when the user presses the join button
@@ -101,12 +103,8 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         }
 
         //get peer IP address
-        EditText editIP = view.findViewById(R.id.edit_host);
-        final String peerIP = editIP.getText().toString();
-        if (peerIP.isEmpty()) {
-            displayOkAlertDialog(R.string.no_hostname_alert_title, R.string.no_hostname_alert_message);
-            return;
-        }
+        final String peerIP = mNsdServiceInfo.getHost().getHostAddress();
+        final int peerPort = mNsdServiceInfo.getPort();
 
         // Store moniker and host entered
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
@@ -118,21 +116,20 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         editor.commit();
 
 
-        getPeers(peerIP);
+        getPeers(peerIP, peerPort);
     }
 
-    private void getPeers(final String peerIP) {
-        /*
+    private void getPeers(final String peerIP, final int peerPort) {
         try {
             mHttpGenesisPeerDiscoveryRequest = HttpPeerDiscoveryRequest.createGenesisPeersRequest(peerIP,
-                    BabbleService.DEFAULT_DISCOVERY_PORT, new ResponseListener() {
+                    peerPort, new ResponseListener() {
                         @Override
                         public void onReceivePeers(List<Peer> genesisPeers) {
                             mGenesisPeers = genesisPeers;
 
                             mHttpCurrentPeerDiscoveryRequest =
                                     HttpPeerDiscoveryRequest.createCurrentPeersRequest(
-                                            peerIP, BabbleService.DEFAULT_DISCOVERY_PORT,
+                                            peerIP, peerPort,
                                             JoinGroupFragment.this, getContext());
 
                             mHttpCurrentPeerDiscoveryRequest.send();
@@ -148,21 +145,19 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
             return;
         }
 
-         */
-
         mLoadingDialog.show();
         mHttpGenesisPeerDiscoveryRequest.send();
     }
 
     @Override
     public void onReceivePeers(List<Peer> currentPeers) {
-        //TODO: check this is safe
+        ConfigManager configManager = ConfigManager.getInstance(getContext().getApplicationContext());
         BabbleService<?> babbleService = mListener.getBabbleService();
 
-        /*
         try {
-            babbleService.configureJoin(mGenesisPeers, currentPeers, mMoniker, Utils.getIPAddr(getContext()));
-        } catch (IllegalArgumentException| CannotStartBabbleNodeException ex) {
+            String configDir = configManager.configureJoin(mGenesisPeers, currentPeers, mNsdServiceInfo.getServiceName(), mMoniker, Utils.getIPAddr(getContext()));
+            babbleService.start(configDir, mNsdServiceInfo.getServiceName());
+        } catch (IllegalStateException | CannotStartBabbleNodeException ex) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port - in which case
@@ -172,10 +167,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
             return;
         }
 
-
-         */
         mLoadingDialog.dismiss();
-        babbleService.start("FIX ME", "FIX ME"); //TODO: fix this
         mListener.onJoined(mMoniker);
     }
 
@@ -252,9 +244,8 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
     @Override
     public void onPause() {
-        //TODO: is this the right place to cancel the requests?
-        cancelRequets();
         super.onPause();
+        cancelRequets();
     }
 
 }
