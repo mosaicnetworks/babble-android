@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,10 +80,16 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
         try {
             mConfigManager.configureArchive(configDirectory, Utils.getIPAddr(getContext()), ConfigManager.DEFAULT_BABBLING_PORT);
 
+        } catch (IOException e)
+        {
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot load configuration: "+  e.getMessage() );
+            return;
         } catch (Exception e)
         {
-            return; //TODO: add some error handling here
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot load configuration: "+ e.getClass().getCanonicalName()+": "+ e.getMessage() );
+            throw e;
         }
+
 
 
         try {

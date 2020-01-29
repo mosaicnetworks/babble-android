@@ -12,6 +12,7 @@ import com.moandjiezana.toml.Toml;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -93,7 +94,7 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureNew(String groupName, String moniker, String inetAddress)  throws CannotStartBabbleNodeException {
+    public String configureNew(String groupName, String moniker, String inetAddress)  throws CannotStartBabbleNodeException, IOException {
         return configureNew(groupName, moniker, inetAddress, DEFAULT_BABBLING_PORT);
     }
 
@@ -105,7 +106,7 @@ public final class ConfigManager {
      * //@param discoveryPort the port used by the HttpPeerDiscoveryServer //TODO: how to deal with this
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureNew(String groupName, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException{
+    public String configureNew(String groupName, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
         List<Peer> genesisPeers = new ArrayList<>();
         genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
         List<Peer> currentPeers = new ArrayList<>();
@@ -119,7 +120,7 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureArchive(ConfigDirectory configDirectory,  String inetAddress)  throws CannotStartBabbleNodeException {
+    public String configureArchive(ConfigDirectory configDirectory,  String inetAddress)  throws  IOException {
         return configureArchive(configDirectory, inetAddress, DEFAULT_BABBLING_PORT);
     }
 
@@ -129,7 +130,7 @@ public final class ConfigManager {
      * @param babblingPort the port used for Babble consensus
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureArchive(ConfigDirectory configDirectory, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException{
+    public String configureArchive(ConfigDirectory configDirectory, String inetAddress, int babblingPort) throws  IOException{
 
         Log.i("configureArchive", configDirectory.directoryName);
 
@@ -165,7 +166,7 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress) throws CannotStartBabbleNodeException {
+    public String configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress) throws CannotStartBabbleNodeException, IOException {
         return configure(genesisPeers, currentPeers, groupName, moniker, inetAddress, DEFAULT_BABBLING_PORT, false);
     }
 
@@ -179,13 +180,13 @@ public final class ConfigManager {
      * //@param discoveryPort the port used by the {HttpPeerDiscoveryServer} //TODO: deal with discovery
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException{
+    public String configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
         return configure(genesisPeers, currentPeers, groupName, moniker, inetAddress, babblingPort, false); //TODO: group name
     }
 
     private String configure(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName,
                              String moniker, String inetAddress, int babblingPort,
-                             boolean isArchive) throws CannotStartBabbleNodeException {
+                             boolean isArchive) throws CannotStartBabbleNodeException, IOException {
 
         NodeConfig nodeConfig = new NodeConfig.Builder().build();
         mMoniker = moniker;
@@ -302,7 +303,7 @@ public final class ConfigManager {
      * @param subConfigDir is the sub-directory of the babble sub-directory of the local storage as passed to the constructor
      * @return the composite path where the babble.toml file was written
      */
-    public String writeBabbleTomlFiles(NodeConfig nodeConfig, String subConfigDir, String inetAddress, int port, String moniker) throws CannotStartBabbleNodeException{
+    public String writeBabbleTomlFiles(NodeConfig nodeConfig, String subConfigDir, String inetAddress, int port, String moniker) throws CannotStartBabbleNodeException, IOException {
 
         //TODO: add inetAddress, port and moniker to nodeConfig??
         Map<String, Object> babble = new HashMap<>();
@@ -356,15 +357,10 @@ public final class ConfigManager {
         babble.put("moniker", moniker);
         babble.put("loadpeers", nodeConfig.loadPeers);
 
-        try {
-            WriteTomlFile(babble);
+        WriteTomlFile(babble);
 
-            Log.i("WriteTomlFile", "Wrote toml file successfully");
+        Log.i("WriteTomlFile", "Wrote toml file successfully");
 
-        } catch (Exception e) {
-            //TODO catch this
-            // Log.e(" writePeersJsonFiles", e.toString());
-        }
 
         if (!isExistingConfigDirectory(compositeName)) {
             addConfigDirectoryToList(compositeName);
@@ -395,7 +391,7 @@ public final class ConfigManager {
      * Writes the Babble Config TOML file. This function relies on mTomlDir being set.
      * @configHashMap A HashMap object containing the config data to be written the Toml File.
      */
-    protected void  WriteTomlFile(Map<String, Object> configHashMap) throws Exception {
+    protected void  WriteTomlFile(Map<String, Object> configHashMap) throws IOException {
         Log.i("WriteTomlFile", mTomlDir);
 
         try {
@@ -403,8 +399,8 @@ public final class ConfigManager {
             tomlWriter.write(configHashMap, new File(mTomlDir, BABBLE_TOML));
 
             Log.i("WriteTomlFile", "Wrote toml file");
-        } catch (Exception e) {
-            //TODO catch this
+        } catch (IOException e) {
+            // Log and rethrow
             Log.e("WriteTomlFile", e.toString());
             throw e;
         }
@@ -416,7 +412,7 @@ public final class ConfigManager {
      * Amends the Babble Config TOML file. This function relies on mTomlDir being set.
      * @configHashMapChanges A HashMap object containing the changed config data to be written the Toml File.
      */
-    public void AmendTomlSettings(Map<String, Object> configHashMapChanges) {
+    public void AmendTomlSettings(Map<String, Object> configHashMapChanges) throws IOException  {
         boolean hasChanged = false;
 
         Map<String, Object> configMap = ReadTomlFile();
@@ -439,9 +435,11 @@ public final class ConfigManager {
             try {
                 WriteTomlFile(configMap);
                 Log.i("AmendTomlSettings", configMap.toString());
-            } catch (Exception e)
+
+             } catch (IOException e)
             {
-                // Do nothing. Logged in WriteTomlFile
+                // Rethrow
+                throw e;
             }
         } else {
             Log.i("AmendTomlSettings", "No changes, no write");
