@@ -113,7 +113,22 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     @Override
     public void onStart() {
         super.onStart();
-        mArchivedList.addAll(mConfigManager.getDirectories());
+
+
+        ArrayList<ConfigDirectory> configFolders = mConfigManager.getDirectories();
+
+        for (ConfigDirectory temp : configFolders) {
+            if (! temp.isBackup) {
+                mArchivedList.add(temp);
+            }
+        }
+        
+
+  //      mArchivedList.addAll(mConfigManager.getDirectories());
+
+
+
+
         mArchivedGroupsAdapter.notifyDataSetChanged();
     }
 
