@@ -13,7 +13,7 @@ apply plugin: 'com.jfrog.bintray'
 // def repository = "https://github.com/mosaicnetworks/babble/releases/download"
 // def protocol = "https"
 
- def babbleCoreVersion = "4afeb9f3b20e92835f2049c1365c6342c1a89994"
+ def babbleCoreVersion = "a3160dc72421ce9f7c71c9bc72d9f2092d953054"
  def repository = System.properties['user.home'] + "/go/src/github.com/mosaicnetworks/babble/build/distmobile"
  def protocol = "file"
 
