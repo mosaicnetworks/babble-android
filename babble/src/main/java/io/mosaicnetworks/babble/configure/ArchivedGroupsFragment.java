@@ -99,7 +99,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
             //TODO: Some sensible error handling here.
             //Errors on starting the babble service were untrapped and killing the app
             displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
-
+            throw ex;
   //          Toast.makeText(getContext(), "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage(), Toast.LENGTH_LONG).show();
         }
 

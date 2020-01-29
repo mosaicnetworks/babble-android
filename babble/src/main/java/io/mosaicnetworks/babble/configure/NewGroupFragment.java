@@ -141,7 +141,7 @@ public class NewGroupFragment extends Fragment {
         } catch (Exception ex) {
             //TODO: Review this. The duplicate dialog function feels overkill.
             displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
-            return;
+            throw ex;
         }
 
 
