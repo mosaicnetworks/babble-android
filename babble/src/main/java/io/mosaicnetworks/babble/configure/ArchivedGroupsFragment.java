@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -82,15 +83,25 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
         } catch (Exception e)
         {
-            return; //TODO add some error handling here
+            return; //TODO: add some error handling here
         }
 
-            String configDir = mConfigManager.getTomlDir();
 
+        try {
+
+            String configDir = mConfigManager.getTomlDir();
             Log.d("MY-TAG", "Config directory name: " + configDir);
             BabbleService<?> babbleService = mListener.getBabbleService();
             babbleService.start(configDir, configDir); //TODO: need to NOT advertise mDNS
             mListener.onArchiveLoaded(""); //TODO pull this in
+        } catch (Exception e) {
+            //TODO: Some sensible error handling here.
+            //Errors on starting the babble service were untrapped and killing the app
+
+            Toast.makeText(getContext(), "Cannot start babble: "+ e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+
     }
 
     @Override
@@ -115,15 +126,16 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
         super.onStart();
 
 
+     // This code trims all backups from the folder list
         ArrayList<ConfigDirectory> configFolders = mConfigManager.getDirectories();
-
         for (ConfigDirectory temp : configFolders) {
             if (! temp.isBackup) {
                 mArchivedList.add(temp);
             }
         }
-        
 
+
+     // If you want all backups - with multiple versions of a single archive, the block above can be replaced by the line below.
   //      mArchivedList.addAll(mConfigManager.getDirectories());
 
 
