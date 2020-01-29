@@ -3,6 +3,8 @@ package io.mosaicnetworks.babble.configure;
 import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,13 +14,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
@@ -94,11 +92,12 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
             BabbleService<?> babbleService = mListener.getBabbleService();
             babbleService.start(configDir, configDir); //TODO: need to NOT advertise mDNS
             mListener.onArchiveLoaded(""); //TODO pull this in
-        } catch (Exception e) {
+        } catch (Exception ex) {
             //TODO: Some sensible error handling here.
             //Errors on starting the babble service were untrapped and killing the app
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
 
-            Toast.makeText(getContext(), "Cannot start babble: "+ e.getClass().getCanonicalName()+": "+ e.getMessage(), Toast.LENGTH_LONG).show();
+  //          Toast.makeText(getContext(), "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage(), Toast.LENGTH_LONG).show();
         }
 
 
@@ -150,6 +149,35 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
         mArchivedList.clear();
         mArchivedGroupsAdapter.notifyDataSetChanged();
     }
+
+
+    //TODO: Review if we need these functions in Archive, Join and New fragments.
+    private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
+        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+                .setTitle(titleId)
+                .setMessage(messageId)
+                .setNeutralButton(R.string.ok_button, null)
+                .create();
+        alertDialog.show();
+    }
+
+
+
+    private void displayOkAlertDialogText(@StringRes int titleId, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+                .setTitle(titleId)
+                .setMessage(message)
+                .setNeutralButton(R.string.ok_button, null)
+                .create();
+        alertDialog.show();
+    }
+
+
+
+
+
+
+
 }
 
 class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.ViewHolder> {
@@ -218,6 +246,10 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
     public interface ItemClickListener {
         void onItemClick(ConfigDirectory configDirectory);
     }
+
+
+
+
 
 
 }

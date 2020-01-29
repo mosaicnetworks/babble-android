@@ -157,13 +157,18 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         try {
             String configDir = configManager.configureJoin(mGenesisPeers, currentPeers, mNsdServiceInfo.getServiceName(), mMoniker, Utils.getIPAddr(getContext()));
             babbleService.start(configDir, mNsdServiceInfo.getServiceName());
-        } catch (IllegalStateException | CannotStartBabbleNodeException ex) {
+        } catch (IllegalStateException | CannotStartBabbleNodeException ex ) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port - in which case
             //we'll keep getting stuck here until the port is available!
             mLoadingDialog.dismiss();
             displayOkAlertDialog(R.string.babble_init_fail_title, R.string.babble_init_fail_message);
+            return;
+        } catch (Exception ex) {
+            //TODO: Review this. The duplicate dialog function feels overkill.
+            mLoadingDialog.dismiss();
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
             return;
         }
 
@@ -214,6 +219,19 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
                 .create();
         alertDialog.show();
     }
+
+
+
+    private void displayOkAlertDialogText(@StringRes int titleId, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+                .setTitle(titleId)
+                .setMessage(message)
+                .setNeutralButton(R.string.ok_button, null)
+                .create();
+        alertDialog.show();
+    }
+
+
 
     private void cancelRequets() {
         if (mHttpCurrentPeerDiscoveryRequest!=null) {

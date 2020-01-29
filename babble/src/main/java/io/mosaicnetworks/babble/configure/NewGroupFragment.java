@@ -134,10 +134,33 @@ public class NewGroupFragment extends Fragment {
         editor.putString("moniker", moniker);
         editor.commit();
 
-        babbleService.start(configDirectory, groupName);
-        mListener.onStartedNew(moniker);
+
+        try {
+            babbleService.start(configDirectory, groupName);
+            mListener.onStartedNew(moniker);
+        } catch (Exception ex) {
+            //TODO: Review this. The duplicate dialog function feels overkill.
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
+            return;
+        }
+
 
     }
+
+
+
+    //TODO: Review if we need both.
+    private void displayOkAlertDialogText(@StringRes int titleId, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+                .setTitle(titleId)
+                .setMessage(message)
+                .setNeutralButton(R.string.ok_button, null)
+                .create();
+        alertDialog.show();
+    }
+
+
+
 
     private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
         AlertDialog alertDialog = new AlertDialog.Builder(getContext())
