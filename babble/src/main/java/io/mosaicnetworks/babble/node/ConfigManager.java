@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.UUID;
 
 import io.mosaicnetworks.babble.discovery.Peer;
@@ -43,6 +42,12 @@ public final class ConfigManager {
     private static ConfigManager INSTANCE;
     private String mRootDir;
     private String mTomlDir = "";
+
+    public String getMoniker() {
+        return mMoniker;
+    }
+
+    private String mMoniker = "";
     private final String mAppId;
     private ConfigDirectoryBackupPolicy mConfigDirectoryBackupPolicy = ConfigDirectoryBackupPolicy.SINGLE_BACKUP; //TODO: requires getter and setter
     private ArrayList<ConfigDirectory> mDirectories = new ArrayList<>();
@@ -139,9 +144,8 @@ public final class ConfigManager {
         configChanges.put("listen", inetAddress + ":" + Integer.toString(babblingPort));
         configChanges.put("advertise", inetAddress + ":" + Integer.toString(babblingPort));
 
-        String    moniker = AmendTomlSettings(configChanges);
+        AmendTomlSettings(configChanges);
 
-        Log.i("configArchive:moniker", moniker);
 
         return mTomlDir;
 
@@ -184,7 +188,7 @@ public final class ConfigManager {
                              boolean isArchive) throws CannotStartBabbleNodeException {
 
         NodeConfig nodeConfig = new NodeConfig.Builder().build();
-
+        mMoniker = moniker;
         //TODO: is there a cleaner way of obtaining the path?
         // It is stored in mTomlDir which has getTomlDir and setTomlDir getter and setters
         String fullPath = writeBabbleTomlFiles(nodeConfig, groupName, inetAddress, babblingPort, moniker);
@@ -411,9 +415,8 @@ public final class ConfigManager {
     /**
      * Amends the Babble Config TOML file. This function relies on mTomlDir being set.
      * @configHashMapChanges A HashMap object containing the changed config data to be written the Toml File.
-     * @return the moniker from this config file
      */
-    public String AmendTomlSettings(Map<String, Object> configHashMapChanges) {
+    public void AmendTomlSettings(Map<String, Object> configHashMapChanges) {
         boolean hasChanged = false;
 
         Map<String, Object> configMap = ReadTomlFile();
@@ -447,11 +450,11 @@ public final class ConfigManager {
 
         if (configMap.containsKey("moniker"))
         {
-            return configMap.get("moniker").toString();
+            mMoniker = configMap.get("moniker").toString();
+            Log.i("configArchive:moniker", mMoniker);
         }
 
 
-        return "";
     }
 
 

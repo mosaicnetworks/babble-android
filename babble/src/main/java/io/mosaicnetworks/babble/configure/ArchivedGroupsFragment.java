@@ -91,7 +91,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
             Log.d("MY-TAG", "Config directory name: " + configDir);
             BabbleService<?> babbleService = mListener.getBabbleService();
             babbleService.start(configDir, configDir); //TODO: need to NOT advertise mDNS
-            mListener.onArchiveLoaded(""); //TODO pull this in
+            mListener.onArchiveLoaded(mConfigManager.getMoniker());
 
         } catch (IllegalArgumentException ex) {
             displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: Illegal Argument: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
