@@ -92,6 +92,9 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
             BabbleService<?> babbleService = mListener.getBabbleService();
             babbleService.start(configDir, configDir); //TODO: need to NOT advertise mDNS
             mListener.onArchiveLoaded(""); //TODO pull this in
+
+        } catch (IllegalArgumentException ex) {
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: Illegal Argument: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
         } catch (Exception ex) {
             //TODO: Some sensible error handling here.
             //Errors on starting the babble service were untrapped and killing the app
