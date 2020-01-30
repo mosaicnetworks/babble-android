@@ -51,6 +51,27 @@ public final class ConfigDirectory {
     }
 
     /**
+     * This function takes a config folder name and removes the backup extensions
+     * @param compositeName is a config folder name
+     * @return compositeName with the backup suffix elided
+     * @throws IllegalArgumentException
+     */
+    public static String rootDirectoryName(String compositeName) throws IllegalArgumentException {
+
+        String[] tempArray;
+        String delimiter = "_";
+
+        tempArray = compositeName.split(delimiter);
+
+        if (tempArray.length < 3) {
+            throw new IllegalArgumentException();
+        }
+
+        return tempArray[0]+"_"+tempArray[1]+"_"+tempArray[2]+"_";
+    }
+
+
+    /**
      * Encodes the description to make it filename safe. Spaces become minus signs, all other
      * non-alphanumeric characters are striped
      * @param description the text to be encoded

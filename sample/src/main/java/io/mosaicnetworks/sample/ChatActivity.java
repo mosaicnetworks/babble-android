@@ -44,7 +44,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
         Log.i("ChatActivity", "registerObserver");
 
-        
+
         if (mArchiveMode) {
             stateUpdated();
         }

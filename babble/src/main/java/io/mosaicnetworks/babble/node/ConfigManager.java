@@ -592,19 +592,30 @@ public final class ConfigManager {
         populateDirectories(new File(this.mRootDir, BABBLE_ROOTDIR));
     }
 
-    public void DeleteDirectoryAndBackups(String compositeName) {
+
+    /**
+     * Function to delete all config folders for a Group. Call the static function
+     * ConfigDirectory.rootDirectoryName() on compositeName before passing it to this function to
+     * ensure that the name is well-formed.
+     * @param compositeName the full underscore separated name of the group
+     * @param onlyDeleteBackups if set to true the "live" copy is delete too
+     */
+
+    public void DeleteDirectoryAndBackups(String compositeName, boolean onlyDeleteBackups) {
+
+        // Call ConfigDirectory.rootDirectoryName on composite name to debackup the name
+
 
         for (ConfigDirectory d : mDirectories) {
-            if ((d.isBackup) && (d.directoryName.startsWith(compositeName))) {
+            if ((d.isBackup || (!onlyDeleteBackups)) && (d.directoryName.startsWith(compositeName))) {
                 deleteDirectory(d.directoryName);
             }
         }
 
         // Rebuild directory list after pruning backups
         populateDirectories(new File(this.mRootDir, BABBLE_ROOTDIR));
-
     }
-    
+
 
 
 
