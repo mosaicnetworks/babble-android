@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.UUID;
 
 import io.mosaicnetworks.babble.discovery.Peer;
@@ -447,7 +448,7 @@ public final class ConfigManager {
 
             if (
                 ( configMap.containsKey(entry.getKey())) &&
-                        (configMap.get(entry.getKey()).equals(entry.getValue()))
+                        (Objects.requireNonNull(configMap.get(entry.getKey())).equals(entry.getValue()))
             ) { continue ; }    // If key exists and value matches, there is nothing to do
             hasChanged = true;
 
@@ -472,7 +473,7 @@ public final class ConfigManager {
 
         if (configMap.containsKey("moniker"))
         {
-            mMoniker = configMap.get("moniker").toString();
+            mMoniker = Objects.requireNonNull(configMap.get("moniker")).toString();
             Log.i("configArchive:moniker", mMoniker);
         }
 
@@ -552,7 +553,7 @@ public final class ConfigManager {
     private boolean deleteDir(File file) {
         try {
             if (file.isDirectory())
-                for (String child : file.list())
+                for (String child : Objects.requireNonNull(file.list()))
                     deleteDir(new File(file, child));
             file.delete();  // delete child file or empty directory
         } catch (Exception e) {
@@ -649,12 +650,12 @@ public final class ConfigManager {
         mDirectories = new ArrayList<>();
 
         Collections.addAll(directories,
-                babbleDir.list(new FilenameFilter(){
+                Objects.requireNonNull(babbleDir.list(new FilenameFilter() {
                     @Override
                     public boolean accept(File current, String name) {
                         return new File(current, name).isDirectory();
                     }
-                }));
+                })));
 
         // Popualate mDirectories with the results
         for (String s : directories) {

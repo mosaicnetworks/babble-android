@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ServicesListView extends RecyclerView {
 
@@ -115,7 +116,7 @@ public class ServicesListView extends RecyclerView {
                 Runnable myRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        getAdapter().notifyDataSetChanged();
+                        Objects.requireNonNull(getAdapter()).notifyDataSetChanged();
                     }
                 };
                 mainHandler.post(myRunnable);

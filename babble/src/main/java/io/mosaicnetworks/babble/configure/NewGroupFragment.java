@@ -39,6 +39,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
@@ -91,7 +92,7 @@ public class NewGroupFragment extends Fragment {
                 }
         );
 
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+        SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
         EditText edit = view.findViewById(R.id.edit_moniker);
@@ -101,7 +102,7 @@ public class NewGroupFragment extends Fragment {
         editGroup.requestFocus();
 
         InputMethodManager imgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); //TODO: fix potential NPE
+        Objects.requireNonNull(imgr).toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); //TODO: fix potential NPE
 
         return view;
     }
@@ -113,7 +114,7 @@ public class NewGroupFragment extends Fragment {
         Log.i("startGroup", "Staring Group ");
         BabbleService<?> babbleService = mListener.getBabbleService();
 
-        ConfigManager configManager = ConfigManager.getInstance(getContext().getApplicationContext());
+        ConfigManager configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
 
         //get moniker
         EditText editMoniker = view.findViewById(R.id.edit_moniker);
@@ -153,7 +154,7 @@ public class NewGroupFragment extends Fragment {
 
 
         // Store moniker entered
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+        SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -177,7 +178,7 @@ public class NewGroupFragment extends Fragment {
 
     //TODO: Review if we need both.
     private void displayOkAlertDialogText(@StringRes int titleId, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(titleId)
                 .setMessage(message)
                 .setNeutralButton(R.string.ok_button, null)
@@ -189,7 +190,7 @@ public class NewGroupFragment extends Fragment {
 
 
     private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(titleId)
                 .setMessage(messageId)
                 .setNeutralButton(R.string.ok_button, null)

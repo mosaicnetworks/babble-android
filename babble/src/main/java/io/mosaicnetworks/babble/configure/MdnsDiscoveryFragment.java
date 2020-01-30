@@ -37,6 +37,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import java.util.Objects;
+
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.servicediscovery.mdns.ServicesListView;
 
@@ -168,7 +170,7 @@ public class MdnsDiscoveryFragment extends Fragment {
     }
 
     private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(titleId)
                 .setMessage(messageId)
                 .setNeutralButton(R.string.ok_button, null)

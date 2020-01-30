@@ -28,6 +28,8 @@ import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 
+import java.util.Objects;
+
 public class MdnsAdvertiser {
 
     public static final String SERVICE_TYPE = "_http._tcp.";
@@ -48,7 +50,7 @@ public class MdnsAdvertiser {
 
         Context appContext = context.getApplicationContext();
         mNsdManager = (NsdManager) appContext.getSystemService(Context.NSD_SERVICE);
-        mNsdManager.registerService(mServiceInfo, NsdManager.PROTOCOL_DNS_SD, mRegistrationListener);
+        Objects.requireNonNull(mNsdManager).registerService(mServiceInfo, NsdManager.PROTOCOL_DNS_SD, mRegistrationListener);
     }
 
     public void stopAdvertising() {

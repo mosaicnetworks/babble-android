@@ -25,7 +25,6 @@
 package io.mosaicnetworks.babble.servicediscovery.mdns;
 
 import android.content.Context;
-import android.net.nsd.NsdServiceInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

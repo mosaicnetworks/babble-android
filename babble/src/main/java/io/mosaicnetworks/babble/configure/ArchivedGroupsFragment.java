@@ -25,8 +25,6 @@
 package io.mosaicnetworks.babble.configure;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.StringRes;
@@ -48,6 +46,7 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
@@ -88,7 +87,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mConfigManager = ConfigManager.getInstance(getContext().getApplicationContext());
+        mConfigManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
         initActionModeCallback();
     }
 
@@ -112,7 +111,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
 
         try {
-            mConfigManager.configureArchive(configDirectory, Utils.getIPAddr(getContext()), ConfigManager.DEFAULT_BABBLING_PORT);
+            mConfigManager.configureArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), ConfigManager.DEFAULT_BABBLING_PORT);
 
         } catch (IOException e)
         {
@@ -163,7 +162,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
         if (mActionMode == null) {
             // Start the CAB
-            mActionMode = getActivity().startActionMode(mActionModeCallback);
+            mActionMode = Objects.requireNonNull(getActivity()).startActionMode(mActionModeCallback);
         }
     }
 
@@ -265,7 +264,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
     //TODO: Review if we need these functions in Archive, Join and New fragments.
     private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(titleId)
                 .setMessage(messageId)
                 .setNeutralButton(R.string.ok_button, null)
@@ -276,7 +275,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
 
     private void displayOkAlertDialogText(@StringRes int titleId, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(titleId)
                 .setMessage(message)
                 .setNeutralButton(R.string.ok_button, null)

@@ -41,6 +41,7 @@ import android.widget.EditText;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
@@ -103,15 +104,15 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
                 }
         );
 
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+        SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
-        EditText edit = (EditText) view.findViewById(R.id.edit_moniker);
+        EditText edit = view.findViewById(R.id.edit_moniker);
         edit.setText(sharedPref.getString("moniker", "Me"));
         edit.requestFocus();
 
         InputMethodManager imgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
+        Objects.requireNonNull(imgr).toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
 
         return view;
 
@@ -132,7 +133,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         final int peerPort = mNsdServiceInfo.getPort();
 
         // Store moniker and host entered
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+        SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -176,7 +177,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
     @Override
     public void onReceivePeers(List<Peer> currentPeers) {
-        ConfigManager configManager = ConfigManager.getInstance(getContext().getApplicationContext());
+        ConfigManager configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
         BabbleService<?> babbleService = mListener.getBabbleService();
 
         try {
@@ -237,7 +238,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
     }
 
     private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(titleId)
                 .setMessage(messageId)
                 .setNeutralButton(R.string.ok_button, null)
@@ -248,7 +249,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
 
     private void displayOkAlertDialogText(@StringRes int titleId, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(titleId)
                 .setMessage(message)
                 .setNeutralButton(R.string.ok_button, null)

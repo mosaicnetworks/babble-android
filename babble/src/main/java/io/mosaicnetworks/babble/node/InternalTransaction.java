@@ -35,8 +35,6 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 
 import java.lang.reflect.Type;
-import java.net.InterfaceAddress;
-import java.util.Map;
 
 import io.mosaicnetworks.babble.discovery.Peer;
 

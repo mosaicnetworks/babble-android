@@ -58,7 +58,6 @@ public final class ConfigDirectory {
         if (tempArray.length < 4) {
             isBackup = false;
             BackUpVersion = 0;
-            return;
         } else {
             int version;
 

@@ -118,7 +118,7 @@ public class TabsFragment extends Fragment {
                 case 1: return ArchivedGroupsFragment.newInstance();
             }
 
-            return null;
+            return null;  //TODO: This function is defined as @NonNull - should we throw an exception instead?
         }
 
         @Override

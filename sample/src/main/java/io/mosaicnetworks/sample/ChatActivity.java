@@ -37,7 +37,6 @@ import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
 import java.util.List;
 
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ServiceObserver;
 
 /**

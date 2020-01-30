@@ -36,8 +36,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.lang.reflect.Type;
 
-import io.mosaicnetworks.babble.discovery.Peer;
-
 public final class InternalTransactionReceipt {
     private final static Gson mCustomGson;
 
