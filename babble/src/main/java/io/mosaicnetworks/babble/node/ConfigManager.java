@@ -592,6 +592,22 @@ public final class ConfigManager {
         populateDirectories(new File(this.mRootDir, BABBLE_ROOTDIR));
     }
 
+    public void DeleteDirectoryAndBackups(String compositeName) {
+
+        for (ConfigDirectory d : mDirectories) {
+            if ((d.isBackup) && (d.directoryName.startsWith(compositeName))) {
+                deleteDirectory(d.directoryName);
+            }
+        }
+
+        // Rebuild directory list after pruning backups
+        populateDirectories(new File(this.mRootDir, BABBLE_ROOTDIR));
+
+    }
+    
+
+
+
     private void populateDirectories(File babbleDir) {
         ArrayList<String> directories = new ArrayList<>();
 
