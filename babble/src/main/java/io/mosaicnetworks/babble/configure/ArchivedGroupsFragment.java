@@ -43,9 +43,10 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     private ArchivedGroupsAdapter mArchivedGroupsAdapter;
     private List<ConfigDirectory> mArchivedList = new ArrayList<>();
     private ConfigManager mConfigManager;
-    private View previousLongClickView;
+    private View mPreviousLongClickView;
     private ActionMode mActionMode;
     private ActionMode.Callback mActionModeCallback;
+    private ConfigDirectory mSelectedGroup;
 
     public ArchivedGroupsFragment() {
     }
@@ -123,23 +124,21 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     }
 
     /** Called when the user long clicks a group in the archive list*/
-    public void onItemLongClick(View view, int position) {
+    public void onItemLongClick(View view, ConfigDirectory configDirectory) {
 
         // un-highlight previously selected view
-        if (previousLongClickView != null) {
-            previousLongClickView.setSelected(false);
+        if (mPreviousLongClickView != null) {
+            mPreviousLongClickView.setSelected(false);
         }
 
         // highlight selected
         view.setSelected(true);
-        previousLongClickView = view;
+        mPreviousLongClickView = view;
 
-        // update selected contact
-        //selectedContact = adapter.getItem(position);
+        mSelectedGroup = configDirectory;
 
-        // Start CAB if not already started
         if (mActionMode == null) {
-            // Start the CAB using the ActionMode.Callback defined above
+            // Start the CAB
             mActionMode = getActivity().startActionMode(mActionModeCallback);
         }
     }
@@ -147,7 +146,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     private void initActionModeCallback() {
         mActionModeCallback = new ActionMode.Callback() {
 
-            // Called when the action mode is created; startActionMode() was called
+            // Called when startActionMode() is called
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 // Inflate a menu resource providing context menu items
@@ -160,88 +159,31 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
             // may be called multiple times if the mode is invalidated.
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false; // Return false if nothing is done
+                return false; // nothing is done so return false
             }
 
             // Called when the user selects a contextual menu item
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                /*switch (item.getItemId()) {
-                    case R.id.delete_contact:
+                int itemId = item.getItemId();
 
-                        if (db.userConfigDao().getAll().get(0).getPubKeyHex().equals(selectedContact.getPubKeyHex())) {
-                            // contact is the user do not precede
-                            AlertDialog alertDialog = new AlertDialog.Builder(ContactsActivity.this).create();
-                            alertDialog.setTitle("Cannot delete contact");
-                            alertDialog.setMessage("You can't delete yourself!");
-                            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                                    new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                            alertDialog.show();
+                if (itemId == R.id.delete_contact) {
+                    mConfigManager.DeleteDirectoryAndBackups(mSelectedGroup.directoryName, false);
+                    mArchivedList.remove(mSelectedGroup);
+                    mArchivedGroupsAdapter.notifyDataSetChanged();
+                    mode.finish();
+                    return true;
+                }
 
-                        } else {
-
-
-                            List<GroupEntry> groups = db.groupContactJoinDao().getGroupsForContacts(selectedContact.getPubKeyHex());
-
-                            if (groups.isEmpty()) {
-                                //safe to delete - check user intention
-                                AlertDialog alertDialog = new AlertDialog.Builder(ContactsActivity.this).create();
-                                alertDialog.setTitle("Delete contact?");
-                                alertDialog.setMessage("Are you sure you want to delete this contact?");
-                                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                db.contactDao().delete(selectedContact);
-                                                //refresh the contacts list by restarting the activity
-                                                Intent intent = new Intent(ContactsActivity.this, ContactsActivity.class);
-                                                startActivity(intent);
-                                                dialog.dismiss();
-                                            }
-                                        });
-                                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        });
-                                alertDialog.show();
-
-
-
-                            } else {
-                                //contact is a member of at least one group - do not delete
-                                AlertDialog alertDialog = new AlertDialog.Builder(ContactsActivity.this).create();
-                                alertDialog.setTitle("Cannot delete contact");
-                                alertDialog.setMessage("The contact is a member of at least one group. Delete all groups they are members of first.");
-                                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                                        new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                            }
-                                        });
-                                alertDialog.show();
-                            }
-                        }
-
-                        mode.finish(); // Action picked, so close the CAB
-                        return true;
-                    default:
-                        return false;
-                }*/
-
-                return true;
+                return false;
             }
 
             // Called when the user exits the action mode
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 // un-highlight previously selected view
-                if (previousLongClickView != null) {
-                    previousLongClickView.setSelected(false);
+                if (mPreviousLongClickView != null) {
+                    mPreviousLongClickView.setSelected(false);
                 }
 
                 mActionMode = null;
@@ -339,7 +281,7 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
 
         @Override
         public boolean onLongClick(View view) {
-            if (mClickListener != null) mClickListener.onItemLongClick(view, getAdapterPosition());
+            if (mClickListener != null) mClickListener.onItemLongClick(view, mData.get(getAdapterPosition()));
             // Return true to indicate the click was handled
             return true;
         }
@@ -394,7 +336,7 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
 
         void onItemShortClick(ConfigDirectory configDirectory);
 
-        void onItemLongClick(View view, int position);
+        void onItemLongClick(View view, ConfigDirectory configDirectory);
     }
 
 }
