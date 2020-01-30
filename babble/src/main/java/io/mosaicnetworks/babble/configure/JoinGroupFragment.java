@@ -138,7 +138,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("moniker", mMoniker);
         editor.putString("host", peerIP);
-        editor.commit();
+        editor.apply();
 
 
         getPeers(peerIP, peerPort);

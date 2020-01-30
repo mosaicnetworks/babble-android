@@ -29,5 +29,5 @@
     <item
         android:id="@+id/delete_contact"
         android:icon="@drawable/ic_delete_white_24dp"
-        android:title="delete" />
+        android:title="@string/delete" />
 </menu>

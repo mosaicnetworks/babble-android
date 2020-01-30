@@ -30,9 +30,10 @@
     android:layout_width="match_parent"
     android:background="@drawable/selector"
     android:clickable="true"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:focusable="true">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -52,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingBottom="4dp"
-            android:text="bob"
+            android:text=""
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="20sp" />
 
@@ -78,6 +79,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_group_white_24dp" />
+        app:srcCompat="@drawable/ic_group_white_24dp"
+        android:contentDescription="Item Background" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

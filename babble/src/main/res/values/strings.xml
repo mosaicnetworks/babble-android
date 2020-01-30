@@ -25,16 +25,12 @@
 <resources>
     <string name="app_name">babble</string>
     <string name="moniker">Moniker</string>
-    <string name="host">Hostname</string>
     <string name="join">Join</string>
     <string name="start">Start</string>
-    <string name="new_group">New</string>
     <string name="no_moniker_alert_title">No moniker</string>
     <string name="no_moniker_alert_message">Please enter a moniker!</string>
     <string name="no_group_name_alert_title">No group name</string>
     <string name="no_group_name_alert_message">Please enter a group name!</string>
-    <string name="no_hostname_alert_title">No hostname</string>
-    <string name="no_hostname_alert_message">Please enter a hostname!</string>
     <string name="invalid_hostname_alert_title">Invalid hostname</string>
     <string name="invalid_hostname_alert_message">Please enter a valid hostname!</string>
     <string name="peers_error_alert_title">Unable to retrieve peers list</string>
@@ -56,4 +52,5 @@
     <string name="group_name">Group name</string>
     <string name="live_tab">LIVE</string>
     <string name="archived_tab">ARCHIVED</string>
+    <string name="delete">delete</string>
 </resources>

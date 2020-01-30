@@ -158,7 +158,7 @@ public class NewGroupFragment extends Fragment {
 
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("moniker", moniker);
-        editor.commit();
+        editor.apply();
 
 
         try {
