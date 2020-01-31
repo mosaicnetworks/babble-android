@@ -53,7 +53,7 @@ public final class ConfigDirectory {
 
         appId = tempArray[0];
         uniqueId = tempArray[1];
-        description = DecodeDescription(tempArray[2]);
+        description = decodeDescription(tempArray[2]);
 
         if (tempArray.length < 4) {
             isBackup = false;
@@ -100,7 +100,7 @@ public final class ConfigDirectory {
      * @param description the text to be encoded
      * @return the encoded version of description
      */
-    public static String EncodeDescription(String description) {
+    public static String encodeDescription(String description) {
         return description.replaceAll("[^a-zA-Z0-9 ]", "").replaceAll(" ", "-");
     }
 
@@ -109,7 +109,7 @@ public final class ConfigDirectory {
      * @param description the text to be decoded
      * @return the decoded human-readble version of description
      */
-    public static String DecodeDescription(String description) {
+    public static String decodeDescription(String description) {
         return description.replaceAll("-", " ");
     }
 }

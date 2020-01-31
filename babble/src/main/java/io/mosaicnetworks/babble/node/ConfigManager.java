@@ -103,7 +103,7 @@ public final class ConfigManager {
 
 // These variables are static to allow them to be set in the initialisation of any app.
 // As ConfigManager is invoked from within BabbleService, it would otherwise not be possible to
-// amend these app wide values without passing them into BabbleService.     
+// amend these app wide values without passing them into BabbleService.
     private static int sUniqueIdLength = 12;
     private static ConfigManager INSTANCE;
     private static String sRootDir = "";
@@ -293,7 +293,7 @@ public final class ConfigManager {
         configChanges.put("listen", inetAddress + ":" + Integer.toString(babblingPort));
         configChanges.put("advertise", inetAddress + ":" + Integer.toString(babblingPort));
 
-        AmendTomlSettings(configChanges);
+        amendTomlSettings(configChanges);
 
         return mTomlDir;
 
@@ -504,9 +504,9 @@ public final class ConfigManager {
         babble.put("moniker", moniker);
         babble.put("loadpeers", nodeConfig.loadPeers);
 
-        WriteTomlFile(babble);
+        writeTomlFile(babble);
 
-        Log.i("WriteTomlFile", "Wrote toml file successfully");
+        Log.i("writeTomlFile", "Wrote toml file successfully");
 
 
         if (!isExistingConfigDirectory(compositeName)) {
@@ -521,7 +521,7 @@ public final class ConfigManager {
      * @return A HashMap object containing the data from the Toml File.
      */
 
-    protected Map<String, Object> ReadTomlFile(){
+    protected Map<String, Object> readTomlFile(){
         File tomlFile =  new File(mTomlDir, BABBLE_TOML);
 
         Toml toml = new Toml().read(tomlFile);
@@ -529,7 +529,7 @@ public final class ConfigManager {
         Map<String, Object> configMap = toml.toMap();
 
 
-        Log.i("ReadTomlFile", "Read toml file successfully");
+        Log.i("readTomlFile", "Read toml file successfully");
 
         return configMap;
     }
@@ -538,17 +538,17 @@ public final class ConfigManager {
      * Writes the Babble Config TOML file. This function relies on mTomlDir being set.
      * @configHashMap A HashMap object containing the config data to be written the Toml File.
      */
-    protected void  WriteTomlFile(Map<String, Object> configHashMap) throws IOException {
-        Log.i("WriteTomlFile", mTomlDir);
+    protected void writeTomlFile(Map<String, Object> configHashMap) throws IOException {
+        Log.i("writeTomlFile", mTomlDir);
 
         try {
             TomlWriter tomlWriter = new TomlWriter();
             tomlWriter.write(configHashMap, new File(mTomlDir, BABBLE_TOML));
 
-            Log.i("WriteTomlFile", "Wrote toml file");
+            Log.i("writeTomlFile", "Wrote toml file");
         } catch (IOException e) {
             // Log and rethrow
-            Log.e("WriteTomlFile", e.toString());
+            Log.e("writeTomlFile", e.toString());
             throw e;
         }
 
@@ -559,14 +559,14 @@ public final class ConfigManager {
      * Amends the Babble Config TOML file. This function relies on mTomlDir being set.
      * @configHashMapChanges A HashMap object containing the changed config data to be written the Toml File.
      */
-    public void AmendTomlSettings(Map<String, Object> configHashMapChanges) throws IOException  {
+    public void amendTomlSettings(Map<String, Object> configHashMapChanges) throws IOException  {
         boolean hasChanged = false;
 
-        Map<String, Object> configMap = ReadTomlFile();
+        Map<String, Object> configMap = readTomlFile();
 
         for (Map.Entry<String,Object> entry : configHashMapChanges.entrySet()) {
 
-            Log.i("AmendTomlSettings", entry.getKey() + " = " + entry.getValue().toString()) ;
+            Log.i("amendTomlSettings", entry.getKey() + " = " + entry.getValue().toString()) ;
 
             if (
                 ( configMap.containsKey(entry.getKey())) &&
@@ -574,14 +574,14 @@ public final class ConfigManager {
             ) { continue ; }    // If key exists and value matches, there is nothing to do
             hasChanged = true;
 
-            Log.i("AmendTomlSettings:SET", entry.getKey() + " = " + entry.getValue().toString());
+            Log.i("amendTomlSettings:SET", entry.getKey() + " = " + entry.getValue().toString());
             configMap.put(entry.getKey(), entry.getValue());
         }
 
         if (hasChanged) {
             try {
-                WriteTomlFile(configMap);
-                Log.i("AmendTomlSettings", configMap.toString());
+                writeTomlFile(configMap);
+                Log.i("amendTomlSettings", configMap.toString());
 
              } catch (IOException e)
             {
@@ -589,7 +589,7 @@ public final class ConfigManager {
                 throw e;
             }
         } else {
-            Log.i("AmendTomlSettings", "No changes, no write");
+            Log.i("amendTomlSettings", "No changes, no write");
         }
 
 
@@ -654,7 +654,7 @@ public final class ConfigManager {
                 ? unique.substring(unique.length() - sUniqueIdLength)
                 : unique;
         
-        String compositeDir = mAppId + "_" + trimmedUnique + "_" + ConfigDirectory.EncodeDescription(networkDescription) + "_";
+        String compositeDir = mAppId + "_" + trimmedUnique + "_" + ConfigDirectory.encodeDescription(networkDescription) + "_";
         return compositeDir;
     }
 
@@ -748,7 +748,7 @@ public final class ConfigManager {
      * @param onlyDeleteBackups if set to true the "live" copy is delete too
      */
 
-    public void DeleteDirectoryAndBackups(String compositeName, boolean onlyDeleteBackups) {
+    public void deleteDirectoryAndBackups(String compositeName, boolean onlyDeleteBackups) {
 
         // Call ConfigDirectory.rootDirectoryName on composite name to debackup the name
 

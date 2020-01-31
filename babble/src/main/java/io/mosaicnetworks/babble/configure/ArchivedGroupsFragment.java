@@ -191,7 +191,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.delete_contact) {
-                    mConfigManager.DeleteDirectoryAndBackups(mSelectedGroup.directoryName, false);
+                    mConfigManager.deleteDirectoryAndBackups(mSelectedGroup.directoryName, false);
                     mArchivedList.remove(mSelectedGroup);
                     mArchivedGroupsAdapter.notifyDataSetChanged();
                     mode.finish();

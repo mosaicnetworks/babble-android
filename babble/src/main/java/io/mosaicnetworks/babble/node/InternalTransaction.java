@@ -64,11 +64,11 @@ public final class InternalTransaction {
     @SerializedName("Signature")
     public String signature = null;
 
-    public final InternalTransactionReceipt AsAccepted() {
+    public final InternalTransactionReceipt asAccepted() {
         return new InternalTransactionReceipt(this, true);
     }
 
-    public final InternalTransactionReceipt AsRefused() {
+    public final InternalTransactionReceipt asRefused() {
         return new InternalTransactionReceipt(this, false);
     }
 }
