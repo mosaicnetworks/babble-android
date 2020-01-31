@@ -45,6 +45,9 @@ import java.util.UUID;
 
 import io.mosaicnetworks.babble.discovery.Peer;
 
+/**
+ * ConfigManager is a singleton class that manages the babble configuration files used by babble-go
+ */
 public final class ConfigManager {
 
     /**
@@ -98,9 +101,13 @@ public final class ConfigManager {
      */
     public final static String PRIV_KEY = "priv_key";
 
+// These variables are static to allow them to be set in the initialisation of any app.
+// As ConfigManager is invoked from within BabbleService, it would otherwise not be possible to
+// amend these app wide values without passing them into BabbleService.     
     private static int sUniqueIdLength = 12;
     private static ConfigManager INSTANCE;
     private static String sRootDir = "";
+
     private String mTomlDir = "";
     private String mMoniker = "";
     private final String mAppId;
@@ -108,6 +115,13 @@ public final class ConfigManager {
     private ArrayList<ConfigDirectory> mDirectories = new ArrayList<>();
     private KeyPair mKeyPair;
 
+
+    /**
+     * Provides an instance of the static ConfigManager class, reusing one if available, calling the
+     * constructor if not.
+     * @param context Context. Used to call getFilesDir to find the path to the babble config dirs
+     * @return
+     */
     public static ConfigManager getInstance(Context context) {
         if (INSTANCE==null) {
             INSTANCE = new ConfigManager(context.getApplicationContext());
@@ -222,10 +236,6 @@ public final class ConfigManager {
 
 
 
-
-    //#######################################################
-    // NOTE: hacked out of the babble service
-
     /**
      * Configure the service to create a new group using the default ports
      * @param moniker node moniker
@@ -285,7 +295,6 @@ public final class ConfigManager {
 
         AmendTomlSettings(configChanges);
 
-
         return mTomlDir;
 
 //        List<Peer> genesisPeers = new ArrayList<>();
@@ -331,7 +340,7 @@ public final class ConfigManager {
         //TODO: is there a cleaner way of obtaining the path?
         // It is stored in mTomlDir which has getTomlDir and setTomlDir getter and setters
         String fullPath = writeBabbleTomlFiles(nodeConfig, groupName, inetAddress, babblingPort, moniker);
-        Log.d("ConfigManager.createConfig", "Full Path:" + fullPath);
+        Log.d("Config.createConfig", "Full Path:" + fullPath);
 
 
 
