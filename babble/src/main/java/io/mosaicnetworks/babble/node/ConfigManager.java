@@ -509,7 +509,7 @@ public final class ConfigManager {
         Log.i("writeTomlFile", "Wrote toml file successfully");
 
 
-        if (!isExistingConfigDirectory(compositeName)) {
+        if (isNotExistingConfigDirectory(compositeName)) {
             addConfigDirectoryToList(compositeName);
         }
         return mTomlDir;
@@ -629,13 +629,13 @@ public final class ConfigManager {
      * @param subConfigDir is a subdirectory under the babble root
      * @return returns true if it already exists
      */
-    private boolean isExistingConfigDirectory(String subConfigDir) {
+    private boolean isNotExistingConfigDirectory(String subConfigDir) {
         for (ConfigDirectory d : mDirectories) {
             if (d.directoryName.equals(subConfigDir)) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     /**
@@ -661,7 +661,7 @@ public final class ConfigManager {
     private boolean deleteDirectory(String subConfigDir) {
         Log.d("deleteDirectory", subConfigDir);
 
-        if ( !isExistingConfigDirectory(subConfigDir)) { // Doesn't exist
+        if (isNotExistingConfigDirectory(subConfigDir)) { // Doesn't exist
             Log.e("deleteDirectory !Exists", subConfigDir);
             return false;
         }
