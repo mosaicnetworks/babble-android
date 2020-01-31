@@ -75,7 +75,7 @@ public class BabbleServiceTest {
             }
         });
 
-        testService.configureNew("alice", "localhost");
+        testService.createConfigNewGroup("alice", "localhost");
         testService.start();
         testService.submitTx(new BabbleTx() {
             @Override
@@ -104,7 +104,7 @@ public class BabbleServiceTest {
             }
         });
 
-        testService.configureNew("alice", "localhost");
+        testService.createConfigNewGroup("alice", "localhost");
         testService.start();
         testService.submitTx(new BabbleTx() {
             @Override
@@ -123,7 +123,7 @@ public class BabbleServiceTest {
 
         final TestService testService = new TestService();
 
-        testService.configureNew("alice", "localhost");
+        testService.createConfigNewGroup("alice", "localhost");
         testService.start();
 
         List<Peer> currentPeers = testService.getCurrentPeers();

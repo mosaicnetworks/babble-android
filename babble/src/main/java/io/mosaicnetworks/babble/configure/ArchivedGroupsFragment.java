@@ -111,7 +111,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
 
         try {
-            mConfigManager.configureArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), ConfigManager.DEFAULT_BABBLING_PORT);
+            mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), ConfigManager.DEFAULT_BABBLING_PORT);
 
         } catch (IOException e)
         {

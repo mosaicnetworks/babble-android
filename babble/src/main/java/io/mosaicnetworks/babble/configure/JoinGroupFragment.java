@@ -181,7 +181,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         BabbleService<?> babbleService = mListener.getBabbleService();
 
         try {
-            String configDir = configManager.configureJoin(mGenesisPeers, currentPeers, mNsdServiceInfo.getServiceName(), mMoniker, Utils.getIPAddr(getContext()));
+            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, mNsdServiceInfo.getServiceName(), mMoniker, Utils.getIPAddr(getContext()));
             babbleService.start(configDir, mNsdServiceInfo.getServiceName());
         } catch (IllegalStateException | CannotStartBabbleNodeException| IOException ex ) {
             //TODO: just catch IOException - this will mean the port is in use

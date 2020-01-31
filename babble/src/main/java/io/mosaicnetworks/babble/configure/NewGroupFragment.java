@@ -138,9 +138,9 @@ public class NewGroupFragment extends Fragment {
 
         String configDirectory;
         try {
-            configDirectory = configManager.configureNew(groupName, moniker, Utils.getIPAddr(getContext()));
+            configDirectory = configManager.createConfigNewGroup(groupName, moniker, Utils.getIPAddr(getContext()));
             Log.i("startGroup", "configDirectory: " + configDirectory);
-            //babbleService.configureNew(moniker, Utils.getIPAddr(getContext()));
+            //babbleService.createConfigNewGroup(moniker, Utils.getIPAddr(getContext()));
         } catch (IllegalArgumentException | CannotStartBabbleNodeException| IOException ex) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,

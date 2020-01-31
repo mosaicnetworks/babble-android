@@ -150,8 +150,8 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureNew(String groupName, String moniker, String inetAddress)  throws CannotStartBabbleNodeException, IOException {
-        return configureNew(groupName, moniker, inetAddress, DEFAULT_BABBLING_PORT);
+    public String createConfigNewGroup(String groupName, String moniker, String inetAddress)  throws CannotStartBabbleNodeException, IOException {
+        return createConfigNewGroup(groupName, moniker, inetAddress, DEFAULT_BABBLING_PORT);
     }
 
     /**
@@ -162,13 +162,13 @@ public final class ConfigManager {
      * //@param discoveryPort the port used by the HttpPeerDiscoveryServer //TODO: how to deal with this
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureNew(String groupName, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
+    public String createConfigNewGroup(String groupName, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
         List<Peer> genesisPeers = new ArrayList<>();
         genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
         List<Peer> currentPeers = new ArrayList<>();
         currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
 
-        return configure(genesisPeers, currentPeers, groupName, moniker, inetAddress, babblingPort, false);
+        return createConfig(genesisPeers, currentPeers, groupName, moniker, inetAddress, babblingPort, false);
     }
 
     /**
@@ -176,8 +176,8 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureArchive(ConfigDirectory configDirectory,  String inetAddress)  throws  IOException {
-        return configureArchive(configDirectory, inetAddress, DEFAULT_BABBLING_PORT);
+    public String setGroupToArchive(ConfigDirectory configDirectory, String inetAddress)  throws  IOException {
+        return setGroupToArchive(configDirectory, inetAddress, DEFAULT_BABBLING_PORT);
     }
 
     /**
@@ -186,9 +186,9 @@ public final class ConfigManager {
      * @param babblingPort the port used for Babble consensus
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureArchive(ConfigDirectory configDirectory, String inetAddress, int babblingPort) throws  IOException{
+    public String setGroupToArchive(ConfigDirectory configDirectory, String inetAddress, int babblingPort) throws  IOException{
 
-        Log.i("configureArchive", configDirectory.directoryName);
+        Log.i("setGroupToArchive", configDirectory.directoryName);
 
         setTomlDir(configDirectory.directoryName);
 
@@ -211,7 +211,7 @@ public final class ConfigManager {
 //        List<Peer> currentPeers = new ArrayList<>();
 //        currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
 
-//        return configure(genesisPeers, currentPeers, "TODO-GROUP-NAME", moniker, inetAddress, babblingPort, true); //TODO: group name
+//        return createConfig(genesisPeers, currentPeers, "TODO-GROUP-NAME", moniker, inetAddress, babblingPort, true); //TODO: group name
     }
 
     /**
@@ -222,8 +222,8 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress) throws CannotStartBabbleNodeException, IOException {
-        return configure(genesisPeers, currentPeers, groupName, moniker, inetAddress, DEFAULT_BABBLING_PORT, false);
+    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress) throws CannotStartBabbleNodeException, IOException {
+        return createConfig(genesisPeers, currentPeers, groupName, moniker, inetAddress, DEFAULT_BABBLING_PORT, false);
     }
 
     /**
@@ -236,20 +236,20 @@ public final class ConfigManager {
      * //@param discoveryPort the port used by the {HttpPeerDiscoveryServer} //TODO: deal with discovery
      * @throws IllegalStateException if the service is currently running
      */
-    public String configureJoin(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
-        return configure(genesisPeers, currentPeers, groupName, moniker, inetAddress, babblingPort, false); //TODO: group name
+    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
+        return createConfig(genesisPeers, currentPeers, groupName, moniker, inetAddress, babblingPort, false); //TODO: group name
     }
 
-    private String configure(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName,
-                             String moniker, String inetAddress, int babblingPort,
-                             boolean isArchive) throws CannotStartBabbleNodeException, IOException {
+    private String createConfig(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName,
+                                String moniker, String inetAddress, int babblingPort,
+                                boolean isArchive) throws CannotStartBabbleNodeException, IOException {
 
         NodeConfig nodeConfig = new NodeConfig.Builder().build();
         mMoniker = moniker;
         //TODO: is there a cleaner way of obtaining the path?
         // It is stored in mTomlDir which has getTomlDir and setTomlDir getter and setters
         String fullPath = writeBabbleTomlFiles(nodeConfig, groupName, inetAddress, babblingPort, moniker);
-        Log.d("ConfigManager.configure", "Full Path:" + fullPath);
+        Log.d("ConfigManager.createConfig", "Full Path:" + fullPath);
 
 
 
@@ -263,7 +263,7 @@ public final class ConfigManager {
 
         /*
         if (mState == BabbleService.State.RUNNING || mState == BabbleService.State.RUNNING_WITH_DISCOVERY) {
-            throw new IllegalStateException("Cannot configure while the service is running");
+            throw new IllegalStateException("Cannot createConfig while the service is running");
         }
          */
 
