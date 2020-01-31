@@ -47,6 +47,15 @@ import io.mosaicnetworks.babble.discovery.Peer;
 
 public final class ConfigManager {
 
+    /**
+     * An enumerated data type that sets the Babble Configuration Backup Policy. When writing
+     * the configuration files, if the configuration already exists, the policy defines what
+     * actions the ConfigManager takes:
+     * DELETE - just deletes any pre-existing configuration for this Group
+     * SINGLE_BACKUP - retains just one archive copy at any time
+     * COMPLETE_BACKUP - saves all archive copies
+     * ABORT - If there is any pre-existing archive for this groups, throw an exception and abort
+     */
     public enum ConfigDirectoryBackupPolicy  {DELETE, SINGLE_BACKUP, COMPLETE_BACKUP, ABORT}
 
     /**
@@ -87,22 +96,12 @@ public final class ConfigManager {
      * The name of the file containing the babble private key. It will be in the root of the babble
      * configuraton folder
      */
-
     public final static String PRIV_KEY = "priv_key";
 
-
-
-    // This constant determines the length of the unique ID
     private static int sUniqueIdLength = 12;
-
     private static ConfigManager INSTANCE;
-    private String mRootDir;
+    private static String sRootDir = "";
     private String mTomlDir = "";
-
-    public String getMoniker() {
-        return mMoniker;
-    }
-
     private String mMoniker = "";
     private final String mAppId;
     private static ConfigDirectoryBackupPolicy sConfigDirectoryBackupPolicy = ConfigDirectoryBackupPolicy.SINGLE_BACKUP;
@@ -122,11 +121,13 @@ public final class ConfigManager {
      * @param appContext the application context
      */
     private ConfigManager(Context appContext) {
-        mRootDir = appContext.getFilesDir().toString();
+        if (sRootDir.equals("")) {
+            sRootDir = appContext.getFilesDir().toString();
+        }
         mAppId = appContext.getPackageName();
         mKeyPair = new KeyPair(); //TODO:  how should the key be handled??
 
-        File babbleDir = new File(this.mRootDir, BABBLE_ROOTDIR);
+        File babbleDir = new File(this.sRootDir, BABBLE_ROOTDIR);
 
         if (babbleDir.exists()) {
             populateDirectories(babbleDir);
@@ -188,11 +189,39 @@ public final class ConfigManager {
         ConfigManager.sUniqueIdLength = sUniqueIdLength;
     }
 
+    /**
+     * The moniker is a human readable name for a babble node. The moniker is not guaranteed to
+     * be unique and can be trivially spoofed
+     * @return the Moniker
+     */
+    public String getMoniker() {
+        return mMoniker;
+    }
+
 
     //TODO: is this the best way to get the root directory?
-    public String getRootDir() {
-        return mRootDir;
+
+    /**
+     * Returns the root directory of the App-specific storage. It defaults to
+     * appContext.getFilesDir().
+     * @return the Root Dir
+     */
+    public static String getRootDir() {
+        return sRootDir;
     }
+
+    /**
+     * Setter for root directory of the App-specific storage. It defaults to
+     * appContext.getFilesDir(). This needs to be set before the first call to ConfigManager.getInstance()
+     * @param sRootDir
+     */
+    public static void setRootDir(String sRootDir) {
+        ConfigManager.sRootDir = sRootDir;
+    }
+
+
+
+
 
     //#######################################################
     // NOTE: hacked out of the babble service
@@ -400,7 +429,7 @@ public final class ConfigManager {
       * @param compositeName the directory name for the config folder. NB this must be the composite version, not the human readable one.
      */
     public void setTomlDir(String compositeName) {
-        mTomlDir = this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + compositeName;
+        mTomlDir = this.sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + compositeName;
         this.mTomlDir = mTomlDir;
     }
 
@@ -628,7 +657,7 @@ public final class ConfigManager {
             return false;
         }
 
-        File dir = new File(this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir);
+        File dir = new File(this.sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir);
 
         return deleteDir(dir);
     }
@@ -657,8 +686,8 @@ public final class ConfigManager {
     }
     
     private void renameConfigDirectory(String oldSubConfigDir, int newSuffix) throws CannotStartBabbleNodeException {
-        File oldFile = new File(this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir);
-        File newFile = new File(this.mRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir + Integer.toString(newSuffix));
+        File oldFile = new File(this.sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir);
+        File newFile = new File(this.sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir + Integer.toString(newSuffix));
         
         Log.d("Rename ", oldFile.getAbsolutePath());
         Log.d("Rename ", newFile.getAbsolutePath());
@@ -698,7 +727,7 @@ public final class ConfigManager {
         }
 
         Log.d("backupOldConfigs POP", compositeName);
-        populateDirectories(new File(this.mRootDir, BABBLE_ROOTDIR));
+        populateDirectories(new File(this.sRootDir, BABBLE_ROOTDIR));
     }
 
 
@@ -722,7 +751,7 @@ public final class ConfigManager {
         }
 
         // Rebuild directory list after pruning backups
-        populateDirectories(new File(this.mRootDir, BABBLE_ROOTDIR));
+        populateDirectories(new File(this.sRootDir, BABBLE_ROOTDIR));
     }
 
 

@@ -49,7 +49,10 @@ public class MainActivity extends BaseConfigActivity {
 
 //        ConfigManager.setUniqueIdLength(8);
 
+// If you want to change the storage location used for babble-go configuration and database files
+// uncomment the line below.
 
+//        ConfigManager.setRootDir(getApplicationContext().getExternalFilesDir(null).toString());
     }
 
     @Override
