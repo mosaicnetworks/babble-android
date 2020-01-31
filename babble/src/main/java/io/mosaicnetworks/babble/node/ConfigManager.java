@@ -653,9 +653,8 @@ public final class ConfigManager {
         String trimmedUnique = unique.length() >= sUniqueIdLength
                 ? unique.substring(unique.length() - sUniqueIdLength)
                 : unique;
-        
-        String compositeDir = mAppId + "_" + trimmedUnique + "_" + ConfigDirectory.encodeDescription(networkDescription) + "_";
-        return compositeDir;
+
+        return mAppId + "_" + trimmedUnique + "_" + ConfigDirectory.encodeDescription(networkDescription) + "_";
     }
 
     private boolean deleteDirectory(String subConfigDir) {

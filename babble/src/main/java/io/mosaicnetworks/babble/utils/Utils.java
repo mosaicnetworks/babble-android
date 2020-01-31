@@ -45,7 +45,6 @@ public class Utils {
      */
     public static String getIPAddr(Context context) {
         WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
-        String ip = Formatter.formatIpAddress(Objects.requireNonNull(wm).getConnectionInfo().getIpAddress());
-        return ip;
+        return Formatter.formatIpAddress(Objects.requireNonNull(wm).getConnectionInfo().getIpAddress());
     }
 }
