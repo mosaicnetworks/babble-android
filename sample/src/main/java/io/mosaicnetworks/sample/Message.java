@@ -95,8 +95,8 @@ public final class Message implements BabbleTx, IMessage {
 
     /**
      * Factory for constructing a {@link Message} from JSON
-     * @param txJson
-     * @return
+     * @param txJson A JSON format transaction string
+     * @return a Message object transaction
      */
     public static Message fromJson(String txJson) {
         return gson.fromJson(txJson, Message.class);

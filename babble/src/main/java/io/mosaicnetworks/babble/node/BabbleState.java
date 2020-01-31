@@ -32,7 +32,7 @@ public interface BabbleState {
 
     /**
      * Called when a block is committed by Babble
-     * @param block
+     * @param block the block to process
      * @return processed block (with state-hash and InternalTransactionReceipts)
      */
     Block processBlock(Block block);

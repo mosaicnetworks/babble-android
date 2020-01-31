@@ -77,7 +77,7 @@ public final class ConfigDirectory {
      * This function takes a config folder name and removes the backup extensions
      * @param compositeName is a config folder name
      * @return compositeName with the backup suffix elided
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException when the composite name is malformed
      */
     public static String rootDirectoryName(String compositeName) throws IllegalArgumentException {
 

@@ -120,7 +120,7 @@ public final class ConfigManager {
      * Provides an instance of the static ConfigManager class, reusing one if available, calling the
      * constructor if not.
      * @param context Context. Used to call getFilesDir to find the path to the babble config dirs
-     * @return
+     * @return an instance of ConfigManager
      */
     public static ConfigManager getInstance(Context context) {
         if (INSTANCE==null) {
@@ -158,7 +158,7 @@ public final class ConfigManager {
      * SINGLE_BACKUP - retains just one archive copy at any time
      * COMPLETE_BACKUP - saves all archive copies
      * ABORT - If there is any pre-existing archive for this groups, throw an exception and abort
-     * @return
+     * @return ConfigDirectoryBackupPolicy
      */
     public static ConfigDirectoryBackupPolicy getConfigDirectoryBackupPolicy() {
         return sConfigDirectoryBackupPolicy;
@@ -227,7 +227,7 @@ public final class ConfigManager {
     /**
      * Setter for root directory of the App-specific storage. It defaults to
      * appContext.getFilesDir(). This needs to be set before the first call to ConfigManager.getInstance()
-     * @param sRootDir
+     * @param sRootDir the root directory to create the babble config directories hierarchy
      */
     public static void setRootDir(String sRootDir) {
         ConfigManager.sRootDir = sRootDir;
@@ -508,7 +508,7 @@ public final class ConfigManager {
 
     /**
      * Writes the Babble Config TOML file. This function relies on mTomlDir being set.
-     * @configHashMap A HashMap object containing the config data to be written the Toml File.
+     * @param configHashMap A HashMap object containing the config data to be written the Toml File.
      */
     protected void writeTomlFile(Map<String, Object> configHashMap) throws IOException {
         Log.i("writeTomlFile", mTomlDir);
@@ -529,7 +529,7 @@ public final class ConfigManager {
 
     /**
      * Amends the Babble Config TOML file. This function relies on mTomlDir being set.
-     * @configHashMapChanges A HashMap object containing the changed config data to be written the Toml File.
+     * @param configHashMapChanges A HashMap object containing the changed config data to be written the Toml File.
      */
     public void amendTomlSettings(Map<String, Object> configHashMapChanges) throws IOException  {
         boolean hasChanged = false;
