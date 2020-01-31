@@ -13,7 +13,7 @@ import com.google.gson.annotations.SerializedName;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-final class Block {
+public final class Block {
 
     private final static Gson mCustomGson;
 
@@ -34,10 +34,16 @@ final class Block {
         public final int roundReceived = 0;
 
         @SerializedName("StateHash")
-        public final byte[] stateHash = new byte[]{};
+        public byte[] stateHash = new byte[]{};
 
         @SerializedName("Transactions")
-        public final byte[][] transactions = new byte[][]{};
+        public byte[][] transactions = new byte[][]{};
+
+        @SerializedName("InternalTransactions")
+        public InternalTransaction[] internalTransactions = new InternalTransaction[]{};
+
+        @SerializedName("InternalTransactionReceipts")
+        public InternalTransactionReceipt[] internalTransactionReceipts = new InternalTransactionReceipt[]{};
 
     }
 
@@ -50,5 +56,9 @@ final class Block {
     public static Block fromJson(String blockJson) {
         //TODO: implement checks for correct types and missing and extra JSON attributes using GSON
         return mCustomGson.fromJson(blockJson, Block.class);
+    }
+
+    public String toJson() {
+        return mCustomGson.toJson(this);
     }
 }

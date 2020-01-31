@@ -3,6 +3,8 @@ package io.mosaicnetworks.sample;
 import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.stfalcon.chatkit.messages.MessageInput;
@@ -22,21 +24,32 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
     private MessagesListAdapter<Message> mAdapter;
     private String mMoniker;
-    private final MessagingService mMessagingService = MessagingService.getInstance();
+    private final MessagingService mMessagingService = MessagingService.getInstance(this);
     private Integer mMessageIndex = 0;
+    private boolean mArchiveMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        Log.i("ChatActivity", "onCreate");
+
         Intent intent = getIntent();
         mMoniker = intent.getStringExtra("MONIKER");
+        mArchiveMode = intent.getBooleanExtra("ARCHIVE_MODE", false);
 
         initialiseAdapter();
         mMessagingService.registerObserver(this);
 
-        if (mMessagingService.getState()!= BabbleService.State.RUNNING_WITH_DISCOVERY) {
+        Log.i("ChatActivity", "registerObserver");
+
+
+        if (mArchiveMode) {
+            stateUpdated();
+        }
+
+        if (!mMessagingService.isAdvertising()) {
             Toast.makeText(this, "Unable to advertise peers", Toast.LENGTH_LONG).show();
         }
     }
@@ -48,14 +61,17 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         mMessagesList.setAdapter(mAdapter);
 
         MessageInput input = findViewById(R.id.input);
-
-        input.setInputListener(new MessageInput.InputListener() {
-            @Override
-            public boolean onSubmit(CharSequence input) {
-                mMessagingService.submitTx(new Message(input.toString(), mMoniker).toBabbleTx());
-                return true;
-            }
-        });
+        if (mArchiveMode) {
+            input.setVisibility(View.GONE);
+        } else {
+            input.setInputListener(new MessageInput.InputListener() {
+                @Override
+                public boolean onSubmit(CharSequence input) {
+                    mMessagingService.submitTx(new Message(input.toString(), mMoniker));
+                    return true;
+                }
+            });
+        }
     }
 
     /**
@@ -65,6 +81,8 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
      */
     @Override
     public void stateUpdated() {
+
+        Log.i("ChatActivity", "stateUpdated");
 
         final List<Message> newMessages = mMessagingService.state.getMessagesFromIndex(mMessageIndex);
 

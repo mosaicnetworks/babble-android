@@ -86,7 +86,7 @@ public class HttpPeerDiscoveryRequestTest {
 
         final CountDownLatch lock = new CountDownLatch(1);
 
-        String host = "10.255.255.1"; // should be an unreachable ip address
+        String host = "198.51.100.255"; // should be an unreachable ip address
 
         HttpPeerDiscoveryRequest httpPeerDiscoveryRequest =
                 HttpPeerDiscoveryRequest.createCurrentPeersRequest(host, 8988, new ResponseListener() {

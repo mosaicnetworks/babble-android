@@ -6,14 +6,20 @@ import android.os.Bundle;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AlertDialog;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import java.io.IOException;
+
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
+import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.utils.Utils;
 
 
@@ -64,13 +70,14 @@ public class NewGroupFragment extends Fragment {
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
-        EditText edit = (EditText) view.findViewById(R.id.edit_moniker);
+        EditText edit = view.findViewById(R.id.edit_moniker);
         edit.setText(sharedPref.getString("moniker", "Me"));
 
-        edit.requestFocus();
+        EditText editGroup = view.findViewById(R.id.edit_group_name);
+        editGroup.requestFocus();
 
         InputMethodManager imgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
+        imgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); //TODO: fix potential NPE
 
         return view;
     }
@@ -78,7 +85,12 @@ public class NewGroupFragment extends Fragment {
     // called when the user presses the start button
     public void startGroup(View view) {
         //TODO: check this is safe
+
+        Log.i("startGroup", "Staring Group ");
         BabbleService<?> babbleService = mListener.getBabbleService();
+
+        ConfigManager configManager = ConfigManager.getInstance(getContext().getApplicationContext());
+
         //get moniker
         EditText editMoniker = view.findViewById(R.id.edit_moniker);
         String moniker = editMoniker.getText().toString();
@@ -87,10 +99,24 @@ public class NewGroupFragment extends Fragment {
             return;
         }
 
-        //MessagingService messagingService = MessagingService.getInstance();
+        //get group name
+        EditText editGroupName = view.findViewById(R.id.edit_group_name);
+        String groupName = editGroupName.getText().toString();
+        if (groupName.isEmpty()) {
+            displayOkAlertDialog(R.string.no_group_name_alert_title, R.string.no_group_name_alert_message);
+            return;
+        }
+
+
+
+        Log.i("startGroup", "Staring Group " + groupName);
+
+        String configDirectory;
         try {
-            babbleService.configureNew(moniker, Utils.getIPAddr(getContext()));
-        } catch (IllegalArgumentException ex) {
+            configDirectory = configManager.configureNew(groupName, moniker, Utils.getIPAddr(getContext()));
+            Log.i("startGroup", "configDirectory: " + configDirectory);
+            //babbleService.configureNew(moniker, Utils.getIPAddr(getContext()));
+        } catch (IllegalArgumentException | CannotStartBabbleNodeException| IOException ex) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port - in which case
@@ -98,6 +124,9 @@ public class NewGroupFragment extends Fragment {
             displayOkAlertDialog(R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             return;
         }
+
+        Log.i("startGroup", "configDirectory: " + configDirectory);
+
 
         // Store moniker entered
         SharedPreferences sharedPref = getActivity().getSharedPreferences(
@@ -108,10 +137,32 @@ public class NewGroupFragment extends Fragment {
         editor.commit();
 
 
-        babbleService.start();
-        mListener.onStartedNew(moniker);
+        try {
+            babbleService.start(configDirectory, groupName);
+            mListener.onStartedNew(moniker);
+        } catch (Exception ex) {
+            //TODO: Review this. The duplicate dialog function feels overkill.
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
+            throw ex;
+        }
+
 
     }
+
+
+
+    //TODO: Review if we need both.
+    private void displayOkAlertDialogText(@StringRes int titleId, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+                .setTitle(titleId)
+                .setMessage(message)
+                .setNeutralButton(R.string.ok_button, null)
+                .create();
+        alertDialog.show();
+    }
+
+
+
 
     private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
         AlertDialog alertDialog = new AlertDialog.Builder(getContext())

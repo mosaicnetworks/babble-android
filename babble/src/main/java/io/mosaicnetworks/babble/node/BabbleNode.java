@@ -1,16 +1,14 @@
 package io.mosaicnetworks.babble.node;
 
-import com.google.gson.Gson;
+import android.util.Log;
+
 import com.google.gson.JsonSyntaxException;
 
 import java.nio.charset.Charset;
-import java.util.List;
 
-import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.PeersProvider;
 import mobile.Mobile;
 import mobile.Node;
-import mobile.MobileConfig;
 
 /**
  * This is the core Babble node. It can be used directly or alternatively the {@link BabbleService}
@@ -19,70 +17,26 @@ import mobile.MobileConfig;
  */
 public final class BabbleNode implements PeersProvider {
 
-    private final static Gson mGson = new Gson();
     private final Node mNode;
 
-    /**
-     * Create a node with default config
-     * @param genesisPeers list of genesis peers
-     * @param currentPeers list of current peers
-     * @param privateKeyHex private key as produced by the {@link KeyPair} class
-     * @param inetAddress ip address for the node to bind to
-     * @param port the port number to bind to
-     * @param moniker node moniker
-     * @param txConsumer the object which will receive the transactions
-     * @return
-     */
-    public static BabbleNode create(List<Peer> genesisPeers, List<Peer> currentPeers,
-                                    String privateKeyHex, String inetAddress,
-                                    int port, String moniker, TxConsumer txConsumer) {
+    public static BabbleNode create(final BlockConsumer blockConsumer, String configDir) {
 
-        return createWithConfig(genesisPeers, currentPeers, privateKeyHex, inetAddress, port, moniker, txConsumer,
-                new BabbleConfig.Builder().build());
-    }
-
-    /**
-     * Create a node with custom config
-     * @param genesisPeers list of genesis peers
-     * @param currentPeers list of current peers
-     * @param privateKeyHex private key as produced by the {@link KeyPair} class
-     * @param inetAddress ip address for the node to bind to
-     * @param port the port number to bind to
-     * @param moniker node moniker
-     * @param txConsumer the object which will receive the transactions
-     * @param babbleConfig custom configuration
-     * @return
-     */
-    public static BabbleNode createWithConfig(List<Peer> genesisPeers, List<Peer> currentPeers,
-                                              String privateKeyHex,
-                                              String inetAddress, int port, String moniker,
-                                              final TxConsumer txConsumer,
-                                              BabbleConfig babbleConfig) {
-
-        MobileConfig mobileConfig = new MobileConfig(
-                babbleConfig.heartbeat,
-                babbleConfig.tcpTimeout,
-                babbleConfig.maxPool,
-                babbleConfig.cacheSize,
-                babbleConfig.syncLimit,
-                babbleConfig.enableFastSync,
-                babbleConfig.store,
-                babbleConfig.logLevel,
-                moniker
-        );
-
+        Log.i("BabbleNode.create", configDir);
         Node node = Mobile.new_(
-                privateKeyHex,
-                inetAddress + ":" + port,
-                mGson.toJson(currentPeers),
-                mGson.toJson(genesisPeers),
                 new mobile.CommitHandler() {
                     @Override
                     public byte[] onCommit(final byte[] blockBytes) {
                         String strJson = new String(blockBytes, Charset.forName("UTF-8"));
                         try {
-                            Block block = Block.fromJson(strJson);
-                            return txConsumer.onReceiveTransactions(block.body.transactions);
+                            Block incomingBlock = Block.fromJson(strJson);
+
+                            Block processedBlock = blockConsumer.onReceiveBlock(incomingBlock);
+
+                            // Encode and return block
+                            String jsonProcessedBlock = processedBlock.toJson();
+                            System.out.println("Processed Block " + processedBlock);
+                            return jsonProcessedBlock.getBytes();
+
                         } catch (JsonSyntaxException ex) {
                             return null;
                         }
@@ -99,8 +53,7 @@ public final class BabbleNode implements PeersProvider {
 
                         throw new IllegalArgumentException(msg);
                     }
-                },
-                mobileConfig);
+                }, configDir);
 
         // If mobile ExceptionHandler isn't called then mNode should not be null, however
         // just in case...

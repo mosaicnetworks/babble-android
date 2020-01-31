@@ -1,6 +1,96 @@
+plugins {
+    id "de.undercouch.download" version "4.0.2"
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
+
+//##################################################################################################
+// babble core configuration
+
+def babbleCoreVersion = "0.6.1"
+def repository = "https://github.com/mosaicnetworks/babble/releases/download"
+def protocol = "https"
+
+// def babbleCoreVersion = "a3160dc72421ce9f7c71c9bc72d9f2092d953054"
+// def repository = System.properties['user.home'] + "/go/src/github.com/mosaicnetworks/babble/build/distmobile"
+// def protocol = "file"
+
+//##################################################################################################
+
+def babbleDependency = "libs/babble-core/$babbleCoreVersion/classes.jar"
+
+task getBabbleCore {
+
+    def versionDirectory = "$projectDir/libs/babble-core/$babbleCoreVersion"
+    def versionDirectoryFile = new File(versionDirectory)
+    def releaseZipUrl = "$repository/v${babbleCoreVersion}/babble_${babbleCoreVersion}_android_library.zip"
+    def fileZipLoc = "$repository/babble_${babbleCoreVersion}_android_library.zip"
+    def downladedFileName = "babble_${babbleCoreVersion}_android_library.zip"
+    def downloadFullPath = "$versionDirectory/tmp/$downladedFileName"
+    def downloadFullPathFile = new File(downloadFullPath)
+    def aarFullPath = "$versionDirectory/tmp/babble_${babbleCoreVersion}_mobile.aar"
+    def aarFullPathFile = new File(aarFullPath)
+
+    if (versionDirectoryFile.exists()) {
+        print("Found babble-core version $babbleCoreVersion\n")
+    } else {
+        print("Could not find babble-core version $babbleCoreVersion in $versionDirectory\n")
+        versionDirectoryFile.mkdirs()
+
+        if (protocol=="file") {
+
+            print("Attempting to copy from $fileZipLoc\n")
+            copy {
+                from fileZipLoc
+                into "$versionDirectory/tmp"
+            }
+
+
+        } else if (protocol=="https") {
+
+            print("Attempting to download from $releaseZipUrl\n")
+
+            download {
+                src releaseZipUrl
+                dest downloadFullPath
+            }
+        }
+
+        copy {
+            from zipTree(downloadFullPathFile)
+            into "$versionDirectory/tmp"
+        }
+
+        copy {
+            from zipTree(aarFullPathFile)
+            into "$versionDirectory/tmp/aar-unzip"
+        }
+
+        copy {
+            from "$versionDirectory/tmp/aar-unzip/classes.jar"
+            into versionDirectory
+        }
+
+        copy {
+            from "$versionDirectory/tmp/aar-unzip/jni"
+            into "$versionDirectory/jni"
+        }
+
+        copy {
+            from "$versionDirectory/tmp/git.version"
+            into "$versionDirectory"
+        }
+
+
+        delete {
+            delete "$versionDirectory/tmp"
+        }
+
+    }
+}
+
 
 android {
     compileSdkVersion 29
@@ -8,8 +98,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 8
-        versionName "0.2.6"
+        versionCode 9
+        versionName "0.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -22,9 +112,10 @@ android {
 
     sourceSets {
         main {
-            jniLibs.srcDirs = ['libs/jni']
+            jniLibs.srcDirs = ["libs/babble-core/$babbleCoreVersion/jni"]
         }
     }
+
 }
 
 task sourcesJar(type: Jar) {
@@ -43,8 +134,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
-
-
 dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
@@ -53,18 +142,24 @@ dependencies {
     implementation 'org.nanohttpd:nanohttpd:2.2.0'
     androidTestImplementation 'androidx.test:rules:1.1.1'
     implementation 'com.android.volley:volley:1.1.1'
-    implementation files('libs/classes.jar')
+    implementation files(babbleDependency)
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'com.moandjiezana.toml:toml4j:0.7.2'
+    implementation 'commons-io:commons-io:2.6'
+    implementation 'com.google.android.material:material:1.2.0-alpha03'
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
 }
 
 artifacts {
     archives sourcesJar
 }
 
-version '0.2.6'
+version '0.3.0'
 
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
@@ -95,8 +190,6 @@ task sourceJar(type: Jar) {
     classifier = 'sources'
     from android.sourceSets.main.java.srcDirs
 }
-
-
 
 publishing {
     publications {
@@ -129,6 +222,8 @@ publishing {
         }
     }
 }
+
+
 
 
 

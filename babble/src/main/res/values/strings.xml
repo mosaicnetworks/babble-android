@@ -7,6 +7,8 @@
     <string name="new_group">New</string>
     <string name="no_moniker_alert_title">No moniker</string>
     <string name="no_moniker_alert_message">Please enter a moniker!</string>
+    <string name="no_group_name_alert_title">No group name</string>
+    <string name="no_group_name_alert_message">Please enter a group name!</string>
     <string name="no_hostname_alert_title">No hostname</string>
     <string name="no_hostname_alert_message">Please enter a hostname!</string>
     <string name="invalid_hostname_alert_title">Invalid hostname</string>
@@ -21,4 +23,13 @@
     <string name="ok_button">OK</string>
     <string name="babble_init_fail_title">Failed to start Babble</string>
     <string name="babble_init_fail_message">Please try again in a few seconds!\n\nIf this message keeps appearing, please check your WiFi connection</string>
+    <string name="service_discovery_resolve_fail_title">Unable to resolve mDNS service</string>
+    <string name="service_discovery_resolve_fail_message">Please try again in a few seconds!</string>
+    <string name="service_discovery_start_fail_title">Failed to start mDNS discovery</string>
+    <string name="service_discovery_start_fail_message">Please refresh to try again</string>
+    <string name="searching_services">Searching for services</string>
+    <string name="discovery_start_failed">Failed to start mDNS\nPlease refresh to try again</string>
+    <string name="group_name">Group name</string>
+    <string name="live_tab">LIVE</string>
+    <string name="archived_tab">ARCHIVED</string>
 </resources>

@@ -1,10 +1,11 @@
 package io.mosaicnetworks.babble.configure;
 
+import android.net.nsd.NsdServiceInfo;
+
 import io.mosaicnetworks.babble.node.BabbleService;
 
 /**
- * This interface defines listeners for the {@link JoinGroupFragment} and {@link NewGroupFragment}
- * fragments
+ * This interface defines listeners for the join group and new group fragments
  */
 public interface OnFragmentInteractionListener {
 
@@ -30,5 +31,14 @@ public interface OnFragmentInteractionListener {
      * @param moniker the moniker chosen by the user
      */
     void onStartedNew(String moniker);
+
+    /**
+     * This method will be called when the {@link BabbleService} has loaded an archive group
+     * @param moniker the moniker as chosen previous by the user. //TODO - do we need this
+     */
+    void onArchiveLoaded(String moniker);
+
+    void onServiceSelected(NsdServiceInfo serviceInfo);
+
 
 }

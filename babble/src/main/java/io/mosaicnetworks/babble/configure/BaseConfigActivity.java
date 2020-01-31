@@ -1,10 +1,12 @@
 package io.mosaicnetworks.babble.configure;
 
+import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.View;
 
 import io.mosaicnetworks.babble.R;
@@ -19,9 +21,9 @@ import io.mosaicnetworks.babble.node.BabbleService;
 public abstract class BaseConfigActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 
     private FragmentManager mFragmentManager;
-    private HomeFragment mHomeFragment;
+    private TabsFragment mHomeFragment;
     private NewGroupFragment mNewGroupFragment;
-    private JoinGroupFragment mJoinGroupFragment;
+    private JoinGroupFragment mJoinGroupMdnsFragment;
     public static final String PREFERENCE_FILE_KEY = "babbleandroid";
 
     @Override
@@ -30,7 +32,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         setContentView(R.layout.activity_base_config);
 
         mFragmentManager = getSupportFragmentManager();
-        mHomeFragment = HomeFragment.newInstance();
+        mHomeFragment = TabsFragment.newInstance();
 
         addFragment(mHomeFragment);
     }
@@ -54,16 +56,16 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         fragmentTransaction.commit();
     }
 
-    // called when the user presses the new button
+    // called when the user presses the new group (plus) button
     public void newGroup(View view) {
         mNewGroupFragment = NewGroupFragment.newInstance();
         replaceFragment(mNewGroupFragment);
     }
 
-    // called when the user presses the join button
-    public void joinGroup(View view) {
-        mJoinGroupFragment = JoinGroupFragment.newInstance();
-        replaceFragment(mJoinGroupFragment);
+    @Override
+    public void onServiceSelected(NsdServiceInfo serviceInfo) {
+        mJoinGroupMdnsFragment = JoinGroupFragment.newInstance(serviceInfo);
+        replaceFragment(mJoinGroupMdnsFragment);
     }
 
     @Override
@@ -74,4 +76,8 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
 
     @Override
     public abstract void onStartedNew(String moniker);
+
+    @Override
+    public abstract void onArchiveLoaded(String moniker);
+
 }

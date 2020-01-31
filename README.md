@@ -10,6 +10,8 @@ into their Android apps.
 
 A complete API reference can be found [here](https://javadoc.io/doc/io.mosaicnetworks/babble/latest/index.html)
 
+A tutorial can be found [here](https://android.babble.io)
+
 ## Quickstart
 
 The best place to start is [this](https://github.com/mosaicnetworks/babble-android/tree/master/docs/first_app) comprehensive tutorial,
@@ -17,7 +19,7 @@ which guides you through building the [sample app](https://github.com/mosaicnetw
 
 For the impatient, add the following to your app's `build.gradle` file:
 
-```implementation 'io.mosaicnetworks:babble:0.2.6'```
+```implementation 'io.mosaicnetworks:babble:0.3.0'```
 
 and start coding!
 

@@ -1,0 +1,954 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>First App &#8212; Babble Android 0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="What Next?" href="../whatnext/whatnext.html" />
+    <link rel="prev" title="Welcome to Babble Android" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/babblelogo2.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">Babble Android</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=mosaicnetworks&repo=babble&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to Babble Android</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">First App</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#our-first-minimal-app">Our First Minimal App</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#our-first-babble-app">Our First Babble App</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#our-first-babble-network">Our First Babble Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#some-explanations">Some Explanations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interacting-with-babble">Interacting with Babble</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#joining">Joining</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../whatnext/whatnext.html">What Next?</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">Welcome to Babble Android</a></li>
+      <li>Next: <a href="../whatnext/whatnext.html" title="next chapter">What Next?</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="first-app">
+<span id="firstapp"></span><h1>First App<a class="headerlink" href="#first-app" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>We will assume that you have installed Android Studio, an Android SDK with API
+version 29 and Android NDK. If you use a previous API version, the <code class="docutils literal notranslate"><span class="pre">create</span>
+<span class="pre">activity</span></code> items in these instructions will use AppCompat instead of
+AndroidX <a class="footnote-reference" href="#androidx" id="id1">[1]</a>, leading to incompatibilities with the pasted source code.
+The Babble node itself is compatible with AppCompat, but converting the sample
+to use AppCompat is beyond the scope of this article.</p>
+<p>This tutorial is going to assume deployment to a physical Android device. Thus
+you will need an Android device (minimum API version 19 <a class="footnote-reference" href="#androiddevice" id="id2">[2]</a>) with
+the developer options turned on, debugging enabled, and a suitable USB cable.
+You could use the android emulator, but that is beyond the scope of this
+article.</p>
+<table class="docutils footnote" frame="void" id="androidx" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>You can read more about AndroidX
+<a class="reference external" href="https://android-developers.googleblog.com/2018/05/hello-world-androidx.html">here</a>.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="androiddevice" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>API version 19 is Android 4.4 (KitKat). In May 2019, 3.8% of
+devices were using version 18 or lower. Android 4.4 was released in 2013.
+Whilst it would be possible to code support for earlier versions, the
+existing code uses Android features introduced in Android 4.4.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="our-first-minimal-app">
+<h2>Our First Minimal App<a class="headerlink" href="#our-first-minimal-app" title="Permalink to this headline">¶</a></h2>
+<p>First up, we will create a minimal app to test our environment and prove that we
+have loaded the <code class="docutils literal notranslate"><span class="pre">babble-android</span></code> library correctly. Fire up Android Studio and
+select <code class="docutils literal notranslate"><span class="pre">File/New</span> <span class="pre">Project</span></code>. You are asked to choose a project template.</p>
+<div class="figure" id="id5">
+<img alt="../_images/create_new_project.png" src="../_images/create_new_project.png" />
+<p class="caption"><span class="caption-text">Create New Project Screen</span></p>
+</div>
+<p>Choose <strong>Empty Activity</strong> from the <strong>Phone and Tablet</strong> tab, and click <strong>Next</strong>.</p>
+<div class="figure" id="id6">
+<img alt="../_images/new_project_options.png" src="../_images/new_project_options.png" />
+<p class="caption"><span class="caption-text">New Project Options</span></p>
+</div>
+<p>The options here should be self-explanatory. We would recommend not using spaces
+in the <strong>Package name</strong> or the <strong>Save location</strong>. Do not set the Minimum API
+level below 19. Click <strong>Finish</strong>.</p>
+<div class="figure" id="id7">
+<img alt="../_images/empty_android_studio.png" src="../_images/empty_android_studio.png" />
+<p class="caption"><span class="caption-text">Initial Android Studio</span></p>
+</div>
+<p>Android Studio will open, and after expanding some of the menus it will look
+something like above.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">the screen will change a few seconds after opening when the initial gradle
+scripts complete. The status bar at the bottom of the window should tell you
+this is happening.</p>
+</div>
+<div class="section" id="running-the-app">
+<h3>Running the App<a class="headerlink" href="#running-the-app" title="Permalink to this headline">¶</a></h3>
+<p>Connect your android device to your computer via a USB cable. First we will test
+that the Android Debug Bridge (<strong>adb</strong>) can see the device.</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ adb devices
+List of devices attached
+4JPNU18709118621    device
+</pre></div>
+</div>
+<p>The command <code class="docutils literal notranslate"><span class="pre">adb</span> <span class="pre">kill-server</span></code> will reset this connection.</p>
+<p>If you can see a device listed, go back to Android Studio and in the top right
+is a target device dropdown. Select your device from the list.</p>
+<div class="figure" id="id8">
+<img alt="../_images/device_selection.png" src="../_images/device_selection.png" />
+<p class="caption"><span class="caption-text">Select Device</span></p>
+</div>
+<p>If you cannot find your device in the list, the
+<code class="docutils literal notranslate"><span class="pre">Troubleshoot</span> <span class="pre">device</span> <span class="pre">connections</span></code> option on that menu should help.</p>
+<p>Then press that little green triangle to the right of the dropdown device menu.
+Gradle builds the app, which is then installed onto the physical Android device
+that you selected. The whole process took about 20 seconds on my laptop (feel
+free to buy me a quicker one).</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><div class="first last figure" id="id9">
+<img alt="../_images/mobile_step_1.png" src="../_images/mobile_step_1.png" />
+<p class="caption"><span class="caption-text">First App Screenshot</span></p>
+</div>
+</td>
+<td><div class="first last figure" id="id10">
+<img alt="../_images/default_icon.png" src="../_images/default_icon.png" />
+<p class="caption"><span class="caption-text">First App Icon</span></p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>If you look on the device, you should find the app installed, as on the right
+above.</p>
+<p>Congratulations, you have an app. Now onto Babble…</p>
+</div>
+</div>
+<div class="section" id="our-first-babble-app">
+<h2>Our First Babble App<a class="headerlink" href="#our-first-babble-app" title="Permalink to this headline">¶</a></h2>
+<p>We will now integrate the <code class="docutils literal notranslate"><span class="pre">babble-android</span></code> library into our skeleton app. We
+will use it to generate a key pair – just to prove that we have a working
+library instance.</p>
+<div class="section" id="integrating-the-babble-android-library">
+<h3>Integrating the Babble-Android Library<a class="headerlink" href="#integrating-the-babble-android-library" title="Permalink to this headline">¶</a></h3>
+<p>The library is hosted in <strong>jcenter</strong>. To make it available, we need to amend
+some gradle scripts.</p>
+<div class="figure" id="id11">
+<img alt="../_images/gradle_scripts.png" src="../_images/gradle_scripts.png" />
+<p class="caption"><span class="caption-text">Gradle Scripts</span></p>
+</div>
+<p>In Android Studio, double click on the Project <code class="docutils literal notranslate"><span class="pre">build.gradle</span></code> as highlighted
+in the screenshot above.</p>
+<p>We then add the 3 line <code class="docutils literal notranslate"><span class="pre">maven</span></code> instruction as below:</p>
+<div class="code highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">allprojects</span> <span class="p">{</span>
+    <span class="n">repositories</span> <span class="p">{</span>
+        <span class="n">google</span><span class="p">()</span>
+        <span class="n">jcenter</span><span class="p">()</span>
+        <span class="n">maven</span> <span class="p">{</span>
+            <span class="n">url</span> <span class="s1">&#39;https://dl.bintray.com/mosaicnetworks/maven&#39;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Which leaves the entire file looking like this:</p>
+<div class="code highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">Top</span><span class="o">-</span><span class="n">level</span> <span class="n">build</span> <span class="n">file</span> <span class="n">where</span> <span class="n">you</span> <span class="n">can</span> <span class="n">add</span> <span class="n">configuration</span> <span class="n">options</span> <span class="n">common</span> <span class="n">to</span> <span class="nb">all</span>
+<span class="o">//</span> <span class="n">sub</span><span class="o">-</span><span class="n">projects</span><span class="o">/</span><span class="n">modules</span><span class="o">.</span>
+
+<span class="n">buildscript</span> <span class="p">{</span>
+    <span class="n">repositories</span> <span class="p">{</span>
+        <span class="n">google</span><span class="p">()</span>
+        <span class="n">jcenter</span><span class="p">()</span>
+
+    <span class="p">}</span>
+    <span class="n">dependencies</span> <span class="p">{</span>
+        <span class="n">classpath</span> <span class="s1">&#39;com.android.tools.build:gradle:3.5.2&#39;</span>
+
+        <span class="o">//</span> <span class="n">NOTE</span><span class="p">:</span> <span class="n">Do</span> <span class="ow">not</span> <span class="n">place</span> <span class="n">your</span> <span class="n">application</span> <span class="n">dependencies</span> <span class="n">here</span><span class="p">;</span> <span class="n">they</span> <span class="n">belong</span>
+        <span class="o">//</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">individual</span> <span class="n">module</span> <span class="n">build</span><span class="o">.</span><span class="n">gradle</span> <span class="n">files</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">allprojects</span> <span class="p">{</span>
+    <span class="n">repositories</span> <span class="p">{</span>
+        <span class="n">google</span><span class="p">()</span>
+        <span class="n">jcenter</span><span class="p">()</span>
+        <span class="n">maven</span> <span class="p">{</span>
+            <span class="n">url</span> <span class="s1">&#39;https://dl.bintray.com/mosaicnetworks/maven&#39;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">task</span> <span class="n">clean</span><span class="p">(</span><span class="nb">type</span><span class="p">:</span> <span class="n">Delete</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">delete</span> <span class="n">rootProject</span><span class="o">.</span><span class="n">buildDir</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Next we need to amend the app <code class="docutils literal notranslate"><span class="pre">build.gradle</span></code> (it is below the Project
+<code class="docutils literal notranslate"><span class="pre">build.gradle</span></code> in the screenshot above). We add an implementation line to the
+bottom dependencies section.</p>
+<div class="code highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">implementation</span> <span class="s1">&#39;io.mosaicnetworks:babble:0.2.1&#39;</span>
+</pre></div>
+</div>
+<p>This leaves us with this full file:</p>
+<div class="code highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">apply</span> <span class="n">plugin</span><span class="p">:</span> <span class="s1">&#39;com.android.application&#39;</span>
+
+<span class="n">android</span> <span class="p">{</span>
+ <span class="n">compileSdkVersion</span> <span class="mi">29</span>
+ <span class="n">buildToolsVersion</span> <span class="s2">&quot;29.0.2&quot;</span>
+ <span class="n">defaultConfig</span> <span class="p">{</span>
+  <span class="n">applicationId</span> <span class="s2">&quot;io.mosaicnetworks.myfirstapp&quot;</span>
+  <span class="n">minSdkVersion</span> <span class="mi">19</span>
+  <span class="n">targetSdkVersion</span> <span class="mi">29</span>
+  <span class="n">versionCode</span> <span class="mi">1</span>
+  <span class="n">versionName</span> <span class="s2">&quot;1.0&quot;</span>
+  <span class="n">testInstrumentationRunner</span> <span class="s2">&quot;androidx.test.runner.AndroidJUnitRunner&quot;</span>
+<span class="p">}</span>
+<span class="n">buildTypes</span> <span class="p">{</span>
+ <span class="n">release</span> <span class="p">{</span>
+ <span class="n">minifyEnabled</span> <span class="n">false</span>
+ <span class="n">proguardFiles</span> <span class="n">getDefaultProguardFile</span><span class="p">(</span><span class="s1">&#39;proguard-android-optimize.txt&#39;</span><span class="p">),</span>
+     <span class="s1">&#39;proguard-rules.pro&#39;</span>
+  <span class="p">}</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">dependencies</span> <span class="p">{</span>
+  <span class="n">implementation</span> <span class="n">fileTree</span><span class="p">(</span><span class="nb">dir</span><span class="p">:</span> <span class="s1">&#39;libs&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;*.jar&#39;</span><span class="p">])</span>
+  <span class="n">implementation</span> <span class="s1">&#39;io.mosaicnetworks:babble:0.2.1&#39;</span>
+  <span class="n">implementation</span> <span class="s1">&#39;androidx.appcompat:appcompat:1.1.0&#39;</span>
+  <span class="n">implementation</span> <span class="s1">&#39;androidx.constraintlayout:constraintlayout:1.1.3&#39;</span>
+  <span class="n">testImplementation</span> <span class="s1">&#39;junit:junit:4.12&#39;</span>
+  <span class="n">androidTestImplementation</span> <span class="s1">&#39;androidx.test.ext:junit:1.1.1&#39;</span>
+  <span class="n">androidTestImplementation</span> <span class="s1">&#39;androidx.test.espresso:espresso-core:3.2.0&#39;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="figure" id="id12">
+<img alt="../_images/sync_message.png" src="../_images/sync_message.png" />
+<p class="caption"><span class="caption-text">Sync Message</span></p>
+</div>
+</div>
+<div class="section" id="using-the-library">
+<h3>Using the Library<a class="headerlink" href="#using-the-library" title="Permalink to this headline">¶</a></h3>
+<p>The library should now be included in the project. So lets use it! Open
+<code class="docutils literal notranslate"><span class="pre">MainActivity.java</span></code> as below:</p>
+<div class="figure" id="id13">
+<img alt="../_images/main_activity.png" src="../_images/main_activity.png" />
+<p class="caption"><span class="caption-text">Main Activity</span></p>
+</div>
+<p>Add the lines below underneath the last import statement. The lines will appear
+greyed out, as the import is not yet used. As well as Babble we are importing
+the <code class="docutils literal notranslate"><span class="pre">Log</span></code> package to write to the Android logs.</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">io.mosaicnetworks.babble.node.KeyPair</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">android.util.Log</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Add the following lines as the last line of the <code class="docutils literal notranslate"><span class="pre">onCreate</span></code> function</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">KeyPair</span> <span class="n">kp</span> <span class="o">=</span> <span class="n">new</span> <span class="n">KeyPair</span><span class="p">();</span>
+<span class="n">Log</span><span class="o">.</span><span class="n">i</span><span class="p">(</span><span class="s2">&quot;Yippee&quot;</span><span class="p">,</span><span class="n">kp</span><span class="o">.</span><span class="n">privateKey</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This code generates a key pair and writes the private code to the logs.</p>
+<p>Save all the files and run your app.</p>
+<div class="figure" id="id14">
+<img alt="../_images/logcat.png" src="../_images/logcat.png" />
+<p class="caption"><span class="caption-text">LogCat</span></p>
+</div>
+<p>The app looks exactly as per the previous iteration, so lets take a look under
+the hood. Press logcat, as highlighted in gray in the screenshot above. Then
+type <code class="docutils literal notranslate"><span class="pre">yippee</span></code> in the search box at the top of that window to filter the logs.
+You should have a freshly generated private key in there.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The project at this stage is available from github from
+<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage1">the stage1 branch of the tutorial repo</a>.</p>
+</div>
+<p>The downloadable version of the project has <em>Mosaic Networks</em> icons, rather than
+the default Android ones. You can customise the icons using
+<a class="reference external" href="(https://developer.android.com/studio/write/image-asset-studio">Android Studio Image Asset Studio</a>.</p>
+</div>
+</div>
+<div class="section" id="our-first-babble-network">
+<h2>Our First Babble Network<a class="headerlink" href="#our-first-babble-network" title="Permalink to this headline">¶</a></h2>
+<p>Now we have access to the Babble library from within our app, the next stage is
+to start a Babble network. We will start with a single node. But before we can
+start Babble we need to add some UI elements to allow us to interact with our
+babble node.</p>
+<p>Currently our application launches the activity <code class="docutils literal notranslate"><span class="pre">MainActivity</span></code> which calls the
+key pair generation code in it’s <code class="docutils literal notranslate"><span class="pre">onCreate</span></code> method.</p>
+<p>In the Sample App <a class="footnote-reference" href="#sampleapp" id="id3">[3]</a> that we are working towards, the MainActivity
+Screen presents the user with a choice of “<strong>New</strong>” or “<strong>Join</strong>”. <strong>New</strong>
+starts a new Babble network with your device as the sole peer. <strong>Join</strong> lets you
+specify the address of an existing network, pull down the configuration for that
+network and request to join it.</p>
+<p>As <strong>New</strong> is standalone functionality, and <strong>Join</strong> requires <strong>New</strong> be
+implemented to function, we will implement <strong>New</strong> first.</p>
+<table class="docutils footnote" frame="void" id="sampleapp" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>The sample app is part of the <code class="docutils literal notranslate"><span class="pre">babble-android</span></code> library and is
+available from the
+<a class="reference external" href="https://github.com/mosaicnetworks/babble-android">GitHub repo</a>.</td></tr>
+</tbody>
+</table>
+<div class="section" id="main-activity">
+<h3>Main Activity<a class="headerlink" href="#main-activity" title="Permalink to this headline">¶</a></h3>
+<p>First up we will amend <code class="docutils literal notranslate"><span class="pre">MainActivity.java</span></code>. replace all of the code with the
+following:</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">io</span><span class="o">.</span><span class="n">mosaicnetworks</span><span class="o">.</span><span class="n">myfirstapp</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">androidx.appcompat.app.AppCompatActivity</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">android.content.Intent</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">io.mosaicnetworks.babble.node.KeyPair</span><span class="p">;</span>
+
+
+<span class="kn">import</span> <span class="nn">io.mosaicnetworks.babble.configure.BaseConfigActivity</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">io.mosaicnetworks.babble.node.BabbleService</span><span class="p">;</span>
+
+
+<span class="kn">import</span> <span class="nn">android.util.Log</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">MainActivity</span> <span class="n">extends</span> <span class="n">BaseConfigActivity</span> <span class="p">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">BabbleService</span> <span class="n">getBabbleService</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">MessagingService</span><span class="o">.</span><span class="n">getInstance</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">void</span> <span class="n">onJoined</span><span class="p">(</span><span class="n">String</span> <span class="n">moniker</span><span class="p">)</span> <span class="p">{</span>
+        <span class="o">//</span> <span class="n">DO</span> <span class="n">nothing</span> <span class="k">for</span> <span class="n">now</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">void</span> <span class="n">onStartedNew</span><span class="p">(</span><span class="n">String</span> <span class="n">moniker</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Intent</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">ChatActivity</span><span class="o">.</span><span class="n">class</span><span class="p">);</span>
+        <span class="n">intent</span><span class="o">.</span><span class="n">putExtra</span><span class="p">(</span><span class="s2">&quot;MONIKER&quot;</span><span class="p">,</span> <span class="n">moniker</span><span class="p">);</span>
+        <span class="n">startActivity</span><span class="p">(</span><span class="n">intent</span><span class="p">);</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>We have removed our key generation in the onCreate method. Instead,
+<code class="docutils literal notranslate"><span class="pre">MainActivity</span></code> now extends <code class="docutils literal notranslate"><span class="pre">BaseConfigActivity</span></code>. The <code class="docutils literal notranslate"><span class="pre">BaseConfigActivity</span></code>
+provides screens to create <strong>New</strong> and to <strong>Join</strong> networks. We just need to
+define the callback event handlers for each case. The further processing is
+identical in both cases - both result in your Babble node being started and
+in a Babble network – the only difference is the number of nodes.</p>
+<p>If you want more control over the network joining screens, the branches with
+0.2.1 suffices in the github repo have a worked version using activities
+external to the <code class="docutils literal notranslate"><span class="pre">babble-android</span></code> library.</p>
+<p>Add the line below as the first line of the class, we will use this later to
+identify log messages from our app. :</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">public</span> <span class="k">class</span> <span class="nc">MainActivity</span> <span class="n">extends</span> <span class="n">AppCompatActivity</span> <span class="p">{</span>
+
+    <span class="n">public</span> <span class="n">static</span> <span class="n">final</span> <span class="n">String</span> <span class="n">TAG</span> <span class="o">=</span> <span class="s2">&quot;FIRST-BABBLE-APP&quot;</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="appstate-java">
+<h3>AppState.java<a class="headerlink" href="#appstate-java" title="Permalink to this headline">¶</a></h3>
+<p>Copy the source below into place in the same folder as <code class="docutils literal notranslate"><span class="pre">MainActivity.java</span></code>:</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">io</span><span class="o">.</span><span class="n">mosaicnetworks</span><span class="o">.</span><span class="n">myfirstapp</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">com.google.gson.JsonSyntaxException</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">java.nio.charset.StandardCharsets</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.util.HashMap</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">io.mosaicnetworks.babble.node.BabbleState</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">AppState</span> <span class="n">implements</span> <span class="n">BabbleState</span> <span class="p">{</span>
+
+    <span class="n">private</span> <span class="n">byte</span><span class="p">[]</span> <span class="n">mStateHash</span> <span class="o">=</span> <span class="n">new</span> <span class="n">byte</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+    <span class="n">private</span> <span class="n">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">Integer</span><span class="p">,</span> <span class="n">BabbleTx</span><span class="o">&gt;</span> <span class="n">mState</span> <span class="o">=</span> <span class="n">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+    <span class="n">private</span> <span class="n">Integer</span> <span class="n">mNextIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">byte</span><span class="p">[]</span> <span class="n">applyTransactions</span><span class="p">(</span><span class="n">byte</span><span class="p">[][]</span> <span class="n">transactions</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">byte</span><span class="p">[]</span> <span class="n">rawTx</span><span class="p">:</span><span class="n">transactions</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">String</span> <span class="n">tx</span> <span class="o">=</span> <span class="n">new</span> <span class="n">String</span><span class="p">(</span><span class="n">rawTx</span><span class="p">,</span> <span class="n">StandardCharsets</span><span class="o">.</span><span class="n">UTF_8</span><span class="p">);</span>
+
+            <span class="n">BabbleTx</span> <span class="n">babbleTx</span><span class="p">;</span>
+            <span class="k">try</span> <span class="p">{</span>
+                <span class="n">babbleTx</span> <span class="o">=</span> <span class="n">BabbleTx</span><span class="o">.</span><span class="n">fromJson</span><span class="p">(</span><span class="n">tx</span><span class="p">);</span>
+            <span class="p">}</span> <span class="n">catch</span> <span class="p">(</span><span class="n">JsonSyntaxException</span> <span class="n">ex</span><span class="p">)</span> <span class="p">{</span>
+                <span class="o">//</span><span class="n">skip</span> <span class="nb">any</span> <span class="n">malformed</span> <span class="n">transactions</span>
+                <span class="k">continue</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="n">mState</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">mNextIndex</span><span class="p">,</span> <span class="n">babbleTx</span><span class="p">);</span>
+            <span class="n">mNextIndex</span><span class="o">++</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="n">updateStateHash</span><span class="p">();</span>
+        <span class="k">return</span> <span class="n">mStateHash</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">void</span> <span class="n">reset</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">mState</span><span class="o">.</span><span class="n">clear</span><span class="p">();</span>
+        <span class="n">mNextIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Message</span><span class="o">&gt;</span> <span class="n">getMessagesFromIndex</span><span class="p">(</span><span class="n">Integer</span> <span class="n">index</span><span class="p">)</span> <span class="p">{</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">index</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">throw</span> <span class="n">new</span> <span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s2">&quot;Index cannot be less than 0&quot;</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="n">mNextIndex</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="n">Integer</span> <span class="n">numMessages</span> <span class="o">=</span> <span class="n">mNextIndex</span> <span class="o">-</span> <span class="n">index</span><span class="p">;</span>
+
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">Message</span><span class="o">&gt;</span> <span class="n">messages</span> <span class="o">=</span> <span class="n">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">numMessages</span><span class="p">);</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="nb">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">numMessages</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Message</span><span class="o">.</span><span class="n">fromBabbleTx</span><span class="p">(</span><span class="n">mState</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="n">i</span><span class="p">)));</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">messages</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">private</span> <span class="n">void</span> <span class="n">updateStateHash</span><span class="p">()</span> <span class="p">{</span>
+        <span class="o">//</span><span class="n">TODO</span><span class="p">:</span> <span class="n">implement</span> <span class="n">this</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="babbletx-java">
+<h3>BabbleTx.java<a class="headerlink" href="#babbletx-java" title="Permalink to this headline">¶</a></h3>
+<p>Copy the source below into place in the same folder as <code class="docutils literal notranslate"><span class="pre">MainActivity.java</span></code>:</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">io</span><span class="o">.</span><span class="n">mosaicnetworks</span><span class="o">.</span><span class="n">myfirstapp</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">com.google.gson.Gson</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">com.google.gson.annotations.SerializedName</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">BabbleTx</span> <span class="n">implements</span> <span class="n">io</span><span class="o">.</span><span class="n">mosaicnetworks</span><span class="o">.</span><span class="n">babble</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">BabbleTx</span> <span class="p">{</span>
+
+    <span class="n">private</span> <span class="n">final</span> <span class="n">static</span> <span class="n">Gson</span> <span class="n">gson</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Gson</span><span class="p">();</span>
+
+    <span class="nd">@SerializedName</span><span class="p">(</span><span class="s2">&quot;from&quot;</span><span class="p">)</span>
+    <span class="n">public</span> <span class="n">final</span> <span class="n">String</span> <span class="n">from</span><span class="p">;</span>
+
+    <span class="nd">@SerializedName</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">)</span>
+    <span class="n">public</span> <span class="n">final</span> <span class="n">String</span> <span class="n">text</span><span class="p">;</span>
+
+    <span class="n">public</span> <span class="n">BabbleTx</span><span class="p">(</span><span class="n">String</span> <span class="n">from</span><span class="p">,</span> <span class="n">String</span> <span class="n">text</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="o">.</span><span class="kn">from</span> <span class="o">=</span> <span class="n">from</span><span class="p">;</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">static</span> <span class="n">BabbleTx</span> <span class="n">fromJson</span><span class="p">(</span><span class="n">String</span> <span class="n">txJson</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">gson</span><span class="o">.</span><span class="n">fromJson</span><span class="p">(</span><span class="n">txJson</span><span class="p">,</span> <span class="n">BabbleTx</span><span class="o">.</span><span class="n">class</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">byte</span><span class="p">[]</span> <span class="n">toBytes</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">gson</span><span class="o">.</span><span class="n">toJson</span><span class="p">(</span><span class="n">this</span><span class="p">)</span><span class="o">.</span><span class="n">getBytes</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="message-java">
+<h3>Message.java<a class="headerlink" href="#message-java" title="Permalink to this headline">¶</a></h3>
+<p>Copy the source below into place in the same folder as <code class="docutils literal notranslate"><span class="pre">MainActivity.java</span></code>:</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">io</span><span class="o">.</span><span class="n">mosaicnetworks</span><span class="o">.</span><span class="n">myfirstapp</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">com.stfalcon.chatkit.commons.models.IMessage</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">com.stfalcon.chatkit.commons.models.IUser</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Date</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="n">final</span> <span class="k">class</span> <span class="nc">Message</span> <span class="n">implements</span> <span class="n">IMessage</span> <span class="p">{</span>
+
+    <span class="n">public</span> <span class="n">final</span> <span class="n">static</span> <span class="k">class</span> <span class="nc">Author</span> <span class="n">implements</span> <span class="n">IUser</span> <span class="p">{</span>
+
+        <span class="n">private</span> <span class="n">final</span> <span class="n">String</span> <span class="n">mName</span><span class="p">;</span>
+
+        <span class="n">public</span> <span class="n">Author</span><span class="p">(</span><span class="n">String</span> <span class="n">name</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">mName</span> <span class="o">=</span> <span class="n">name</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="n">public</span> <span class="n">String</span> <span class="n">getId</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">mName</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="n">public</span> <span class="n">String</span> <span class="n">getName</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">mName</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nd">@Override</span>
+        <span class="n">public</span> <span class="n">String</span> <span class="n">getAvatar</span><span class="p">()</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">null</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">private</span> <span class="n">final</span> <span class="n">String</span> <span class="n">mText</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">final</span> <span class="n">String</span> <span class="n">mAuthor</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">final</span> <span class="n">Date</span> <span class="n">mDate</span><span class="p">;</span>
+
+    <span class="n">public</span> <span class="n">Message</span><span class="p">(</span><span class="n">String</span> <span class="n">text</span><span class="p">,</span> <span class="n">String</span> <span class="n">author</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">mText</span> <span class="o">=</span> <span class="n">text</span><span class="p">;</span>
+        <span class="n">mAuthor</span> <span class="o">=</span> <span class="n">author</span><span class="p">;</span>
+        <span class="n">mDate</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Date</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">static</span> <span class="n">Message</span> <span class="n">fromBabbleTx</span><span class="p">(</span><span class="n">BabbleTx</span> <span class="n">babbleTx</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">new</span> <span class="n">Message</span><span class="p">(</span><span class="n">babbleTx</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">babbleTx</span><span class="o">.</span><span class="n">from</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">public</span> <span class="n">BabbleTx</span> <span class="n">toBabbleTx</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">new</span> <span class="n">BabbleTx</span><span class="p">(</span><span class="n">mAuthor</span><span class="p">,</span> <span class="n">mText</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">String</span> <span class="n">getId</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">mAuthor</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">String</span> <span class="n">getText</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">mText</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">Author</span> <span class="n">getUser</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">new</span> <span class="n">Author</span><span class="p">(</span><span class="n">mAuthor</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">Date</span> <span class="n">getCreatedAt</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">mDate</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You will note the section below introduces an external dependency:</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">com.stfalcon.chatkit.commons.models.IMessage</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">com.stfalcon.chatkit.commons.models.IUser</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Add the lines below to the app <code class="docutils literal notranslate"><span class="pre">build.gradle</span></code> file dependencies section, and
+click <strong>Sync Now</strong> on the pop up bar:</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">implementation</span> <span class="s1">&#39;com.google.code.gson:gson:2.8.5&#39;</span>
+<span class="n">implementation</span> <span class="s1">&#39;com.github.stfalcon:chatkit:0.3.3&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="messagingservice-java">
+<h3>MessagingService.java<a class="headerlink" href="#messagingservice-java" title="Permalink to this headline">¶</a></h3>
+<p>Copy the source below into place in the same folder as <code class="docutils literal notranslate"><span class="pre">MainActivity.java</span></code>:</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">io</span><span class="o">.</span><span class="n">mosaicnetworks</span><span class="o">.</span><span class="n">myfirstapp</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">io.mosaicnetworks.babble.node.BabbleService</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="n">final</span> <span class="k">class</span> <span class="nc">MessagingService</span> <span class="n">extends</span> <span class="n">BabbleService</span><span class="o">&lt;</span><span class="n">AppState</span><span class="o">&gt;</span> <span class="p">{</span>
+
+    <span class="n">private</span> <span class="n">static</span> <span class="n">MessagingService</span> <span class="n">INSTANCE</span><span class="p">;</span>
+
+    <span class="n">public</span> <span class="n">static</span> <span class="n">MessagingService</span> <span class="n">getInstance</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">INSTANCE</span><span class="o">==</span><span class="n">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">INSTANCE</span> <span class="o">=</span> <span class="n">new</span> <span class="n">MessagingService</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">INSTANCE</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">private</span> <span class="n">MessagingService</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">new</span> <span class="n">AppState</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="chat-activity">
+<h3>Chat Activity<a class="headerlink" href="#chat-activity" title="Permalink to this headline">¶</a></h3>
+<p>Create a new empty activity, <code class="docutils literal notranslate"><span class="pre">ChatActivity</span></code>. We will not add any functionality
+to it at this point, we just need it to exist as it is referenced in
+<code class="docutils literal notranslate"><span class="pre">MainActivity</span></code>.</p>
+</div>
+<div class="section" id="running-babble">
+<h3>Running Babble<a class="headerlink" href="#running-babble" title="Permalink to this headline">¶</a></h3>
+<p>And finally after all of that cut and paste, we have a working instance of
+babble — albeit with at least one major drawback — it has no UI and no way
+to access it.</p>
+<p>If you start the app through Android Studio, and look at the logcat output
+(filtered to just our app), after pressing the New button, entering a Moniker
+and pressing the Join button, you should see something like below:</p>
+<div class="figure" id="id15">
+<img alt="../_images/logcat_babble.png" src="../_images/logcat_babble.png" />
+<p class="caption"><span class="caption-text">First Babble LogCat</span></p>
+</div>
+<p>The lines of red text are the lines of interest, stripping out the date and
+other prefixes gives something like:</p>
+<div class="code highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Creating InmemStore&quot;</span> <span class="n">prefix</span><span class="o">=</span><span class="n">babble</span>
+<span class="n">msg</span><span class="o">=</span><span class="n">PARTICIPANTS</span> <span class="n">genesis_peers</span><span class="o">=</span><span class="mi">1</span> <span class="nb">id</span><span class="o">=</span><span class="mi">2193277640</span> <span class="n">moniker</span><span class="o">=</span><span class="n">Jon</span> <span class="n">peers</span><span class="o">=</span><span class="mi">1</span> <span class="n">prefix</span><span class="o">=</span><span class="n">babble</span>
+<span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Start Listening&quot;</span> <span class="n">prefix</span><span class="o">=</span><span class="n">babble</span>
+<span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Node belongs to PeerSet&quot;</span> <span class="n">prefix</span><span class="o">=</span><span class="n">babble</span>
+<span class="n">msg</span><span class="o">=</span><span class="s2">&quot;FastSync not enabled =&gt; Babbling&quot;</span> <span class="n">prefix</span><span class="o">=</span><span class="n">babble</span>
+<span class="n">msg</span><span class="o">=</span><span class="n">SetHeadAndSeq</span> <span class="n">core</span><span class="o">.</span><span class="n">Head</span><span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">Seq</span><span class="o">=-</span><span class="mi">1</span> <span class="n">prefix</span><span class="o">=</span><span class="n">babble</span>
+<span class="n">msg</span><span class="o">=</span><span class="n">runasync</span> <span class="n">gossip</span><span class="o">=</span><span class="n">true</span> <span class="n">prefix</span><span class="o">=</span><span class="n">babble</span>
+<span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Run loop&quot;</span> <span class="n">prefix</span><span class="o">=</span><span class="n">babble</span> <span class="n">state</span><span class="o">=</span><span class="n">Babbling</span>
+<span class="n">msg</span><span class="o">=</span><span class="n">BABBLING</span> <span class="n">prefix</span><span class="o">=</span><span class="n">babble</span>
+</pre></div>
+</div>
+<p>The key item is the “<strong>state=Babbling</strong>” line, which denotes that Babble is up
+and running.</p>
+</div>
+</div>
+<div class="section" id="some-explanations">
+<h2>Some Explanations<a class="headerlink" href="#some-explanations" title="Permalink to this headline">¶</a></h2>
+<p>We have just added a lot of code, which is all co-dependent. Now we have a
+babble invocation in place, we can pause to explain what just happened there.</p>
+<p>The configuration of a Babble node is handled by the <code class="docutils literal notranslate"><span class="pre">BaseConfigActivity</span></code>
+class from whom <code class="docutils literal notranslate"><span class="pre">MainActivity</span></code> inherits. We just need to wire in the
+<code class="docutils literal notranslate"><span class="pre">ChatActivity</span></code> to take over once we have a Babble network.</p>
+<p>We define a <code class="docutils literal notranslate"><span class="pre">MessagingService</span></code> using the <code class="docutils literal notranslate"><span class="pre">getBabbleService()</span></code> function. This
+boilerplate class wraps <code class="docutils literal notranslate"><span class="pre">BabbleService</span></code> from the babble-android library.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The project at this stage is available from
+<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage2">the stage2 branch of the tutorial repo</a>.</p>
+</div>
+</div>
+<div class="section" id="interacting-with-babble">
+<h2>Interacting with Babble<a class="headerlink" href="#interacting-with-babble" title="Permalink to this headline">¶</a></h2>
+<p>The next stage is to make Babble usable. To do that we need to work on the
+<code class="docutils literal notranslate"><span class="pre">ChatActivity</span></code> so it sends and receives messages from Babble.</p>
+<p>First up we need a UI. We are going to use
+<a class="reference external" href="https://github.com/stfalcon-studio/ChatKit">ChatKit</a> rather than reinvent the
+wheel.</p>
+<div class="section" id="activity-chat-xml">
+<h3>activity_chat.xml<a class="headerlink" href="#activity-chat-xml" title="Permalink to this headline">¶</a></h3>
+<p>We can then add the layout to <code class="docutils literal notranslate"><span class="pre">res/layout/activity_chat.xml</span></code>
+— replace all the contents with the code below:</p>
+<div class="code xml highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;RelativeLayout
+    xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;
+    xmlns:app=&quot;http://schemas.android.com/apk/res-auto&quot;
+    xmlns:tools=&quot;http://schemas.android.com/tools&quot;
+    android:layout_width=&quot;match_parent&quot;
+    android:layout_height=&quot;match_parent&quot;
+    android:background=&quot;@color/white&quot;
+    tools:context=&quot;.ChatActivity&quot;&gt;
+
+    &lt;com.stfalcon.chatkit.messages.MessagesList
+        android:id=&quot;@+id/messagesList&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;match_parent&quot;
+        android:layout_above=&quot;@+id/input&quot;/&gt;
+
+    &lt;View
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;1dp&quot;
+        android:layout_above=&quot;@+id/input&quot;
+        android:layout_marginLeft=&quot;16dp&quot;
+        android:layout_marginRight=&quot;16dp&quot;
+        android:background=&quot;@color/gray_light&quot;/&gt;
+
+    &lt;com.stfalcon.chatkit.messages.MessageInput
+        android:id=&quot;@+id/input&quot;
+        android:layout_width=&quot;match_parent&quot;
+        android:layout_height=&quot;wrap_content&quot;
+        android:layout_alignParentBottom=&quot;true&quot;
+        app:inputHint=&quot;@string/hint_enter_a_message&quot;
+        app:showAttachmentButton=&quot;true&quot;/&gt;
+
+&lt;/RelativeLayout&gt;
+</pre></div>
+</div>
+<p>The layout here is a fairly standard chat layout a message entry section at the
+bottom of the screen and a message display above it.</p>
+</div>
+<div class="section" id="colors-xml">
+<h3>colors.xml<a class="headerlink" href="#colors-xml" title="Permalink to this headline">¶</a></h3>
+<p>We need to the add the following to <code class="docutils literal notranslate"><span class="pre">res/values/colors.xml</span></code> as it is used in
+the code changes above.</p>
+<div class="code xml highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">color</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;gray_light&quot;</span><span class="o">&gt;</span><span class="c1">#e8e8e8&lt;/color&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="chatactivity-java">
+<h3>ChatActivity.java<a class="headerlink" href="#chatactivity-java" title="Permalink to this headline">¶</a></h3>
+<p>Replace all of the file <code class="docutils literal notranslate"><span class="pre">ChatActivity.java</span></code> with the code below:</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">package</span> <span class="n">io</span><span class="o">.</span><span class="n">mosaicnetworks</span><span class="o">.</span><span class="n">myfirstapp</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">android.content.Intent</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">android.os.Bundle</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">android.widget.Toast</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">androidx.appcompat.app.AppCompatActivity</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">com.stfalcon.chatkit.messages.MessageInput</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">com.stfalcon.chatkit.messages.MessagesList</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">com.stfalcon.chatkit.messages.MessagesListAdapter</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="p">;</span>
+
+<span class="kn">import</span> <span class="nn">io.mosaicnetworks.babble.node.BabbleService</span><span class="p">;</span>
+<span class="kn">import</span> <span class="nn">io.mosaicnetworks.babble.node.ServiceObserver</span><span class="p">;</span>
+
+<span class="n">public</span> <span class="k">class</span> <span class="nc">ChatActivity</span> <span class="n">extends</span> <span class="n">AppCompatActivity</span> <span class="n">implements</span> <span class="n">ServiceObserver</span> <span class="p">{</span>
+
+    <span class="n">private</span> <span class="n">MessagesListAdapter</span><span class="o">&lt;</span><span class="n">Message</span><span class="o">&gt;</span> <span class="n">mAdapter</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">String</span> <span class="n">mMoniker</span><span class="p">;</span>
+    <span class="n">private</span> <span class="n">final</span> <span class="n">MessagingService</span> <span class="n">mMessagingService</span> <span class="o">=</span>
+                                            <span class="n">MessagingService</span><span class="o">.</span><span class="n">getInstance</span><span class="p">();</span>
+    <span class="n">private</span> <span class="n">Integer</span> <span class="n">mMessageIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">protected</span> <span class="n">void</span> <span class="n">onCreate</span><span class="p">(</span><span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">super</span><span class="o">.</span><span class="n">onCreate</span><span class="p">(</span><span class="n">savedInstanceState</span><span class="p">);</span>
+        <span class="n">setContentView</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">activity_chat</span><span class="p">);</span>
+
+        <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="n">getIntent</span><span class="p">();</span>
+        <span class="n">mMoniker</span> <span class="o">=</span> <span class="n">intent</span><span class="o">.</span><span class="n">getStringExtra</span><span class="p">(</span><span class="s2">&quot;MONIKER&quot;</span><span class="p">);</span>
+
+        <span class="n">initialiseAdapter</span><span class="p">();</span>
+        <span class="n">mMessagingService</span><span class="o">.</span><span class="n">registerObserver</span><span class="p">(</span><span class="n">this</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">mMessagingService</span><span class="o">.</span><span class="n">getState</span><span class="p">()</span><span class="o">!=</span>
+                        <span class="n">BabbleService</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">RUNNING_WITH_DISCOVERY</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">Toast</span><span class="o">.</span><span class="n">makeText</span><span class="p">(</span><span class="n">this</span><span class="p">,</span>
+                        <span class="s2">&quot;Unable to advertise peers&quot;</span><span class="p">,</span>
+                        <span class="n">Toast</span><span class="o">.</span><span class="n">LENGTH_LONG</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">private</span> <span class="n">void</span> <span class="n">initialiseAdapter</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">MessagesList</span> <span class="n">mMessagesList</span> <span class="o">=</span> <span class="n">findViewById</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">messagesList</span><span class="p">);</span>
+
+        <span class="n">mAdapter</span> <span class="o">=</span> <span class="n">new</span> <span class="n">MessagesListAdapter</span><span class="o">&lt;&gt;</span><span class="p">(</span><span class="n">mMoniker</span><span class="p">,</span> <span class="n">null</span><span class="p">);</span>
+        <span class="n">mMessagesList</span><span class="o">.</span><span class="n">setAdapter</span><span class="p">(</span><span class="n">mAdapter</span><span class="p">);</span>
+
+        <span class="n">MessageInput</span> <span class="nb">input</span> <span class="o">=</span> <span class="n">findViewById</span><span class="p">(</span><span class="n">R</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">input</span><span class="p">);</span>
+
+        <span class="nb">input</span><span class="o">.</span><span class="n">setInputListener</span><span class="p">(</span><span class="n">new</span> <span class="n">MessageInput</span><span class="o">.</span><span class="n">InputListener</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nd">@Override</span>
+            <span class="n">public</span> <span class="n">boolean</span> <span class="n">onSubmit</span><span class="p">(</span><span class="n">CharSequence</span> <span class="nb">input</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">mMessagingService</span><span class="o">.</span><span class="n">submitTx</span><span class="p">(</span>
+                    <span class="n">new</span> <span class="n">Message</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">toString</span><span class="p">(),</span> <span class="n">mMoniker</span><span class="p">)</span><span class="o">.</span><span class="n">toBabbleTx</span><span class="p">());</span>
+                <span class="k">return</span> <span class="n">true</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">void</span> <span class="n">stateUpdated</span><span class="p">()</span> <span class="p">{</span>
+
+        <span class="n">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Message</span><span class="o">&gt;</span> <span class="n">newMessages</span> <span class="o">=</span>
+                <span class="n">mMessagingService</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">getMessagesFromIndex</span><span class="p">(</span><span class="n">mMessageIndex</span><span class="p">);</span>
+
+        <span class="n">runOnUiThread</span><span class="p">(</span><span class="n">new</span> <span class="n">Runnable</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nd">@Override</span>
+            <span class="n">public</span> <span class="n">void</span> <span class="n">run</span><span class="p">()</span> <span class="p">{</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">Message</span> <span class="n">message</span> <span class="p">:</span> <span class="n">newMessages</span> <span class="p">)</span> <span class="p">{</span>
+                    <span class="n">mAdapter</span><span class="o">.</span><span class="n">addToStart</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">});</span>
+
+        <span class="n">mMessageIndex</span> <span class="o">=</span> <span class="n">mMessageIndex</span> <span class="o">+</span> <span class="n">newMessages</span><span class="o">.</span><span class="n">size</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">public</span> <span class="n">void</span> <span class="n">onBackPressed</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">mMessagingService</span><span class="o">.</span><span class="n">leave</span><span class="p">(</span><span class="n">null</span><span class="p">);</span>
+        <span class="nb">super</span><span class="o">.</span><span class="n">onBackPressed</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">protected</span> <span class="n">void</span> <span class="n">onDestroy</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">mMessagingService</span><span class="o">.</span><span class="n">removeObserver</span><span class="p">(</span><span class="n">this</span><span class="p">);</span>
+
+        <span class="nb">super</span><span class="o">.</span><span class="n">onDestroy</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="strings-xml">
+<h3>strings.xml<a class="headerlink" href="#strings-xml" title="Permalink to this headline">¶</a></h3>
+<p>We need to add the following to <code class="docutils literal notranslate"><span class="pre">res/values/strings.xml</span></code> as they are used in
+the code changes above.</p>
+<div class="code xml highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">string</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;hint_enter_a_message&quot;</span><span class="o">&gt;</span><span class="n">Enter</span> <span class="n">a</span> <span class="n">message</span><span class="o">&lt;/</span><span class="n">string</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="build-run-and-test">
+<h3>Build, Run and Test<a class="headerlink" href="#build-run-and-test" title="Permalink to this headline">¶</a></h3>
+<p>Build your app and run it. You should now be able to start a chat with yourself
+and send messages to yourself as below:</p>
+<div class="figure" id="id16">
+<a class="reference internal image-reference" href="../_images/first_chat.png"><img alt="../_images/first_chat.png" src="../_images/first_chat.png" style="width: 80%;" /></a>
+<p class="caption"><span class="caption-text">First Chat</span></p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The project at this stage is available from
+<a class="reference external" href="(https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage3">the stage3 branch of the tutorial repo</a>.</p>
+</div>
+</div>
+</div>
+<div class="section" id="joining">
+<h2>Joining<a class="headerlink" href="#joining" title="Permalink to this headline">¶</a></h2>
+<p>Thus far, we have been dealing with a single node, which kind of misses the
+whole point of using distributed consensus. This section remedies this. We will
+add a new button in the <code class="docutils literal notranslate"><span class="pre">MainActivity</span></code> to <strong>Join</strong> an existing network. This
+will require discovering the network; we will enter the IP address of an
+existing node, but more sophisticated service-discovery schemes would be used in
+a production environment.</p>
+<p>Add the following three lines of code to <code class="docutils literal notranslate"><span class="pre">MainActivity.java</span></code>:</p>
+<div class="code java highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@Override</span>
+<span class="n">public</span> <span class="n">void</span> <span class="n">onJoined</span><span class="p">(</span><span class="n">String</span> <span class="n">moniker</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Intent</span> <span class="n">intent</span> <span class="o">=</span> <span class="n">new</span> <span class="n">Intent</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">ChatActivity</span><span class="o">.</span><span class="n">class</span><span class="p">);</span>
+    <span class="n">intent</span><span class="o">.</span><span class="n">putExtra</span><span class="p">(</span><span class="s2">&quot;MONIKER&quot;</span><span class="p">,</span> <span class="n">moniker</span><span class="p">);</span>
+    <span class="n">startActivity</span><span class="p">(</span><span class="n">intent</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="id4">
+<h3>Build, Run and Test<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<p>Build your app and run it on 2 devices. You should now be able to start a chat
+on one and join with the other:</p>
+<div class="figure" id="id17">
+<a class="reference internal image-reference" href="../_images/stage_4.png"><img alt="../_images/stage_4.png" src="../_images/stage_4.png" style="width: 80%;" /></a>
+<p class="caption"><span class="caption-text">Stage 4 Phone</span></p>
+</div>
+<div class="figure" id="id18">
+<a class="reference internal image-reference" href="../_images/stage_4_tab.png"><img alt="../_images/stage_4_tab.png" src="../_images/stage_4_tab.png" style="width: 80%;" /></a>
+<p class="caption"><span class="caption-text">Stage 4 Tablet</span></p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The project at this stage is available on
+<a class="reference external" href="https://github.com/mosaicnetworks/babble-android-tutorial/tree/stage4">the stage4 branch of the tutoral repo</a>.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2017, Mosaic Networks.
+      
+      |
+      <a href="../_sources/firstapp/firstapp.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
