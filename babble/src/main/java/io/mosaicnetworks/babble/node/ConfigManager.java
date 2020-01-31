@@ -31,8 +31,6 @@ import com.google.gson.Gson;
 import com.moandjiezana.toml.TomlWriter;
 import com.moandjiezana.toml.Toml;
 
-
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
@@ -55,15 +53,47 @@ public final class ConfigManager {
      * The default babbling port. This can be overridden when configuring the service
      */
     public static final int DEFAULT_BABBLING_PORT = 6666;
+
+    /**
+     * The subfolder of the file store for the app that contains all of the babble-go configuration
+     * files and badger_db databases
+     */
     public final static String BABBLE_ROOTDIR = "babble";
+
+    /**
+     * The subfolder within a configuration folder that contains the badger_db database
+     */
     public final static String DB_SUBDIR = "badger_db";
+
+    /**
+     * The name of the configuration file for babble. It will be in the root of the babble
+     * configuraton folder
+     */
     public final static String BABBLE_TOML = "babble.toml";
+
+    /**
+     * The name of the peers file for babble. It will be in the root of the babble
+     * configuraton folder
+     */
     public final static String PEERS_JSON = "peers.json";
+
+    /**
+     * The name of the initial peers file for babble. It will be in the root of the babble
+     * configuraton folder
+     */
     public final static String PEERS_GENESIS_JSON = "peers.genesis.json";
+
+    /**
+     * The name of the file containing the babble private key. It will be in the root of the babble
+     * configuraton folder
+     */
+
     public final static String PRIV_KEY = "priv_key";
 
+
+
     // This constant determines the length of the unique ID
-    private final static int sUniqueIdLength = 12;
+    private static int sUniqueIdLength = 12;
 
     private static ConfigManager INSTANCE;
     private String mRootDir;
@@ -75,7 +105,6 @@ public final class ConfigManager {
 
     private String mMoniker = "";
     private final String mAppId;
-
     private static ConfigDirectoryBackupPolicy sConfigDirectoryBackupPolicy = ConfigDirectoryBackupPolicy.SINGLE_BACKUP;
     private ArrayList<ConfigDirectory> mDirectories = new ArrayList<>();
     private KeyPair mKeyPair;
@@ -134,6 +163,30 @@ public final class ConfigManager {
     }
 
 
+    /**
+     * Getter method for Unique ID Length
+     *
+     * Each configuration has a unique identifier that is formed by concatenating an appId with
+     * a unique ID and the group description using underscores. The Unique ID length controls how
+     * long the unique hex string is. The default length is 12.
+     * @return the unique ID length
+     */
+    public static int getUniqueIdLength() {
+        return sUniqueIdLength;
+    }
+
+
+    /**
+     * Setter method for Unique ID Length
+     *
+     * Each configuration has a unique identifier that is formed by concatenating an appId with
+     * a unique ID and the group description using underscores. The Unique ID length controls how
+     * long the unique hex string is. The default length is 12.
+     * @param sUniqueIdLength the unique ID length
+     */
+    public static void setUniqueIdLength(int sUniqueIdLength) {
+        ConfigManager.sUniqueIdLength = sUniqueIdLength;
+    }
 
 
     //TODO: is this the best way to get the root directory?
