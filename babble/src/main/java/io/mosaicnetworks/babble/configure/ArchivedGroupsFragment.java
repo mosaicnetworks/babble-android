@@ -44,7 +44,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileSystemNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -85,9 +87,18 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
-        mConfigManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
+        try {
+            mConfigManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
+        } catch (FileNotFoundException ex) {
+            //TODO: We cannot rethrow this exception as the overridden method does not throw it.
+            //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
+            //This is probably a fatal error.
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
+            throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
+                                                // The app will terminate. But babble is unstartable from here.
+        }
         initActionModeCallback();
     }
 

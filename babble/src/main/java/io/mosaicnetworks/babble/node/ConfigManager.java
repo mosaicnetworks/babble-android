@@ -32,6 +32,7 @@ import com.moandjiezana.toml.TomlWriter;
 import com.moandjiezana.toml.Toml;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -122,7 +123,7 @@ public final class ConfigManager {
      * @param context Context. Used to call getFilesDir to find the path to the babble config dirs
      * @return an instance of ConfigManager
      */
-    public static ConfigManager getInstance(Context context) {
+    public static ConfigManager getInstance(Context context) throws FileNotFoundException {
         if (INSTANCE==null) {
             INSTANCE = new ConfigManager(context.getApplicationContext());
         }
@@ -133,8 +134,9 @@ public final class ConfigManager {
     /**
      * Create an object to manage multiple Babble Configs
      * @param appContext the application context
+     * @throws FileNotFoundException when the babble root dir cannot be created
      */
-    private ConfigManager(Context appContext) {
+    private ConfigManager(Context appContext) throws FileNotFoundException{
         if (sRootDir.equals("")) {
             sRootDir = appContext.getFilesDir().toString();
         }
@@ -146,7 +148,9 @@ public final class ConfigManager {
         if (babbleDir.exists()) {
             populateDirectories(babbleDir);
         } else { // First run, so we create the root dir - clearly no subdirs yet
-            babbleDir.mkdirs();
+            if ( ( ! babbleDir.mkdirs() ) && (! babbleDir.exists())) {
+                throw new FileNotFoundException();
+            }
         }
     }
 

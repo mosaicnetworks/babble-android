@@ -41,6 +41,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -179,7 +180,19 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
     @Override
     public void onReceivePeers(List<Peer> currentPeers) {
-        ConfigManager configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
+
+        ConfigManager configManager;
+        try {
+            configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
+        } catch (FileNotFoundException ex) {
+            //TODO: We cannot rethrow this exception as the overridden method does not throw it.
+            //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
+            //This is probably a fatal error.
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
+            throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
+            // The app will terminate. But babble is unstartable from here.
+        }
+
         BabbleService<?> babbleService = mListener.getBabbleService();
 
         try {

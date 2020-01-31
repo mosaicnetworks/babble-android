@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -24,7 +25,7 @@ public class ConfigManagerTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
-    public void simpleCreateTest() throws CannotStartBabbleNodeException {
+    public void simpleCreateTest() throws CannotStartBabbleNodeException, FileNotFoundException, IOException   {
 
         String dir = temporaryFolder.toString();
 
@@ -63,7 +64,7 @@ public class ConfigManagerTest {
     }
 
     @Test
-    public void simpleCheckTest() throws CannotStartBabbleNodeException {
+    public void simpleCheckTest() throws CannotStartBabbleNodeException, FileNotFoundException {
 
         ConfigManager configManager = ConfigManager.getInstance(InstrumentationRegistry.getInstrumentation().getTargetContext());
         ArrayList<ConfigDirectory> configDirectories = configManager.getDirectories();
