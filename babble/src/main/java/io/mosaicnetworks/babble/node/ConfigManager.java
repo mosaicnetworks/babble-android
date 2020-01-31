@@ -75,7 +75,8 @@ public final class ConfigManager {
 
     private String mMoniker = "";
     private final String mAppId;
-    private ConfigDirectoryBackupPolicy mConfigDirectoryBackupPolicy = ConfigDirectoryBackupPolicy.SINGLE_BACKUP; //TODO: requires getter and setter
+
+    private static ConfigDirectoryBackupPolicy sConfigDirectoryBackupPolicy = ConfigDirectoryBackupPolicy.SINGLE_BACKUP;
     private ArrayList<ConfigDirectory> mDirectories = new ArrayList<>();
     private KeyPair mKeyPair;
 
@@ -104,6 +105,36 @@ public final class ConfigManager {
             babbleDir.mkdirs();
         }
     }
+
+
+    /**
+     * ConfigDirectoryBackupPolicy getter takes an enumerated type ConfigDirectoryBackupPolicy
+     * which can take the following types:
+     * DELETE - just deletes any pre-existing configuration for this Group
+     * SINGLE_BACKUP - retains just one archive copy at any time
+     * COMPLETE_BACKUP - saves all archive copies
+     * ABORT - If there is any pre-existing archive for this groups, throw an exception and abort
+     * @return
+     */
+    public static ConfigDirectoryBackupPolicy getConfigDirectoryBackupPolicy() {
+        return sConfigDirectoryBackupPolicy;
+    }
+
+    /**
+     * ConfigDirectoryBackupPolicy setter takes an enumerated type ConfigDirectoryBackupPolicy
+     * which can take the following types:
+     * DELETE - just deletes any pre-existing configuration for this Group
+     * SINGLE_BACKUP - retains just one archive copy at any time
+     * COMPLETE_BACKUP - saves all archive copies
+     * ABORT - If there is any pre-existing archive for this groups, throw an exception and abort
+     * @param mConfigDirectoryBackupPolicy the policy to use
+     */
+    public static void setConfigDirectoryBackupPolicy(ConfigDirectoryBackupPolicy mConfigDirectoryBackupPolicy) {
+        ConfigManager.sConfigDirectoryBackupPolicy = mConfigDirectoryBackupPolicy;
+    }
+
+
+
 
     //TODO: is this the best way to get the root directory?
     public String getRootDir() {
@@ -339,7 +370,7 @@ public final class ConfigManager {
         File babbleDir = new File(mTomlDir, DB_SUBDIR);
         if (babbleDir.exists()){
             // We have a clash.
-            switch (mConfigDirectoryBackupPolicy) {
+            switch (sConfigDirectoryBackupPolicy) {
                 case ABORT:
                     throw new CannotStartBabbleNodeException("Config directory already exists and we have ABORT policy");
                 case COMPLETE_BACKUP:
@@ -587,7 +618,7 @@ public final class ConfigManager {
 
     private void backupOldConfigs(String compositeName) throws CannotStartBabbleNodeException {
         
-        if (mConfigDirectoryBackupPolicy == ConfigDirectoryBackupPolicy.SINGLE_BACKUP) {
+        if (sConfigDirectoryBackupPolicy == ConfigDirectoryBackupPolicy.SINGLE_BACKUP) {
 
             Log.d("backupOldConfigs SINGLE", compositeName);
             for (ConfigDirectory d : mDirectories) {
