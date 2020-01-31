@@ -260,7 +260,7 @@ public final class ConfigManager {
         List<Peer> currentPeers = new ArrayList<>();
         currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
 
-        return createConfig(genesisPeers, currentPeers, groupName, moniker, inetAddress, babblingPort, false);
+        return createConfig(genesisPeers, currentPeers, groupName, moniker, inetAddress, babblingPort);
     }
 
     /**
@@ -314,7 +314,7 @@ public final class ConfigManager {
      * @throws IllegalStateException if the service is currently running
      */
     public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress) throws CannotStartBabbleNodeException, IOException {
-        return createConfig(genesisPeers, currentPeers, groupName, moniker, inetAddress, DEFAULT_BABBLING_PORT, false);
+        return createConfig(genesisPeers, currentPeers, groupName, moniker, inetAddress, DEFAULT_BABBLING_PORT);
     }
 
     /**
@@ -328,22 +328,18 @@ public final class ConfigManager {
      * @throws IllegalStateException if the service is currently running
      */
     public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
-        return createConfig(genesisPeers, currentPeers, groupName, moniker, inetAddress, babblingPort, false); //TODO: group name
+        return createConfig(genesisPeers, currentPeers, groupName, moniker, inetAddress, babblingPort); //TODO: group name
     }
 
     private String createConfig(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName,
-                                String moniker, String inetAddress, int babblingPort,
-                                boolean isArchive) throws CannotStartBabbleNodeException, IOException {
+                                String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException {
 
         NodeConfig nodeConfig = new NodeConfig.Builder().build();
         mMoniker = moniker;
         //TODO: is there a cleaner way of obtaining the path?
         // It is stored in mTomlDir which has getTomlDir and setTomlDir getter and setters
         String fullPath = writeBabbleTomlFiles(nodeConfig, groupName, inetAddress, babblingPort, moniker);
-        Log.d("Config.createConfig", "Full Path:" + fullPath);
-
-
-
+        Log.v("Config.createConfig", "Full Path:" + fullPath);
 
         writePeersJsonFiles(fullPath, genesisPeers, currentPeers);
 
@@ -351,30 +347,6 @@ public final class ConfigManager {
         writePrivateKey(fullPath, mKeyPair.privateKey);
 
         return fullPath;
-
-        /*
-        if (mState == BabbleService.State.RUNNING || mState == BabbleService.State.RUNNING_WITH_DISCOVERY) {
-            throw new IllegalStateException("Cannot createConfig while the service is running");
-        }
-         */
-
-        /*
-        mBabbleNode = BabbleNode.createWithConfig(genesisPeers, currentPeers,
-                mKeyPair.privateKey, inetAddress,
-                babblingPort, moniker,
-                new BlockConsumer() {
-                    @Override
-                    public Block onReceiveBlock(Block block) {
-                        Block processedBlock = mBabbleState.processBlock(block);
-                        notifyObservers();
-                        return processedBlock;
-                    }
-                },
-                mNodeConfig, mConfigDir, mSubConfigDir, mConfigFolderBackupPolicy, mAppId);
-
-        mBabbleState.reset();
-        mState = State.CONFIGURED;
-         */
     }
 
     //#######################################################
