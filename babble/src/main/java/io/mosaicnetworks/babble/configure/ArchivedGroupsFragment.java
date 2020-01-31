@@ -27,6 +27,7 @@ package io.mosaicnetworks.babble.configure;
 import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -214,7 +215,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
@@ -319,8 +320,9 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
     }
 
     // inflates the row layout from xml when needed
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.service_recyclerview_row, parent, false);
         return new ViewHolder(view);
     }

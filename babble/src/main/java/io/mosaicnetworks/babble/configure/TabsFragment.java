@@ -74,7 +74,7 @@ public class TabsFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
     }
 
@@ -110,6 +110,7 @@ public class TabsFragment extends Fragment {
             super(fragment);
         }
 
+        @NonNull
         @Override
         public Fragment createFragment(int position) {
 
