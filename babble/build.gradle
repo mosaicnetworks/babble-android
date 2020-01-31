@@ -51,8 +51,8 @@ task getBabbleCore {
     def versionDirectoryFile = new File(versionDirectory)
     def releaseZipUrl = "$repository/v${babbleCoreVersion}/babble_${babbleCoreVersion}_android_library.zip"
     def fileZipLoc = "$repository/babble_${babbleCoreVersion}_android_library.zip"
-    def downladedFileName = "babble_${babbleCoreVersion}_android_library.zip"
-    def downloadFullPath = "$versionDirectory/tmp/$downladedFileName"
+    def downloadedFileName = "babble_${babbleCoreVersion}_android_library.zip"
+    def downloadFullPath = "$versionDirectory/tmp/$downloadedFileName"
     def downloadFullPathFile = new File(downloadFullPath)
     def aarFullPath = "$versionDirectory/tmp/babble_${babbleCoreVersion}_mobile.aar"
     def aarFullPathFile = new File(aarFullPath)
