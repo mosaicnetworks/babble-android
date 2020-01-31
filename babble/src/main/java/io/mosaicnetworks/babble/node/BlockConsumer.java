@@ -27,6 +27,7 @@ package io.mosaicnetworks.babble.node;
 /**
  * A consumer of Babble blocks
  */
+@SuppressWarnings("WeakerAccess")
 public interface BlockConsumer {
 
     /**

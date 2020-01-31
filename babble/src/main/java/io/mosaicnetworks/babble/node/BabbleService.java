@@ -61,7 +61,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * Constructor
      * @param babbleState the underlying app state, to which babble transactions are applied
      */
-    public BabbleService(AppState babbleState, Context context) {
+    protected BabbleService(AppState babbleState, Context context) {
         state = babbleState;
     }
 

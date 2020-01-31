@@ -29,7 +29,6 @@ import android.os.Bundle;
 
 import io.mosaicnetworks.babble.configure.BaseConfigActivity;
 import io.mosaicnetworks.babble.node.BabbleService;
-import io.mosaicnetworks.babble.node.ConfigManager;
 
 public class MainActivity extends BaseConfigActivity {
 
