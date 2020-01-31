@@ -9,13 +9,13 @@ apply plugin: 'com.jfrog.bintray'
 //##################################################################################################
 // babble core configuration
 
-// def babbleCoreVersion = "0.6.0"
-// def repository = "https://github.com/mosaicnetworks/babble/releases/download"
-// def protocol = "https"
+def babbleCoreVersion = "0.6.1"
+def repository = "https://github.com/mosaicnetworks/babble/releases/download"
+def protocol = "https"
 
- def babbleCoreVersion = "a3160dc72421ce9f7c71c9bc72d9f2092d953054"
- def repository = System.properties['user.home'] + "/go/src/github.com/mosaicnetworks/babble/build/distmobile"
- def protocol = "file"
+// def babbleCoreVersion = "a3160dc72421ce9f7c71c9bc72d9f2092d953054"
+// def repository = System.properties['user.home'] + "/go/src/github.com/mosaicnetworks/babble/build/distmobile"
+// def protocol = "file"
 
 //##################################################################################################
 
@@ -98,8 +98,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 8
-        versionName "0.2.6"
+        versionCode 9
+        versionName "0.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -159,7 +159,7 @@ artifacts {
     archives sourcesJar
 }
 
-version '0.2.6'
+version '0.3.0'
 
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())

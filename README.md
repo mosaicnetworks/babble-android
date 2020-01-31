@@ -19,7 +19,7 @@ which guides you through building the [sample app](https://github.com/mosaicnetw
 
 For the impatient, add the following to your app's `build.gradle` file:
 
-```implementation 'io.mosaicnetworks:babble:0.2.6'```
+```implementation 'io.mosaicnetworks:babble:0.3.0'```
 
 and start coding!
 
