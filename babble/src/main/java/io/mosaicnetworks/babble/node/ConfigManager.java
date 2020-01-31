@@ -141,7 +141,7 @@ public final class ConfigManager {
         mAppId = appContext.getPackageName();
         mKeyPair = new KeyPair(); //TODO:  how should the key be handled??
 
-        File babbleDir = new File(this.sRootDir, BABBLE_ROOTDIR);
+        File babbleDir = new File(sRootDir, BABBLE_ROOTDIR);
 
         if (babbleDir.exists()) {
             populateDirectories(babbleDir);
@@ -290,8 +290,8 @@ public final class ConfigManager {
 
         Map<String, Object> configChanges = new HashMap<>();
         configChanges.put("maintenance-mode", true);
-        configChanges.put("listen", inetAddress + ":" + Integer.toString(babblingPort));
-        configChanges.put("advertise", inetAddress + ":" + Integer.toString(babblingPort));
+        configChanges.put("listen", inetAddress + ":" + babblingPort);
+        configChanges.put("advertise", inetAddress + ":" + babblingPort);
 
         amendTomlSettings(configChanges);
 
@@ -438,7 +438,7 @@ public final class ConfigManager {
       * @param compositeName the directory name for the config folder. NB this must be the composite version, not the human readable one.
      */
     public void setTomlDir(String compositeName) {
-        mTomlDir = this.sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + compositeName;
+        mTomlDir = sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + compositeName;
         this.mTomlDir = mTomlDir;
     }
 
@@ -666,7 +666,7 @@ public final class ConfigManager {
             return false;
         }
 
-        File dir = new File(this.sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir);
+        File dir = new File(sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir);
 
         return deleteDir(dir);
     }
@@ -695,8 +695,8 @@ public final class ConfigManager {
     }
     
     private void renameConfigDirectory(String oldSubConfigDir, int newSuffix) throws CannotStartBabbleNodeException {
-        File oldFile = new File(this.sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir);
-        File newFile = new File(this.sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir + Integer.toString(newSuffix));
+        File oldFile = new File(sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir);
+        File newFile = new File(sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir + newSuffix);
         
         Log.d("Rename ", oldFile.getAbsolutePath());
         Log.d("Rename ", newFile.getAbsolutePath());
@@ -736,7 +736,7 @@ public final class ConfigManager {
         }
 
         Log.d("backupOldConfigs POP", compositeName);
-        populateDirectories(new File(this.sRootDir, BABBLE_ROOTDIR));
+        populateDirectories(new File(sRootDir, BABBLE_ROOTDIR));
     }
 
 
@@ -760,7 +760,7 @@ public final class ConfigManager {
         }
 
         // Rebuild directory list after pruning backups
-        populateDirectories(new File(this.sRootDir, BABBLE_ROOTDIR));
+        populateDirectories(new File(sRootDir, BABBLE_ROOTDIR));
     }
 
 

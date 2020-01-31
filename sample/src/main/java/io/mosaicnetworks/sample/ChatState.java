@@ -67,7 +67,7 @@ public class ChatState implements BabbleState {
         // Accept all internal transactions, and populate receipts.
         InternalTransactionReceipt[] itr = new InternalTransactionReceipt[block.body.internalTransactions.length];
         for(int i=0; i< block.body.internalTransactions.length; i++){
-            itr[i] = block.body.internalTransactions[i].AsAccepted();
+            itr[i] = block.body.internalTransactions[i].asAccepted();
         }
 
         // Set block stateHash and receipts
