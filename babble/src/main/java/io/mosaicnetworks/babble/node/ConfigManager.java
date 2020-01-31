@@ -240,7 +240,7 @@ public final class ConfigManager {
 
 
 
-    /**
+    /**b
      * Configure the service to create a new group using the default ports
      * @param moniker node moniker
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
@@ -444,14 +444,19 @@ public final class ConfigManager {
                 case SINGLE_BACKUP:
                     // Rename
                     backupOldConfigs(compositeName);
-                    babbleDir.mkdirs();
+                    if   ( ( ! babbleDir.mkdirs() ) && (! babbleDir.exists())) {
+                        throw new CannotStartBabbleNodeException("Cannot create new Config directory (SINGLE_BACKUP policy)");
+                    }
                     break;
                 case DELETE:
                     deleteDirectory(subConfigDir);
                     break;
             }
         } else {
-            babbleDir.mkdirs();
+
+            if   ( ( ! babbleDir.mkdirs() ) && (! babbleDir.exists())) {
+                throw new CannotStartBabbleNodeException("Cannot create new Config directory (no previous backup)");
+            }
         }
 
         babble.put("datadir", mTomlDir) ;
@@ -652,8 +657,8 @@ public final class ConfigManager {
             if (file.isDirectory())
                 for (String child : Objects.requireNonNull(file.list()))
                     deleteDir(new File(file, child));
-            file.delete();  // delete child file or empty directory
-        } catch (Exception e) {
+            if (! file.delete() ) {return false;}  // delete child file or empty directory
+        } catch (Exception e) {  //TODO: narrow the scope of thus catch
             return false;
         }
 
