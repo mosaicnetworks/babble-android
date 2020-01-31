@@ -59,7 +59,6 @@ public final class NodeConfig {
         private int mCacheSize = 50000;
         private int mSyncLimit = 1000;
         private boolean mEnableFastSync = false;
-        private String mDatabaseDir = "";     //db
         private boolean mBootstrap = true;   //bootstrap
         private String mServiceListen = "";   //service-listen
         private String mJoinTimeout = "20s";  //join_timeout
@@ -76,7 +75,7 @@ public final class NodeConfig {
          * @return modified builder
          */
         public Builder databaseDir(String databaseDir) {
-            mDatabaseDir = databaseDir;
+            //db
             return this;
         }
 

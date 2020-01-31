@@ -45,9 +45,6 @@ import io.mosaicnetworks.babble.node.BabbleService;
 public abstract class BaseConfigActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 
     private FragmentManager mFragmentManager;
-    private TabsFragment mHomeFragment;
-    private NewGroupFragment mNewGroupFragment;
-    private JoinGroupFragment mJoinGroupMdnsFragment;
     public static final String PREFERENCE_FILE_KEY = "babbleandroid";
 
     @Override
@@ -56,7 +53,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         setContentView(R.layout.activity_base_config);
 
         mFragmentManager = getSupportFragmentManager();
-        mHomeFragment = TabsFragment.newInstance();
+        TabsFragment mHomeFragment = TabsFragment.newInstance();
 
         addFragment(mHomeFragment);
     }
@@ -82,13 +79,13 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
 
     // called when the user presses the new group (plus) button
     public void newGroup(View view) {
-        mNewGroupFragment = NewGroupFragment.newInstance();
+        NewGroupFragment mNewGroupFragment = NewGroupFragment.newInstance();
         replaceFragment(mNewGroupFragment);
     }
 
     @Override
     public void onServiceSelected(NsdServiceInfo serviceInfo) {
-        mJoinGroupMdnsFragment = JoinGroupFragment.newInstance(serviceInfo);
+        JoinGroupFragment mJoinGroupMdnsFragment = JoinGroupFragment.newInstance(serviceInfo);
         replaceFragment(mJoinGroupMdnsFragment);
     }
 

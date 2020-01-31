@@ -62,7 +62,6 @@ import io.mosaicnetworks.babble.utils.Utils;
 public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAdapter.ItemClickListener {
 
     private OnFragmentInteractionListener mListener;
-    private RecyclerView mRvArchivedGroups;
     private ArchivedGroupsAdapter mArchivedGroupsAdapter;
     private List<ConfigDirectory> mArchivedList = new ArrayList<>();
     private ConfigManager mConfigManager;
@@ -95,7 +94,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_archived_groups, container, false);
-        mRvArchivedGroups = view.findViewById(R.id.rv_archived_groups);
+        RecyclerView mRvArchivedGroups = view.findViewById(R.id.rv_archived_groups);
         mRvArchivedGroups.setLayoutManager(new LinearLayoutManager(getContext()));
         mArchivedGroupsAdapter = new ArchivedGroupsAdapter(getContext(), mArchivedList);
         mArchivedGroupsAdapter.setClickListener(this);
