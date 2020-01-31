@@ -25,11 +25,32 @@
 package io.mosaicnetworks.sample;
 
 import android.content.Intent;
+import android.os.Bundle;
 
 import io.mosaicnetworks.babble.configure.BaseConfigActivity;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.node.ConfigManager;
 
 public class MainActivity extends BaseConfigActivity {
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+// If you wish to change the Babble Configuration Backup Policy uncomment the code below:
+
+//        ConfigManager.setConfigDirectoryBackupPolicy(
+//                [ConfigManager.ConfigDirectoryBackupPolicy.ABORT|SINGLE_BACKUP|DELETE|COMPLETE_BACKUP]
+//        );
+
+// If you want to change the length of the unique ID component of the configuration dir name,
+// uncomment the line below
+
+//        ConfigManager.setUniqueIdLength(8);
+
+
+    }
 
     @Override
     public BabbleService getBabbleService() {
