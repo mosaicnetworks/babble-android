@@ -36,7 +36,7 @@ public final class ConfigDirectory {
     /**
      * This constructor takes a directory name and parses it to populate the public final properties
      * of this class
-     * @param directoryName the config directoryname
+     * @param directoryName the config directory name
      * @throws IllegalArgumentException is thrown when the directoryname is malformed
      */
     public ConfigDirectory(String directoryName) throws IllegalArgumentException {
@@ -107,7 +107,7 @@ public final class ConfigDirectory {
     /**
      * Decodes the description from the filename safe version.
      * @param description the text to be decoded
-     * @return the decoded human-readble version of description
+     * @return the decoded human-readable version of description
      */
     public static String decodeDescription(String description) {
         return description.replaceAll("-", " ");

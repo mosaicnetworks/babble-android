@@ -102,7 +102,7 @@ Additionally comment out every ``@Override`` from that file. We are simply
 removing a dependency on the chat library. 
 
 Refactor ``ChatActivity.java``. We will be calling it ``GameActivity.java``.
-Remembe to also refactor ``activity_chat.xml`` to ``activity_game.xml``.
+Remember to also refactor ``activity_chat.xml`` to ``activity_game.xml``.
 
 In ``GameActivity.java``, delete the following lines of code which implement
 the chat interface:

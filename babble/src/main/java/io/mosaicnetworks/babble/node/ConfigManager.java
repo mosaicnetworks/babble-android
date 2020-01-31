@@ -80,25 +80,25 @@ public final class ConfigManager {
 
     /**
      * The name of the configuration file for babble. It will be in the root of the babble
-     * configuraton folder
+     * configuration folder
      */
     public final static String BABBLE_TOML = "babble.toml";
 
     /**
      * The name of the peers file for babble. It will be in the root of the babble
-     * configuraton folder
+     * configuration folder
      */
     public final static String PEERS_JSON = "peers.json";
 
     /**
      * The name of the initial peers file for babble. It will be in the root of the babble
-     * configuraton folder
+     * configuration folder
      */
     public final static String PEERS_GENESIS_JSON = "peers.genesis.json";
 
     /**
      * The name of the file containing the babble private key. It will be in the root of the babble
-     * configuraton folder
+     * configuration folder
      */
     public final static String PRIV_KEY = "priv_key";
 
@@ -147,7 +147,7 @@ public final class ConfigManager {
 
         if (babbleDir.exists()) {
             populateDirectories(babbleDir);
-        } else { // First run, so we create the root dir - clearly no subdirs yet
+        } else { // First run, so we create the root dir - clearly no sub dirs yet
             if ( ( ! babbleDir.mkdirs() ) && (! babbleDir.exists())) {
                 throw new FileNotFoundException();
             }
@@ -730,7 +730,7 @@ public final class ConfigManager {
 
     public void deleteDirectoryAndBackups(String compositeName, boolean onlyDeleteBackups) {
 
-        // Call ConfigDirectory.rootDirectoryName on composite name to debackup the name
+        // Call ConfigDirectory.rootDirectoryName on composite name to de-backup the name
 
 
         for (ConfigDirectory d : mDirectories) {
@@ -759,7 +759,7 @@ public final class ConfigManager {
                     }
                 })));
 
-        // Popualate mDirectories with the results
+        // Populate mDirectories with the results
         for (String s : directories) {
             addConfigDirectoryToList(s);
         }

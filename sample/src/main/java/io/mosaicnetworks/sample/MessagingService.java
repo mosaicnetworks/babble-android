@@ -118,7 +118,7 @@ public final class MessagingService extends BabbleService<ChatState> {
 
     /**
      * Sets the port for the DiscoveryServer. If not called, will default to 8988.
-     * @param discoveryPort the port numbner
+     * @param discoveryPort the port number
      */
     public static void setDiscoveryPort(int discoveryPort) {
         MessagingService.sDiscoveryPort = discoveryPort;

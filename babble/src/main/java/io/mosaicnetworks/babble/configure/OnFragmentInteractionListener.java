@@ -34,7 +34,7 @@ import io.mosaicnetworks.babble.node.BabbleService;
 public interface OnFragmentInteractionListener {
 
     /**
-     * Your app will need an instance of the {@link BabbleService}. This method provides acccess to
+     * Your app will need an instance of the {@link BabbleService}. This method provides access to
      * the service for the fragments in this activity.
      *
      * @return Your apps {@link BabbleService}.

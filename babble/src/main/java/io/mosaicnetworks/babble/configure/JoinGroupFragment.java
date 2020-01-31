@@ -248,7 +248,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         mLoadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
-                cancelRequets();
+                cancelRequests();
             }});
     }
 
@@ -274,7 +274,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
 
 
-    private void cancelRequets() {
+    private void cancelRequests() {
         if (mHttpCurrentPeerDiscoveryRequest!=null) {
             mHttpCurrentPeerDiscoveryRequest.cancel();
         }
@@ -304,7 +304,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
     @Override
     public void onPause() {
         super.onPause();
-        cancelRequets();
+        cancelRequests();
     }
 
 }
