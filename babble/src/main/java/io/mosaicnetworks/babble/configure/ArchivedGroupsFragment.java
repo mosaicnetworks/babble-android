@@ -73,6 +73,9 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     private ActionMode.Callback mActionModeCallback;
     private ConfigDirectory mSelectedGroup;
 
+
+
+    //TODO: either expose this switch or remove it.
     /**
      * This switch controls whether all archive versions are displayed or just the "Live" ones.
      */

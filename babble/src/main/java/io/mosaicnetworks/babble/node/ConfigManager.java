@@ -308,8 +308,14 @@ public final class ConfigManager {
         configChanges.put("maintenance-mode", true);
         configChanges.put("listen", inetAddress + ":" + babblingPort);
         configChanges.put("advertise", inetAddress + ":" + babblingPort);
+
+
+        //TODO: possibly move these amendments into the backup config processing to avoid having to
+        //      set them here
         configChanges.put("datadir", mTomlDir);
         configChanges.put("db",  mTomlDir + File.separator+ DB_SUBDIR);
+
+
         amendTomlSettings(configChanges);
 
         return mTomlDir;
