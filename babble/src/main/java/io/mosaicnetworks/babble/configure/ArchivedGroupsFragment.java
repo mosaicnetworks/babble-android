@@ -73,6 +73,12 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     private ActionMode.Callback mActionModeCallback;
     private ConfigDirectory mSelectedGroup;
 
+    /**
+     * This switch controls whether all archive versions are displayed or just the "Live" ones.
+     */
+    private boolean mShowAllArchiveVersion = true;
+
+
     public ArchivedGroupsFragment() {
     }
 
@@ -247,19 +253,19 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
         super.onStart();
 
 
-     // This code trims all backups from the folder list
-        ArrayList<ConfigDirectory> configFolders = mConfigManager.getDirectories();
-        for (ConfigDirectory temp : configFolders) {
-            if (! temp.isBackup) {
-                mArchivedList.add(temp);
+        //TODO: This is currently a hardcoded boolean. But it is coded this way to preserve both
+        //methods, and potentially it will be switchable in the future
+        if (mShowAllArchiveVersion) {
+            mArchivedList.addAll(mConfigManager.getDirectories());
+        } else {
+            // This code trims all backups from the folder list
+            ArrayList<ConfigDirectory> configFolders = mConfigManager.getDirectories();
+            for (ConfigDirectory temp : configFolders) {
+                if (!temp.isBackup) {
+                    mArchivedList.add(temp);
+                }
             }
         }
-
-
-     // If you want all backups - with multiple versions of a single archive, the block above can be replaced by the line below.
-  //      mArchivedList.addAll(mConfigManager.getDirectories());
-
-
 
 
         mArchivedGroupsAdapter.notifyDataSetChanged();

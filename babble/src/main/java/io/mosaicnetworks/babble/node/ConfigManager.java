@@ -308,7 +308,8 @@ public final class ConfigManager {
         configChanges.put("maintenance-mode", true);
         configChanges.put("listen", inetAddress + ":" + babblingPort);
         configChanges.put("advertise", inetAddress + ":" + babblingPort);
-
+        configChanges.put("datadir", mTomlDir);
+        configChanges.put("db",  mTomlDir + File.separator+ DB_SUBDIR);
         amendTomlSettings(configChanges);
 
         return mTomlDir;
@@ -614,7 +615,7 @@ public final class ConfigManager {
     public String getUniqueId() {
         UUID uuid = UUID.randomUUID();
         return uuid.toString().replaceAll("-", "");
-      //   return uuid.toString().replaceAll("[^A]", "A");
+        // return uuid.toString().replaceAll("[^A]", "A");
     }
 
     /**
