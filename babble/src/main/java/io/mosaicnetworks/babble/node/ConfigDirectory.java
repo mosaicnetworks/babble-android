@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018- Mosaic Networks
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package io.mosaicnetworks.babble.node;
 
 public final class ConfigDirectory {
@@ -12,7 +36,7 @@ public final class ConfigDirectory {
     /**
      * This constructor takes a directory name and parses it to populate the public final properties
      * of this class
-     * @param directoryName the config directoryname
+     * @param directoryName the config directory name
      * @throws IllegalArgumentException is thrown when the directoryname is malformed
      */
     public ConfigDirectory(String directoryName) throws IllegalArgumentException {
@@ -29,12 +53,11 @@ public final class ConfigDirectory {
 
         appId = tempArray[0];
         uniqueId = tempArray[1];
-        description = DecodeDescription(tempArray[2]);
+        description = decodeDescription(tempArray[2]);
 
         if (tempArray.length < 4) {
             isBackup = false;
             BackUpVersion = 0;
-            return;
         } else {
             int version;
 
@@ -54,7 +77,7 @@ public final class ConfigDirectory {
      * This function takes a config folder name and removes the backup extensions
      * @param compositeName is a config folder name
      * @return compositeName with the backup suffix elided
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException when the composite name is malformed
      */
     public static String rootDirectoryName(String compositeName) throws IllegalArgumentException {
 
@@ -77,16 +100,16 @@ public final class ConfigDirectory {
      * @param description the text to be encoded
      * @return the encoded version of description
      */
-    public static String EncodeDescription(String description) {
+    public static String encodeDescription(String description) {
         return description.replaceAll("[^a-zA-Z0-9 ]", "").replaceAll(" ", "-");
     }
 
     /**
      * Decodes the description from the filename safe version.
      * @param description the text to be decoded
-     * @return the decoded human-readble version of description
+     * @return the decoded human-readable version of description
      */
-    public static String DecodeDescription(String description) {
+    public static String decodeDescription(String description) {
         return description.replaceAll("-", " ");
     }
 }

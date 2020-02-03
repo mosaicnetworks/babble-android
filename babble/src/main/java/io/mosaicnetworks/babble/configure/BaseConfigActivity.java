@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018- Mosaic Networks
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package io.mosaicnetworks.babble.configure;
 
 import android.net.nsd.NsdServiceInfo;
@@ -21,9 +45,6 @@ import io.mosaicnetworks.babble.node.BabbleService;
 public abstract class BaseConfigActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 
     private FragmentManager mFragmentManager;
-    private TabsFragment mHomeFragment;
-    private NewGroupFragment mNewGroupFragment;
-    private JoinGroupFragment mJoinGroupMdnsFragment;
     public static final String PREFERENCE_FILE_KEY = "babbleandroid";
 
     @Override
@@ -32,7 +53,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         setContentView(R.layout.activity_base_config);
 
         mFragmentManager = getSupportFragmentManager();
-        mHomeFragment = TabsFragment.newInstance();
+        TabsFragment mHomeFragment = TabsFragment.newInstance();
 
         addFragment(mHomeFragment);
     }
@@ -58,13 +79,13 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
 
     // called when the user presses the new group (plus) button
     public void newGroup(View view) {
-        mNewGroupFragment = NewGroupFragment.newInstance();
+        NewGroupFragment mNewGroupFragment = NewGroupFragment.newInstance();
         replaceFragment(mNewGroupFragment);
     }
 
     @Override
     public void onServiceSelected(NsdServiceInfo serviceInfo) {
-        mJoinGroupMdnsFragment = JoinGroupFragment.newInstance(serviceInfo);
+        JoinGroupFragment mJoinGroupMdnsFragment = JoinGroupFragment.newInstance(serviceInfo);
         replaceFragment(mJoinGroupMdnsFragment);
     }
 

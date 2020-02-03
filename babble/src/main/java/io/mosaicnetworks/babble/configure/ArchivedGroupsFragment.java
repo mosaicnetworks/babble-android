@@ -1,10 +1,33 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018- Mosaic Networks
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package io.mosaicnetworks.babble.configure;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -21,9 +44,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileSystemNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
@@ -39,7 +65,6 @@ import io.mosaicnetworks.babble.utils.Utils;
 public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAdapter.ItemClickListener {
 
     private OnFragmentInteractionListener mListener;
-    private RecyclerView mRvArchivedGroups;
     private ArchivedGroupsAdapter mArchivedGroupsAdapter;
     private List<ConfigDirectory> mArchivedList = new ArrayList<>();
     private ConfigManager mConfigManager;
@@ -62,9 +87,18 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState)  {
         super.onCreate(savedInstanceState);
-        mConfigManager = ConfigManager.getInstance(getContext().getApplicationContext());
+        try {
+            mConfigManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
+        } catch (FileNotFoundException ex) {
+            //TODO: We cannot rethrow this exception as the overridden method does not throw it.
+            //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
+            //This is probably a fatal error.
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
+            throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
+                                                // The app will terminate. But babble is unstartable from here.
+        }
         initActionModeCallback();
     }
 
@@ -72,7 +106,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_archived_groups, container, false);
-        mRvArchivedGroups = view.findViewById(R.id.rv_archived_groups);
+        RecyclerView mRvArchivedGroups = view.findViewById(R.id.rv_archived_groups);
         mRvArchivedGroups.setLayoutManager(new LinearLayoutManager(getContext()));
         mArchivedGroupsAdapter = new ArchivedGroupsAdapter(getContext(), mArchivedList);
         mArchivedGroupsAdapter.setClickListener(this);
@@ -88,7 +122,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
 
         try {
-            mConfigManager.configureArchive(configDirectory, Utils.getIPAddr(getContext()), ConfigManager.DEFAULT_BABBLING_PORT);
+            mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), ConfigManager.DEFAULT_BABBLING_PORT);
 
         } catch (IOException e)
         {
@@ -139,7 +173,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
         if (mActionMode == null) {
             // Start the CAB
-            mActionMode = getActivity().startActionMode(mActionModeCallback);
+            mActionMode = Objects.requireNonNull(getActivity()).startActionMode(mActionModeCallback);
         }
     }
 
@@ -168,7 +202,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.delete_contact) {
-                    mConfigManager.DeleteDirectoryAndBackups(mSelectedGroup.directoryName, false);
+                    mConfigManager.deleteDirectoryAndBackups(mSelectedGroup.directoryName, false);
                     mArchivedList.remove(mSelectedGroup);
                     mArchivedGroupsAdapter.notifyDataSetChanged();
                     mode.finish();
@@ -192,7 +226,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
@@ -241,7 +275,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
     //TODO: Review if we need these functions in Archive, Join and New fragments.
     private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(titleId)
                 .setMessage(messageId)
                 .setNeutralButton(R.string.ok_button, null)
@@ -252,7 +286,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
 
     private void displayOkAlertDialogText(@StringRes int titleId, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(titleId)
                 .setMessage(message)
                 .setNeutralButton(R.string.ok_button, null)
@@ -297,8 +331,9 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
     }
 
     // inflates the row layout from xml when needed
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.service_recyclerview_row, parent, false);
         return new ViewHolder(view);
     }

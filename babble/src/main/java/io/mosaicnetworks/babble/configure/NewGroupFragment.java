@@ -1,8 +1,34 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018- Mosaic Networks
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package io.mosaicnetworks.babble.configure;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AlertDialog;
@@ -14,7 +40,9 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
@@ -67,7 +95,7 @@ public class NewGroupFragment extends Fragment {
                 }
         );
 
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+        SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
         EditText edit = view.findViewById(R.id.edit_moniker);
@@ -77,7 +105,7 @@ public class NewGroupFragment extends Fragment {
         editGroup.requestFocus();
 
         InputMethodManager imgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); //TODO: fix potential NPE
+        Objects.requireNonNull(imgr).toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS); //TODO: fix potential NPE
 
         return view;
     }
@@ -86,10 +114,25 @@ public class NewGroupFragment extends Fragment {
     public void startGroup(View view) {
         //TODO: check this is safe
 
-        Log.i("startGroup", "Staring Group ");
+        Log.i("startGroup", "Starting Group ");
         BabbleService<?> babbleService = mListener.getBabbleService();
 
-        ConfigManager configManager = ConfigManager.getInstance(getContext().getApplicationContext());
+        Log.v("startGroup", "Got Babble Service ");
+
+        ConfigManager configManager;
+        try {
+            configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
+
+            Log.v("startGroup", "Got ConfigManager ");
+
+        } catch (FileNotFoundException ex) {
+            //TODO: We cannot rethrow this exception as the overridden method does not throw it.
+            //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
+            //This is probably a fatal error.
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
+            throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
+            // The app will terminate. But babble is unstartable from here.
+        }
 
         //get moniker
         EditText editMoniker = view.findViewById(R.id.edit_moniker);
@@ -109,13 +152,13 @@ public class NewGroupFragment extends Fragment {
 
 
 
-        Log.i("startGroup", "Staring Group " + groupName);
+        Log.i("startGroup", "Starting Group " + groupName);
 
         String configDirectory;
         try {
-            configDirectory = configManager.configureNew(groupName, moniker, Utils.getIPAddr(getContext()));
+            configDirectory = configManager.createConfigNewGroup(groupName, moniker, Utils.getIPAddr(getContext()));
             Log.i("startGroup", "configDirectory: " + configDirectory);
-            //babbleService.configureNew(moniker, Utils.getIPAddr(getContext()));
+            //babbleService.createConfigNewGroup(moniker, Utils.getIPAddr(getContext()));
         } catch (IllegalArgumentException | CannotStartBabbleNodeException| IOException ex) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
@@ -129,12 +172,12 @@ public class NewGroupFragment extends Fragment {
 
 
         // Store moniker entered
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+        SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("moniker", moniker);
-        editor.commit();
+        editor.apply();
 
 
         try {
@@ -153,7 +196,7 @@ public class NewGroupFragment extends Fragment {
 
     //TODO: Review if we need both.
     private void displayOkAlertDialogText(@StringRes int titleId, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(titleId)
                 .setMessage(message)
                 .setNeutralButton(R.string.ok_button, null)
@@ -165,7 +208,7 @@ public class NewGroupFragment extends Fragment {
 
 
     private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(titleId)
                 .setMessage(messageId)
                 .setNeutralButton(R.string.ok_button, null)
@@ -174,7 +217,7 @@ public class NewGroupFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;

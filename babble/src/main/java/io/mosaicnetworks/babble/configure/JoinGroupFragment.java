@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018- Mosaic Networks
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package io.mosaicnetworks.babble.configure;
 
 import android.app.ProgressDialog;
@@ -6,6 +30,8 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AlertDialog;
@@ -15,8 +41,10 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
@@ -79,15 +107,15 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
                 }
         );
 
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+        SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
-        EditText edit = (EditText) view.findViewById(R.id.edit_moniker);
+        EditText edit = view.findViewById(R.id.edit_moniker);
         edit.setText(sharedPref.getString("moniker", "Me"));
         edit.requestFocus();
 
         InputMethodManager imgr = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        imgr.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
+        Objects.requireNonNull(imgr).toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
 
         return view;
 
@@ -108,13 +136,13 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         final int peerPort = mNsdServiceInfo.getPort();
 
         // Store moniker and host entered
-        SharedPreferences sharedPref = getActivity().getSharedPreferences(
+        SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
                 BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("moniker", mMoniker);
         editor.putString("host", peerIP);
-        editor.commit();
+        editor.apply();
 
 
         getPeers(peerIP, peerPort);
@@ -152,11 +180,23 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
     @Override
     public void onReceivePeers(List<Peer> currentPeers) {
-        ConfigManager configManager = ConfigManager.getInstance(getContext().getApplicationContext());
+
+        ConfigManager configManager;
+        try {
+            configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
+        } catch (FileNotFoundException ex) {
+            //TODO: We cannot rethrow this exception as the overridden method does not throw it.
+            //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
+            //This is probably a fatal error.
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
+            throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
+            // The app will terminate. But babble is unstartable from here.
+        }
+
         BabbleService<?> babbleService = mListener.getBabbleService();
 
         try {
-            String configDir = configManager.configureJoin(mGenesisPeers, currentPeers, mNsdServiceInfo.getServiceName(), mMoniker, Utils.getIPAddr(getContext()));
+            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, mNsdServiceInfo.getServiceName(), mMoniker, Utils.getIPAddr(getContext()));
             babbleService.start(configDir, mNsdServiceInfo.getServiceName());
         } catch (IllegalStateException | CannotStartBabbleNodeException| IOException ex ) {
             //TODO: just catch IOException - this will mean the port is in use
@@ -208,12 +248,12 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         mLoadingDialog.setOnCancelListener(new DialogInterface.OnCancelListener(){
             @Override
             public void onCancel(DialogInterface dialog){
-                cancelRequets();
+                cancelRequests();
             }});
     }
 
     private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(titleId)
                 .setMessage(messageId)
                 .setNeutralButton(R.string.ok_button, null)
@@ -224,7 +264,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
 
     private void displayOkAlertDialogText(@StringRes int titleId, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
+        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
                 .setTitle(titleId)
                 .setMessage(message)
                 .setNeutralButton(R.string.ok_button, null)
@@ -234,7 +274,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
 
 
-    private void cancelRequets() {
+    private void cancelRequests() {
         if (mHttpCurrentPeerDiscoveryRequest!=null) {
             mHttpCurrentPeerDiscoveryRequest.cancel();
         }
@@ -245,7 +285,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
@@ -264,7 +304,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
     @Override
     public void onPause() {
         super.onPause();
-        cancelRequets();
+        cancelRequests();
     }
 
 }
