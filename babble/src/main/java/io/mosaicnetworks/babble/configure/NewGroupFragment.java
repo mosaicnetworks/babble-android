@@ -114,12 +114,17 @@ public class NewGroupFragment extends Fragment {
     public void startGroup(View view) {
         //TODO: check this is safe
 
-        Log.i("startGroup", "Staring Group ");
+        Log.i("startGroup", "Starting Group ");
         BabbleService<?> babbleService = mListener.getBabbleService();
+
+        Log.v("startGroup", "Got Babble Service ");
 
         ConfigManager configManager;
         try {
             configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
+
+            Log.v("startGroup", "Got ConfigManager ");
+
         } catch (FileNotFoundException ex) {
             //TODO: We cannot rethrow this exception as the overridden method does not throw it.
             //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
@@ -147,7 +152,7 @@ public class NewGroupFragment extends Fragment {
 
 
 
-        Log.i("startGroup", "Staring Group " + groupName);
+        Log.i("startGroup", "Starting Group " + groupName);
 
         String configDirectory;
         try {

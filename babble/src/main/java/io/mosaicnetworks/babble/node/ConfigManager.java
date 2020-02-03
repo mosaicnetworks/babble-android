@@ -125,6 +125,7 @@ public final class ConfigManager {
      */
     public static ConfigManager getInstance(Context context) throws FileNotFoundException {
         if (INSTANCE==null) {
+            Log.v("ConfigManager", "getInstance");
             INSTANCE = new ConfigManager(context.getApplicationContext());
         }
 
@@ -137,11 +138,22 @@ public final class ConfigManager {
      * @throws FileNotFoundException when the babble root dir cannot be created
      */
     private ConfigManager(Context appContext) throws FileNotFoundException{
+
+        Log.v("ConfigManager", "constructor");
+
         if (sRootDir.equals("")) {
             sRootDir = appContext.getFilesDir().toString();
         }
+
+        Log.v("ConfigManager", "got FilesDir");
+
         mAppId = appContext.getPackageName();
+
+        Log.v("ConfigManager", "got Package Name");
+
         mKeyPair = new KeyPair(); //TODO:  how should the key be handled??
+
+        Log.v("ConfigManager", "got Key Pair");
 
         File babbleDir = new File(sRootDir, BABBLE_ROOTDIR);
 
