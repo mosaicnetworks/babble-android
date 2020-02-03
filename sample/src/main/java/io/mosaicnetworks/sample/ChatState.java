@@ -24,6 +24,8 @@
 
 package io.mosaicnetworks.sample;
 
+import android.annotation.SuppressLint;
+
 import com.google.gson.JsonSyntaxException;
 
 import java.nio.charset.StandardCharsets;
@@ -43,6 +45,7 @@ import io.mosaicnetworks.babble.node.InternalTransactionReceipt;
 public class ChatState implements BabbleState {
 
     private byte[] mStateHash = new byte[0];
+    @SuppressLint("UseSparseArrays")
     private final Map<Integer, Message> mState = new HashMap<>();
     private Integer mNextIndex = 0;
 
