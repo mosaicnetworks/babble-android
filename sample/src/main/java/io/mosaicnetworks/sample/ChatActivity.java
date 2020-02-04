@@ -35,6 +35,7 @@ import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.mosaicnetworks.babble.node.ServiceObserver;
@@ -107,7 +108,20 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
         Log.i("ChatActivity", "stateUpdated");
 
-        final List<Message> newMessages = mMessagingService.state.getMessagesFromIndex(mMessageIndex);
+
+        List<Message> newMessagesTemp = new ArrayList<>();
+
+        for (Message m : mMessagingService.state.getMessagesFromIndex(mMessageIndex)) {
+
+            if (m.author.equals(mMoniker)) {
+                newMessagesTemp.add(m);
+            } else {
+                newMessagesTemp.add(new Message(m.author+ ":\n" + m.text, m.author, m.date));
+            }
+
+        }
+
+        final List<Message> newMessages = newMessagesTemp;
 
         runOnUiThread(new Runnable() {
             @Override
