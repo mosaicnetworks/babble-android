@@ -57,6 +57,10 @@ public class MainActivity extends BaseConfigActivity {
             });
 
             alertDialog.show();
+
+            ex.printStackTrace();
+
+            throw ex;
         }
     }
 

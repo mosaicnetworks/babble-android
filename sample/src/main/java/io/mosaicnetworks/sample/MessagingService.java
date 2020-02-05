@@ -71,6 +71,10 @@ public final class MessagingService extends BabbleService<ChatState> {
         //TODO: should this be part of the base service?
 
         super.onStarted();
+
+        // No need for discovery services in Archive mode
+        if (mIsArchive) return;
+
         mMdnsAdvertiser = new MdnsAdvertiser(mGroupDescriptor, sDiscoveryPort, mAppContext);
 
         mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(sDiscoveryPort, mBabbleNode); //TODO: use next available port?

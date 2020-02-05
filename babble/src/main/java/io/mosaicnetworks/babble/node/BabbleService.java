@@ -52,6 +52,9 @@ public abstract class BabbleService<AppState extends BabbleState> {
     protected BabbleNode mBabbleNode;
     protected GroupDescriptor mGroupDescriptor;
 
+    protected boolean mIsArchive = false;
+    protected int mNetworkType;
+
     /**
      * The underlying app state, to which babble transactions are applied
      */
@@ -65,15 +68,35 @@ public abstract class BabbleService<AppState extends BabbleState> {
         state = babbleState;
     }
 
+
+
     /**
      * Start the service
+     *
+     * @param configDirectory The full path to the babble configuration directory
+     * @param groupDescriptor The group descriptor
      * @throws IllegalStateException if the service is currently running
      */
     public void start(String configDirectory, GroupDescriptor groupDescriptor) {
+        start(configDirectory, groupDescriptor, false);
+    }
+
+
+    /**
+     * Start the service
+     *
+     * @param configDirectory The full path to the babble configuration directory
+     * @param groupDescriptor The group descriptor
+     * @param isArchive set to true when opening a config as an archive
+     * @throws IllegalStateException if the service is currently running
+     */
+    public void start(String configDirectory, GroupDescriptor groupDescriptor, boolean isArchive) {
         if (mState==State.RUNNING) {
             Log.e("BabbleService.start", "Service is already running");
             throw new IllegalStateException("Service is already running");
         }
+
+        this.mIsArchive = isArchive;
 
         mBabbleNode = BabbleNode.create(new BlockConsumer() {
                                             @Override

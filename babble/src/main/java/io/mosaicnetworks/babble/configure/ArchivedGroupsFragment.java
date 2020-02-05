@@ -149,7 +149,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
             String configDir = mConfigManager.getTomlDir();
             Log.d("MY-TAG", "Config directory name: " + configDir);
             BabbleService<?> babbleService = mListener.getBabbleService();
-            babbleService.start(configDir, new GroupDescriptor("Archived Group")); //TODO: need to get a proper group descriptor + need to NOT advertise mDNS
+            babbleService.start(configDir, new GroupDescriptor("Archived Group"), true); //TODO: need to get a proper group descriptor + need to NOT advertise mDNS
             mListener.onArchiveLoaded(mConfigManager.getMoniker());
 
         } catch (IllegalArgumentException ex) {
