@@ -24,6 +24,8 @@
 
 package io.mosaicnetworks.sample;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -36,12 +38,26 @@ public class MainActivity extends BaseConfigActivity {
         super();
 
         // Control which tabs are shown. This needs to be in the constructor as they are used in the onCreate handler
+        try {
+            setShowArchive(true);
+            setShowmDNS(true);
+            setShowP2P(true);
+        } catch (IllegalStateException ex) {
 
-        mShowArchive = false;
-        mShowmDNS = true;
-        mShowP2P = true;
 
-        //TODO: uses protected global variable. Does this need to use a setter method?
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setTitle("Alert Dialog");
+            alertDialog.setMessage("Failed to set tab visibility");
+
+
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+
+            alertDialog.show();
+        }
     }
 
     @Override

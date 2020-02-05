@@ -56,7 +56,12 @@ public class TabsFragment extends Fragment {
     GroupCollectionAdapter groupCollectionAdapter;
     ViewPager2 viewPager;
 
-    public TabsFragment() {
+    public TabsFragment(Bundle args) {
+        super();
+        mShowmDNS = args.getBoolean(BaseConfigActivity.SHOW_MDNS, true);
+        mShowP2P = args.getBoolean(BaseConfigActivity.SHOW_P2P, true);
+        mShowArchive = args.getBoolean(BaseConfigActivity.SHOW_ARCHIVE, true);
+        setArguments(args);
     }
 
     /**
@@ -66,14 +71,7 @@ public class TabsFragment extends Fragment {
      * @return A new instance of fragment HomeFragment.
      */
     public static TabsFragment newInstance(Bundle args) {
-        TabsFragment fragment = new TabsFragment();
-//        Bundle args = new Bundle();
-        fragment.setArguments(args);
-
-        mShowmDNS = args.getBoolean("SHOW_MDNS", true);
-        mShowP2P = args.getBoolean("SHOW_P2P", true);
-        mShowArchive = args.getBoolean("SHOW_ARCHIVE", true);
-
+        TabsFragment fragment = new TabsFragment(args);
         return fragment;
     }
 
