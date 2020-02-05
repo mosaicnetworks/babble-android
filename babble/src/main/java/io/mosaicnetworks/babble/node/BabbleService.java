@@ -75,7 +75,6 @@ public abstract class BabbleService<AppState extends BabbleState> {
             throw new IllegalStateException("Service is already running");
         }
 
-        /*
         mBabbleNode = BabbleNode.create(new BlockConsumer() {
                                             @Override
                                             public Block onReceiveBlock(Block block) {
@@ -87,7 +86,6 @@ public abstract class BabbleService<AppState extends BabbleState> {
                                         }, configDirectory);
         mBabbleNode.run();
 
-         */
         mState = State.RUNNING;
         mGroupDescriptor = groupDescriptor;
 
@@ -104,7 +102,6 @@ public abstract class BabbleService<AppState extends BabbleState> {
             throw new IllegalStateException("Service is not running");
         }
 
-        /*
         mBabbleNode.leave(new LeaveResponseListener() {
             @Override
             public void onComplete() {
@@ -119,7 +116,6 @@ public abstract class BabbleService<AppState extends BabbleState> {
             }
         });
 
-         */
 
         onStopped();
     }
