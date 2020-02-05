@@ -34,26 +34,22 @@ import java.util.List;
 public class MdnsDiscovery {
 
     private static final String TAG = "MdnsDiscovery";
-    private final List<NsdDiscoveredService> mDiscoveredServices;
+    private final List<NsdResolvedService> mResolvedServices;
     private NsdManager mNsdManager;
-    private NsdManager.ResolveListener mResolveListener;
     private NsdManager.DiscoveryListener mDiscoveryListener;
     private boolean mDiscoveryActive = false;
+    private ServiceDiscoveryListener mServiceDiscoveryListener;
 
     public interface ServiceDiscoveryListener {
         void onServiceListUpdated();
         void onStartDiscoveryFailed();
     }
 
-    public interface ResolutionListener {
-        void onServiceResolved(NsdServiceInfo service);
-        void onResolveFailed();
-    }
-
-    public MdnsDiscovery(Context context, List<NsdDiscoveredService> discoveredServices,
+    public MdnsDiscovery(Context context, List<NsdResolvedService> resolvedServices,
                          ServiceDiscoveryListener serviceDiscoveryListener) {
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
-        mDiscoveredServices = discoveredServices;
+        mResolvedServices = resolvedServices;
+        mServiceDiscoveryListener = serviceDiscoveryListener;
         initializeDiscoveryListener(serviceDiscoveryListener);
     }
 
@@ -61,60 +57,40 @@ public class MdnsDiscovery {
         mDiscoveryListener = new NsdManager.DiscoveryListener() {
             @Override
             public void onDiscoveryStarted(String regType) {
-                Log.d(TAG, "Service discovery started");
                 mDiscoveryActive = true;
             }
             @Override
             public void onServiceFound(NsdServiceInfo serviceInfo) {
 
                 if (serviceInfo.getServiceType().equals(MdnsAdvertiser.SERVICE_TYPE)) {
-                    Log.d(TAG, "Service discovery success" + serviceInfo);
 
-                    NsdDiscoveredService discoveredService = new NsdDiscoveredService(serviceInfo);
+                    //TODO: confusing naming
+                    NsdResolvedService discoveredService = new NsdResolvedService(serviceInfo);
 
-                    if (!mDiscoveredServices.contains(discoveredService)) {
-                        mDiscoveredServices.add(discoveredService);
+                    if (!mResolvedServices.contains(discoveredService)) {
+                        resolveService(serviceInfo);
                     }
-
-                    serviceDiscoveryListener.onServiceListUpdated();
                 }
             }
             @Override
             public void onServiceLost(NsdServiceInfo serviceInfo) {
                 Log.e(TAG, "service lost" + serviceInfo);
-                mDiscoveredServices.remove(new NsdDiscoveredService(serviceInfo));
+                mResolvedServices.remove(new NsdResolvedService(serviceInfo));
                 serviceDiscoveryListener.onServiceListUpdated();
             }
             @Override
             public void onDiscoveryStopped(String serviceType) {
-                Log.i(TAG, "Discovery stopped: " + serviceType);
                 mDiscoveryActive = false;
-                mDiscoveredServices.clear();
+                mResolvedServices.clear();
                 serviceDiscoveryListener.onServiceListUpdated();
             }
             @Override
             public void onStartDiscoveryFailed(String serviceType, int errorCode) {
-                Log.e(TAG, "Discovery failed: Error code:" + errorCode);
                 serviceDiscoveryListener.onStartDiscoveryFailed();
             }
             @Override
             public void onStopDiscoveryFailed(String serviceType, int errorCode) {
-                Log.e(TAG, "Discovery failed: Error code:" + errorCode);
-            }
-        };
-    }
-
-    private void initializeResolveListener(final ResolutionListener resolutionListener) {
-        mResolveListener = new NsdManager.ResolveListener() {
-            @Override
-            public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-                Log.e(TAG, "Resolve failed" + errorCode);
-                resolutionListener.onResolveFailed();
-            }
-            @Override
-            public void onServiceResolved(NsdServiceInfo serviceInfo) {
-                Log.e(TAG, "Resolve Succeeded. " + serviceInfo);
-                resolutionListener.onServiceResolved(serviceInfo);
+                //do nothing
             }
         };
     }
@@ -126,13 +102,20 @@ public class MdnsDiscovery {
 
     }
 
-    public void resolveService(NsdDiscoveredService serviceInfo, ResolutionListener resolutionListener) {
-        initializeResolveListener(resolutionListener);
+    private void resolveService(NsdServiceInfo serviceInfo) {
 
-        NsdServiceInfo nsdServiceInfo = new NsdServiceInfo();
-        nsdServiceInfo.setServiceType(serviceInfo.getServiceType());
-        nsdServiceInfo.setServiceName(serviceInfo.getServiceName());
-        mNsdManager.resolveService(nsdServiceInfo, mResolveListener);
+        mNsdManager.resolveService(serviceInfo, new NsdManager.ResolveListener() {
+            @Override
+            public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
+                //do nothing
+            }
+
+            @Override
+            public void onServiceResolved(NsdServiceInfo serviceInfo) {
+                mResolvedServices.add(new NsdResolvedService(serviceInfo));
+                mServiceDiscoveryListener.onServiceListUpdated();
+            }
+        });
     }
 
     public void stopDiscovery() {

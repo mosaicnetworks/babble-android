@@ -48,6 +48,7 @@ import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
+import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.utils.Utils;
 
 
@@ -151,12 +152,11 @@ public class NewGroupFragment extends Fragment {
         }
 
 
-
-        Log.i("startGroup", "Starting Group " + groupName);
+        GroupDescriptor groupDescriptor = new GroupDescriptor(groupName);
 
         String configDirectory;
         try {
-            configDirectory = configManager.createConfigNewGroup(groupName, moniker, Utils.getIPAddr(getContext()));
+            configDirectory = configManager.createConfigNewGroup(groupDescriptor, moniker, Utils.getIPAddr(getContext()));
             Log.i("startGroup", "configDirectory: " + configDirectory);
             //babbleService.createConfigNewGroup(moniker, Utils.getIPAddr(getContext()));
         } catch (IllegalArgumentException | CannotStartBabbleNodeException| IOException ex) {
@@ -181,7 +181,7 @@ public class NewGroupFragment extends Fragment {
 
 
         try {
-            babbleService.start(configDirectory, groupName);
+            babbleService.start(configDirectory, groupDescriptor);
             mListener.onStartedNew(moniker);
         } catch (Exception ex) {
             //TODO: Review this. The duplicate dialog function feels overkill.

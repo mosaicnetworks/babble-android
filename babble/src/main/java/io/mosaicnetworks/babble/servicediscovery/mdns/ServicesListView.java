@@ -51,7 +51,7 @@ public class ServicesListView extends RecyclerView {
         void onListEmptyStatusChange(boolean empty);
     }
 
-    private List<NsdDiscoveredService> mServiceInfoList = new ArrayList<>();
+    private List<NsdResolvedService> mServiceInfoList = new ArrayList<>();
     private ServicesListListener mServicesListListener;
     private MdnsDiscovery mMdnsDiscovery;
     private boolean mPrevIsEmpty = true;
@@ -79,28 +79,12 @@ public class ServicesListView extends RecyclerView {
         adapter.setClickListener(new ServicesListAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                adapter.getItem(position);
-                mMdnsDiscovery.resolveService(adapter.getItem(position), new MdnsDiscovery.ResolutionListener() {
-                    @Override
-                    public void onServiceResolved(final NsdServiceInfo service) {
-                        Handler mainHandler = new Handler(context.getMainLooper());
 
-                        Runnable myRunnable = new Runnable() {
-                            @Override
-                            public void run() {
-                                mServicesListListener.onServiceSelectedSuccess(service);
-                            }
-                        };
-                        mainHandler.post(myRunnable);
-
-                    }
-
-                    @Override
-                    public void onResolveFailed() {
-                        mServicesListListener.onServiceSelectedFailure();
-                    }
-                });
-
+                NsdResolvedService service = adapter.getItem(position);
+                NsdServiceInfo serviceInfo = new NsdServiceInfo();
+                serviceInfo.setServiceName(service.getServiceName());
+                serviceInfo.setServiceType(service.getServiceType());
+                mServicesListListener.onServiceSelectedSuccess(serviceInfo);
             }
         });
 

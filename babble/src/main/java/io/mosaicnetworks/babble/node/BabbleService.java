@@ -50,7 +50,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
     private final List<ServiceObserver> mObservers = new ArrayList<>();
     private State mState = State.STOPPED;
     protected BabbleNode mBabbleNode;
-    protected String mGroupName;
+    protected GroupDescriptor mGroupDescriptor;
 
     /**
      * The underlying app state, to which babble transactions are applied
@@ -69,12 +69,13 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * Start the service
      * @throws IllegalStateException if the service is currently running
      */
-    public void start(String configDirectory, String groupName) {
+    public void start(String configDirectory, GroupDescriptor groupDescriptor) {
         if (mState==State.RUNNING) {
             Log.e("BabbleService.start", "Service is already running");
             throw new IllegalStateException("Service is already running");
         }
 
+        /*
         mBabbleNode = BabbleNode.create(new BlockConsumer() {
                                             @Override
                                             public Block onReceiveBlock(Block block) {
@@ -85,8 +86,10 @@ public abstract class BabbleService<AppState extends BabbleState> {
                                             }
                                         }, configDirectory);
         mBabbleNode.run();
+
+         */
         mState = State.RUNNING;
-        mGroupName = groupName;
+        mGroupDescriptor = groupDescriptor;
 
         onStarted();
     }
@@ -101,12 +104,13 @@ public abstract class BabbleService<AppState extends BabbleState> {
             throw new IllegalStateException("Service is not running");
         }
 
+        /*
         mBabbleNode.leave(new LeaveResponseListener() {
             @Override
             public void onComplete() {
                 mBabbleNode=null;
                 mState = State.STOPPED;
-                mGroupName = null;
+                mGroupDescriptor = null;
                 state.reset();
 
                 if (listener!=null) {
@@ -114,6 +118,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
                 }
             }
         });
+
+         */
 
         onStopped();
     }

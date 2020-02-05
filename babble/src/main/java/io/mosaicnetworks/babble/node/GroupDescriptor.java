@@ -22,34 +22,34 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.utils;
+package io.mosaicnetworks.babble.node;
 
-import android.content.Context;
-import android.net.wifi.WifiManager;
-import android.text.format.Formatter;
-
-import java.util.Objects;
 import java.util.UUID;
 
-import static android.content.Context.WIFI_SERVICE;
+import io.mosaicnetworks.babble.utils.RandomString;
 
-/**
- * A collection of utilities
- */
-public final class Utils {
+public final class GroupDescriptor {
 
-    /**
-     * Returns the device's IPv4 address on the wireless network. Returns 0.0.0.0 if the device is
-     * not connected.
-     * @param context an instance of the applications context
-     * @return the ip address in dot-decimal notation
-     */
-    public static String getIPAddr(Context context) {
-        WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
-        return Formatter.formatIpAddress(Objects.requireNonNull(wm).getConnectionInfo().getIpAddress());
+    private final String mName;
+    private final String mUid;
+
+    public GroupDescriptor(String name, String uid) {
+        mName = name;
+        mUid = uid;
     }
 
+    public GroupDescriptor(String name) {
+        mName = name;
+        mUid = new RandomString().nextString();
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public String getUid() {
+        return mUid;
+    }
+
+
 }
-
-
-

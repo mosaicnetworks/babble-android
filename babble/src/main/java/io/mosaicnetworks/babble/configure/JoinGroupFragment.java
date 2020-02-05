@@ -53,6 +53,7 @@ import io.mosaicnetworks.babble.discovery.ResponseListener;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
+import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.utils.Utils;
 
 
@@ -194,10 +195,11 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         }
 
         BabbleService<?> babbleService = mListener.getBabbleService();
+        GroupDescriptor groupDescriptor = new GroupDescriptor(mNsdServiceInfo.getServiceName(), mNsdServiceInfo.getServiceType());
 
         try {
-            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, mNsdServiceInfo.getServiceName(), mMoniker, Utils.getIPAddr(getContext()));
-            babbleService.start(configDir, mNsdServiceInfo.getServiceName());
+            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, mMoniker, Utils.getIPAddr(getContext()));
+            babbleService.start(configDir, groupDescriptor);
         } catch (IllegalStateException | CannotStartBabbleNodeException| IOException ex ) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,

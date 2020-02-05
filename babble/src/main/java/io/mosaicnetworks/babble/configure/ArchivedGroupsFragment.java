@@ -55,6 +55,7 @@ import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
+import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.utils.Utils;
 
 /**
@@ -72,8 +73,6 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     private ActionMode mActionMode;
     private ActionMode.Callback mActionModeCallback;
     private ConfigDirectory mSelectedGroup;
-
-
 
     //TODO: either expose this switch or remove it.
     /**
@@ -150,7 +149,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
             String configDir = mConfigManager.getTomlDir();
             Log.d("MY-TAG", "Config directory name: " + configDir);
             BabbleService<?> babbleService = mListener.getBabbleService();
-            babbleService.start(configDir, configDir); //TODO: need to NOT advertise mDNS
+            babbleService.start(configDir, new GroupDescriptor("Archived Group")); //TODO: need to get a proper group descriptor + need to NOT advertise mDNS
             mListener.onArchiveLoaded(mConfigManager.getMoniker());
 
         } catch (IllegalArgumentException ex) {
