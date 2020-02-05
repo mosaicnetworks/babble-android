@@ -32,6 +32,17 @@ import io.mosaicnetworks.babble.node.BabbleService;
 
 public class MainActivity extends BaseConfigActivity {
 
+    public MainActivity() {
+        super();
+
+        // Control which tabs are shown. This needs to be in the constructor as they are used in the onCreate handler
+
+        mShowArchive = false;
+        mShowmDNS = true;
+        mShowP2P = true;
+
+        //TODO: uses protected global variable. Does this need to use a setter method?
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

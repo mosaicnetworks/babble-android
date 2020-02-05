@@ -47,13 +47,27 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     private FragmentManager mFragmentManager;
     public static final String PREFERENCE_FILE_KEY = "babbleandroid";
 
+    protected static boolean mShowmDNS = true;
+    protected static boolean mShowP2P = true;
+    protected static boolean mShowArchive = true;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base_config);
 
         mFragmentManager = getSupportFragmentManager();
-        TabsFragment mHomeFragment = TabsFragment.newInstance();
+
+        Bundle bundle = new Bundle();
+
+        bundle.putBoolean("SHOW_MDNS", mShowmDNS);
+        bundle.putBoolean("SHOW_P2P", mShowP2P);
+        bundle.putBoolean("SHOW_ARCHIVE", mShowArchive);
+
+        TabsFragment mHomeFragment = TabsFragment.newInstance(bundle);
 
         addFragment(mHomeFragment);
     }
