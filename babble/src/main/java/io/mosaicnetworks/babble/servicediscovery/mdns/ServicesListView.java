@@ -42,7 +42,7 @@ public class ServicesListView extends RecyclerView {
 
     public interface ServicesListListener {
 
-        void onServiceSelectedSuccess(NsdServiceInfo nsdServiceInfo);
+        void onServiceSelectedSuccess(ResolvedGroup resolvedGroup);
 
         void onServiceSelectedFailure();
 
@@ -51,7 +51,7 @@ public class ServicesListView extends RecyclerView {
         void onListEmptyStatusChange(boolean empty);
     }
 
-    private List<NsdResolvedService> mServiceInfoList = new ArrayList<>();
+    private List<ResolvedGroup> mServiceInfoList = new ArrayList<>();
     private ServicesListListener mServicesListListener;
     private MdnsDiscovery mMdnsDiscovery;
     private boolean mPrevIsEmpty = true;
@@ -79,12 +79,7 @@ public class ServicesListView extends RecyclerView {
         adapter.setClickListener(new ServicesListAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-
-                NsdResolvedService service = adapter.getItem(position);
-                NsdServiceInfo serviceInfo = new NsdServiceInfo();
-                serviceInfo.setServiceName(service.getServiceName());
-                serviceInfo.setServiceType(service.getServiceType());
-                mServicesListListener.onServiceSelectedSuccess(serviceInfo);
+                mServicesListListener.onServiceSelectedSuccess(adapter.getItem(position));
             }
         });
 
@@ -92,8 +87,7 @@ public class ServicesListView extends RecyclerView {
 
         mMdnsDiscovery = new MdnsDiscovery(context, mServiceInfoList, new MdnsDiscovery.ServiceDiscoveryListener() {
             @Override
-            public void onServiceListUpdated() {
-
+            public void onServiceListUpdated(boolean groupCountChange) {
                 // let the adapter know
                 Handler mainHandler = new Handler(context.getMainLooper());
 
@@ -107,6 +101,7 @@ public class ServicesListView extends RecyclerView {
 
                 // if the service list info's empty status has changed, let the service listener
                 // know
+                //TODO: can we use the groupCountChange (or a suitable return) to make this easier?
                 final boolean curIsEmpty = mServiceInfoList.isEmpty();
                 if (mPrevIsEmpty ^ curIsEmpty) {
                     //service list info's empty status has changed
@@ -122,7 +117,6 @@ public class ServicesListView extends RecyclerView {
                 }
 
                 mPrevIsEmpty = curIsEmpty;
-
             }
 
             @Override
