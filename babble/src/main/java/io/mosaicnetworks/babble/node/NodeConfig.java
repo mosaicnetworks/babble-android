@@ -53,13 +53,13 @@ public final class NodeConfig {
         private int mHeartbeat = 10;
         private int mSlowHeartbeat = 10;
         private boolean mStore = true;
-        private String mLogLevel = "debug";
+        private String mLogLevel = "info";
         private int mTcpTimeout = 1000;
         private int mMaxPool = 2;
         private int mCacheSize = 50000;
         private int mSyncLimit = 1000;
         private boolean mEnableFastSync = false;
-        private boolean mBootstrap = true;   //bootstrap
+        private boolean mBootstrap = false;   //bootstrap
         private String mServiceListen = "";   //service-listen
         private String mJoinTimeout = "20s";  //join_timeout
         private boolean mMaintenanceMode = false;  //maintenance-mode
