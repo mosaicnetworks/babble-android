@@ -84,7 +84,6 @@ public final class ResolvedGroup {
         return mResolvedServices.isEmpty();
     }
 
-
     /**
      * Get the list of resolved services associated with this group
      * @return a shallow copy of the list of services associated with this group
