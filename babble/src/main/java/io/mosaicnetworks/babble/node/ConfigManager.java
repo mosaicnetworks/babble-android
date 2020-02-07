@@ -258,8 +258,8 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigNewGroup(String groupName, String moniker, String inetAddress)  throws CannotStartBabbleNodeException, IOException {
-        return createConfigNewGroup(groupName, moniker, inetAddress, DEFAULT_BABBLING_PORT);
+    public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String inetAddress)  throws CannotStartBabbleNodeException, IOException {
+        return createConfigNewGroup(groupDescriptor, moniker, inetAddress, DEFAULT_BABBLING_PORT);
     }
 
     /**
@@ -270,13 +270,13 @@ public final class ConfigManager {
      * //@param discoveryPort the port used by the HttpPeerDiscoveryServer //TODO: how to deal with this
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigNewGroup(String groupName, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
+    public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
         List<Peer> genesisPeers = new ArrayList<>();
         genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
         List<Peer> currentPeers = new ArrayList<>();
         currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
 
-        return createConfig(genesisPeers, currentPeers, groupName, moniker, inetAddress, babblingPort);
+        return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, inetAddress, babblingPort);
     }
 
     /**
@@ -336,8 +336,8 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress) throws CannotStartBabbleNodeException, IOException {
-        return createConfig(genesisPeers, currentPeers, groupName, moniker, inetAddress, DEFAULT_BABBLING_PORT);
+    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor, String moniker, String inetAddress) throws CannotStartBabbleNodeException, IOException {
+        return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, inetAddress, DEFAULT_BABBLING_PORT);
     }
 
     /**
@@ -350,18 +350,20 @@ public final class ConfigManager {
      * //@param discoveryPort the port used by the {HttpPeerDiscoveryServer} //TODO: deal with discovery
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
-        return createConfig(genesisPeers, currentPeers, groupName, moniker, inetAddress, babblingPort); //TODO: group name
+    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
+        return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, inetAddress, babblingPort); //TODO: group name
     }
 
-    private String createConfig(List<Peer> genesisPeers, List<Peer> currentPeers, String groupName,
+    private String createConfig(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor,
                                 String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException {
+
+        String compositeGroupName = getCompositeConfigDir(groupDescriptor);
 
         NodeConfig nodeConfig = new NodeConfig.Builder().build();
         mMoniker = moniker;
         //TODO: is there a cleaner way of obtaining the path?
         // It is stored in mTomlDir which has getTomlDir and setTomlDir getter and setters
-        String fullPath = writeBabbleTomlFiles(nodeConfig, groupName, inetAddress, babblingPort, moniker);
+        String fullPath = writeBabbleTomlFiles(nodeConfig, compositeGroupName, inetAddress, babblingPort, moniker);
         Log.v("Config.createConfig", "Full Path:" + fullPath);
 
         writePeersJsonFiles(fullPath, genesisPeers, currentPeers);
@@ -442,16 +444,16 @@ public final class ConfigManager {
     /**
      * Write Babble Config to disk ready for Babble to use
      * @param nodeConfig is the babble configuration object
-     * @param subConfigDir is the sub-directory of the babble sub-directory of the local storage as passed to the constructor
+     * @param compositeGroupName is the sub-directory of the babble sub-directory of the local storage as passed to the constructor
      * @return the composite path where the babble.toml file was written
      */
-    public String writeBabbleTomlFiles(NodeConfig nodeConfig, String subConfigDir, String inetAddress, int port, String moniker) throws CannotStartBabbleNodeException, IOException {
+    public String writeBabbleTomlFiles(NodeConfig nodeConfig, String compositeGroupName, String inetAddress, int port, String moniker) throws CannotStartBabbleNodeException, IOException {
 
         //TODO: add inetAddress, port and moniker to nodeConfig??
         Map<String, Object> babble = new HashMap<>();
 
-        String compositeName = getCompositeConfigDir(subConfigDir);
-        setTomlDir(compositeName);
+
+        setTomlDir(compositeGroupName);
 
         File babbleDir = new File(mTomlDir, DB_SUBDIR);
         if (babbleDir.exists()){
@@ -462,20 +464,16 @@ public final class ConfigManager {
                 case COMPLETE_BACKUP:
                 case SINGLE_BACKUP:
                     // Rename
-                    backupOldConfigs(compositeName);
-                    if   ( ( ! babbleDir.mkdirs() ) && (! babbleDir.exists())) {
-                        throw new CannotStartBabbleNodeException("Cannot create new Config directory (SINGLE_BACKUP policy)");
-                    }
+                    backupOldConfigs(compositeGroupName);
                     break;
                 case DELETE:
-                    deleteDirectory(subConfigDir);
+                    deleteDirectory(compositeGroupName);
                     break;
             }
-        } else {
+        }
 
-            if   ( ( ! babbleDir.mkdirs() ) && (! babbleDir.exists())) {
-                throw new CannotStartBabbleNodeException("Cannot create new Config directory (no previous backup)");
-            }
+        if   ( ( ! babbleDir.mkdirs() ) && (! babbleDir.exists())) {
+            throw new CannotStartBabbleNodeException("Cannot create new Config directory (no previous backup)");
         }
 
         babble.put("datadir", mTomlDir) ;
@@ -508,10 +506,10 @@ public final class ConfigManager {
 
         Log.i("writeTomlFile", "Wrote toml file successfully");
 
-
-        if (isNotExistingConfigDirectory(compositeName)) {
-            addConfigDirectoryToList(compositeName);
+        if (isNotExistingConfigDirectory(compositeGroupName)) {
+            addConfigDirectoryToList(compositeGroupName);
         }
+
         return mTomlDir;
     }
 
@@ -644,17 +642,22 @@ public final class ConfigManager {
      * The 2nd part is a unique id as generated in getUniqueId. Currently this is 16 characters
      * The 3rd part is a narrative description field with spaces converted to minus signs and
      * input limit to spaces, letters and numbers only.
-     * @param networkDescription contains a human readable description for this network.
+     * @param groupDescriptor is the group information
      * @return a unique directory name
      */
-    private String getCompositeConfigDir(String networkDescription) {
+    private String getCompositeConfigDir(GroupDescriptor groupDescriptor) {
 
-        String unique = getUniqueId();
+        String unique = groupDescriptor.getUid();
+
+        //TODO: should this length be controlled in this class or in the group descriptor?
         String trimmedUnique = unique.length() >= sUniqueIdLength
                 ? unique.substring(unique.length() - sUniqueIdLength)
                 : unique;
 
-        return mAppId + "_" + trimmedUnique + "_" + ConfigDirectory.encodeDescription(networkDescription) + "_";
+        //TODO: the encodeDescription method is lossy e.g. "My-Group" and "MyGroup" will be mapped to "MyGroup"
+        //      We should consider the limitations imposed by MDNS (this should all be done in the
+        //      GroupDescriptor)
+        return mAppId + "_" + trimmedUnique + "_" + ConfigDirectory.encodeDescription(groupDescriptor.getName()) + "_";
     }
 
     private boolean deleteDirectory(String subConfigDir) {

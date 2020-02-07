@@ -35,6 +35,7 @@ import android.view.View;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedGroup;
 
 /**
  * This activity complements the {@link BabbleService}. It consists of a set of fragments which
@@ -84,8 +85,8 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     }
 
     @Override
-    public void onServiceSelected(NsdServiceInfo serviceInfo) {
-        JoinGroupFragment mJoinGroupMdnsFragment = JoinGroupFragment.newInstance(serviceInfo);
+    public void onServiceSelected(ResolvedGroup resolvedGroup) {
+        JoinGroupFragment mJoinGroupMdnsFragment = JoinGroupFragment.newInstance(resolvedGroup);
         replaceFragment(mJoinGroupMdnsFragment);
     }
 

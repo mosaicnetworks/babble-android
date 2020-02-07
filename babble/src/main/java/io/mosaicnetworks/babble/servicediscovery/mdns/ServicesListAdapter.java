@@ -55,11 +55,11 @@ public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapte
         }
     }
 
-    private List<NsdDiscoveredService> mData;
+    private List<ResolvedGroup> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    public ServicesListAdapter(Context context, List<NsdDiscoveredService> data) {
+    public ServicesListAdapter(Context context, List<ResolvedGroup> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -75,8 +75,7 @@ public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapte
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String serviceName = mData.get(position).getServiceName();
-
+        String serviceName = mData.get(position).getGroupName();
         holder.genericTextView.setText(serviceName);
     }
 
@@ -91,7 +90,7 @@ public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapte
     }
 
     // convenience method for getting data at click position
-    public NsdDiscoveredService getItem(int id) {
+    public ResolvedGroup getItem(int id) {
         return mData.get(id);
     }
 

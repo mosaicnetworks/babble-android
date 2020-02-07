@@ -41,6 +41,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.mdns.ServicesListView;
 
 public class MdnsDiscoveryFragment extends Fragment {
@@ -136,8 +137,8 @@ public class MdnsDiscoveryFragment extends Fragment {
         mServiceListView.startDiscovery(new ServicesListView.ServicesListListener() {
 
             @Override
-            public void onServiceSelectedSuccess(NsdServiceInfo nsdServiceInfo) {
-                mListener.onServiceSelected(nsdServiceInfo);
+            public void onServiceSelectedSuccess(ResolvedGroup resolvedGroup) {
+                mListener.onServiceSelected(resolvedGroup);
             }
 
             @Override

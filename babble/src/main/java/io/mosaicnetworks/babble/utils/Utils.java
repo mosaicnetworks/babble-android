@@ -29,13 +29,14 @@ import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import static android.content.Context.WIFI_SERVICE;
 
 /**
  * A collection of utilities
  */
-public class Utils {
+public final class Utils {
 
     /**
      * Returns the device's IPv4 address on the wireless network. Returns 0.0.0.0 if the device is
@@ -47,4 +48,8 @@ public class Utils {
         WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
         return Formatter.formatIpAddress(Objects.requireNonNull(wm).getConnectionInfo().getIpAddress());
     }
+
 }
+
+
+

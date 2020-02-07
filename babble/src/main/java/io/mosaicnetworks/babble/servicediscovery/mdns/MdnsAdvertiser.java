@@ -30,26 +30,37 @@ import android.net.nsd.NsdServiceInfo;
 
 import java.util.Objects;
 
+import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.utils.RandomString;
+
 public class MdnsAdvertiser {
 
-    public static final String SERVICE_TYPE = "_http._tcp.";
+    public static final String SERVICE_TYPE = "_babble._tcp.";
+    public static final String APP_IDENTIFIER = "appIdentifier";
+    public static final String GROUP_NAME = "groupName";
+    public static final String GROUP_UID = "groupUid";
     private NsdManager mNsdManager;
     private NsdManager.RegistrationListener mRegistrationListener;
-    public String serviceName;
+    private String mServiceName;
     private NsdServiceInfo mServiceInfo = new NsdServiceInfo();
+    private Context mAppContext;
 
-    public MdnsAdvertiser(String serviceName, int port) {
+    public MdnsAdvertiser(GroupDescriptor groupDescriptor, int port, Context context) {
         initializeRegistrationListener();
 
-        mServiceInfo.setServiceName(serviceName);
+        mAppContext = context.getApplicationContext();
         mServiceInfo.setServiceType(SERVICE_TYPE);
+        mServiceName = new RandomString(32).nextString();
+        mServiceInfo.setServiceName(mServiceName);
+        mServiceInfo.setAttribute(APP_IDENTIFIER, mAppContext.getPackageName()); //https://developer.android.com/studio/build/application-id note: The application ID used to be directly tied to your code's package name; so some Android APIs use the term "package name" in their method names and parameter names, but this is actually your application ID. For example, the Context.getPackageName() method returns your application ID
+        mServiceInfo.setAttribute(GROUP_NAME, groupDescriptor.getName());
+        mServiceInfo.setAttribute(GROUP_UID, groupDescriptor.getUid());
         mServiceInfo.setPort(port);
     }
 
-    public void advertise(Context context) {
+    public void advertise() {
 
-        Context appContext = context.getApplicationContext();
-        mNsdManager = (NsdManager) appContext.getSystemService(Context.NSD_SERVICE);
+        mNsdManager = (NsdManager) mAppContext.getSystemService(Context.NSD_SERVICE);
         Objects.requireNonNull(mNsdManager).registerService(mServiceInfo, NsdManager.PROTOCOL_DNS_SD, mRegistrationListener);
     }
 
@@ -63,9 +74,12 @@ public class MdnsAdvertiser {
             @Override
             public void onServiceRegistered(NsdServiceInfo NsdServiceInfo) {
                 // Save the service name. Android may have changed it in order to
-                // resolve a conflict, so update the name you initially requested
-                // with the name Android actually used.
-                serviceName = NsdServiceInfo.getServiceName();
+                // resolve a conflict, so update the name we initially requested
+                // with the name Android actually used - We chose a random string
+                // anyway, so:
+                // 1) It's almost certain to be unique
+                // 2) We don't care if Android changes it
+                mServiceName = NsdServiceInfo.getServiceName();
             }
 
             @Override
@@ -79,7 +93,9 @@ public class MdnsAdvertiser {
         };
     }
 
-
+    public String getServiceName() {
+        return mServiceName;
+    }
 }
 
 
