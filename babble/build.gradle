@@ -33,7 +33,7 @@ apply plugin: 'com.jfrog.bintray'
 //##################################################################################################
 // babble core configuration
 
-def babbleCoreVersion = "0.6.1"
+def babbleCoreVersion = "0.6.2"
 def repository = "https://github.com/mosaicnetworks/babble/releases/download"
 def protocol = "https"
 
