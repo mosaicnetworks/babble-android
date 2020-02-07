@@ -95,6 +95,7 @@ public class MdnsDiscovery {
             public void onDiscoveryStopped(String serviceType) {
                 mDiscoveryActive = false;
                 mResolvedServices.clear();
+                mResolvedGroups.clear();
                 serviceDiscoveryListener.onServiceListUpdated(true);
             }
             @Override
