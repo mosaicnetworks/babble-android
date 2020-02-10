@@ -50,8 +50,8 @@ public final class NodeConfig {
 // NB these defaults are tested in BabbleConfigTest.java allDefaultConfigTest()
 // If you change these values, you must change the values in that file.
 
-        private int mHeartbeat = 10;
-        private int mSlowHeartbeat = 10;
+        private int mHeartbeat = 100;
+        private int mSlowHeartbeat = 200;
         private boolean mStore = true;
         private String mLogLevel = "info";
         private int mTcpTimeout = 1000;
