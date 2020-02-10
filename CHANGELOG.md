@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.3.1 (TBA February, 2020)
+## v0.3.1 (February 10, 2020)
 
 SECURITY:
 
