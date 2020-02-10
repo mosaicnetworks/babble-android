@@ -30,6 +30,6 @@ file. NOTE: there are THREE parameters here, all of which must be incremented.
 
 10. Create a git tag.
 
-11. Push the develop and master branches to github.
+11. Push the develop and master branches and tags to github.
 
 12. Upload to bintray ```gradlew bintrayUpload```.
