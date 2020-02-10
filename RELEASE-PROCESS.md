@@ -6,9 +6,9 @@ Assume all feature branches have been merged into the develop branch
 1. Pull develop and master branches from github.
 
 2. Ensure babble-go version in the babble build.gradle file is a released
-version of babble-go. If it isn't (i.e. it refrences a git commit) then check
-if there is a suitable release. If there is, adjust the babble-go version and
-create a commit.
+version of babble-go. If it isn't (i.e. it references a git commit) then check
+if there is a suitable release. If there is, adjust the babble-go version, run
+all the tests and create a commit.
 
 3. Merge master into develop - there may be commits on the master branch that
 are not on the develop branch (these should't be code commits, however just in
