@@ -33,6 +33,7 @@ import java.nio.charset.Charset;
 import io.mosaicnetworks.babble.discovery.PeersProvider;
 import mobile.Mobile;
 import mobile.Node;
+import mobile.StateChangeHandler;
 
 /**
  * This is the core Babble node. It can be used directly or alternatively the {@link BabbleService}
@@ -40,6 +41,49 @@ import mobile.Node;
  * node, call {@link BabbleNode#run()} to start it.
  */
 public final class BabbleNode implements PeersProvider {
+
+    /**
+     * The current state of the Babble-Core node
+     */
+    public enum State {
+        //Babbling is the initial state of a Babble node.
+        Babbling(0),
+
+        //CatchingUp implements Fast Sync
+        CatchingUp(1),
+
+        //Joining is joining
+        Joining(2),
+
+        //Leaving is leaving
+        Leaving(3),
+
+        //Shutdown is shutdown
+        Shutdown(4),
+
+        //Suspended is initialised, but not gossipping
+        Suspended(5);
+
+        private int value;
+
+        private State(int value) {
+            this.value = value;
+        }
+
+        static State fromValue(int value) {
+            for (State my: State.values()) {
+                if (my.value == value) {
+                    return my;
+                }
+            }
+
+            return null;
+        }
+
+        int value() {
+            return value;
+        }
+    }
 
     private final Node mNode;
 
@@ -64,6 +108,12 @@ public final class BabbleNode implements PeersProvider {
                         } catch (JsonSyntaxException ex) {
                             return null;
                         }
+                    }
+                },
+                new mobile.StateChangeHandler() {
+                    @Override
+                    public void onStateChanged(final int state) {
+                        System.out.println("BabbleState " + State.fromValue(state));
                     }
                 },
                 new mobile.ExceptionHandler() {
