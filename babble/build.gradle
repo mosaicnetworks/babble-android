@@ -33,13 +33,13 @@ apply plugin: 'com.jfrog.bintray'
 //##################################################################################################
 // babble core configuration
 
-def babbleCoreVersion = "0.6.2"
-def repository = "https://github.com/mosaicnetworks/babble/releases/download"
-def protocol = "https"
+//def babbleCoreVersion = "0.6.2"
+//def repository = "https://github.com/mosaicnetworks/babble/releases/download"
+//def protocol = "https"
 
-// def babbleCoreVersion = "a3160dc72421ce9f7c71c9bc72d9f2092d953054"
-// def repository = System.properties['user.home'] + "/go/src/github.com/mosaicnetworks/babble/build/distmobile"
-// def protocol = "file"
+def babbleCoreVersion = "767fcb678bbeb9506ac54160ea1cb85e037c5366"
+def repository = System.properties['user.home'] + "/go/src/github.com/mosaicnetworks/babble/build/distmobile"
+def protocol = "file"
 
 //##################################################################################################
 
@@ -177,6 +177,7 @@ dependencies {
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
 }
 
 artifacts {
