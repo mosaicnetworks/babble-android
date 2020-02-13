@@ -28,13 +28,15 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -42,17 +44,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.FileSystemNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
@@ -69,10 +70,15 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     private ArchivedGroupsAdapter mArchivedGroupsAdapter;
     private List<ConfigDirectory> mArchivedList = new ArrayList<>();
     private ConfigManager mConfigManager;
-    private View mPreviousLongClickView;
     private ActionMode mActionMode;
     private ActionMode.Callback mActionModeCallback;
-    private ConfigDirectory mSelectedGroup;
+    private List<ConfigDirectory> mSelectedGroupsConfigs = new ArrayList<>();
+    private List<View> mSelectedGroupsViews = new ArrayList<>();
+    private ArchivedGroupsViewModel mViewModel;
+    private RecyclerView mRvArchivedGroups;
+    private LinearLayout mLinearLayoutArchiveLoading;
+    private Boolean mSelected;
+
 
     //TODO: either expose this switch or remove it.
     /**
@@ -95,7 +101,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState)  {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
             mConfigManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
@@ -108,76 +114,116 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
                                                 // The app will terminate. But babble is unstartable from here.
         }
         initActionModeCallback();
+
+        mViewModel = ViewModelProviders.of(this, new ArchivedGroupsViewModelFactory(mListener.getBabbleService())).get(ArchivedGroupsViewModel.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_archived_groups, container, false);
-        RecyclerView mRvArchivedGroups = view.findViewById(R.id.rv_archived_groups);
-        mRvArchivedGroups.setLayoutManager(new LinearLayoutManager(getContext()));
         mArchivedGroupsAdapter = new ArchivedGroupsAdapter(getContext(), mArchivedList);
         mArchivedGroupsAdapter.setClickListener(this);
+        mRvArchivedGroups = view.findViewById(R.id.rv_archived_groups);
+        mRvArchivedGroups.setLayoutManager(new LinearLayoutManager(getContext()));
         mRvArchivedGroups.setAdapter(mArchivedGroupsAdapter);
+
+        mLinearLayoutArchiveLoading = view.findViewById(R.id.linearLayout_archive_loading);
+
+        final Observer<ArchivedGroupsViewModel.State> viewModelState = new Observer<ArchivedGroupsViewModel.State>() {
+            @Override
+            public void onChanged(@Nullable final ArchivedGroupsViewModel.State newState) {
+                onViewModelStateChanged(newState);
+            }
+        };
+
+        mViewModel.getState().observe(this, viewModelState);
+        onViewModelStateChanged(mViewModel.getState().getValue());
+
         return view;
     }
 
+    private void onViewModelStateChanged(ArchivedGroupsViewModel.State state) {
+
+        switch (state) {
+            case LIST:
+                mRvArchivedGroups.setVisibility(View.VISIBLE);
+                mLinearLayoutArchiveLoading.setVisibility(View.GONE);
+                break;
+            case LOADING:
+                mRvArchivedGroups.setVisibility(View.GONE);
+                mLinearLayoutArchiveLoading.setVisibility(View.VISIBLE);
+                break;
+            case LOADED:
+                //If it loads when we're on a different tab then abort. This does mean it's possible
+                //for a configuration change to cause an abort
+                if (isResumed()) {
+                    mListener.onArchiveLoaded("made up moniker"); //TODO: fix moniker
+                } else {
+                    mListener.getBabbleService().leave(null);
+                    mViewModel.getState().setValue(ArchivedGroupsViewModel.State.LIST);
+                }
+                break;
+            case FAILED:
+                displayOkAlertDialog(R.string.archive_load_fail_title, R.string.archive_load_fail_message);
+                mViewModel.getState().setValue(ArchivedGroupsViewModel.State.LIST);
+        }
+    }
+
     @Override
-    public void onItemShortClick(ConfigDirectory configDirectory) {
+    public void onItemShortClick(View view, ConfigDirectory configDirectory) {
 
+        if (mSelectedGroupsViews.isEmpty()) {
 
-        Log.i("onItemClick", configDirectory.directoryName);
+            try {
+                mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), ConfigManager.DEFAULT_BABBLING_PORT);
 
+            } catch (IOException e) {
+                displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot load configuration: " + e.getMessage());
+                return;
+            } catch (Exception e) {
+                displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot load configuration: " + e.getClass().getCanonicalName() + ": " + e.getMessage());
+                throw e;
+            }
 
-        try {
-            mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), ConfigManager.DEFAULT_BABBLING_PORT);
+            try {
+                String configDir = mConfigManager.getTomlDir();
+                mViewModel.loadArchive(configDir, new GroupDescriptor("Archived Group")); //TODO: need to get a proper group descriptor
 
-        } catch (IOException e)
-        {
-            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot load configuration: "+  e.getMessage() );
-            return;
-        } catch (Exception e)
-        {
-            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot load configuration: "+ e.getClass().getCanonicalName()+": "+ e.getMessage() );
-            throw e;
+            } catch (IllegalArgumentException ex) {
+                displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: Illegal Argument: " + ex.getClass().getCanonicalName() + ": " + ex.getMessage());
+            } catch (Exception ex) {
+                //TODO: Some sensible error handling here.
+                //Errors on starting the babble service were untrapped and killing the app
+                displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: " + ex.getClass().getCanonicalName() + ": " + ex.getMessage());
+                throw ex;
+                //          Toast.makeText(getContext(), "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage(), Toast.LENGTH_LONG).show();
+            }
+
+        } else {
+            mSelectedGroupsConfigs.add(configDirectory);
+            mSelectedGroupsViews.add(view);
+            view.setSelected(true);
+
+            //TODO: need to un select if clicked again?
         }
-
-
-
-        try {
-
-            String configDir = mConfigManager.getTomlDir();
-            Log.d("MY-TAG", "Config directory name: " + configDir);
-            BabbleService<?> babbleService = mListener.getBabbleService();
-            babbleService.start(configDir, new GroupDescriptor("Archived Group")); //TODO: need to get a proper group descriptor + need to NOT advertise mDNS
-            mListener.onArchiveLoaded(mConfigManager.getMoniker());
-
-        } catch (IllegalArgumentException ex) {
-            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: Illegal Argument: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
-        } catch (Exception ex) {
-            //TODO: Some sensible error handling here.
-            //Errors on starting the babble service were untrapped and killing the app
-            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
-            throw ex;
-  //          Toast.makeText(getContext(), "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage(), Toast.LENGTH_LONG).show();
-        }
-
-
     }
 
     /** Called when the user long clicks a group in the archive list*/
     public void onItemLongClick(View view, ConfigDirectory configDirectory) {
 
-        // un-highlight previously selected view
-        if (mPreviousLongClickView != null) {
-            mPreviousLongClickView.setSelected(false);
+        // un-highlight previously selected views
+        for (View viewS:mSelectedGroupsViews) {
+            viewS.setSelected(false);
         }
-
         // highlight selected
         view.setSelected(true);
-        mPreviousLongClickView = view;
 
-        mSelectedGroup = configDirectory;
+        mSelectedGroupsConfigs = new ArrayList<>();
+        mSelectedGroupsConfigs.add(configDirectory);
+
+        mSelectedGroupsViews = new ArrayList<>();
+        mSelectedGroupsViews.add(view);
 
         if (mActionMode == null) {
             // Start the CAB
@@ -210,10 +256,15 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.delete_contact) {
-                    mConfigManager.deleteDirectoryAndBackups(mSelectedGroup.directoryName, false);
-                    mArchivedList.remove(mSelectedGroup);
+
+                    for (ConfigDirectory configDirectory: mSelectedGroupsConfigs) {
+                        mConfigManager.deleteDirectoryAndBackups(configDirectory.directoryName, false);
+                        mArchivedList.remove(configDirectory);
+                    }
+
                     mArchivedGroupsAdapter.notifyDataSetChanged();
                     mode.finish();
+
                     return true;
                 }
 
@@ -223,10 +274,13 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
             // Called when the user exits the action mode
             @Override
             public void onDestroyActionMode(ActionMode mode) {
-                // un-highlight previously selected view
-                if (mPreviousLongClickView != null) {
-                    mPreviousLongClickView.setSelected(false);
+                // un-highlight previously selected views
+                for (View lView:mSelectedGroupsViews) {
+                    lView.setSelected(false);
                 }
+
+                mSelectedGroupsViews.clear();
+                mSelectedGroupsConfigs.clear();
 
                 mActionMode = null;
             }
@@ -254,7 +308,6 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     public void onStart() {
         super.onStart();
 
-
         //TODO: This is currently a hardcoded boolean. But it is coded this way to preserve both
         //methods, and potentially it will be switchable in the future
         if (mShowAllArchiveVersion) {
@@ -269,7 +322,6 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
             }
         }
 
-
         mArchivedGroupsAdapter.notifyDataSetChanged();
     }
 
@@ -278,8 +330,11 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
         super.onStop();
         mArchivedList.clear();
         mArchivedGroupsAdapter.notifyDataSetChanged();
-    }
 
+        if (mViewModel.getState().getValue() == ArchivedGroupsViewModel.State.LOADED) {
+            mViewModel.getState().setValue(ArchivedGroupsViewModel.State.LIST);
+        }
+    }
 
     //TODO: Review if we need these functions in Archive, Join and New fragments.
     private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
@@ -290,8 +345,6 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
                 .create();
         alertDialog.show();
     }
-
-
 
     private void displayOkAlertDialogText(@StringRes int titleId, String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
@@ -318,7 +371,7 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
 
         @Override
         public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onItemShortClick(mData.get(getAdapterPosition()));
+            if (mClickListener != null) mClickListener.onItemShortClick(view, mData.get(getAdapterPosition()));
         }
 
         @Override
@@ -377,7 +430,7 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
 
-        void onItemShortClick(ConfigDirectory configDirectory);
+        void onItemShortClick(View view, ConfigDirectory configDirectory);
 
         void onItemLongClick(View view, ConfigDirectory configDirectory);
     }
