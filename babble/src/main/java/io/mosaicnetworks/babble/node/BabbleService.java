@@ -72,9 +72,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * @throws IllegalStateException if the service is currently running
      */
     public void start(String configDirectory, GroupDescriptor groupDescriptor) {
-        if (mState==State.RUNNING) {
-            Log.e("BabbleService.start", "Service is already running");
-            throw new IllegalStateException("Service is already running");
+        if (mState!=State.STOPPED) {
+            throw new IllegalStateException("Cannot start service which isn't stopped");
         }
 
         mBabbleNode = BabbleNode.create(new BlockConsumer() {
@@ -108,9 +107,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
      */
     public void startArchive(final String configDirectory, GroupDescriptor groupDescriptor,
                              final StartArchiveListener listener) {
-        if (mState==State.RUNNING) {
-            Log.e("BabbleService.start", "Service is already running");
-            throw new IllegalStateException("Service is already running");
+        if (mState!=State.STOPPED) {
+            throw new IllegalStateException("Cannot start archive service which isn't stopped");
         }
 
         mState = State.ARCHIVE_INIT;
@@ -136,8 +134,15 @@ public abstract class BabbleService<AppState extends BabbleState> {
                         return;
                     }
 
-                    mState = State.ARCHIVE;
-                    listener.onInitialised();
+                    // If the service has been force stopped then we shouldn't transition into
+                    // ARCHIVE
+                    if (mState==State.ARCHIVE_INIT) {
+                        mState = State.ARCHIVE;
+                        listener.onInitialised();
+                    } else {
+                        //we need to call stop on the now initialised babble node!!
+                        stop();
+                    }
                 }
             }).start();
 
@@ -173,6 +178,20 @@ public abstract class BabbleService<AppState extends BabbleState> {
             });
 
         onStopped();
+    }
+
+    /**
+     * Forces the service to immediately stop
+     */
+    public void stop() {
+        if (mBabbleNode!=null) {
+            mBabbleNode.shutdown();
+        }
+
+        mBabbleNode = null;
+        mState = State.STOPPED;
+        mGroupDescriptor = null;
+        state.reset();
     }
 
     /**
