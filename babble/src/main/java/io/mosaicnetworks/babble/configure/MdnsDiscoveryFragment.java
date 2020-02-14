@@ -44,6 +44,7 @@ import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.mdns.ServicesListView;
 
+
 public class MdnsDiscoveryFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;

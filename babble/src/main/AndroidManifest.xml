@@ -27,12 +27,28 @@
     package="io.mosaicnetworks.babble" >
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
+    <!--
+    //TODO: review whether required=true is required. The following permissions are required for
+    // WIFI Direct
+    <uses-permission
+        android:required="true"
+        android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission
+        android:required="true"
+        android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission
+        android:required="true"
+        android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission
+        android:required="true"
+        android:name="android.permission.INTERNET"/>
+    -->
     <application
         android:usesCleartextTraffic="true"
         tools:targetApi="m">

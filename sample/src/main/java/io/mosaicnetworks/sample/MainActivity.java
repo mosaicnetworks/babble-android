@@ -24,6 +24,8 @@
 
 package io.mosaicnetworks.sample;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -32,6 +34,38 @@ import io.mosaicnetworks.babble.node.BabbleService;
 
 public class MainActivity extends BaseConfigActivity {
 
+    public MainActivity() {
+        super();
+
+        // Control which tabs are shown. This needs to be in the constructor as they are used in the onCreate handler
+        try {
+            setShowArchive(true);
+            setShowmDNS(true);
+            setShowP2P(true);
+
+            // Show all version of each group in the archive tab
+            setShowAllArchiveVersions(true);
+        } catch (IllegalStateException ex) {
+
+
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setTitle("Alert Dialog");
+            alertDialog.setMessage("Failed to set tab visibility");
+
+
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+
+            alertDialog.show();
+
+            ex.printStackTrace();
+
+            throw ex;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

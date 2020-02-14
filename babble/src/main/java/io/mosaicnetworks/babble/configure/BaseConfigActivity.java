@@ -45,8 +45,86 @@ import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedGroup;
  */
 public abstract class BaseConfigActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 
+    /**
+     * Key for the bundle used to pass the visibility flag for the mDNS tab to the fragment
+     */
+    public static final String SHOW_MDNS ="SHOW_MDNS";
+
+    /**
+     * Key for the bundle used to pass the visibility flag for the P2P tab to the fragment
+     */
+    public static final String SHOW_P2P ="SHOW_P2P";
+
+    /**
+     * Key for the bundle used to pass the visibility flag for the Archive Tab to the fragment
+     */
+    public static final String SHOW_ARCHIVE ="SHOW_ARCHIVE";
+
+
+    /**
+     * Key for the bundle used to pass the flag for showing all versions in the Archive Tab to the fragment
+     */
+    public static final String SHOW_ALL_ARCHIVE ="SHOW_ALL_ARCHIVE";
+
+
     private FragmentManager mFragmentManager;
     public static final String PREFERENCE_FILE_KEY = "babbleandroid";
+
+
+    /**
+     * Controls whether to show the mDNS tab. Much be called in the constructor of the instance that
+     * implements BaseConfigActivity as the parameter are used in BaseConfigActivity.onCreate.
+     * @param showmDNS true to show the mDNS tab, false to hide
+     * @throws IllegalStateException if the OnCreate event handler has already been run
+     */
+    protected static void setShowmDNS(boolean showmDNS) throws IllegalStateException {
+        if (mTooLateToChangeShowTabs) throw new IllegalStateException();
+        BaseConfigActivity.mShowmDNS = showmDNS;
+    }
+
+    /**
+     * Controls whether to show the P2P tab. Much be called in the constructor of the instance that
+     * implements BaseConfigActivity as the parameter are used in BaseConfigActivity.onCreate.
+     * @param showP2P true to show the mDNS tab, false to hide
+     * @throws IllegalStateException if the OnCreate event handler has already been run
+     */
+    protected static void setShowP2P(boolean showP2P) throws IllegalStateException {
+        if (mTooLateToChangeShowTabs) throw new IllegalStateException();
+        BaseConfigActivity.mShowP2P = showP2P;
+    }
+
+    /**
+     * Controls whether to show the Archive tab. Much be called in the constructor of the instance that
+     * implements BaseConfigActivity as the parameter are used in BaseConfigActivity.onCreate.
+     * @param showArchive true to show the mDNS tab, false to hide
+     * @throws IllegalStateException if the OnCreate event handler has already been run
+     */
+    protected static void setShowArchive(boolean showArchive) throws IllegalStateException {
+        if (mTooLateToChangeShowTabs) throw new IllegalStateException();
+        BaseConfigActivity.mShowArchive = showArchive;
+    }
+
+    /**
+     * Controls whether to show all archive versions of group. Much be called in the constructor of the instance that
+     * implements BaseConfigActivity as the parameter are used in BaseConfigActivity.onCreate.
+     * @param showAllArchiveVersions true to show all archive versions of group, false for just the latest ones
+     * @throws IllegalStateException if the OnCreate event handler has already been run
+     */
+    public static void setShowAllArchiveVersions(boolean showAllArchiveVersions)  throws IllegalStateException {
+        if (mTooLateToChangeShowTabs) throw new IllegalStateException();
+        BaseConfigActivity.mShowAllArchiveVersions = showAllArchiveVersions;
+    }
+
+
+
+
+    private static boolean mShowmDNS = true;
+    private static boolean mShowP2P = true;
+    private static boolean mShowArchive = true;
+    private static boolean mTooLateToChangeShowTabs = false;
+
+    private static boolean mShowAllArchiveVersions = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +132,16 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         setContentView(R.layout.activity_base_config);
 
         mFragmentManager = getSupportFragmentManager();
-        TabsFragment mHomeFragment = TabsFragment.newInstance();
+
+
+        mTooLateToChangeShowTabs = true;
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(SHOW_MDNS, mShowmDNS);
+        bundle.putBoolean(SHOW_P2P, mShowP2P);
+        bundle.putBoolean(SHOW_ARCHIVE, mShowArchive);
+        bundle.putBoolean(SHOW_ALL_ARCHIVE, mShowAllArchiveVersions);
+
+        TabsFragment mHomeFragment = TabsFragment.newInstance(bundle);
 
         addFragment(mHomeFragment);
     }

@@ -37,6 +37,7 @@ public class MdnsDiscovery {
     private static final String TAG = "MdnsDiscovery";
     private final Map<String, ResolvedService> mResolvedServices = new HashMap<>();
     private final List<ResolvedGroup> mResolvedGroups;
+
     private NsdManager mNsdManager;
     private NsdManager.DiscoveryListener mDiscoveryListener;
     private boolean mDiscoveryActive = false;
