@@ -24,7 +24,6 @@
 
 package io.mosaicnetworks.babble.configure;
 
-import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -54,9 +53,14 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         setContentView(R.layout.activity_base_config);
 
         mFragmentManager = getSupportFragmentManager();
-        TabsFragment mHomeFragment = TabsFragment.newInstance();
 
-        addFragment(mHomeFragment);
+        //"When a config change occurs the old Fragment adds itself to the new Activity when it's
+        //recreated". - https://stackoverflow.com/questions/8474104/android-fragment-lifecycle-over-orientation-changes
+        //Check if fragment is already added to avoid attaching multiple instances of the fragment
+        TabsFragment fragment = (TabsFragment) mFragmentManager.findFragmentById(R.id.constraint_layout);
+        if (fragment == null) {
+            addFragment(TabsFragment.newInstance());
+        }
     }
 
     private void addFragment(Fragment fragment) {
@@ -82,6 +86,17 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     public void newGroup(View view) {
         NewGroupFragment mNewGroupFragment = NewGroupFragment.newInstance();
         replaceFragment(mNewGroupFragment);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        // If an archive is loading and the user presses the back button. This activity will be
+        // destroyed, if in the meantime the service transitions into the "ARCHIVE" state, when the
+        // app is restarted the service won't be in the "STOPPED" or "ARCHIVE-INIT" state which this
+        // activity expects
+        getBabbleService().stop();
     }
 
     @Override

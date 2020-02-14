@@ -45,6 +45,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
     public enum State {
         STOPPED,
         RUNNING,
+        ARCHIVE_INIT,
+        ARCHIVE,
     }
 
     private final List<ServiceObserver> mObservers = new ArrayList<>();
@@ -70,9 +72,8 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * @throws IllegalStateException if the service is currently running
      */
     public void start(String configDirectory, GroupDescriptor groupDescriptor) {
-        if (mState==State.RUNNING) {
-            Log.e("BabbleService.start", "Service is already running");
-            throw new IllegalStateException("Service is already running");
+        if (mState!=State.STOPPED) {
+            throw new IllegalStateException("Cannot start service which isn't stopped");
         }
 
         mBabbleNode = BabbleNode.create(new BlockConsumer() {
@@ -92,6 +93,62 @@ public abstract class BabbleService<AppState extends BabbleState> {
         onStarted();
     }
 
+    public interface StartArchiveListener {
+
+        void onInitialised();
+
+        void onFailed();
+    }
+
+    /**
+     * This is an asynchrnous call to start the service in archive mode
+     * @param configDirectory
+     * @param groupDescriptor
+     */
+    public void startArchive(final String configDirectory, GroupDescriptor groupDescriptor,
+                             final StartArchiveListener listener) {
+        if (mState!=State.STOPPED) {
+            throw new IllegalStateException("Cannot start archive service which isn't stopped");
+        }
+
+        mState = State.ARCHIVE_INIT;
+
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        mBabbleNode = BabbleNode.create(new BlockConsumer() {
+                            @Override
+                            public Block onReceiveBlock(Block block) {
+                                Log.i("ProcessBlock", "Process block");
+                                Block processedBlock = state.processBlock(block);
+                                notifyObservers();
+                                return processedBlock;
+                            }
+                        }, configDirectory);
+
+                    } catch (IllegalArgumentException ex) {
+                        //TODO: need more refined Babble exceptions
+                        state.reset();
+                        listener.onFailed();
+                        mState = State.STOPPED;
+                        return;
+                    }
+
+                    // If the service has been force stopped then we shouldn't transition into
+                    // ARCHIVE
+                    if (mState==State.ARCHIVE_INIT) {
+                        mState = State.ARCHIVE;
+                        listener.onInitialised();
+                    } else {
+                        //we need to call stop on the now initialised babble node!!
+                        stop();
+                    }
+                }
+            }).start();
+
+        mGroupDescriptor = groupDescriptor;
+    }
+
     /**
      * Asynchronous method for leaving a group
      * @param listener called when the leave completes
@@ -102,22 +159,39 @@ public abstract class BabbleService<AppState extends BabbleState> {
             throw new IllegalStateException("Service is not running");
         }
 
-        mBabbleNode.leave(new LeaveResponseListener() {
-            @Override
-            public void onComplete() {
-                mBabbleNode=null;
-                mState = State.STOPPED;
-                mGroupDescriptor = null;
-                state.reset();
+        if (mState==State.ARCHIVE_INIT) {
+            throw new IllegalStateException("Cannot leave while initialising archive");
+        }
 
-                if (listener!=null) {
-                    listener.onComplete();
+            mBabbleNode.leave(new LeaveResponseListener() {
+                @Override
+                public void onComplete() {
+                    mBabbleNode = null;
+                    mState = State.STOPPED;
+                    mGroupDescriptor = null;
+                    state.reset();
+
+                    if (listener != null) {
+                        listener.onComplete();
+                    }
                 }
-            }
-        });
-
+            });
 
         onStopped();
+    }
+
+    /**
+     * Forces the service to immediately stop
+     */
+    public void stop() {
+        if (mBabbleNode!=null) {
+            mBabbleNode.shutdown();
+        }
+
+        mBabbleNode = null;
+        mState = State.STOPPED;
+        mGroupDescriptor = null;
+        state.reset();
     }
 
     /**
