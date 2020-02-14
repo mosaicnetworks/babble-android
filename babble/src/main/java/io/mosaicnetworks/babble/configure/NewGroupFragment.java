@@ -182,7 +182,7 @@ public class NewGroupFragment extends Fragment {
 
         try {
             babbleService.start(configDirectory, groupDescriptor);
-            mListener.onStartedNew(moniker);
+            mListener.baseOnStartedNew(moniker);
         } catch (Exception ex) {
             //TODO: Review this. The duplicate dialog function feels overkill.
             displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );

@@ -221,7 +221,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         }
 
         mLoadingDialog.dismiss();
-        mListener.onJoined(mMoniker);
+        mListener.baseOnJoined(mMoniker);
     }
 
     @Override

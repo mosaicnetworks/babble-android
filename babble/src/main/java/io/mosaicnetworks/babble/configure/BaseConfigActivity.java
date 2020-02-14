@@ -46,6 +46,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
 
     private FragmentManager mFragmentManager;
     public static final String PREFERENCE_FILE_KEY = "babbleandroid";
+    private Boolean mFromGroup = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,17 +76,19 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         fragmentTransaction.commit();
     }
 
-    private void replaceFragment(Fragment fragment) {
+    private void replaceFragment(Fragment fragment, Boolean addToBackStack) {
         FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.constraint_layout, fragment);
-        fragmentTransaction.addToBackStack(null);
+        if (addToBackStack) {
+            fragmentTransaction.addToBackStack(null);
+        }
         fragmentTransaction.commit();
     }
 
     // called when the user presses the new group (plus) button
     public void newGroup(View view) {
         NewGroupFragment mNewGroupFragment = NewGroupFragment.newInstance();
-        replaceFragment(mNewGroupFragment);
+        replaceFragment(mNewGroupFragment, true);
     }
 
     @Override
@@ -102,16 +105,35 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     @Override
     public void onServiceSelected(ResolvedGroup resolvedGroup) {
         JoinGroupFragment mJoinGroupMdnsFragment = JoinGroupFragment.newInstance(resolvedGroup);
-        replaceFragment(mJoinGroupMdnsFragment);
+        replaceFragment(mJoinGroupMdnsFragment, true);
+    }
+
+    @Override
+    public void baseOnJoined(String moniker) {
+        onJoined(moniker);
+        mFromGroup = true;
+    }
+
+    @Override
+    public void baseOnStartedNew(String moniker) {
+        onStartedNew(moniker);
+        mFromGroup = true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mFromGroup) {
+            mFragmentManager.popBackStack();
+            mFromGroup = false;
+        }
     }
 
     @Override
     public abstract BabbleService getBabbleService();
 
-    @Override
     public abstract void onJoined(String moniker);
 
-    @Override
     public abstract void onStartedNew(String moniker);
 
     @Override
