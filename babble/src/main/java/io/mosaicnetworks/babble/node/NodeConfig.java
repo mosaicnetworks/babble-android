@@ -50,16 +50,16 @@ public final class NodeConfig {
 // NB these defaults are tested in BabbleConfigTest.java allDefaultConfigTest()
 // If you change these values, you must change the values in that file.
 
-        private int mHeartbeat = 10;
-        private int mSlowHeartbeat = 10;
+        private int mHeartbeat = 100;
+        private int mSlowHeartbeat = 200;
         private boolean mStore = true;
-        private String mLogLevel = "debug";
+        private String mLogLevel = "info";
         private int mTcpTimeout = 1000;
         private int mMaxPool = 2;
         private int mCacheSize = 50000;
         private int mSyncLimit = 1000;
         private boolean mEnableFastSync = false;
-        private boolean mBootstrap = true;   //bootstrap
+        private boolean mBootstrap = false;   //bootstrap
         private String mServiceListen = "";   //service-listen
         private String mJoinTimeout = "20s";  //join_timeout
         private boolean mMaintenanceMode = false;  //maintenance-mode

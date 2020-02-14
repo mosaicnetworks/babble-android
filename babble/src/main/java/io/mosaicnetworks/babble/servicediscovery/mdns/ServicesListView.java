@@ -38,11 +38,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class MdnsListView extends RecyclerView {
+public class ServicesListView extends RecyclerView {
 
     public interface ServicesListListener {
 
-        void onServiceSelectedSuccess(NsdServiceInfo nsdServiceInfo);
+        void onServiceSelectedSuccess(ResolvedGroup resolvedGroup);
 
         void onServiceSelectedFailure();
 
@@ -51,22 +51,22 @@ public class MdnsListView extends RecyclerView {
         void onListEmptyStatusChange(boolean empty);
     }
 
-    private List<NsdResolvedService> mServiceInfoList = new ArrayList<>();
+    private List<ResolvedGroup> mServiceInfoList = new ArrayList<>();
     private ServicesListListener mServicesListListener;
     private MdnsDiscovery mMdnsDiscovery;
     private boolean mPrevIsEmpty = true;
 
-    public MdnsListView(Context context) {
+    public ServicesListView(Context context) {
         super(context);
         initialize(context);
     }
 
-    public MdnsListView(Context context, @Nullable AttributeSet attrs) {
+    public ServicesListView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initialize(context);
     }
 
-    public MdnsListView(Context context, @Nullable AttributeSet attrs, int defStyle) {
+    public ServicesListView(Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initialize(context);
     }
@@ -75,16 +75,11 @@ public class MdnsListView extends RecyclerView {
 
         setLayoutManager(new LinearLayoutManager(context));
 
-        final MdnsListAdapter adapter = new MdnsListAdapter(context, mServiceInfoList);
-        adapter.setClickListener(new MdnsListAdapter.ItemClickListener() {
+        final ServicesListAdapter adapter = new ServicesListAdapter(context, mServiceInfoList);
+        adapter.setClickListener(new ServicesListAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-
-                NsdResolvedService service = adapter.getItem(position);
-                NsdServiceInfo serviceInfo = new NsdServiceInfo();
-                serviceInfo.setServiceName(service.getServiceName());
-                serviceInfo.setServiceType(service.getServiceType());
-                mServicesListListener.onServiceSelectedSuccess(serviceInfo);
+                mServicesListListener.onServiceSelectedSuccess(adapter.getItem(position));
             }
         });
 
@@ -92,8 +87,7 @@ public class MdnsListView extends RecyclerView {
 
         mMdnsDiscovery = new MdnsDiscovery(context, mServiceInfoList, new MdnsDiscovery.ServiceDiscoveryListener() {
             @Override
-            public void onServiceListUpdated() {
-
+            public void onServiceListUpdated(boolean groupCountChange) {
                 // let the adapter know
                 Handler mainHandler = new Handler(context.getMainLooper());
 
@@ -107,6 +101,7 @@ public class MdnsListView extends RecyclerView {
 
                 // if the service list info's empty status has changed, let the service listener
                 // know
+                //TODO: can we use the groupCountChange (or a suitable return) to make this easier?
                 final boolean curIsEmpty = mServiceInfoList.isEmpty();
                 if (mPrevIsEmpty ^ curIsEmpty) {
                     //service list info's empty status has changed
@@ -122,7 +117,6 @@ public class MdnsListView extends RecyclerView {
                 }
 
                 mPrevIsEmpty = curIsEmpty;
-
             }
 
             @Override

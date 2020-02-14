@@ -37,7 +37,7 @@ import java.util.List;
 
 import io.mosaicnetworks.babble.R;
 
-public class MdnsListAdapter extends RecyclerView.Adapter<MdnsListAdapter.ViewHolder> {
+public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapter.ViewHolder> {
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -55,11 +55,11 @@ public class MdnsListAdapter extends RecyclerView.Adapter<MdnsListAdapter.ViewHo
         }
     }
 
-    private List<NsdResolvedService> mData;
+    private List<ResolvedGroup> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    public MdnsListAdapter(Context context, List<NsdResolvedService> data) {
+    public ServicesListAdapter(Context context, List<ResolvedGroup> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -76,7 +76,6 @@ public class MdnsListAdapter extends RecyclerView.Adapter<MdnsListAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         String serviceName = mData.get(position).getGroupName();
-
         holder.genericTextView.setText(serviceName);
     }
 
@@ -91,7 +90,7 @@ public class MdnsListAdapter extends RecyclerView.Adapter<MdnsListAdapter.ViewHo
     }
 
     // convenience method for getting data at click position
-    public NsdResolvedService getItem(int id) {
+    public ResolvedGroup getItem(int id) {
         return mData.get(id);
     }
 

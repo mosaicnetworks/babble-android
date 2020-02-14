@@ -54,7 +54,6 @@ public class ChatState implements BabbleState {
         // Process regular transactions
         for (byte[] rawTx:block.body.transactions) {
             String tx = new String(rawTx, StandardCharsets.UTF_8);
-
             Message msg;
             try {
                 msg = Message.fromJson(tx);
@@ -71,6 +70,16 @@ public class ChatState implements BabbleState {
         InternalTransactionReceipt[] itr = new InternalTransactionReceipt[block.body.internalTransactions.length];
         for(int i=0; i< block.body.internalTransactions.length; i++){
             itr[i] = block.body.internalTransactions[i].asAccepted();
+            Message msg;
+
+            if (block.body.internalTransactions[i].body.type == 0 ) {
+                msg = new Message(block.body.internalTransactions[i].body.peer.moniker + " joined the group", "System");
+            } else {
+                msg = new Message(block.body.internalTransactions[i].body.peer.moniker + " left the group", "System");
+            }
+            mState.put(mNextIndex, msg);
+            mNextIndex++;
+
         }
 
         // Set block stateHash and receipts

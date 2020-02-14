@@ -41,7 +41,7 @@
         android:layout_height="match_parent"
         android:visibility="gone" >
 
-        <io.mosaicnetworks.babble.servicediscovery.mdns.MdnsListView
+        <io.mosaicnetworks.babble.servicediscovery.mdns.ServicesListView
             android:id="@+id/servicesListView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

@@ -41,12 +41,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsListView;
+import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.mdns.ServicesListView;
 
 public class P2PDiscoveryFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private MdnsListView mServiceListView;
+    private ServicesListView mServiceListView;
     private LinearLayout mLinearLayoutServiceSearch;
     private SwipeRefreshLayout mSwipeRefreshDiscoveryFailed;
     private SwipeRefreshLayout mSwipeRefreshServicesDisplaying;
@@ -133,11 +134,11 @@ public class P2PDiscoveryFragment extends Fragment {
     }
 
     private void startDiscovery() {
-        mServiceListView.startDiscovery(new MdnsListView.ServicesListListener() {
+        mServiceListView.startDiscovery(new ServicesListView.ServicesListListener() {
 
             @Override
-            public void onServiceSelectedSuccess(NsdServiceInfo nsdServiceInfo) {
-                mListener.onServiceSelected(nsdServiceInfo);
+            public void onServiceSelectedSuccess(ResolvedGroup resolvedGroup) {
+                mListener.onServiceSelected(resolvedGroup);
             }
 
             @Override

@@ -54,6 +54,8 @@ import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedService;
 import io.mosaicnetworks.babble.utils.Utils;
 
 
@@ -71,10 +73,11 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
     private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
-    private NsdServiceInfo mNsdServiceInfo;
+    private ResolvedGroup mResolvedGroup;
+    private ResolvedService mResolvedService;
 
-    public JoinGroupFragment(NsdServiceInfo nsdServiceInfo) {
-        mNsdServiceInfo = nsdServiceInfo;
+    public JoinGroupFragment(ResolvedGroup resolvedGroup) {
+        mResolvedGroup = resolvedGroup;
         // Required empty public constructor
     }
 
@@ -84,8 +87,8 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
      *
      * @return A new instance of fragment JoinGroupFragment.
      */
-    public static JoinGroupFragment newInstance(NsdServiceInfo nsdServiceInfo) {
-        return new JoinGroupFragment(nsdServiceInfo);
+    public static JoinGroupFragment newInstance(ResolvedGroup resolvedGroup) {
+        return new JoinGroupFragment(resolvedGroup);
     }
 
     @Override
@@ -132,9 +135,11 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
             return;
         }
 
-        //get peer IP address
-        final String peerIP = mNsdServiceInfo.getHost().getHostAddress();
-        final int peerPort = mNsdServiceInfo.getPort();
+        //TODO: the list of resolved services could be empty
+        //TODO: we are choosing to only try the first resolved service - we could try others when there's a failure
+        mResolvedService = mResolvedGroup.getResolvedServices().get(0);
+        final String peerIP = mResolvedService.getInetAddress().getHostAddress();
+        final int peerPort = mResolvedService.getPort();
 
         // Store moniker and host entered
         SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
@@ -195,7 +200,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         }
 
         BabbleService<?> babbleService = mListener.getBabbleService();
-        GroupDescriptor groupDescriptor = new GroupDescriptor(mNsdServiceInfo.getServiceName(), mNsdServiceInfo.getServiceType());
+        GroupDescriptor groupDescriptor = new GroupDescriptor(mResolvedService.getGroupName(), mResolvedService.getGroupUid());
 
         try {
             String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, mMoniker, Utils.getIPAddr(getContext()));

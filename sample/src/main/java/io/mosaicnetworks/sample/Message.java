@@ -93,6 +93,21 @@ public final class Message implements BabbleTx, IMessage {
         this.date = new Date();
     }
 
+
+    /**
+     * Constructor
+     * @param text the message text
+     * @param author the message author
+     * @param date the message date
+     */
+    public Message(String text, String author, Date date) {
+        this.text = text;
+        this.author = author;
+        this.date = date;
+    }
+
+
+
     /**
      * Factory for constructing a {@link Message} from JSON
      * @param txJson A JSON format transaction string
