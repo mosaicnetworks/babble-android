@@ -33,7 +33,7 @@ import java.util.List;
 
 public class MdnsDiscovery {
 
-    private static final String TAG = "MdnsDiscovery";
+    private static final String TAG = "P2PDiscovery";
     private final List<NsdResolvedService> mResolvedServices;
     private NsdManager mNsdManager;
     private NsdManager.DiscoveryListener mDiscoveryListener;

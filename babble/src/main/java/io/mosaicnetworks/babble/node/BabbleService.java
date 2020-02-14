@@ -53,7 +53,22 @@ public abstract class BabbleService<AppState extends BabbleState> {
     protected GroupDescriptor mGroupDescriptor;
 
     protected boolean mIsArchive = false;
+
+    public int getNetworkType() {
+        return mNetworkType;
+    }
+
+    public void setNetworkType(int networkType) {
+        this.mNetworkType = mNetworkType;
+    }
+
     protected int mNetworkType;
+
+    //TODO: Should we move these?
+    public final static int NETWORK_WIFI = 1;
+    public final static int NETWORK_P2P = 2;
+    public final static int NETWORK_NONE = 0;
+
 
     /**
      * The underlying app state, to which babble transactions are applied
@@ -70,6 +85,20 @@ public abstract class BabbleService<AppState extends BabbleState> {
 
 
 
+
+    /**
+     * Start the service
+     *
+     * @param configDirectory The full path to the babble configuration directory
+     * @param networkType BabbleService.NETWORK_NONE for archive, NETWORK_WIFI or NETWORK_P2P for mDNS or WiFi Direct
+     * @throws IllegalStateException if the service is currently running
+     */
+    public void start(String configDirectory, int networkType) {
+        start(configDirectory, null, networkType);    // Defaults to the original mDNS configuration
+    }
+
+
+
     /**
      * Start the service
      *
@@ -78,7 +107,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * @throws IllegalStateException if the service is currently running
      */
     public void start(String configDirectory, GroupDescriptor groupDescriptor) {
-        start(configDirectory, groupDescriptor, false);
+        start(configDirectory, groupDescriptor, NETWORK_WIFI);    // Defaults to the original mDNS configuration
     }
 
 
@@ -87,16 +116,18 @@ public abstract class BabbleService<AppState extends BabbleState> {
      *
      * @param configDirectory The full path to the babble configuration directory
      * @param groupDescriptor The group descriptor
-     * @param isArchive set to true when opening a config as an archive
+     * @param networkType BabbleService.NETWORK_NONE for archive, NETWORK_WIFI or NETWORK_P2P for mDNS or WiFi Direct
      * @throws IllegalStateException if the service is currently running
      */
-    public void start(String configDirectory, GroupDescriptor groupDescriptor, boolean isArchive) {
+    public void start(String configDirectory, GroupDescriptor groupDescriptor, int networkType) {
         if (mState==State.RUNNING) {
             Log.e("BabbleService.start", "Service is already running");
             throw new IllegalStateException("Service is already running");
         }
 
-        this.mIsArchive = isArchive;
+
+        this.mNetworkType = networkType;
+        this.mIsArchive = (this.mNetworkType == 0) ;
 
         mBabbleNode = BabbleNode.create(new BlockConsumer() {
                                             @Override

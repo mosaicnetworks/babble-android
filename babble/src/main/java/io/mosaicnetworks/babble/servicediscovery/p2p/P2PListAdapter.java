@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.servicediscovery.mdns;
+package io.mosaicnetworks.babble.servicediscovery.p2p;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -37,7 +37,7 @@ import java.util.List;
 
 import io.mosaicnetworks.babble.R;
 
-public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapter.ViewHolder> {
+public class P2PListAdapter extends RecyclerView.Adapter<P2PListAdapter.ViewHolder> {
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -59,7 +59,7 @@ public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapte
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    public ServicesListAdapter(Context context, List<NsdResolvedService> data) {
+    public P2PListAdapter(Context context, List<NsdResolvedService> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }

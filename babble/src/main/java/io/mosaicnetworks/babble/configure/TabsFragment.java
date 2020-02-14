@@ -45,6 +45,7 @@ public class TabsFragment extends Fragment {
     private static boolean mShowmDNS = true;
     private static boolean mShowP2P = true;
     private static boolean mShowArchive = true;
+    private static boolean mShowAllArchiveVersions = true;
 
     private static int mTabmDNS;
     private static int mTabP2P;
@@ -61,6 +62,7 @@ public class TabsFragment extends Fragment {
         mShowmDNS = args.getBoolean(BaseConfigActivity.SHOW_MDNS, true);
         mShowP2P = args.getBoolean(BaseConfigActivity.SHOW_P2P, true);
         mShowArchive = args.getBoolean(BaseConfigActivity.SHOW_ARCHIVE, true);
+        mShowAllArchiveVersions = args.getBoolean(BaseConfigActivity.SHOW_ALL_ARCHIVE, true);
         setArguments(args);
     }
 
@@ -147,10 +149,12 @@ public class TabsFragment extends Fragment {
                 return MdnsDiscoveryFragment.newInstance();
             } else {
                 if (position == mTabP2P) {
-                    return MdnsDiscoveryFragment.newInstance();
+                    return P2PDiscoveryFragment.newInstance();
                 } else {
                     if (position == mTabArchive) {
-                        return ArchivedGroupsFragment.newInstance();
+                        Bundle args = new Bundle();
+                        args.putBoolean(BaseConfigActivity.SHOW_ALL_ARCHIVE, mShowAllArchiveVersions);
+                        return ArchivedGroupsFragment.newInstance(args);
                     }
                 }
             }

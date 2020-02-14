@@ -60,7 +60,10 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     public static final String SHOW_ARCHIVE ="SHOW_ARCHIVE";
 
 
-
+    /**
+     * Key for the bundle used to pass the flag for showing all versions in the Archive Tab to the fragment
+     */
+    public static final String SHOW_ALL_ARCHIVE ="SHOW_ALL_ARCHIVE";
 
 
     private FragmentManager mFragmentManager;
@@ -68,7 +71,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
 
 
     /**
-     * Controls where to show the mDNS tab. Much be called in the constructor of the instance that
+     * Controls whether to show the mDNS tab. Much be called in the constructor of the instance that
      * implements BaseConfigActivity as the parameter are used in BaseConfigActivity.onCreate.
      * @param showmDNS true to show the mDNS tab, false to hide
      * @throws IllegalStateException if the OnCreate event handler has already been run
@@ -79,7 +82,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     }
 
     /**
-     * Controls where to show the P2P tab. Much be called in the constructor of the instance that
+     * Controls whether to show the P2P tab. Much be called in the constructor of the instance that
      * implements BaseConfigActivity as the parameter are used in BaseConfigActivity.onCreate.
      * @param showP2P true to show the mDNS tab, false to hide
      * @throws IllegalStateException if the OnCreate event handler has already been run
@@ -90,7 +93,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     }
 
     /**
-     * Controls where to show the Archive tab. Much be called in the constructor of the instance that
+     * Controls whether to show the Archive tab. Much be called in the constructor of the instance that
      * implements BaseConfigActivity as the parameter are used in BaseConfigActivity.onCreate.
      * @param showArchive true to show the mDNS tab, false to hide
      * @throws IllegalStateException if the OnCreate event handler has already been run
@@ -100,12 +103,26 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         BaseConfigActivity.mShowArchive = showArchive;
     }
 
+    /**
+     * Controls whether to show all archive versions of group. Much be called in the constructor of the instance that
+     * implements BaseConfigActivity as the parameter are used in BaseConfigActivity.onCreate.
+     * @param showAllArchiveVersions true to show all archive versions of group, false for just the latest ones
+     * @throws IllegalStateException if the OnCreate event handler has already been run
+     */
+    public static void setShowAllArchiveVersions(boolean showAllArchiveVersions)  throws IllegalStateException {
+        if (mTooLateToChangeShowTabs) throw new IllegalStateException();
+        BaseConfigActivity.mShowAllArchiveVersions = showAllArchiveVersions;
+    }
+
+
+
 
     private static boolean mShowmDNS = true;
     private static boolean mShowP2P = true;
     private static boolean mShowArchive = true;
     private static boolean mTooLateToChangeShowTabs = false;
 
+    private static boolean mShowAllArchiveVersions = true;
 
 
     @Override
@@ -121,6 +138,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         bundle.putBoolean(SHOW_MDNS, mShowmDNS);
         bundle.putBoolean(SHOW_P2P, mShowP2P);
         bundle.putBoolean(SHOW_ARCHIVE, mShowArchive);
+        bundle.putBoolean(SHOW_ALL_ARCHIVE, mShowAllArchiveVersions);
 
         TabsFragment mHomeFragment = TabsFragment.newInstance(bundle);
 

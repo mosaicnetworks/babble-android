@@ -41,17 +41,17 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.servicediscovery.mdns.ServicesListView;
+import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsListView;
 
-public class MdnsDiscoveryFragment extends Fragment {
+public class P2PDiscoveryFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private ServicesListView mServiceListView;
+    private MdnsListView mServiceListView;
     private LinearLayout mLinearLayoutServiceSearch;
     private SwipeRefreshLayout mSwipeRefreshDiscoveryFailed;
     private SwipeRefreshLayout mSwipeRefreshServicesDisplaying;
 
-    public MdnsDiscoveryFragment() {
+    public P2PDiscoveryFragment() {
         // Required empty public constructor
     }
 
@@ -61,8 +61,8 @@ public class MdnsDiscoveryFragment extends Fragment {
      *
      * @return A new instance of fragment MdnsDiscoveryFragment.
      */
-    public static MdnsDiscoveryFragment newInstance() {
-        return new MdnsDiscoveryFragment();
+    public static P2PDiscoveryFragment newInstance() {
+        return new P2PDiscoveryFragment();
     }
 
     @Override
@@ -133,7 +133,7 @@ public class MdnsDiscoveryFragment extends Fragment {
     }
 
     private void startDiscovery() {
-        mServiceListView.startDiscovery(new ServicesListView.ServicesListListener() {
+        mServiceListView.startDiscovery(new MdnsListView.ServicesListListener() {
 
             @Override
             public void onServiceSelectedSuccess(NsdServiceInfo nsdServiceInfo) {

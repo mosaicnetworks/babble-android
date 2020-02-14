@@ -42,6 +42,9 @@ public class MainActivity extends BaseConfigActivity {
             setShowArchive(true);
             setShowmDNS(true);
             setShowP2P(true);
+
+            // Show all version of each group in the archive tab
+            setShowAllArchiveVersions(true);
         } catch (IllegalStateException ex) {
 
 

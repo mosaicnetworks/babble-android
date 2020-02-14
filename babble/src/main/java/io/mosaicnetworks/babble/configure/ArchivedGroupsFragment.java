@@ -73,15 +73,14 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     private ActionMode mActionMode;
     private ActionMode.Callback mActionModeCallback;
     private ConfigDirectory mSelectedGroup;
-
-    //TODO: either expose this switch or remove it.
     /**
      * This switch controls whether all archive versions are displayed or just the "Live" ones.
      */
     private boolean mShowAllArchiveVersion = true;
 
 
-    public ArchivedGroupsFragment() {
+    public ArchivedGroupsFragment(Bundle args) {
+        mShowAllArchiveVersion = args.getBoolean(BaseConfigActivity.SHOW_ALL_ARCHIVE, true);
     }
 
     /**
@@ -90,8 +89,8 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
      *
      * @return A new instance of fragment ArchivedGroupsFragment.
      */
-    public static ArchivedGroupsFragment newInstance() {
-        return new ArchivedGroupsFragment();
+    public static ArchivedGroupsFragment newInstance(Bundle args) {
+        return new ArchivedGroupsFragment(args);
     }
 
     @Override
@@ -149,7 +148,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
             String configDir = mConfigManager.getTomlDir();
             Log.d("MY-TAG", "Config directory name: " + configDir);
             BabbleService<?> babbleService = mListener.getBabbleService();
-            babbleService.start(configDir, new GroupDescriptor("Archived Group"), true); //TODO: need to get a proper group descriptor + need to NOT advertise mDNS
+            babbleService.start(configDir, BabbleService.NETWORK_NONE);
             mListener.onArchiveLoaded(mConfigManager.getMoniker());
 
         } catch (IllegalArgumentException ex) {

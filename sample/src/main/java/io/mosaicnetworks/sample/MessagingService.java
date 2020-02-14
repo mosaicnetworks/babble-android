@@ -31,7 +31,9 @@ import java.io.IOException;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
 
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser;
+import io.mosaicnetworks.babble.servicediscovery.p2p.P2PAdvertiser;
 
 /**
  * This is a singleton which provides a Messaging service. It extends the {@link BabbleService}
@@ -43,7 +45,7 @@ public final class MessagingService extends BabbleService<ChatState> {
     private static int sDiscoveryPort = 8988;
 
     private static MessagingService INSTANCE;
-    private MdnsAdvertiser mMdnsAdvertiser;
+    private ServiceAdvertiser mAdvertiser;
     private Context mAppContext;
     private HttpPeerDiscoveryServer mHttpPeerDiscoveryServer;
     private boolean mAdvertising = false;
@@ -73,14 +75,25 @@ public final class MessagingService extends BabbleService<ChatState> {
         super.onStarted();
 
         // No need for discovery services in Archive mode
-        if (mIsArchive) return;
+        if (mIsArchive) return; //TODO: maybe remove this line - should be caught by the NETWORK_NONE case
 
-        mMdnsAdvertiser = new MdnsAdvertiser(mGroupDescriptor, sDiscoveryPort, mAppContext);
+
+        switch (mNetworkType) {
+            case BabbleService.NETWORK_NONE: return;
+            case BabbleService.NETWORK_WIFI:
+                mAdvertiser = new MdnsAdvertiser(mGroupDescriptor, sDiscoveryPort, mAppContext);
+                break;
+            case BabbleService.NETWORK_P2P:
+                mAdvertiser = new P2PAdvertiser(mGroupDescriptor, sDiscoveryPort, mAppContext);
+                break;
+        }
+
+
 
         mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(sDiscoveryPort, mBabbleNode); //TODO: use next available port?
         try {
             mHttpPeerDiscoveryServer.start();
-            mMdnsAdvertiser.advertise(); // start mDNS advertising if server started
+            mAdvertiser.advertise(); // start mDNS advertising if server started
             mAdvertising = true;
         } catch (IOException ex) {
             //Probably the port is in use, we'll continue without the discovery service
@@ -90,9 +103,9 @@ public final class MessagingService extends BabbleService<ChatState> {
     @Override
     protected void onStopped() {
         super.onStopped();
-        if (mMdnsAdvertiser != null) {
-            mMdnsAdvertiser.stopAdvertising();
-            mMdnsAdvertiser = null;
+        if (mAdvertiser != null) {
+            mAdvertiser.stopAdvertising();
+            mAdvertiser = null;
         }
 
         if (mHttpPeerDiscoveryServer != null) {

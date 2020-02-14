@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ServicesListView extends RecyclerView {
+public class MdnsListView extends RecyclerView {
 
     public interface ServicesListListener {
 
@@ -56,17 +56,17 @@ public class ServicesListView extends RecyclerView {
     private MdnsDiscovery mMdnsDiscovery;
     private boolean mPrevIsEmpty = true;
 
-    public ServicesListView(Context context) {
+    public MdnsListView(Context context) {
         super(context);
         initialize(context);
     }
 
-    public ServicesListView(Context context, @Nullable AttributeSet attrs) {
+    public MdnsListView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initialize(context);
     }
 
-    public ServicesListView(Context context, @Nullable AttributeSet attrs, int defStyle) {
+    public MdnsListView(Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initialize(context);
     }
@@ -75,8 +75,8 @@ public class ServicesListView extends RecyclerView {
 
         setLayoutManager(new LinearLayoutManager(context));
 
-        final ServicesListAdapter adapter = new ServicesListAdapter(context, mServiceInfoList);
-        adapter.setClickListener(new ServicesListAdapter.ItemClickListener() {
+        final MdnsListAdapter adapter = new MdnsListAdapter(context, mServiceInfoList);
+        adapter.setClickListener(new MdnsListAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
 
