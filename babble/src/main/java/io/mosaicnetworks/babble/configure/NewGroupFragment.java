@@ -39,6 +39,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Switch;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -151,6 +152,17 @@ public class NewGroupFragment extends Fragment {
             return;
         }
 
+        // Get network type
+        Switch switchP2P =  view.findViewById(R.id.switch_p2p);
+        boolean isP2P = switchP2P.isChecked();
+        int networkType;
+
+        if (isP2P) {
+            networkType = BabbleService.NETWORK_P2P;
+        } else {
+            networkType = BabbleService.NETWORK_WIFI;
+        }
+
 
         GroupDescriptor groupDescriptor = new GroupDescriptor(groupName);
 
@@ -181,7 +193,7 @@ public class NewGroupFragment extends Fragment {
 
 
         try {
-            babbleService.start(configDirectory, groupDescriptor);
+            babbleService.start(configDirectory, groupDescriptor, networkType);
             mListener.onStartedNew(moniker);
         } catch (Exception ex) {
             //TODO: Review this. The duplicate dialog function feels overkill.

@@ -42,28 +42,51 @@ import io.mosaicnetworks.babble.R;
 
 public class TabsFragment extends Fragment {
 
+    private static boolean mShowmDNS = true;
+    private static boolean mShowP2P = true;
+    private static boolean mShowArchive = true;
+    private static boolean mShowAllArchiveVersions = true;
+
+    private static int mTabmDNS;
+    private static int mTabP2P;
+    private static int mTabArchive;
+
+
+
+
     GroupCollectionAdapter groupCollectionAdapter;
     ViewPager2 viewPager;
 
-    public TabsFragment() {
+    public TabsFragment(Bundle args) {
+        super();
+        mShowmDNS = args.getBoolean(BaseConfigActivity.SHOW_MDNS, true);
+        mShowP2P = args.getBoolean(BaseConfigActivity.SHOW_P2P, true);
+        mShowArchive = args.getBoolean(BaseConfigActivity.SHOW_ARCHIVE, true);
+        mShowAllArchiveVersions = args.getBoolean(BaseConfigActivity.SHOW_ALL_ARCHIVE, true);
+        setArguments(args);
     }
 
     /**
      * Use this factory method to create a new instance of
      * this fragment.
-     *
+     * @param args Bundle of arguments for this fragment
      * @return A new instance of fragment HomeFragment.
      */
-    public static TabsFragment newInstance() {
-        TabsFragment fragment = new TabsFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
+    public static TabsFragment newInstance(Bundle args) {
+        TabsFragment fragment = new TabsFragment(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        int idx = 0;
+        if (mShowmDNS) { mTabmDNS = idx; idx++;}  else {mTabmDNS = -1;}
+        if (mShowP2P) { mTabP2P = idx; idx++;} else {
+            mTabP2P = -1;}
+        if (mShowArchive) { mTabArchive = idx; idx++;}  else {
+            mTabArchive = -1;}
     }
 
     @Override
@@ -95,10 +118,17 @@ public class TabsFragment extends Fragment {
             @Override
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
 
-                switch (position) {
-                    case 0: tab.setText(R.string.live_tab);
-                        break;
-                    case 1: tab.setText(R.string.archived_tab);
+                // These are not compile time constants so we cannot use a switch
+                if (position == mTabmDNS) {
+                    tab.setText(R.string.wifi_tab);
+                } else {
+                    if (position == mTabP2P) {
+                        tab.setText(R.string.p2p_tab);
+                    } else {
+                        if (position == mTabArchive) {
+                            tab.setText(R.string.archived_tab);
+                        }
+                    }
                 }
 
             }}).attach();
@@ -114,17 +144,33 @@ public class TabsFragment extends Fragment {
         @Override
         public Fragment createFragment(int position) {
 
-            switch (position) {
-                case 0: return MdnsDiscoveryFragment.newInstance();
-                case 1: return ArchivedGroupsFragment.newInstance();
+            // These are not compile time constants so we cannot use a switch
+            if (position == mTabmDNS) {
+                return MdnsDiscoveryFragment.newInstance();
+            } else {
+                if (position == mTabP2P) {
+                    return P2PDiscoveryFragment.newInstance();
+                } else {
+                    if (position == mTabArchive) {
+                        Bundle args = new Bundle();
+                        args.putBoolean(BaseConfigActivity.SHOW_ALL_ARCHIVE, mShowAllArchiveVersions);
+                        return ArchivedGroupsFragment.newInstance(args);
+                    }
+                }
             }
+
 
             return null;  //TODO: This function is defined as @NonNull - should we throw an exception instead?
         }
 
         @Override
         public int getItemCount() {
-            return 2;
+            int itemCount = 0;
+            if (mShowmDNS) itemCount++;
+            if (mShowP2P) itemCount++;
+            if (mShowArchive) itemCount++;
+
+            return itemCount;
         }
     }
 

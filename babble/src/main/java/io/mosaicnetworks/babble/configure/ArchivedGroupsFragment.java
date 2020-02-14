@@ -87,7 +87,8 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     private boolean mShowAllArchiveVersion = true;
 
 
-    public ArchivedGroupsFragment() {
+    public ArchivedGroupsFragment(Bundle args) {
+        mShowAllArchiveVersion = args.getBoolean(BaseConfigActivity.SHOW_ALL_ARCHIVE, true);
     }
 
     /**
@@ -96,8 +97,8 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
      *
      * @return A new instance of fragment ArchivedGroupsFragment.
      */
-    public static ArchivedGroupsFragment newInstance() {
-        return new ArchivedGroupsFragment();
+    public static ArchivedGroupsFragment newInstance(Bundle args) {
+        return new ArchivedGroupsFragment(args);
     }
 
     @Override
@@ -176,14 +177,22 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
             try {
                 mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), ConfigManager.DEFAULT_BABBLING_PORT);
-
+/*
+            String configDir = mConfigManager.getTomlDir();
+            Log.d("MY-TAG", "Config directory name: " + configDir);
+            BabbleService<?> babbleService = mListener.getBabbleService();
+            babbleService.start(configDir, BabbleService.NETWORK_NONE);
+            mListener.onArchiveLoaded(mConfigManager.getMoniker());
+*/
+  
             } catch (IOException e) {
-                displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot load configuration: " + e.getMessage());
+                displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot load configuration: " + ex.getClass().getCanonicalName()+": "+e.getMessage());
                 return;
             } catch (Exception e) {
                 displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot load configuration: " + e.getClass().getCanonicalName() + ": " + e.getMessage());
                 throw e;
             }
+
 
             try {
                 String configDir = mConfigManager.getTomlDir();
@@ -194,7 +203,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
             } catch (Exception ex) {
                 //TODO: Some sensible error handling here.
                 //Errors on starting the babble service were untrapped and killing the app
-                displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: " + ex.getClass().getCanonicalName() + ": " + ex.getMessage());
+                displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: " + ex.getClass().getCanonicalName() + ": " + ex.getClass().getCanonicalName() + ": " + ex.getMessage());
                 throw ex;
                 //          Toast.makeText(getContext(), "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage(), Toast.LENGTH_LONG).show();
             }

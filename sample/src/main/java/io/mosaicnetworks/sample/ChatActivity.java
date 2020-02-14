@@ -71,6 +71,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
         if (mArchiveMode) {
             stateUpdated();
+
         } else {
             if (!mMessagingService.isAdvertising()) {
                 Toast.makeText(this, "Unable to advertise peers", Toast.LENGTH_LONG).show();
