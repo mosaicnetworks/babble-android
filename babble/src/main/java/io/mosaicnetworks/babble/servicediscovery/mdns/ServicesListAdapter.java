@@ -41,11 +41,13 @@ public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapte
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView genericTextView;
+        TextView serviceNameTextView;
+        TextView groupUidTextView;
 
         ViewHolder(View itemView) {
             super(itemView);
-            genericTextView = itemView.findViewById(R.id.serviceName);
+            serviceNameTextView = itemView.findViewById(R.id.serviceName);
+            groupUidTextView = itemView.findViewById(R.id.groupUid);
             itemView.setOnClickListener(this);
         }
 
@@ -75,8 +77,10 @@ public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapte
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String serviceName = mData.get(position).getGroupName();
-        holder.genericTextView.setText(serviceName);
+        ResolvedGroup groupInfo = mData.get(position);
+
+        holder.groupUidTextView.setText(groupInfo.getGroupUid());
+        holder.serviceNameTextView.setText(groupInfo.getGroupName());
     }
 
     // total number of rows
