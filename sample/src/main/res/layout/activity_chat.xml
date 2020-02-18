@@ -23,35 +23,61 @@
   ~ SOFTWARE.
   -->
 
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".ChatActivity">
+    android:gravity="center"
+    android:orientation="vertical">
 
-    <com.stfalcon.chatkit.messages.MessagesList
-        android:id="@+id/messagesList"
+    <RelativeLayout
+        android:id="@+id/relativeLayout_messages"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/input"/>
+        android:background="@color/white"
+        tools:context=".ChatActivity">
 
-    <View
+        <com.stfalcon.chatkit.messages.MessagesList
+            android:id="@+id/messagesList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/input"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_above="@+id/input"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@color/gray_light"/>
+
+        <com.stfalcon.chatkit.messages.MessageInput
+            android:id="@+id/input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            app:inputHint="@string/hint_enter_a_message"
+            app:showAttachmentButton="true"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout_empty_archive"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_above="@+id/input"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:background="@color/gray_light"/>
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <com.stfalcon.chatkit.messages.MessageInput
-        android:id="@+id/input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        app:inputHint="@string/hint_enter_a_message"
-        app:showAttachmentButton="true"/>
+        <TextView
+            android:id="@+id/textView_empty_archive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/no_messages_in_archive"
+            android:textAlignment="center" />
+    </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>
