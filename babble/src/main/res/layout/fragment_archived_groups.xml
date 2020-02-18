@@ -52,4 +52,19 @@
         android:id="@+id/rv_archived_groups"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout_no_archives"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView_no_archives"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/no_archives_found"
+            android:textAlignment="center" />
+    </LinearLayout>
 </LinearLayout>

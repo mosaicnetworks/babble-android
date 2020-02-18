@@ -56,4 +56,6 @@
     <string name="loading_archive">Loading archive</string>
     <string name="archive_load_fail_title">Unable to load archive</string>
     <string name="archive_load_fail_message">Please try again later!</string>
+    <string name="no_archives_found">There are no archives to view</string>
+
 </resources>

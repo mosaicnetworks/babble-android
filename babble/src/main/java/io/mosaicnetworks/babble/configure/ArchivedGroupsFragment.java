@@ -77,6 +77,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     private ArchivedGroupsViewModel mViewModel;
     private RecyclerView mRvArchivedGroups;
     private LinearLayout mLinearLayoutArchiveLoading;
+    private LinearLayout mLinearLayoutNoArchives;
     private Boolean mSelected;
 
 
@@ -129,6 +130,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
         mRvArchivedGroups.setAdapter(mArchivedGroupsAdapter);
 
         mLinearLayoutArchiveLoading = view.findViewById(R.id.linearLayout_archive_loading);
+        mLinearLayoutNoArchives = view.findViewById(R.id.linearLayout_no_archives);
 
         final Observer<ArchivedGroupsViewModel.State> viewModelState = new Observer<ArchivedGroupsViewModel.State>() {
             @Override
@@ -146,8 +148,15 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
         switch (state) {
             case LIST:
-                mRvArchivedGroups.setVisibility(View.VISIBLE);
-                mLinearLayoutArchiveLoading.setVisibility(View.GONE);
+                if (mArchivedList.isEmpty()) {
+                    mLinearLayoutNoArchives.setVisibility(View.VISIBLE);
+                    mRvArchivedGroups.setVisibility(View.GONE);
+                    mLinearLayoutArchiveLoading.setVisibility(View.GONE);
+                } else {
+                    mLinearLayoutNoArchives.setVisibility(View.GONE);
+                    mRvArchivedGroups.setVisibility(View.VISIBLE);
+                    mLinearLayoutArchiveLoading.setVisibility(View.GONE);
+                }
                 break;
             case LOADING:
                 mRvArchivedGroups.setVisibility(View.GONE);
@@ -259,6 +268,12 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
                     for (ConfigDirectory configDirectory: mSelectedGroupsConfigs) {
                         mConfigManager.deleteDirectoryAndBackups(configDirectory.directoryName, false);
                         mArchivedList.remove(configDirectory);
+                    }
+
+                    if (mArchivedList.isEmpty()) {
+                        mLinearLayoutNoArchives.setVisibility(View.VISIBLE);
+                        mRvArchivedGroups.setVisibility(View.GONE);
+                        mLinearLayoutArchiveLoading.setVisibility(View.GONE);
                     }
 
                     mArchivedGroupsAdapter.notifyDataSetChanged();
