@@ -128,8 +128,7 @@ public class ServicesListView extends RecyclerView {
 
     public void startDiscovery(ServicesListListener servicesListListener) {
         mServicesListListener = servicesListListener;
-        //mMdnsDiscovery.discoverServices();
-        mServicesListListener.onDiscoveryStartFailure();
+        mMdnsDiscovery.discoverServices();
     }
 
     public void stopDiscovery() {
