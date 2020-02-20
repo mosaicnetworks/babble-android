@@ -181,7 +181,6 @@ public class NewGroupFragment extends Fragment {
 
 
         try {
-            Log.d("BUG-HUNT", "startGroup: ");
             babbleService.start(configDirectory, groupDescriptor);
         } catch (IllegalArgumentException ex) {
             //we'll assume this is caused by the node taking a while to leave a previous group,
@@ -192,7 +191,7 @@ public class NewGroupFragment extends Fragment {
             return;
         }
 
-        mListener.onStartedNew(moniker);
+        mListener.baseOnStartedNew(moniker);       
     }
 
 

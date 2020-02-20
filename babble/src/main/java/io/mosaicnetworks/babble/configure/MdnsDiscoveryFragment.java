@@ -48,7 +48,7 @@ public class MdnsDiscoveryFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private ServicesListView mServiceListView;
-    private LinearLayout mLinearLayoutServiceSearch;
+    public SwipeRefreshLayout mSwipeRefreshServiceSearch;
     private SwipeRefreshLayout mSwipeRefreshDiscoveryFailed;
     private SwipeRefreshLayout mSwipeRefreshServicesDisplaying;
 
@@ -77,7 +77,7 @@ public class MdnsDiscoveryFragment extends Fragment {
         final View view = inflater.inflate(R.layout.fragment_mdns_discovery, container, false);
 
         mServiceListView = view.findViewById(R.id.servicesListView);
-        mLinearLayoutServiceSearch = view.findViewById(R.id.linearLayout_service_search);
+        mSwipeRefreshServiceSearch = view.findViewById(R.id.swipeRefresh_service_search);
         mSwipeRefreshDiscoveryFailed = view.findViewById(R.id.swiperefresh_discovery_failed);
         mSwipeRefreshServicesDisplaying = view.findViewById(R.id.swiperefresh_services_displaying);
 
@@ -86,7 +86,7 @@ public class MdnsDiscoveryFragment extends Fragment {
                     @Override
                     public void onRefresh() {
 
-                        mLinearLayoutServiceSearch.setVisibility(View.VISIBLE);
+                        mSwipeRefreshServiceSearch.setVisibility(View.VISIBLE);
                         mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
                         mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
 
@@ -108,6 +108,20 @@ public class MdnsDiscoveryFragment extends Fragment {
 
                         if (mSwipeRefreshServicesDisplaying.isRefreshing()) {
                             mSwipeRefreshServicesDisplaying.setRefreshing(false);
+                        }
+                    }
+                }
+        );
+
+        mSwipeRefreshServiceSearch.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+
+                        //do nothing ;)
+
+                        if (mSwipeRefreshServiceSearch.isRefreshing()) {
+                            mSwipeRefreshServiceSearch.setRefreshing(false);
                         }
                     }
                 }
@@ -150,7 +164,7 @@ public class MdnsDiscoveryFragment extends Fragment {
             public void onDiscoveryStartFailure() {
                 displayOkAlertDialog(R.string.service_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
 
-                mLinearLayoutServiceSearch.setVisibility(View.GONE);
+                mSwipeRefreshServiceSearch.setVisibility(View.GONE);
                 mSwipeRefreshDiscoveryFailed.setVisibility(View.VISIBLE);
                 mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
             }
@@ -158,11 +172,11 @@ public class MdnsDiscoveryFragment extends Fragment {
             @Override
             public void onListEmptyStatusChange(boolean empty) {
                 if (empty) {
-                    mLinearLayoutServiceSearch.setVisibility(View.VISIBLE);
+                    mSwipeRefreshServiceSearch.setVisibility(View.VISIBLE);
                     mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
                     mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
                 } else {
-                    mLinearLayoutServiceSearch.setVisibility(View.GONE);
+                    mSwipeRefreshServiceSearch.setVisibility(View.GONE);
                     mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
                     mSwipeRefreshServicesDisplaying.setVisibility(View.VISIBLE);
                 }
@@ -191,7 +205,7 @@ public class MdnsDiscoveryFragment extends Fragment {
 
         super.onPause();
 
-        mLinearLayoutServiceSearch.setVisibility(View.VISIBLE);
+        mSwipeRefreshServiceSearch.setVisibility(View.VISIBLE);
         mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
         mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
 

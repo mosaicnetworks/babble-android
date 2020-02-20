@@ -47,7 +47,7 @@ public interface OnFragmentInteractionListener {
      *
      * @param moniker the moniker chosen by the user
      */
-    void onJoined(String moniker);
+    void baseOnJoined(String moniker);
 
     /**
      * This method will be called when the {@link BabbleService} has successfully started a new
@@ -55,7 +55,7 @@ public interface OnFragmentInteractionListener {
      *
      * @param moniker the moniker chosen by the user
      */
-    void onStartedNew(String moniker);
+    void baseOnStartedNew(String moniker);
 
     /**
      * This method will be called when the {@link BabbleService} has loaded an archive group

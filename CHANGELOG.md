@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## UNRELEASED
+
+SECURITY:
+
+FEATURES:
+
+IMPROVEMENTS:
+
+- group UID is now displayed in the live groups list
+- added group UID to archive view and changed text colour of backup archives to light gray
+- display a message if archive is empty in Sample app ChatActivity
+- display message if no archives found
+- add swipe refresh on mDNS service search
+
+BUG FIXES:
+
+- Fix bug when refreshing after mDNS start failure
+
 ## v0.3.1 (February 10, 2020)
 
 SECURITY:
