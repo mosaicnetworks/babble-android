@@ -77,6 +77,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     private ArchivedGroupsViewModel mViewModel;
     private RecyclerView mRvArchivedGroups;
     private LinearLayout mLinearLayoutArchiveLoading;
+    private LinearLayout mLinearLayoutNoArchives;
     private Boolean mSelected;
 
 
@@ -129,6 +130,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
         mRvArchivedGroups.setAdapter(mArchivedGroupsAdapter);
 
         mLinearLayoutArchiveLoading = view.findViewById(R.id.linearLayout_archive_loading);
+        mLinearLayoutNoArchives = view.findViewById(R.id.linearLayout_no_archives);
 
         final Observer<ArchivedGroupsViewModel.State> viewModelState = new Observer<ArchivedGroupsViewModel.State>() {
             @Override
@@ -146,8 +148,15 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
         switch (state) {
             case LIST:
-                mRvArchivedGroups.setVisibility(View.VISIBLE);
-                mLinearLayoutArchiveLoading.setVisibility(View.GONE);
+                if (mArchivedList.isEmpty()) {
+                    mLinearLayoutNoArchives.setVisibility(View.VISIBLE);
+                    mRvArchivedGroups.setVisibility(View.GONE);
+                    mLinearLayoutArchiveLoading.setVisibility(View.GONE);
+                } else {
+                    mLinearLayoutNoArchives.setVisibility(View.GONE);
+                    mRvArchivedGroups.setVisibility(View.VISIBLE);
+                    mLinearLayoutArchiveLoading.setVisibility(View.GONE);
+                }
                 break;
             case LOADING:
                 mRvArchivedGroups.setVisibility(View.GONE);
@@ -261,6 +270,12 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
                         mArchivedList.remove(configDirectory);
                     }
 
+                    if (mArchivedList.isEmpty()) {
+                        mLinearLayoutNoArchives.setVisibility(View.VISIBLE);
+                        mRvArchivedGroups.setVisibility(View.GONE);
+                        mLinearLayoutArchiveLoading.setVisibility(View.GONE);
+                    }
+
                     mArchivedGroupsAdapter.notifyDataSetChanged();
                     mode.finish();
 
@@ -359,11 +374,13 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        TextView genericTextView;
+        TextView groupNameTextView;
+        TextView groupUidTextView;
 
         ViewHolder(View itemView) {
             super(itemView);
-            genericTextView = itemView.findViewById(R.id.serviceName);
+            groupNameTextView = itemView.findViewById(R.id.serviceName);
+            groupUidTextView = itemView.findViewById(R.id.groupUid);
             itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }
@@ -384,13 +401,14 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
     private List<ConfigDirectory> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+    private Context mContext;
 
     public ArchivedGroupsAdapter(Context context, List<ConfigDirectory> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        mContext = context;
     }
 
-    // inflates the row layout from xml when needed
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -398,15 +416,29 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
         return new ViewHolder(view);
     }
 
-    // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String serviceName = mData.get(position).description;
+        ConfigDirectory configDirectory = mData.get(position);
+        String serviceName = configDirectory.description;
+        String groupUid = configDirectory.uniqueId;
 
-        holder.genericTextView.setText(serviceName);
+        holder.groupNameTextView.setText(serviceName);
+        holder.groupUidTextView.setText(groupUid);
+
+        int colourGroupName;
+        int colourGroupUid;
+        if (configDirectory.isBackup) {
+            colourGroupName = R.color.colorArchivedGroup;
+            colourGroupUid = R.color.colorArchivedGroup;
+        } else {
+            colourGroupName = android.R.color.primary_text_light;
+            colourGroupUid = android.R.color.secondary_text_light;
+        }
+
+        holder.groupNameTextView.setTextColor(mContext.getResources().getColor(colourGroupName));
+        holder.groupUidTextView.setTextColor(mContext.getResources().getColor(colourGroupUid));
     }
 
-    // total number of rows
     @Override
     public int getItemCount() {
         if (mData == null) {
@@ -416,12 +448,10 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
         }
     }
 
-    // convenience method for getting data at click position
     public ConfigDirectory getItem(int id) {
         return mData.get(id);
     }
 
-    // allows clicks events to be caught
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }
