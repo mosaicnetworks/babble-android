@@ -181,15 +181,18 @@ public class NewGroupFragment extends Fragment {
 
 
         try {
+            Log.d("BUG-HUNT", "startGroup: ");
             babbleService.start(configDirectory, groupDescriptor);
-            mListener.onStartedNew(moniker);
-        } catch (Exception ex) {
-            //TODO: Review this. The duplicate dialog function feels overkill.
-            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
-            throw ex;
+        } catch (IllegalArgumentException ex) {
+            //we'll assume this is caused by the node taking a while to leave a previous group,
+            //though it could be that another application is using the port or WiFi is turned off -
+            // in which case we'll keep getting stuck here until the port is available or WiFi is
+            // turned on!
+            displayOkAlertDialog(R.string.babble_init_fail_title, R.string.babble_init_fail_message);
+            return;
         }
 
-
+        mListener.onStartedNew(moniker);
     }
 
 
