@@ -38,7 +38,7 @@ apply plugin: 'com.jfrog.bintray'
 // def protocol = "https"
 
 def babbleCoreVersion = "develop_011243e4f3e102b75ae15cb5692314a7cecdbd87"
-def repository = "${System.getenv('GOPATH')}/src/github.com/mosaicnetworks/babble/build/distmobile"
+def repository = (System.getenv('GOPATH') == null ? System.properties['user.home'] + "/go" : System.getenv('GOPATH'))  + "/src/github.com/mosaicnetworks/babble/build/distmobile"
 def protocol = "file"
 
 //##################################################################################################
