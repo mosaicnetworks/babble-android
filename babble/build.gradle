@@ -122,8 +122,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 10
-        versionName "0.3.1"
+        versionCode 11
+        versionName "0.4.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -184,7 +184,7 @@ artifacts {
     archives sourcesJar
 }
 
-version '0.3.1'
+version '0.4.0'
 
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
