@@ -10,9 +10,7 @@ version of babble-go. If it isn't (i.e. it references a git commit) then check
 if there is a suitable release. If there is, adjust the babble-go version, run
 all the tests and create a commit.
 
-3. Merge master into develop - there may be commits on the master branch that
-are not on the develop branch (these should't be code commits, however just in
-case do this merge).
+3. Merge develop into master (this should be a fast forward merge)
 
 4. Run all tests, confirm they pass. If they pass, a release can be created.
 
@@ -26,9 +24,9 @@ file. NOTE: there are THREE parameters here, all of which must be incremented.
 
 8. Create a git commit - e.g. "Bumped version to 0.2.6".
 
-9. Merge develop into master (a fast forward should not be done).
+9. Create a git tag e.g. "v0.2.6"
 
-10. Create a git tag.
+10. Merge master into develop (this should be a fast forward merge).
 
 11. Push the develop and master branches and tags to github.
 
