@@ -24,10 +24,8 @@
 
 package io.mosaicnetworks.babble.configure;
 
-import android.net.nsd.NsdServiceInfo;
-
 import io.mosaicnetworks.babble.node.BabbleService;
-import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 /**
  * This interface defines listeners for the join group and new group fragments
@@ -59,11 +57,10 @@ public interface OnFragmentInteractionListener {
 
     /**
      * This method will be called when the {@link BabbleService} has loaded an archive group
-     * @param moniker the moniker as chosen previous by the user. //TODO - do we need this
+     * @param moniker the moniker as chosen previous by the user.
      */
     void onArchiveLoaded(String moniker);
 
     void onServiceSelected(ResolvedGroup resolvedGroup);
-
 
 }

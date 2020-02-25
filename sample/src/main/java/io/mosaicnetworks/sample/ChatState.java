@@ -122,6 +122,6 @@ public class ChatState implements BabbleState {
     }
 
     private void updateStateHash() {
-        //TODO: implement this
+        //TODO: implement the state hash
     }
 }

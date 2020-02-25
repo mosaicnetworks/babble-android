@@ -32,23 +32,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
+
+
 public class MdnsDiscovery {
 
     private static final String TAG = "MdnsDiscovery";
-    private final Map<String, ResolvedService> mResolvedServices = new HashMap<>();
-    private final List<ResolvedGroup> mResolvedGroups;
+    private final Map<String, MdnsResolvedService> mResolvedServices = new HashMap<>();
+    private final List<MdnsResolvedGroup> mResolvedGroups;
     private NsdManager mNsdManager;
     private NsdManager.DiscoveryListener mDiscoveryListener;
     private boolean mDiscoveryActive = false;
     private ServiceDiscoveryListener mServiceDiscoveryListener;
     private Context mAppContext;
 
-    public interface ServiceDiscoveryListener {
-        void onServiceListUpdated(boolean groupCountChange);
-        void onStartDiscoveryFailed();
-    }
 
-    public MdnsDiscovery(Context context, List<ResolvedGroup> resolvedGroups,
+    public MdnsDiscovery(Context context, List<MdnsResolvedGroup> resolvedGroups,
                          ServiceDiscoveryListener serviceDiscoveryListener) {
         mAppContext = context.getApplicationContext();
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
@@ -79,7 +78,7 @@ public class MdnsDiscovery {
             public void onServiceLost(NsdServiceInfo serviceInfo) {
 
                 if (mResolvedServices.containsKey(serviceInfo.getServiceName())) {
-                    ResolvedService lostService = mResolvedServices.get(serviceInfo.getServiceName());
+                    MdnsResolvedService lostService = mResolvedServices.get(serviceInfo.getServiceName());
                     boolean empty = lostService.getResolvedGroup().removeService(lostService);
                     mResolvedServices.remove(serviceInfo.getServiceName());
 
@@ -133,9 +132,9 @@ public class MdnsDiscovery {
                     return;
                 };
 
-                ResolvedService resolvedService;
+                MdnsResolvedService resolvedService;
                 try {
-                    resolvedService = new ResolvedService(nsdServiceInfo);
+                    resolvedService = new MdnsResolvedService(nsdServiceInfo);
                 } catch (IllegalArgumentException ex) {
                     //The txt record doesn't even have the attributes we need, so we'll skip
                     return;
@@ -148,7 +147,7 @@ public class MdnsDiscovery {
 
                 mResolvedServices.put(nsdServiceInfo.getServiceName(), resolvedService);
 
-                for (ResolvedGroup group:mResolvedGroups) {
+                for (MdnsResolvedGroup group:mResolvedGroups) {
                     if (group.getGroupUid().equals(resolvedService.getGroupUid())) {
                         resolvedService.setResolvedGroup(group);
                         group.addService(resolvedService);
@@ -159,7 +158,7 @@ public class MdnsDiscovery {
                 }
 
                 //no matching group - create a new group
-                ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService);
+                MdnsResolvedGroup resolvedGroup = new MdnsResolvedGroup(resolvedService);
                 mResolvedGroups.add(resolvedGroup);
                 resolvedService.setResolvedGroup(resolvedGroup);
                 mServiceDiscoveryListener.onServiceListUpdated(false);

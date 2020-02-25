@@ -31,9 +31,10 @@ import android.net.nsd.NsdServiceInfo;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.utils.RandomString;
 
-public class MdnsAdvertiser {
+public class MdnsAdvertiser implements ServiceAdvertiser  {
 
     public static final String SERVICE_TYPE = "_babble._tcp.";
     public static final String APP_IDENTIFIER = "appIdentifier";

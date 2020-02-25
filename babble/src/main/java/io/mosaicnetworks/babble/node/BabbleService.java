@@ -54,6 +54,28 @@ public abstract class BabbleService<AppState extends BabbleState> {
     protected BabbleNode mBabbleNode;
     protected GroupDescriptor mGroupDescriptor;
 
+    protected boolean mIsArchive = false;
+
+    public int getNetworkType() {
+        return mNetworkType;
+    }
+
+    public void setNetworkType(int networkType) {
+        this.mNetworkType = mNetworkType;
+    }
+
+    public final static int NETWORK_WIFI = 1;
+    public final static int NETWORK_P2P = 2;
+    public final static int NETWORK_NONE = 0;
+
+
+    protected int mNetworkType;
+
+    //TODO: populate this from Gradle
+    public final static String BABBLE_VERSION = "0.6.2";
+
+
+
     /**
      * The underlying app state, to which babble transactions are applied
      */
@@ -72,6 +94,32 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * @throws IllegalStateException if the service is currently running
      */
     public void start(String configDirectory, GroupDescriptor groupDescriptor) {
+        start(configDirectory, groupDescriptor, NETWORK_WIFI);  // Defaults to the original mDNS configuration
+    }
+
+
+    /**
+     * Start the service
+     *
+     * @param configDirectory The full path to the babble configuration directory
+     * @param networkType BabbleService.NETWORK_NONE for archive, NETWORK_WIFI or NETWORK_P2P for mDNS or WiFi Direct
+     * @throws IllegalStateException if the service is currently running
+     */
+    public void start(String configDirectory, int networkType) {
+        start(configDirectory, null, networkType);    // Defaults to the original mDNS configuration
+    }
+
+
+
+    /**
+     * Start the service
+     *
+     * @param configDirectory The full path to the babble configuration directory
+     * @param groupDescriptor The group descriptor
+     * @param networkType BabbleService.NETWORK_NONE for archive, NETWORK_WIFI or NETWORK_P2P for mDNS or WiFi Direct
+     * @throws IllegalStateException if the service is currently running
+     */
+    public void start(String configDirectory, GroupDescriptor groupDescriptor, int networkType) {
         if (mState!=State.STOPPED) {
             throw new IllegalStateException("Cannot start service which isn't stopped");
         }
@@ -85,6 +133,10 @@ public abstract class BabbleService<AppState extends BabbleState> {
                                                 return processedBlock;
                                             }
                                         }, configDirectory);
+
+        this.mNetworkType = networkType;
+        this.mIsArchive = (this.mNetworkType == 0) ;
+
         mBabbleNode.run();
 
         mState = State.RUNNING;
@@ -112,7 +164,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
         }
 
         mState = State.ARCHIVE_INIT;
-
+        mIsArchive = true;
             new Thread(new Runnable() {
                 public void run() {
                     try {

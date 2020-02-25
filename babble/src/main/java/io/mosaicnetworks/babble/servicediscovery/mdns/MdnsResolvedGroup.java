@@ -27,12 +27,15 @@ package io.mosaicnetworks.babble.servicediscovery.mdns;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
+
 /**
  * This represents a group of resolved services with the same group UID. Services with a matching
  * group UID and group name can be added to the group as they're discovered. Services can be removed
  * from the group as and when they are lost.
  */
-public final class ResolvedGroup {
+public final class MdnsResolvedGroup implements ResolvedGroup {
 
     private final String mGroupName;
     private final String mGroupUid;
@@ -42,10 +45,10 @@ public final class ResolvedGroup {
      * Constructor, the group is initialised from a resolved service
      * @param resolvedService a resolved service used to initialise the group
      */
-    public ResolvedGroup(ResolvedService resolvedService) {
+    public MdnsResolvedGroup(ResolvedService resolvedService) {
         mGroupName = resolvedService.getGroupName();
         mGroupUid = resolvedService.getGroupUid();
-        mResolvedServices.add(resolvedService);
+        mResolvedServices.add((MdnsResolvedService)resolvedService);
     }
 
     /**
@@ -65,7 +68,7 @@ public final class ResolvedGroup {
             throw new IllegalArgumentException("Cannot add service: Service group name does not match this group's name");
         }
 
-        mResolvedServices.add(resolvedService);
+        mResolvedServices.add((MdnsResolvedService)resolvedService);
     }
 
     /**

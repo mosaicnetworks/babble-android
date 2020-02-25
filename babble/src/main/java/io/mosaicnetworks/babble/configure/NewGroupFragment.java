@@ -39,6 +39,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Switch;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -49,7 +50,11 @@ import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;
 import io.mosaicnetworks.babble.utils.Utils;
+
+
+
 
 
 /**
@@ -58,12 +63,25 @@ import io.mosaicnetworks.babble.utils.Utils;
  * interface to handle interaction events. Use the {@link NewGroupFragment#newInstance} factory
  * method to create an instance of this fragment.
  */
-public class NewGroupFragment extends Fragment {
+public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
+
+    private static boolean mShowmDNS = true;
+    private static boolean mShowP2P = true;
+
+
+    //TODO: This variable is not currently exposed. It controls the initial value of the P2P / MDNS switch
+    // true for P2P, false for MDNS.
+    private static boolean mInitSwitchP2P = false;
+
+
+
+    GroupDescriptor mGroupDescriptor;
+    int mNetworkType;
+    String mMoniker;
 
     private OnFragmentInteractionListener mListener;
 
     public NewGroupFragment() {
-        // Required empty public constructor
     }
 
     /**
@@ -72,7 +90,10 @@ public class NewGroupFragment extends Fragment {
      *
      * @return A new instance of fragment NewGroupFragment.
      */
-    public static NewGroupFragment newInstance() {
+    public static NewGroupFragment newInstance(Bundle args) {
+        mShowmDNS = args.getBoolean(BaseConfigActivity.SHOW_MDNS, true);
+        mShowP2P = args.getBoolean(BaseConfigActivity.SHOW_P2P, true);
+//        setArguments(args);
         return new NewGroupFragment();
     }
 
@@ -102,6 +123,28 @@ public class NewGroupFragment extends Fragment {
         EditText edit = view.findViewById(R.id.edit_moniker);
         edit.setText(sharedPref.getString("moniker", "Me"));
 
+        // If only one discovery tab is shown then set and then disable the toggle switch to only
+        // allow a valid selection.
+
+        Switch switchP2P =  view.findViewById(R.id.switch_p2p);
+        if (mShowmDNS) {
+            if ( mShowP2P) {
+                switchP2P.setChecked(mInitSwitchP2P);
+                switchP2P.setEnabled(true);
+            } else {
+                    switchP2P.setChecked(false);
+                    switchP2P.setEnabled(false);
+            }
+
+
+        } else {
+            if (mShowP2P) {
+                switchP2P.setChecked(true);
+                switchP2P.setEnabled(false);
+            }
+        }
+
+
         EditText editGroup = view.findViewById(R.id.edit_group_name);
         editGroup.requestFocus();
 
@@ -113,32 +156,12 @@ public class NewGroupFragment extends Fragment {
 
     // called when the user presses the start button
     public void startGroup(View view) {
-        //TODO: check this is safe
-
         Log.i("startGroup", "Starting Group ");
-        BabbleService<?> babbleService = mListener.getBabbleService();
-
-        Log.v("startGroup", "Got Babble Service ");
-
-        ConfigManager configManager;
-        try {
-            configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
-
-            Log.v("startGroup", "Got ConfigManager ");
-
-        } catch (FileNotFoundException ex) {
-            //TODO: We cannot rethrow this exception as the overridden method does not throw it.
-            //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
-            //This is probably a fatal error.
-            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
-            throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
-            // The app will terminate. But babble is unstartable from here.
-        }
 
         //get moniker
         EditText editMoniker = view.findViewById(R.id.edit_moniker);
-        String moniker = editMoniker.getText().toString();
-        if (moniker.isEmpty()) {
+        mMoniker = editMoniker.getText().toString();
+        if (mMoniker.isEmpty()) {
             displayOkAlertDialog(R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
             return;
         }
@@ -151,12 +174,92 @@ public class NewGroupFragment extends Fragment {
             return;
         }
 
+        // Get network type
+        Switch switchP2P =  view.findViewById(R.id.switch_p2p);
+        boolean isP2P = switchP2P.isChecked();
+        int networkType;
 
-        GroupDescriptor groupDescriptor = new GroupDescriptor(groupName);
+        if (isP2P) {
+            mNetworkType = BabbleService.NETWORK_P2P;
+        } else {
+            mNetworkType = BabbleService.NETWORK_WIFI;
+        }
+
+        mGroupDescriptor = new GroupDescriptor(groupName);
+
+        //TODO: P2P - Need change the workflow here. We are launching a new instance, but we rely
+        //      on having started Wifi Direct up.
+
+
+        String ip = "";
+
+        switch (mNetworkType) {
+            case BabbleService.NETWORK_P2P:
+                P2PService p2PService = P2PService.getInstance(getContext());
+                p2PService.registerOnNetworkInitialised(this);
+
+                // This will call back onNetworkInitialised
+                Log.i("startGroup", "Start Broadcasting P2P");
+                p2PService.startRegistration(mMoniker, groupName, BabbleService.BABBLE_VERSION, false);
+                //TODO: Turned off discovery for the lead peer, but may need to re-enable to trigger discovery.
+
+
+                break;
+            default:
+                ip = Utils.getIPAddr(getContext());
+
+                Log.i("startGroup", "mDNS");
+
+                // N.B. mDNS does not require a callback, so we call configAndStartBabble directly.
+
+                onNetworkInitialised(ip);
+        }
+
+
+        // Store moniker entered
+        SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
+                BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("moniker", mMoniker);
+        editor.apply();
+
+
+
+    }
+
+
+
+    public void onNetworkInitialised(String ip){
+        Log.i("startGroup", "onNetworkInitialised: "+ ip);
+        configAndStartBabble(ip);
+    }
+
+    private void configAndStartBabble(String ip) {
+        BabbleService<?> babbleService = mListener.getBabbleService();
+        ConfigManager configManager;
 
         String configDirectory;
+
+
         try {
-            configDirectory = configManager.createConfigNewGroup(groupDescriptor, moniker, Utils.getIPAddr(getContext()));
+            configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
+
+            Log.v("startGroup", "Got ConfigManager ");
+
+        } catch (FileNotFoundException ex) {
+            //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
+            //This is probably a fatal error.
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
+            throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
+            // The app will terminate. But babble is unstartable from here.
+        }
+
+
+
+
+        try {
+            configDirectory = configManager.createConfigNewGroup(mGroupDescriptor, mMoniker, ip);
             Log.i("startGroup", "configDirectory: " + configDirectory);
             //babbleService.createConfigNewGroup(moniker, Utils.getIPAddr(getContext()));
         } catch (IllegalArgumentException | CannotStartBabbleNodeException| IOException ex) {
@@ -171,17 +274,8 @@ public class NewGroupFragment extends Fragment {
         Log.i("startGroup", "configDirectory: " + configDirectory);
 
 
-        // Store moniker entered
-        SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
-                BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("moniker", moniker);
-        editor.apply();
-
-
         try {
-            babbleService.start(configDirectory, groupDescriptor);
+            babbleService.start(configDirectory, mGroupDescriptor, mNetworkType);
         } catch (IllegalArgumentException ex) {
             //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port or WiFi is turned off -
@@ -189,10 +283,17 @@ public class NewGroupFragment extends Fragment {
             // turned on!
             displayOkAlertDialog(R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             return;
+        } catch (Exception ex) {
+            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
+            throw ex;
         }
 
-        mListener.baseOnStartedNew(moniker);       
+        mListener.baseOnStartedNew(mMoniker);
+
     }
+
+
+
 
 
 

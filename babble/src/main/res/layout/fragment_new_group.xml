@@ -67,7 +67,18 @@
                 android:hint="@string/moniker"
                 android:inputType="textPersonName"
                 android:importantForAutofill="no" />
-
+            <Switch
+                android:id="@+id/switch_p2p"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:text="@string/network_type"
+                android:checked="true"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="4dp"
+                />
             <Button
                 android:id="@+id/button_start"
                 android:layout_width="match_parent"
