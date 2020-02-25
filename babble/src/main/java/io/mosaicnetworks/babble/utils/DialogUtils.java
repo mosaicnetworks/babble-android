@@ -24,35 +24,36 @@
 
 package io.mosaicnetworks.babble.utils;
 
+import android.app.AlertDialog;
 import android.content.Context;
-import android.net.wifi.WifiManager;
-import android.text.format.Formatter;
+
+import androidx.annotation.StringRes;
 
 import java.util.Objects;
-import java.util.UUID;
 
-import static android.content.Context.WIFI_SERVICE;
+import io.mosaicnetworks.babble.R;
 
-/**
- * A collection of utilities
- */
-public final class Utils {
+public class DialogUtils {
 
-    /**
-     * Returns the device's IPv4 address on the wireless network. Returns 0.0.0.0 if the device is
-     * not connected.
-     * @param context an instance of the applications context
-     * @return the ip address in dot-decimal notation
-     */
-    public static String getIPAddr(Context context) {
-        WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
-        return Formatter.formatIpAddress(Objects.requireNonNull(wm).getConnectionInfo().getIpAddress());
+    public static void displayOkAlertDialog(Context context, @StringRes int titleId, @StringRes int messageId) {
+        AlertDialog alertDialog = new AlertDialog.Builder(context)
+                .setTitle(titleId)
+                .setMessage(messageId)
+                .setNeutralButton(R.string.ok_button, null)
+                .create();
+        alertDialog.show();
     }
 
 
 
+    public static void displayOkAlertDialogText(Context context, @StringRes int titleId, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(context)
+                .setTitle(titleId)
+                .setMessage(message)
+                .setNeutralButton(R.string.ok_button, null)
+                .create();
+        alertDialog.show();
+    }
+
 
 }
-
-
-

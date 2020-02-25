@@ -62,6 +62,7 @@ import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedService;
+import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
 
@@ -141,7 +142,7 @@ public class MdnsJoinGroupFragment extends Fragment implements ResponseListener 
         EditText editText = view.findViewById(R.id.edit_moniker);
         mMoniker = editText.getText().toString();
         if (mMoniker.isEmpty()) {
-            displayOkAlertDialog(R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
             return;
         }
 
@@ -149,7 +150,7 @@ public class MdnsJoinGroupFragment extends Fragment implements ResponseListener 
         List<ResolvedService> resolvedServices = mResolvedGroup.getResolvedServices();
 
         if (resolvedServices.size() < 1) {
-            displayOkAlertDialog(R.string.no_service_alert_title, R.string.no_service_alert_message);
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.no_service_alert_title, R.string.no_service_alert_message);
             return;
         }
 
@@ -197,7 +198,7 @@ public class MdnsJoinGroupFragment extends Fragment implements ResponseListener 
                         }
                     }, getContext());
         } catch (IllegalArgumentException ex) {
-            displayOkAlertDialog(R.string.invalid_hostname_alert_title, R.string.invalid_hostname_alert_message);
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.invalid_hostname_alert_title, R.string.invalid_hostname_alert_message);
             return;
         }
 
@@ -214,7 +215,7 @@ public class MdnsJoinGroupFragment extends Fragment implements ResponseListener 
         } catch (FileNotFoundException ex) {
             //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
             //This is probably a fatal error.
-            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
+            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
             throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
             // The app will terminate. But babble is unstartable from here.
         }
@@ -232,12 +233,12 @@ public class MdnsJoinGroupFragment extends Fragment implements ResponseListener 
             // in which case we'll keep getting stuck here until the port is available or WiFi is
             // turned on!
             mLoadingDialog.dismiss();
-            displayOkAlertDialog(R.string.babble_init_fail_title, R.string.babble_init_fail_message);
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             return;
         } catch (Exception ex) {
             //TODO: Review this. The duplicate dialog function feels overkill.
             mLoadingDialog.dismiss();
-            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
+            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
             throw ex;
         }
 
@@ -262,7 +263,7 @@ public class MdnsJoinGroupFragment extends Fragment implements ResponseListener 
             default:
                 messageId = R.string.peers_unknown_error_alert_message;
         }
-        displayOkAlertDialog(R.string.peers_error_alert_title, messageId);
+        DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.peers_error_alert_title, messageId);
     }
 
     private void initLoadingDialog() {
@@ -279,27 +280,6 @@ public class MdnsJoinGroupFragment extends Fragment implements ResponseListener 
                 cancelRequests();
             }});
     }
-
-    private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
-                .setTitle(titleId)
-                .setMessage(messageId)
-                .setNeutralButton(R.string.ok_button, null)
-                .create();
-        alertDialog.show();
-    }
-
-
-
-    private void displayOkAlertDialogText(@StringRes int titleId, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
-                .setTitle(titleId)
-                .setMessage(message)
-                .setNeutralButton(R.string.ok_button, null)
-                .create();
-        alertDialog.show();
-    }
-
 
 
     private void cancelRequests() {

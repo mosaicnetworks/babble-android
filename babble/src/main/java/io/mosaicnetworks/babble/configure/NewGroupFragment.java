@@ -51,6 +51,7 @@ import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;
+import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
 
@@ -162,7 +163,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
         EditText editMoniker = view.findViewById(R.id.edit_moniker);
         mMoniker = editMoniker.getText().toString();
         if (mMoniker.isEmpty()) {
-            displayOkAlertDialog(R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
             return;
         }
 
@@ -170,7 +171,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
         EditText editGroupName = view.findViewById(R.id.edit_group_name);
         String groupName = editGroupName.getText().toString();
         if (groupName.isEmpty()) {
-            displayOkAlertDialog(R.string.no_group_name_alert_title, R.string.no_group_name_alert_message);
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.no_group_name_alert_title, R.string.no_group_name_alert_message);
             return;
         }
 
@@ -250,7 +251,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
         } catch (FileNotFoundException ex) {
             //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
             //This is probably a fatal error.
-            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
+            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
             throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
             // The app will terminate. But babble is unstartable from here.
         }
@@ -267,7 +268,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
             //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port - in which case
             //we'll keep getting stuck here until the port is available!
-            displayOkAlertDialog(R.string.babble_init_fail_title, R.string.babble_init_fail_message);
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             return;
         }
 
@@ -281,10 +282,10 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
             //though it could be that another application is using the port or WiFi is turned off -
             // in which case we'll keep getting stuck here until the port is available or WiFi is
             // turned on!
-            displayOkAlertDialog(R.string.babble_init_fail_title, R.string.babble_init_fail_message);
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             return;
         } catch (Exception ex) {
-            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
+            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
             throw ex;
         }
 
@@ -292,32 +293,6 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
 
     }
 
-
-
-
-
-
-    //TODO: Review if we need both.
-    private void displayOkAlertDialogText(@StringRes int titleId, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
-                .setTitle(titleId)
-                .setMessage(message)
-                .setNeutralButton(R.string.ok_button, null)
-                .create();
-        alertDialog.show();
-    }
-
-
-
-
-    private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
-                .setTitle(titleId)
-                .setMessage(messageId)
-                .setNeutralButton(R.string.ok_button, null)
-                .create();
-        alertDialog.show();
-    }
 
     @Override
     public void onAttach(@NonNull Context context) {

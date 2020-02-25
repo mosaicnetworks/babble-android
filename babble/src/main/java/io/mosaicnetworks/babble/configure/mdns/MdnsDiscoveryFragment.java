@@ -44,6 +44,7 @@ import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsServicesListView;
+import io.mosaicnetworks.babble.utils.DialogUtils;
 
 public class MdnsDiscoveryFragment extends Fragment {
 
@@ -158,12 +159,12 @@ public class MdnsDiscoveryFragment extends Fragment {
 
             @Override
             public void onServiceSelectedFailure() {
-                displayOkAlertDialog(R.string.service_discovery_resolve_fail_title, R.string.service_discovery_resolve_fail_message);
+                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_discovery_resolve_fail_title, R.string.service_discovery_resolve_fail_message);
             }
 
             @Override
             public void onDiscoveryStartFailure() {
-                displayOkAlertDialog(R.string.service_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
+                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
 
                 mSwipeRefreshServiceSearch.setVisibility(View.GONE);
                 mSwipeRefreshDiscoveryFailed.setVisibility(View.VISIBLE);
@@ -186,14 +187,7 @@ public class MdnsDiscoveryFragment extends Fragment {
 
     }
 
-    private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
-                .setTitle(titleId)
-                .setMessage(messageId)
-                .setNeutralButton(R.string.ok_button, null)
-                .create();
-        alertDialog.show();
-    }
+
 
     @Override
     public void onResume() {
