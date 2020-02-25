@@ -36,13 +36,12 @@ import com.stfalcon.chatkit.commons.models.IMessage;
 import com.stfalcon.chatkit.commons.models.IUser;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.Date;
 
 import io.mosaicnetworks.babble.node.BabbleTx;
 
 
-class MyDateTypeAdapter extends TypeAdapter<Date> {
+class UnixEraDateTypeAdapter extends TypeAdapter<Date> {
     @Override
     public void write(JsonWriter out, Date value) throws IOException {
         if (value == null)
@@ -69,7 +68,7 @@ class MyDateTypeAdapter extends TypeAdapter<Date> {
 public final class Message implements BabbleTx, IMessage {
 
 
-    private final static Gson gson = new GsonBuilder().registerTypeAdapter(Date.class,new MyDateTypeAdapter()).create();
+    private final static Gson gson = new GsonBuilder().registerTypeAdapter(Date.class,new UnixEraDateTypeAdapter()).create();
 
   //  private final static Gson gson =  new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
