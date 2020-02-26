@@ -32,8 +32,7 @@ import io.mosaicnetworks.babble.node.GroupDescriptor;
 
 public class ArchivedGroupsViewModel extends ViewModel {
 
-    //TODO: are these the right states
-    //TODO: extra state leaving?
+    //TODO: Review theses states for completeness; possibly extra state for leaving?
     public enum State {
         LIST,
         LOADING,

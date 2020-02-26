@@ -59,7 +59,7 @@ public class ResolvedServiceTest {
         nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_NAME, groupName);
         nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_UID, groupUid);
 
-        ResolvedService resolvedService = new ResolvedService(nsdServiceInfo);
+        MdnsResolvedService resolvedService = new MdnsResolvedService(nsdServiceInfo);
 
         assertEquals(inetAddress, resolvedService.getInetAddress());
         assertEquals(port, resolvedService.getPort());
@@ -88,9 +88,9 @@ public class ResolvedServiceTest {
         nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_NAME, groupName);
         nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_UID, groupUid);
 
-        ResolvedService resolvedService = new ResolvedService(nsdServiceInfo);
+        MdnsResolvedService resolvedService = new MdnsResolvedService(nsdServiceInfo);
 
-        ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService);
+        MdnsResolvedGroup resolvedGroup = new MdnsResolvedGroup(resolvedService);
 
         resolvedService.setResolvedGroup(resolvedGroup);
 
@@ -118,9 +118,9 @@ public class ResolvedServiceTest {
         nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_NAME, groupName);
         nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_UID, groupUid);
 
-        ResolvedService resolvedService = new ResolvedService(nsdServiceInfo);
+        MdnsResolvedService resolvedService = new MdnsResolvedService(nsdServiceInfo);
 
-        ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService);
+        MdnsResolvedGroup resolvedGroup = new MdnsResolvedGroup(resolvedService);
 
         resolvedService.setResolvedGroup(resolvedGroup);
         resolvedService.setResolvedGroup(resolvedGroup); //should throw an IllegalStateException

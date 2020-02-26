@@ -22,13 +22,19 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.servicediscovery.mdns;
+package io.mosaicnetworks.babble.servicediscovery.p2p;
 
 import android.net.nsd.NsdServiceInfo;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.Map;
+
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
+import com.google.common.net.InetAddresses;
 
 import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.APP_IDENTIFIER;
 import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.GROUP_NAME;
@@ -40,44 +46,47 @@ import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.GROU
  * In this sense it holds NSD info specific to this app's service.
  *
  * Several instances of this class may refer to the same group that are advertised by a different
- * hosts. Instances of the {@link ResolvedGroup} class can be used to hold a collection of
- * {@link ResolvedService} that represent the same group. In this sense a {@link ResolvedService} is
+ * hosts. Instances of the {@link P2PResolvedGroup} class can be used to hold a collection of
+ * {@link P2PResolvedService} that represent the same group. In this sense a {@link P2PResolvedService} is
  * assigned to a group. This assignment can be set by calling the
- * {@link #setResolvedGroup(ResolvedGroup)} method.
  */
-public final class ResolvedService {
+public final class P2PResolvedService implements ResolvedService {
 
-    private final InetAddress mInetAddress;
+    private final InetAddress mInetAddress ;
     private final int mPort;
     private final String mAppIdentifier;
     private final String mGroupName;
     private final String mGroupUid;
-    private ResolvedGroup mResolvedGroup;
+    private P2PResolvedGroup mResolvedGroup;
     private final Map<String, byte[]> mServiceAttributes;
     private boolean mAssignedGroup = false;
 
     /**
      * Initialise from service info
-     * @param nsdServiceInfo the service info from which service parameters are extracted
      */
-    public ResolvedService(NsdServiceInfo nsdServiceInfo) {
-        mInetAddress = nsdServiceInfo.getHost();
-        mPort = nsdServiceInfo.getPort();
-        mServiceAttributes = nsdServiceInfo.getAttributes();
-        mAppIdentifier = extractStringAttribute(APP_IDENTIFIER);
-        mGroupName = extractStringAttribute(GROUP_NAME);
-        mGroupUid = extractStringAttribute(GROUP_UID);
-    }
+    public P2PResolvedService(String uuID, Map map) throws UnknownHostException {
 
-    private String extractStringAttribute(String key) {
+        /*
 
-        if (!mServiceAttributes.containsKey(key)) {
-            throw new IllegalArgumentException("Map does not contain attribute: " + key);
-        }
+    public final static String PORT_LABEL = "port";
+    public final static String MONIKER_LABEL = "moniker";
+    public final static String DNS_VERSION_LABEL = "textvers";
+    private final static String DNS_VERSION = "0.0.1";
+    public final static String BABBLE_VERSION_LABEL = "babblevers";
 
-        //TODO: "This method always replaces malformed-input and unmappable-character sequences with
-        // this charset's default replacement string" - is this ok?
-        return new String(mServiceAttributes.get(key), Charset.forName("UTF-8"));
+    public final static String GROUP_LABEL = "group";
+
+         */
+
+   //     mInetAddress =  InetAddresses.forString((String) map.get(P2PService.HOST_LABEL));
+        mInetAddress =  InetAddresses.forString((String) map.get(P2PService.HOST_LABEL)); //TODO: Revert this debug code
+        mPort = Integer.parseInt((String) map.get(P2PService.PORT_LABEL));
+
+        mServiceAttributes = new HashMap<>(); //nsdServiceInfo.getAttributes();
+
+        mAppIdentifier = (String) map.get(P2PService.APP_LABEL);
+        mGroupName = (String) map.get(P2PService.GROUP_LABEL);
+        mGroupUid = uuID;
     }
 
     /**
@@ -99,7 +108,7 @@ public final class ResolvedService {
             throw new IllegalStateException("This service has already been assigned to a group");
         }
 
-        mResolvedGroup = resolvedGroup;
+        mResolvedGroup = (P2PResolvedGroup) resolvedGroup;
         mAssignedGroup = true;
 
     }

@@ -22,24 +22,38 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure;
+package io.mosaicnetworks.babble.utils;
 
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
+import android.app.AlertDialog;
+import android.content.Context;
 
-import io.mosaicnetworks.babble.node.BabbleService;
+import androidx.annotation.StringRes;
 
-public class ArchivedGroupsViewModelFactory implements ViewModelProvider.Factory {
+import java.util.Objects;
 
-    private BabbleService mBabbleService;
+import io.mosaicnetworks.babble.R;
 
-    public ArchivedGroupsViewModelFactory(BabbleService babbleService) {
-        mBabbleService = babbleService;
+public class DialogUtils {
+
+    public static void displayOkAlertDialog(Context context, @StringRes int titleId, @StringRes int messageId) {
+        AlertDialog alertDialog = new AlertDialog.Builder(context)
+                .setTitle(titleId)
+                .setMessage(messageId)
+                .setNeutralButton(R.string.ok_button, null)
+                .create();
+        alertDialog.show();
     }
 
-    @Override
-    @SuppressWarnings("unchecked")  //unchecked cast warning caused by the use of generics.
-    public <T extends ViewModel> T create(Class<T> modelClass) {
-        return (T) new ArchivedGroupsViewModel(mBabbleService);
+
+
+    public static void displayOkAlertDialogText(Context context, @StringRes int titleId, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(context)
+                .setTitle(titleId)
+                .setMessage(message)
+                .setNeutralButton(R.string.ok_button, null)
+                .create();
+        alertDialog.show();
     }
+
+
 }

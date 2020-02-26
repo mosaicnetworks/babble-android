@@ -25,7 +25,6 @@
 package io.mosaicnetworks.babble.servicediscovery.mdns;
 
 import android.content.Context;
-import android.net.nsd.NsdServiceInfo;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
@@ -38,35 +37,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ServicesListView extends RecyclerView {
+import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
+import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
 
-    public interface ServicesListListener {
+public class MdnsServicesListView extends RecyclerView {
 
-        void onServiceSelectedSuccess(ResolvedGroup resolvedGroup);
 
-        void onServiceSelectedFailure();
-
-        void onDiscoveryStartFailure();
-
-        void onListEmptyStatusChange(boolean empty);
-    }
-
-    private List<ResolvedGroup> mServiceInfoList = new ArrayList<>();
+    private List<MdnsResolvedGroup> mServiceInfoList = new ArrayList<>();
     private ServicesListListener mServicesListListener;
     private MdnsDiscovery mMdnsDiscovery;
     private boolean mPrevIsEmpty = true;
 
-    public ServicesListView(Context context) {
+    public MdnsServicesListView(Context context) {
         super(context);
         initialize(context);
     }
 
-    public ServicesListView(Context context, @Nullable AttributeSet attrs) {
+    public MdnsServicesListView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initialize(context);
     }
 
-    public ServicesListView(Context context, @Nullable AttributeSet attrs, int defStyle) {
+    public MdnsServicesListView(Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initialize(context);
     }
@@ -75,8 +67,8 @@ public class ServicesListView extends RecyclerView {
 
         setLayoutManager(new LinearLayoutManager(context));
 
-        final ServicesListAdapter adapter = new ServicesListAdapter(context, mServiceInfoList);
-        adapter.setClickListener(new ServicesListAdapter.ItemClickListener() {
+        final MdnsServicesListAdapter adapter = new MdnsServicesListAdapter(context, mServiceInfoList);
+        adapter.setClickListener(new MdnsServicesListAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 mServicesListListener.onServiceSelectedSuccess(adapter.getItem(position));
@@ -85,7 +77,7 @@ public class ServicesListView extends RecyclerView {
 
         setAdapter(adapter);
 
-        mMdnsDiscovery = new MdnsDiscovery(context, mServiceInfoList, new MdnsDiscovery.ServiceDiscoveryListener() {
+        mMdnsDiscovery = new MdnsDiscovery(context, mServiceInfoList, new ServiceDiscoveryListener() {
             @Override
             public void onServiceListUpdated(boolean groupCountChange) {
                 // let the adapter know

@@ -22,10 +22,9 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure;
+package io.mosaicnetworks.babble.configure.mdns;
 
 import android.content.Context;
-import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,13 +40,16 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.mdns.ServicesListView;
+import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
+import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsServicesListView;
+import io.mosaicnetworks.babble.utils.DialogUtils;
 
 public class MdnsDiscoveryFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private ServicesListView mServiceListView;
+    private MdnsServicesListView mServiceListView;
     public SwipeRefreshLayout mSwipeRefreshServiceSearch;
     private SwipeRefreshLayout mSwipeRefreshDiscoveryFailed;
     private SwipeRefreshLayout mSwipeRefreshServicesDisplaying;
@@ -148,7 +150,7 @@ public class MdnsDiscoveryFragment extends Fragment {
     }
 
     private void startDiscovery() {
-        mServiceListView.startDiscovery(new ServicesListView.ServicesListListener() {
+        mServiceListView.startDiscovery(new ServicesListListener() {
 
             @Override
             public void onServiceSelectedSuccess(ResolvedGroup resolvedGroup) {
@@ -157,12 +159,12 @@ public class MdnsDiscoveryFragment extends Fragment {
 
             @Override
             public void onServiceSelectedFailure() {
-                displayOkAlertDialog(R.string.service_discovery_resolve_fail_title, R.string.service_discovery_resolve_fail_message);
+                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_discovery_resolve_fail_title, R.string.service_discovery_resolve_fail_message);
             }
 
             @Override
             public void onDiscoveryStartFailure() {
-                displayOkAlertDialog(R.string.service_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
+                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
 
                 mSwipeRefreshServiceSearch.setVisibility(View.GONE);
                 mSwipeRefreshDiscoveryFailed.setVisibility(View.VISIBLE);
@@ -185,14 +187,7 @@ public class MdnsDiscoveryFragment extends Fragment {
 
     }
 
-    private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
-                .setTitle(titleId)
-                .setMessage(messageId)
-                .setNeutralButton(R.string.ok_button, null)
-                .create();
-        alertDialog.show();
-    }
+
 
     @Override
     public void onResume() {

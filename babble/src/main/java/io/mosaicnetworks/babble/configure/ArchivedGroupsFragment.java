@@ -57,6 +57,7 @@ import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
 /**
@@ -79,25 +80,29 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     private LinearLayout mLinearLayoutArchiveLoading;
     private LinearLayout mLinearLayoutNoArchives;
     private Boolean mSelected;
+    private String mMoniker = "Me";
 
 
-    //TODO: either expose this switch or remove it.
     /**
      * This switch controls whether all archive versions are displayed or just the "Live" ones.
      */
-    private boolean mShowAllArchiveVersion = true;
+    private static boolean mShowAllArchiveVersion = true;
 
 
     public ArchivedGroupsFragment() {
+
     }
 
     /**
      * Use this factory method to create a new instance of
      * this fragment.
      *
+     * @param args Bundle of invocation params
      * @return A new instance of fragment ArchivedGroupsFragment.
      */
-    public static ArchivedGroupsFragment newInstance() {
+    public static ArchivedGroupsFragment newInstance(Bundle args) {
+        mShowAllArchiveVersion = args.getBoolean(BaseConfigActivity.SHOW_ALL_ARCHIVE, true);
+
         return new ArchivedGroupsFragment();
     }
 
@@ -107,10 +112,9 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
         try {
             mConfigManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
         } catch (FileNotFoundException ex) {
-            //TODO: We cannot rethrow this exception as the overridden method does not throw it.
             //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
             //This is probably a fatal error.
-            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
+            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
             throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
                                                 // The app will terminate. But babble is unstartable from here.
         }
@@ -166,14 +170,14 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
                 //If it loads when we're on a different tab then abort. This does mean it's possible
                 //for a configuration change to cause an abort
                 if (isResumed()) {
-                    mListener.onArchiveLoaded("made up moniker"); //TODO: fix moniker
+                    mListener.onArchiveLoaded(mMoniker);
                 } else {
                     mListener.getBabbleService().leave(null);
                     mViewModel.getState().setValue(ArchivedGroupsViewModel.State.LIST);
                 }
                 break;
             case FAILED:
-                displayOkAlertDialog(R.string.archive_load_fail_title, R.string.archive_load_fail_message);
+                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.archive_load_fail_title, R.string.archive_load_fail_message);
                 mViewModel.getState().setValue(ArchivedGroupsViewModel.State.LIST);
         }
     }
@@ -185,12 +189,13 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
             try {
                 mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), ConfigManager.DEFAULT_BABBLING_PORT);
+                mMoniker = mConfigManager.getMoniker();
 
             } catch (IOException e) {
-                displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot load configuration: " + e.getMessage());
+                DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot load configuration: " + e.getMessage());
                 return;
             } catch (Exception e) {
-                displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot load configuration: " + e.getClass().getCanonicalName() + ": " + e.getMessage());
+                DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot load configuration: " + e.getClass().getCanonicalName() + ": " + e.getMessage());
                 throw e;
             }
 
@@ -199,11 +204,11 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
                 mViewModel.loadArchive(configDir, new GroupDescriptor("Archived Group")); //TODO: need to get a proper group descriptor
 
             } catch (IllegalArgumentException ex) {
-                displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: Illegal Argument: " + ex.getClass().getCanonicalName() + ": " + ex.getMessage());
+                DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot start babble: Illegal Argument: " + ex.getClass().getCanonicalName() + ": " + ex.getMessage());
             } catch (Exception ex) {
                 //TODO: Some sensible error handling here.
                 //Errors on starting the babble service were untrapped and killing the app
-                displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: " + ex.getClass().getCanonicalName() + ": " + ex.getMessage());
+                DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot start babble: " + ex.getClass().getCanonicalName() + ": " + ex.getMessage());
                 throw ex;
                 //          Toast.makeText(getContext(), "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage(), Toast.LENGTH_LONG).show();
             }
@@ -322,8 +327,6 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     public void onStart() {
         super.onStart();
 
-        //TODO: This is currently a hardcoded boolean. But it is coded this way to preserve both
-        //methods, and potentially it will be switchable in the future
         if (mShowAllArchiveVersion) {
             mArchivedList.addAll(mConfigManager.getDirectories());
         } else {
@@ -350,24 +353,6 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
         }
     }
 
-    //TODO: Review if we need these functions in Archive, Join and New fragments.
-    private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
-                .setTitle(titleId)
-                .setMessage(messageId)
-                .setNeutralButton(R.string.ok_button, null)
-                .create();
-        alertDialog.show();
-    }
-
-    private void displayOkAlertDialogText(@StringRes int titleId, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
-                .setTitle(titleId)
-                .setMessage(message)
-                .setNeutralButton(R.string.ok_button, null)
-                .create();
-        alertDialog.show();
-    }
 }
 
 class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.ViewHolder> {

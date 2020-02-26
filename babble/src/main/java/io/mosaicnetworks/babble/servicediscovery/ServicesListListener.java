@@ -22,24 +22,15 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure;
+package io.mosaicnetworks.babble.servicediscovery;
 
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
+public interface ServicesListListener {
 
-import io.mosaicnetworks.babble.node.BabbleService;
+    void onServiceSelectedSuccess(ResolvedGroup resolvedGroup);
 
-public class ArchivedGroupsViewModelFactory implements ViewModelProvider.Factory {
+    void onServiceSelectedFailure();
 
-    private BabbleService mBabbleService;
+    void onDiscoveryStartFailure();
 
-    public ArchivedGroupsViewModelFactory(BabbleService babbleService) {
-        mBabbleService = babbleService;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")  //unchecked cast warning caused by the use of generics.
-    public <T extends ViewModel> T create(Class<T> modelClass) {
-        return (T) new ArchivedGroupsViewModel(mBabbleService);
-    }
+    void onListEmptyStatusChange(boolean empty);
 }

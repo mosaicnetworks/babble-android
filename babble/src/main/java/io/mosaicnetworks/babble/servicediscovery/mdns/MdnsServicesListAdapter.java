@@ -37,7 +37,7 @@ import java.util.List;
 
 import io.mosaicnetworks.babble.R;
 
-public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapter.ViewHolder> {
+public class MdnsServicesListAdapter extends RecyclerView.Adapter<MdnsServicesListAdapter.ViewHolder> {
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -57,11 +57,11 @@ public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapte
         }
     }
 
-    private List<ResolvedGroup> mData;
+    private List<MdnsResolvedGroup> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    public ServicesListAdapter(Context context, List<ResolvedGroup> data) {
+    public MdnsServicesListAdapter(Context context, List<MdnsResolvedGroup> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -77,7 +77,7 @@ public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapte
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        ResolvedGroup groupInfo = mData.get(position);
+        MdnsResolvedGroup groupInfo = mData.get(position);
 
         holder.groupUidTextView.setText(groupInfo.getGroupUid());
         holder.serviceNameTextView.setText(groupInfo.getGroupName());
@@ -94,7 +94,7 @@ public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapte
     }
 
     // convenience method for getting data at click position
-    public ResolvedGroup getItem(int id) {
+    public MdnsResolvedGroup getItem(int id) {
         return mData.get(id);
     }
 

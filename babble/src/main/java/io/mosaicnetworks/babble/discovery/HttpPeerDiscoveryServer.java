@@ -24,6 +24,8 @@
 
 package io.mosaicnetworks.babble.discovery;
 
+import android.util.Log;
+
 import java.io.IOException;
 
 import fi.iki.elonen.NanoHTTPD;
@@ -35,6 +37,7 @@ import fi.iki.elonen.NanoHTTPD;
  * in the constructor
  */
 public final class HttpPeerDiscoveryServer {
+    private final static String TAG="HttpPeerDiscoveryServer";
 
     private final NanoWrapper mNanoWrapper;
 
@@ -57,6 +60,7 @@ public final class HttpPeerDiscoveryServer {
      *                      implements this interface so it can be used as a provider)
      */
     public HttpPeerDiscoveryServer(String hostname, int port, PeersProvider peersProvider) {
+        Log.i(TAG, "HttpPeerDiscoveryServer: "+hostname);
         mNanoWrapper = new NanoWrapper(hostname, port, peersProvider);
     }
 
@@ -65,6 +69,7 @@ public final class HttpPeerDiscoveryServer {
      * @throws IOException if the socket is in use or it cannot bind to the interface.
      */
     public void start() throws IOException {
+        Log.i(TAG, "start ");
         mNanoWrapper.start();
     }
 
@@ -89,12 +94,12 @@ public final class HttpPeerDiscoveryServer {
             this.peersProvider = peersProvider;
         }
 
-        //TODO: return correct http status codes
+        //TODO: review http status codes
         @Override
         public Response serve(IHTTPSession session) {
 
             if (session.getMethod() != Method.GET) {
-                return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
+                return newFixedLengthResponse(Response.Status.BAD_REQUEST, MIME_PLAINTEXT,
                         "The requested resource does not exist");
             }
 
@@ -109,12 +114,12 @@ public final class HttpPeerDiscoveryServer {
                     peersJson = peersProvider.getCurrentPeers();
                     break;
                 default :
-                    return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
+                    return newFixedLengthResponse(Response.Status.BAD_REQUEST, MIME_PLAINTEXT,
                             "The requested resource does not exist");
             }
 
             if (peersJson==null) {
-                return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT,
+                return newFixedLengthResponse(Response.Status.BAD_REQUEST, MIME_PLAINTEXT,
                         "Could not get requested resource");
             }
 

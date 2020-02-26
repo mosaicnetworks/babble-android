@@ -120,7 +120,7 @@ android {
     compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 21       // nsdServiceInfo.getAttributes requires API 21
         targetSdkVersion 29
         versionCode 11
         versionName "0.4.0"
@@ -173,6 +173,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.moandjiezana.toml:toml4j:0.7.2'
     implementation 'commons-io:commons-io:2.6'
+    implementation 'com.google.guava:guava:28.2-android'
     implementation 'com.google.android.material:material:1.2.0-alpha04'
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation 'androidx.annotation:annotation:1.1.0'

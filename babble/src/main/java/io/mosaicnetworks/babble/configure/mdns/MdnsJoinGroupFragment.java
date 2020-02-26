@@ -22,19 +22,20 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure;
+package io.mosaicnetworks.babble.configure.mdns;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AlertDialog;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,8 +46,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.configure.BaseConfigActivity;
+import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
@@ -54,30 +58,34 @@ import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
-import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedService;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
+import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedService;
+import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
 
 /**
  * This fragment enables the user to configure the {@link BabbleService} to join an existing group.
  * Activities that contain this fragment must implement the {@link OnFragmentInteractionListener}
- * interface to handle interaction events. Use the {@link JoinGroupFragment#newInstance} factory
+ * interface to handle interaction events. Use the {@link MdnsJoinGroupFragment#newInstance} factory
  * method to create an instance of this fragment.
  */
-public class JoinGroupFragment extends Fragment implements ResponseListener {
+public class MdnsJoinGroupFragment extends Fragment implements ResponseListener {
 
+    private static String TAG="MdnsJoinFragment";
     private OnFragmentInteractionListener mListener;
     private ProgressDialog mLoadingDialog;
     private String mMoniker;
     private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
-    private ResolvedGroup mResolvedGroup;
-    private ResolvedService mResolvedService;
+    private MdnsResolvedGroup mResolvedGroup;
+    private MdnsResolvedService mResolvedService;
+    private static Random randomGenerator = new Random();
 
-    public JoinGroupFragment(ResolvedGroup resolvedGroup) {
-        mResolvedGroup = resolvedGroup;
+    public MdnsJoinGroupFragment() {
         // Required empty public constructor
     }
 
@@ -85,10 +93,13 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
      * Use this factory method to create a new instance of
      * this fragment.
      *
-     * @return A new instance of fragment JoinGroupFragment.
+     * @return A new instance of fragment MdnsJoinGroupFragment.
      */
-    public static JoinGroupFragment newInstance(ResolvedGroup resolvedGroup) {
-        return new JoinGroupFragment(resolvedGroup);
+    public static MdnsJoinGroupFragment newInstance(ResolvedGroup resolvedGroup) {
+        Log.i(TAG, "newInstance: "+ resolvedGroup.getGroupName());
+        MdnsJoinGroupFragment mdnsJoinGroupFragment = new MdnsJoinGroupFragment();
+        mdnsJoinGroupFragment.mResolvedGroup = (MdnsResolvedGroup) resolvedGroup;
+        return  mdnsJoinGroupFragment;
     }
 
     @Override
@@ -131,13 +142,24 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         EditText editText = view.findViewById(R.id.edit_moniker);
         mMoniker = editText.getText().toString();
         if (mMoniker.isEmpty()) {
-            displayOkAlertDialog(R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
             return;
         }
 
-        //TODO: the list of resolved services could be empty
-        //TODO: we are choosing to only try the first resolved service - we could try others when there's a failure
-        mResolvedService = mResolvedGroup.getResolvedServices().get(0);
+
+        List<ResolvedService> resolvedServices = mResolvedGroup.getResolvedServices();
+
+        if (resolvedServices.size() < 1) {
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.no_service_alert_title, R.string.no_service_alert_message);
+            return;
+        }
+
+
+        //We are choosing a random resolved service - if we try again we may get a different
+        //service.
+        mResolvedService = (MdnsResolvedService) resolvedServices.get(randomGenerator.nextInt(resolvedServices.size()));
+
+
         final String peerIP = mResolvedService.getInetAddress().getHostAddress();
         final int peerPort = mResolvedService.getPort();
 
@@ -165,18 +187,18 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
                             mHttpCurrentPeerDiscoveryRequest =
                                     HttpPeerDiscoveryRequest.createCurrentPeersRequest(
                                             peerIP, peerPort,
-                                            JoinGroupFragment.this, getContext());
+                                            MdnsJoinGroupFragment.this, getContext());
 
                             mHttpCurrentPeerDiscoveryRequest.send();
                         }
 
                         @Override
                         public void onFailure(Error error) {
-                            JoinGroupFragment.this.onFailure(error);
+                            MdnsJoinGroupFragment.this.onFailure(error);
                         }
                     }, getContext());
         } catch (IllegalArgumentException ex) {
-            displayOkAlertDialog(R.string.invalid_hostname_alert_title, R.string.invalid_hostname_alert_message);
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.invalid_hostname_alert_title, R.string.invalid_hostname_alert_message);
             return;
         }
 
@@ -191,10 +213,9 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         try {
             configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
         } catch (FileNotFoundException ex) {
-            //TODO: We cannot rethrow this exception as the overridden method does not throw it.
             //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
             //This is probably a fatal error.
-            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
+            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
             throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
             // The app will terminate. But babble is unstartable from here.
         }
@@ -212,12 +233,12 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
             // in which case we'll keep getting stuck here until the port is available or WiFi is
             // turned on!
             mLoadingDialog.dismiss();
-            displayOkAlertDialog(R.string.babble_init_fail_title, R.string.babble_init_fail_message);
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             return;
         } catch (Exception ex) {
             //TODO: Review this. The duplicate dialog function feels overkill.
             mLoadingDialog.dismiss();
-            displayOkAlertDialogText(R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
+            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
             throw ex;
         }
 
@@ -242,7 +263,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
             default:
                 messageId = R.string.peers_unknown_error_alert_message;
         }
-        displayOkAlertDialog(R.string.peers_error_alert_title, messageId);
+        DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.peers_error_alert_title, messageId);
     }
 
     private void initLoadingDialog() {
@@ -259,27 +280,6 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
                 cancelRequests();
             }});
     }
-
-    private void displayOkAlertDialog(@StringRes int titleId, @StringRes int messageId) {
-        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
-                .setTitle(titleId)
-                .setMessage(messageId)
-                .setNeutralButton(R.string.ok_button, null)
-                .create();
-        alertDialog.show();
-    }
-
-
-
-    private void displayOkAlertDialogText(@StringRes int titleId, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()))
-                .setTitle(titleId)
-                .setMessage(message)
-                .setNeutralButton(R.string.ok_button, null)
-                .create();
-        alertDialog.show();
-    }
-
 
 
     private void cancelRequests() {

@@ -24,22 +24,6 @@
 
 package io.mosaicnetworks.babble.configure;
 
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
-
-import io.mosaicnetworks.babble.node.BabbleService;
-
-public class ArchivedGroupsViewModelFactory implements ViewModelProvider.Factory {
-
-    private BabbleService mBabbleService;
-
-    public ArchivedGroupsViewModelFactory(BabbleService babbleService) {
-        mBabbleService = babbleService;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")  //unchecked cast warning caused by the use of generics.
-    public <T extends ViewModel> T create(Class<T> modelClass) {
-        return (T) new ArchivedGroupsViewModel(mBabbleService);
-    }
+public interface OnNetworkInitialised {
+    void onNetworkInitialised(String ip);
 }
