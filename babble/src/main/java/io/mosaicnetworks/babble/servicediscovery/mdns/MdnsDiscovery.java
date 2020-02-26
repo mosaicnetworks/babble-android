@@ -27,33 +27,89 @@ package io.mosaicnetworks.babble.servicediscovery.mdns;
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
+import android.util.Log;
 
+import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 
-
+/**
+ * This class encapsulates the MDNS discover process. There is a bug in released versions of
+ * Android prior to 7.0 which means that the TXT records are not returned.
+ *
+ * There is a custom class CustomNsdManager that can be used in place of NsdManager that wraps
+ * NsdManager substituting an alternative resolving mechanism as appropriate.
+ *
+ * To switch between CustomNdsManager and NdsManager change the declaration of mNsdManager and
+ * its assignment in the constructor. The alternative version is commented out. All other calls
+ * can remain the same.
+ */
 public class MdnsDiscovery {
-
     private static final String TAG = "MdnsDiscovery";
+    // private static final int RESOLVE_TIMEOUT = 5000;  //TODO: reset
+    private static final int RESOLVE_TIMEOUT = 0;
+
+
+    private static MdnsDiscovery INSTANCE;
+
     private final Map<String, MdnsResolvedService> mResolvedServices = new HashMap<>();
     private final List<MdnsResolvedGroup> mResolvedGroups;
-    private NsdManager mNsdManager;
+    // if using NsdManager Direct
+//    private NsdManager mNsdManager;
+    // If using CustomNsdManager
+    private CustomNsdManager mNsdManager;
     private NsdManager.DiscoveryListener mDiscoveryListener;
     private boolean mDiscoveryActive = false;
     private ServiceDiscoveryListener mServiceDiscoveryListener;
-    private Context mAppContext;
+
+    private final String mPackageName;
+
+
 
 
     public MdnsDiscovery(Context context, List<MdnsResolvedGroup> resolvedGroups,
                          ServiceDiscoveryListener serviceDiscoveryListener) {
-        mAppContext = context.getApplicationContext();
-        mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
+        Context appContext = context.getApplicationContext();
+
+        // if using NsdManager Direct
+        // mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
+
+        // If using CustomNsdManager
+         mNsdManager = new CustomNsdManager(context);
+
         mResolvedGroups = resolvedGroups;
         mServiceDiscoveryListener = serviceDiscoveryListener;
+        mPackageName =  appContext.getPackageName() ;
+
         initializeDiscoveryListener(serviceDiscoveryListener);
+
+    }
+
+    public static MdnsDiscovery getInstance(Context context, List<MdnsResolvedGroup> resolvedGroups,
+                                            ServiceDiscoveryListener serviceDiscoveryListener) {
+
+        if (INSTANCE == null) {
+            INSTANCE = new MdnsDiscovery(context, resolvedGroups, serviceDiscoveryListener);
+        } else {
+        }
+
+        return INSTANCE;
+    }
+
+
+    public void discoverServices() {
+        mNsdManager.discoverServices(
+                MdnsAdvertiser.SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
+
+    }
+
+    public void stopDiscovery() {
+        if (mDiscoveryActive) {
+            mNsdManager.stopServiceDiscovery(mDiscoveryListener);
+        }
     }
 
     private void initializeDiscoveryListener(final ServiceDiscoveryListener serviceDiscoveryListener) {
@@ -108,12 +164,6 @@ public class MdnsDiscovery {
         };
     }
 
-    public void discoverServices() {
-
-        mNsdManager.discoverServices(
-                MdnsAdvertiser.SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
-
-    }
 
     private void resolveService(final NsdServiceInfo serviceInfo) {
 
@@ -136,11 +186,12 @@ public class MdnsDiscovery {
                 try {
                     resolvedService = new MdnsResolvedService(nsdServiceInfo);
                 } catch (IllegalArgumentException ex) {
-                    //The txt record doesn't even have the attributes we need, so we'll skip
+                    //The txt record doesn't even have the attributes we need, so we'll try the alternate method
+                    onResolveFailed(serviceInfo, 97);
                     return;
                 }
 
-                if (!resolvedService.getAppIdentifier().equals(mAppContext.getPackageName())) {
+                if (!resolvedService.getAppIdentifier().equals(mPackageName)) {
                     //The service is not for this app, we'll skip it
                     return;
                 }
@@ -167,12 +218,4 @@ public class MdnsDiscovery {
         });
     }
 
-
-
-
-    public void stopDiscovery() {
-        if (mDiscoveryActive) {
-            mNsdManager.stopServiceDiscovery(mDiscoveryListener);
-        }
-    }
 }

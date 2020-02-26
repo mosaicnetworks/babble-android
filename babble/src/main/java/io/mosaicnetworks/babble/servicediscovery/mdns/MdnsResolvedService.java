@@ -25,9 +25,12 @@
 package io.mosaicnetworks.babble.servicediscovery.mdns;
 
 import android.net.nsd.NsdServiceInfo;
+import android.util.Log;
 
 import java.net.InetAddress;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
@@ -50,6 +53,7 @@ import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.GROU
  */
 public final class MdnsResolvedService implements ResolvedService {
 
+    private static final String TAG = "MdnsResolvedService";
     private final InetAddress mInetAddress;
     private final int mPort;
     private final String mAppIdentifier;
@@ -71,6 +75,34 @@ public final class MdnsResolvedService implements ResolvedService {
         mGroupName = extractStringAttribute(GROUP_NAME);
         mGroupUid = extractStringAttribute(GROUP_UID);
     }
+
+    public MdnsResolvedService(InetAddress inetAddress, int port, Map<String, String> dict) {
+        mInetAddress = inetAddress;
+        mPort = port;
+        if (mInetAddress == null) {
+            Log.i(TAG, "mInetAddress is null");
+        } else {
+            Log.i(TAG, "getHostAddress: " + mInetAddress.getHostAddress());
+            Log.i(TAG, "getHostName: " + mInetAddress.getHostName());
+        }
+
+
+        // Convert Strings back to bytes
+        mServiceAttributes = new HashMap<>();
+        Iterator<Map.Entry<String, String>> itr = dict.entrySet().iterator();
+        while(itr.hasNext())
+        {
+            Map.Entry<String, String> entry = itr.next();
+            mServiceAttributes.put(entry.getKey(), entry.getValue().getBytes());
+        }
+
+        mAppIdentifier = extractStringAttribute(APP_IDENTIFIER);
+        mGroupName = extractStringAttribute(GROUP_NAME);
+        mGroupUid = extractStringAttribute(GROUP_UID);
+    }
+
+
+
 
     private String extractStringAttribute(String key) {
 

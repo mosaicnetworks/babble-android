@@ -27,4 +27,5 @@
     <color name="colorSelect">#a6d4f3</color>
     <color name="colorGroupBackground">#c0bebc</color>
     <color name="colorArchivedGroup">#c0bebc</color>
+    <color name="colorGray">#888888</color>
 </resources>
