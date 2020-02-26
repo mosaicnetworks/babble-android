@@ -53,7 +53,12 @@ public class MdnsAdvertiser implements ServiceAdvertiser  {
         mServiceInfo.setServiceType(SERVICE_TYPE);
         mServiceName = new RandomString(32).nextString();
         mServiceInfo.setServiceName(mServiceName);
-        mServiceInfo.setAttribute(APP_IDENTIFIER, mAppContext.getPackageName()); //https://developer.android.com/studio/build/application-id note: The application ID used to be directly tied to your code's package name; so some Android APIs use the term "package name" in their method names and parameter names, but this is actually your application ID. For example, the Context.getPackageName() method returns your application ID
+        mServiceInfo.setAttribute(APP_IDENTIFIER, mAppContext.getPackageName());
+        // https://developer.android.com/studio/build/application-id note: The application ID
+        // used to be directly tied to your code's package name; so some Android APIs use the term
+        // "package name" in their method names and parameter names, but this is actually your
+        // application ID. For example, the Context.getPackageName() method
+        // returns your application ID
         mServiceInfo.setAttribute(GROUP_NAME, groupDescriptor.getName());
         mServiceInfo.setAttribute(GROUP_UID, groupDescriptor.getUid());
         mServiceInfo.setPort(port);
