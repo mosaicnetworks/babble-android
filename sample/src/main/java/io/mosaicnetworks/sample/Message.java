@@ -96,7 +96,7 @@ public final class Message implements BabbleTx, IMessage {
 
         @Override
         public String getAvatar() {
-            return null;
+            return "https://i.imgur.com/kZypAmC.png";
         }
     }
 
