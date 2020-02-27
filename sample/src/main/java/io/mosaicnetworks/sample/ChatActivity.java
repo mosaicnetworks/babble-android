@@ -132,7 +132,11 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
             if (m.author.equals(mMoniker)) {
                 newMessagesTemp.add(m);
             } else {
-                newMessagesTemp.add(new Message(m.author+ ":\n" + m.text, m.author, m.date));
+                if (m.author.equals(Message.SYSTEM_MESSAGE_AUTHOR)) {
+                    newMessagesTemp.add(m);
+                } else {
+                    newMessagesTemp.add(new Message(m.author+ ":\n" + m.text, m.author, m.date));
+                }
             }
 
         }
