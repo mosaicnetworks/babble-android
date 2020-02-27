@@ -73,9 +73,9 @@ public class ChatState implements BabbleState {
             Message msg;
 
             if (block.body.internalTransactions[i].body.type == 0 ) {
-                msg = new Message(block.body.internalTransactions[i].body.peer.moniker + " joined the group", "System");
+                msg = new Message(block.body.internalTransactions[i].body.peer.moniker + " joined the group", Message.SYSTEM_MESSAGE_AUTHOR);
             } else {
-                msg = new Message(block.body.internalTransactions[i].body.peer.moniker + " left the group", "System");
+                msg = new Message(block.body.internalTransactions[i].body.peer.moniker + " left the group", Message.SYSTEM_MESSAGE_AUTHOR);
             }
             mState.put(mNextIndex, msg);
             mNextIndex++;

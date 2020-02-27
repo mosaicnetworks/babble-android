@@ -56,6 +56,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.github.stfalcon:chatkit:0.3.3'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation "com.squareup.picasso:picasso:2.5.2"
     implementation project(':babble')
 
 }

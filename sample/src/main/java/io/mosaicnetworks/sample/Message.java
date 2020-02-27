@@ -67,6 +67,7 @@ class UnixEraDateTypeAdapter extends TypeAdapter<Date> {
  */
 public final class Message implements BabbleTx, IMessage {
 
+    public final static String SYSTEM_MESSAGE_AUTHOR = "SYSTEM-MESSAGE";
 
     private final static Gson gson = new GsonBuilder().registerTypeAdapter(Date.class,new UnixEraDateTypeAdapter()).create();
 
@@ -96,7 +97,12 @@ public final class Message implements BabbleTx, IMessage {
 
         @Override
         public String getAvatar() {
-            return null;
+            if (mName.equals(SYSTEM_MESSAGE_AUTHOR)) {
+                return "https://cdn.imgbin.com/15/20/8/imgbin-computer-icons-avatar-user-laptop-avatar-MdJv7zdCkipYM76aJqupXjBbj.jpg";
+            }
+
+
+            return "https://i.imgur.com/kZypAmC.png";
         }
     }
 

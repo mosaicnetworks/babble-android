@@ -24,13 +24,17 @@
 
 package io.mosaicnetworks.sample;
 
+import android.content.Context;
 import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
@@ -86,8 +90,14 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
     private void initialiseAdapter() {
         MessagesList mMessagesList = findViewById(R.id.messagesList);
+        final Context that = this;
 
-        mAdapter = new MessagesListAdapter<>(mMoniker, null);
+        mAdapter = new MessagesListAdapter<>(mMoniker,   new ImageLoader() {
+            @Override
+            public void loadImage(ImageView imageView, String url, Object payload) {
+                Picasso.with(that).load(url).into(imageView);
+            }
+        });
         mMessagesList.setAdapter(mAdapter);
 
         MessageInput input = findViewById(R.id.input);
@@ -122,7 +132,11 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
             if (m.author.equals(mMoniker)) {
                 newMessagesTemp.add(m);
             } else {
-                newMessagesTemp.add(new Message(m.author+ ":\n" + m.text, m.author, m.date));
+                if (m.author.equals(Message.SYSTEM_MESSAGE_AUTHOR)) {
+                    newMessagesTemp.add(m);
+                } else {
+                    newMessagesTemp.add(new Message(m.author+ ":\n" + m.text, m.author, m.date));
+                }
             }
 
         }
