@@ -29,6 +29,7 @@ import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Iterator;
 import java.util.Map;
@@ -112,7 +113,7 @@ public class CustomNsdManager {
 
             Log.i(TAG, "resolveServiceAlternative: Used Alternative Resolution");
             listener.onServiceResolved(nsdServiceInfo);
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             Log.i(TAG, "resolveServiceAlternative Exception: " + ex.getMessage());
             ex.printStackTrace();
             listener.onResolveFailed(serviceInfo, 98);
