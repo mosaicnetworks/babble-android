@@ -49,7 +49,7 @@ import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.GROU
  * {@link #setResolvedGroup(MdnsResolvedGroup)} method.
  */
 public final class MdnsResolvedService implements ResolvedService {
-
+    
     private final InetAddress mInetAddress;
     private final int mPort;
     private final String mAppIdentifier;
@@ -71,6 +71,7 @@ public final class MdnsResolvedService implements ResolvedService {
         mGroupName = extractStringAttribute(GROUP_NAME);
         mGroupUid = extractStringAttribute(GROUP_UID);
     }
+
 
     private String extractStringAttribute(String key) {
 
