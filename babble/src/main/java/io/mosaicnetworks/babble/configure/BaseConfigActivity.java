@@ -71,66 +71,62 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
 
 
     private FragmentManager mFragmentManager;
-    public static final String PREFERENCE_FILE_KEY = "babbleandroid";
     private Boolean mFromGroup = false;
-
-
+    private boolean mShowmDNS = true;
+    private boolean mShowP2P = true;
+    private boolean mShowArchive = true;
+    private boolean mTooLateToChangeShowTabs = false;
+    private boolean mShowAllArchiveVersions = true;
+    public static final String PREFERENCE_FILE_KEY = "babbleandroid";
     private static final String TAG = "BaseConfigActivity";
 
     /**
-     * Controls whether to show the mDNS tab. Much be called in the constructor of the instance that
-     * implements BaseConfigActivity as the parameter are used in BaseConfigActivity.onCreate.
+     * Controls whether to show the mDNS tab. Must be called before
+     * {@link BaseConfigActivity#onCreate(Bundle)} method is called as the parameters are used in
+     * {@link BaseConfigActivity#onCreate(Bundle)}.
      * @param showmDNS true to show the mDNS tab, false to hide
      * @throws IllegalStateException if the OnCreate event handler has already been run
      */
-    protected static void setShowmDNS(boolean showmDNS) throws IllegalStateException {
+    protected void setShowmDNS(boolean showmDNS) throws IllegalStateException {
         if (mTooLateToChangeShowTabs) throw new IllegalStateException();
-        BaseConfigActivity.mShowmDNS = showmDNS;
+        mShowmDNS = showmDNS;
     }
 
     /**
-     * Controls whether to show the P2P tab. Much be called in the constructor of the instance that
-     * implements BaseConfigActivity as the parameter are used in BaseConfigActivity.onCreate.
+     * Controls whether to show the P2P tab. Must be called before
+     * {@link BaseConfigActivity#onCreate(Bundle)} method is called as the parameters are used in
+     * {@link BaseConfigActivity#onCreate(Bundle)}.
      * @param showP2P true to show the mDNS tab, false to hide
      * @throws IllegalStateException if the OnCreate event handler has already been run
      */
-    protected static void setShowP2P(boolean showP2P) throws IllegalStateException {
+    protected void setShowP2P(boolean showP2P) throws IllegalStateException {
         if (mTooLateToChangeShowTabs) throw new IllegalStateException();
-        BaseConfigActivity.mShowP2P = showP2P;
+        mShowP2P = showP2P;
     }
 
     /**
-     * Controls whether to show the Archive tab. Much be called in the constructor of the instance that
-     * implements BaseConfigActivity as the parameter are used in BaseConfigActivity.onCreate.
+     * Controls whether to show the Archive tab. Must be called before
+     * {@link BaseConfigActivity#onCreate(Bundle)} method is called as the parameters are used in
+     * {@link BaseConfigActivity#onCreate(Bundle)}.
      * @param showArchive true to show the mDNS tab, false to hide
      * @throws IllegalStateException if the OnCreate event handler has already been run
      */
-    protected static void setShowArchive(boolean showArchive) throws IllegalStateException {
+    protected void setShowArchive(boolean showArchive) throws IllegalStateException {
         if (mTooLateToChangeShowTabs) throw new IllegalStateException();
-        BaseConfigActivity.mShowArchive = showArchive;
+        mShowArchive = showArchive;
     }
 
     /**
-     * Controls whether to show all archive versions of group. Much be called in the constructor of the instance that
-     * implements BaseConfigActivity as the parameter are used in BaseConfigActivity.onCreate.
+     * Controls whether to show all archive versions of group.  Must be called before
+     * {@link BaseConfigActivity#onCreate(Bundle)} method is called as the parameters are used in
+     * {@link BaseConfigActivity#onCreate(Bundle)}.
      * @param showAllArchiveVersions true to show all archive versions of group, false for just the latest ones
      * @throws IllegalStateException if the OnCreate event handler has already been run
      */
-    public static void setShowAllArchiveVersions(boolean showAllArchiveVersions)  throws IllegalStateException {
+    public void setShowAllArchiveVersions(boolean showAllArchiveVersions)  throws IllegalStateException {
         if (mTooLateToChangeShowTabs) throw new IllegalStateException();
-        BaseConfigActivity.mShowAllArchiveVersions = showAllArchiveVersions;
+        mShowAllArchiveVersions = showAllArchiveVersions;
     }
-
-
-
-
-
-    private static boolean mShowmDNS = true;
-    private static boolean mShowP2P = true;
-    private static boolean mShowArchive = true;
-    private static boolean mTooLateToChangeShowTabs = false;
-    private static boolean mShowAllArchiveVersions = true;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
