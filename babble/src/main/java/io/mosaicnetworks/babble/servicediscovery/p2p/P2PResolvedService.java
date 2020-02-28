@@ -28,7 +28,6 @@ import android.net.nsd.NsdServiceInfo;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,7 +78,7 @@ public final class P2PResolvedService implements ResolvedService {
          */
 
    //     mInetAddress =  InetAddresses.forString((String) map.get(P2PService.HOST_LABEL));
-        mInetAddress =  InetAddresses.forString((String) map.get(P2PService.HOST_LABEL)); //TODO: Revert this debug code
+        mInetAddress =  InetAddresses.forString((String) map.get(P2PService.HOST_LABEL));
         mPort = Integer.parseInt((String) map.get(P2PService.PORT_LABEL));
 
         mServiceAttributes = new HashMap<>(); //nsdServiceInfo.getAttributes();
