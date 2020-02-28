@@ -92,10 +92,25 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         MessagesList mMessagesList = findViewById(R.id.messagesList);
         final Context that = this;
 
+ //       Picasso.get().setIndicatorsEnabled(true);
+ //       Picasso.get().setLoggingEnabled(true);
+
         mAdapter = new MessagesListAdapter<>(mMoniker,   new ImageLoader() {
             @Override
             public void loadImage(ImageView imageView, String url, Object payload) {
-                Picasso.with(that).load(url).into(imageView);
+                // If string URL starts with R. it is a resource.
+                if (url.startsWith("R.")) {
+                    String[] arrUrl = url.split("\\.", 3);
+                    int ResID = getResources().getIdentifier(arrUrl[2] , arrUrl[1], ChatActivity.this.getPackageName());
+                    Log.i("ChatActivity", "loadImage: " +ResID + " "+ arrUrl[2] + " "+ arrUrl[1] + " "+ ChatActivity.this.getPackageName());
+                    if (ResID == 0) {
+                        Picasso.get().load(R.drawable.error).into(imageView);
+                    } else {
+                        Picasso.get().load(ResID).into(imageView);  //TODO restore this line
+                    }
+                } else {
+                    Picasso.get().load(url).into(imageView);
+                }
             }
         });
         mMessagesList.setAdapter(mAdapter);
