@@ -90,10 +90,6 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
 
     private void initialiseAdapter() {
         MessagesList mMessagesList = findViewById(R.id.messagesList);
-        final Context that = this;
-
- //       Picasso.get().setIndicatorsEnabled(true);
- //       Picasso.get().setLoggingEnabled(true);
 
         mAdapter = new MessagesListAdapter<>(mMoniker,   new ImageLoader() {
             @Override
@@ -113,6 +109,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
                 }
             }
         });
+
         mMessagesList.setAdapter(mAdapter);
 
         MessageInput input = findViewById(R.id.input);

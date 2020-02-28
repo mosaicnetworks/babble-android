@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="UnusedResources">
+        <ignore path="src/main/res/drawable/avatar_0.png" />
+        <ignore path="src/main/res/drawable/avatar_a.png" />
+        <ignore path="src/main/res/drawable/avatar_b.png" />
+        <ignore path="src/main/res/drawable/avatar_c.png" />
+        <ignore path="src/main/res/drawable/avatar_d.png" />
+        <ignore path="src/main/res/drawable/avatar_e.png" />
+        <ignore path="src/main/res/drawable/avatar_f.png" />
+        <ignore path="src/main/res/drawable/avatar_g.png" />
+        <ignore path="src/main/res/drawable/avatar_h.png" />
+        <ignore path="src/main/res/drawable/avatar_i.png" />
+        <ignore path="src/main/res/drawable/avatar_j.png" />
+        <ignore path="src/main/res/drawable/avatar_k.png" />
+        <ignore path="src/main/res/drawable/avatar_l.png" />
+        <ignore path="src/main/res/drawable/avatar_m.png" />
+        <ignore path="src/main/res/drawable/avatar_n.png" />
+        <ignore path="src/main/res/drawable/avatar_o.png" />
+        <ignore path="src/main/res/drawable/avatar_p.png" />
+        <ignore path="src/main/res/drawable/avatar_q.png" />
+        <ignore path="src/main/res/drawable/avatar_r.png" />
+        <ignore path="src/main/res/drawable/avatar_s.png" />
+        <ignore path="src/main/res/drawable/avatar_t.png" />
+        <ignore path="src/main/res/drawable/avatar_u.png" />
+        <ignore path="src/main/res/drawable/avatar_v.png" />
+        <ignore path="src/main/res/drawable/avatar_w.png" />
+        <ignore path="src/main/res/drawable/avatar_x.png" />
+        <ignore path="src/main/res/drawable/avatar_y.png" />
+        <ignore path="src/main/res/drawable/avatar_z.png" />
+    </issue>
+</lint>
