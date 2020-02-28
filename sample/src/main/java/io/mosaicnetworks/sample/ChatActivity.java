@@ -109,6 +109,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
                 }
             }
         });
+
         mMessagesList.setAdapter(mAdapter);
 
         MessageInput input = findViewById(R.id.input);
