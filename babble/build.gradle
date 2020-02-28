@@ -159,10 +159,10 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'org.nanohttpd:nanohttpd:2.2.0'
     androidTestImplementation 'androidx.test:rules:1.2.0'
     implementation 'com.android.volley:volley:1.1.1'
@@ -174,7 +174,7 @@ dependencies {
     implementation 'com.moandjiezana.toml:toml4j:0.7.2'
     implementation 'commons-io:commons-io:2.6'
     implementation 'com.google.guava:guava:28.2-android'
-    implementation 'com.google.android.material:material:1.2.0-alpha04'
+    implementation 'com.google.android.material:material:1.2.0-alpha05'
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
