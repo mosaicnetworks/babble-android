@@ -143,7 +143,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
             }
         };
 
-        mViewModel.getState().observe(this, viewModelState);
+        mViewModel.getState().observe(getViewLifecycleOwner(), viewModelState);
 
         return view;
     }
