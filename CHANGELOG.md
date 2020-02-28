@@ -1,5 +1,25 @@
 # CHANGELOG
 
+
+## v0.4.1 (February 28, 2020)
+
+SECURITY:
+
+FEATURES:
+
+- P2P (Wifi Direct) support added
+
+IMPROVEMENTS:
+
+- Added avatars to the sample add
+- Hid system user name in sample chat announcements
+- Updated versions of library dependencies
+
+BUG FIXES:
+
+- mDNS fix for Android versions lower then 7.0 which could not discover due to an Android bug
+- fix bug that could cause a crash on changing orientation in the chat screen of the sample app
+
 ## v0.4.0 (February 21, 2020)
 
 SECURITY:
