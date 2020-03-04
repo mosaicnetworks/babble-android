@@ -36,10 +36,12 @@ import android.view.View;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.mdns.MdnsJoinGroupFragment;
 import io.mosaicnetworks.babble.configure.p2p.P2PJoinGroupFragment;
+import io.mosaicnetworks.babble.configure.webrtc.WebRTCJoinGroupFragment;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCResolvedGroup;
 
 /**
  * This activity complements the {@link BabbleService}. It consists of a set of fragments which
@@ -65,6 +67,11 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     public static final String SHOW_ARCHIVE ="SHOW_ARCHIVE";
 
     /**
+     * Key for the bundle used to pass the visibility flag for the Archive Tab to the fragment
+     */
+    public static final String SHOW_GLOBAL ="SHOW_GLOBAL";
+
+    /**
      * Key for the bundle used to pass the flag for showing all versions in the Archive Tab to the fragment
      */
     public static final String SHOW_ALL_ARCHIVE ="SHOW_ALL_ARCHIVE";
@@ -74,6 +81,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     private Boolean mFromGroup = false;
     private boolean mShowmDNS = true;
     private boolean mShowP2P = true;
+    private boolean mShowGlobal = true;
     private boolean mShowArchive = true;
     private boolean mTooLateToChangeShowTabs = false;
     private boolean mShowAllArchiveVersions = true;
@@ -103,6 +111,19 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         if (mTooLateToChangeShowTabs) throw new IllegalStateException();
         mShowP2P = showP2P;
     }
+
+    /**
+     * Controls whether to show the P2P tab. Must be called before
+     * {@link BaseConfigActivity#onCreate(Bundle)} method is called as the parameters are used in
+     * {@link BaseConfigActivity#onCreate(Bundle)}.
+     * @param showGlobal true to show the mDNS tab, false to hide
+     * @throws IllegalStateException if the OnCreate event handler has already been run
+     */
+    protected void setShowGlobal(boolean showGlobal) throws IllegalStateException {
+        if (mTooLateToChangeShowTabs) throw new IllegalStateException();
+        mShowGlobal = showGlobal;
+    }
+
 
     /**
      * Controls whether to show the Archive tab. Must be called before
@@ -144,6 +165,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
             Bundle bundle = new Bundle();
             bundle.putBoolean(SHOW_MDNS, mShowmDNS);
             bundle.putBoolean(SHOW_P2P, mShowP2P);
+            bundle.putBoolean(SHOW_GLOBAL, mShowGlobal);
             bundle.putBoolean(SHOW_ARCHIVE, mShowArchive);
             bundle.putBoolean(SHOW_ALL_ARCHIVE, mShowAllArchiveVersions);
 
@@ -177,6 +199,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         Bundle bundle = new Bundle();
         bundle.putBoolean(SHOW_MDNS, mShowmDNS);
         bundle.putBoolean(SHOW_P2P, mShowP2P);
+        bundle.putBoolean(SHOW_GLOBAL, mShowGlobal);
         NewGroupFragment mNewGroupFragment = NewGroupFragment.newInstance(bundle);
         replaceFragment(mNewGroupFragment, true);
     }
@@ -205,6 +228,12 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
                 Log.i(TAG, "onServiceSelected: P2P item selected");
                 P2PJoinGroupFragment mJoinGroupP2PFragment = P2PJoinGroupFragment.newInstance(resolvedGroup);
                 replaceFragment(mJoinGroupP2PFragment, true);
+            } else {
+                if (resolvedGroup instanceof WebRTCResolvedGroup) {
+                    Log.i(TAG, "onServiceSelected: WebRTC item selected");
+                    WebRTCJoinGroupFragment mJoinGroupWebRTCFragment = WebRTCJoinGroupFragment.newInstance(resolvedGroup);
+                    replaceFragment(mJoinGroupWebRTCFragment, true);
+                }
             }
         }
     }

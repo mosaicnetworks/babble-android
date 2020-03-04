@@ -41,6 +41,7 @@ public class MainActivity extends BaseConfigActivity {
         setShowArchive(true);
         setShowmDNS(true);
         setShowP2P(true);
+        setShowGlobal(true);
 
         // Show all versions of each group in the archive tab
         setShowAllArchiveVersions(true);

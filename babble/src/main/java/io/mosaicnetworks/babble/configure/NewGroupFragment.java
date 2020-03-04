@@ -68,12 +68,19 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
 
     private static boolean mShowmDNS = true;
     private static boolean mShowP2P = true;
+    private static boolean mShowGlobal = true;
 
+
+
+    //TODO: This is a 3 way switch, is there is a better UX than 2 switches?
 
     //TODO: This variable is not currently exposed. It controls the initial value of the P2P / MDNS switch
     // true for P2P, false for MDNS.
     private static boolean mInitSwitchP2P = false;
 
+    //TODO: This variable is not currently exposed. It controls the initial value of the WebRTC switch
+    // true for WebRTC, false for MDNS/P2P.
+    private static boolean mInitSwitchGlobal = false;
 
 
     GroupDescriptor mGroupDescriptor;
@@ -94,6 +101,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
     public static NewGroupFragment newInstance(Bundle args) {
         mShowmDNS = args.getBoolean(BaseConfigActivity.SHOW_MDNS, true);
         mShowP2P = args.getBoolean(BaseConfigActivity.SHOW_P2P, true);
+        mShowGlobal = args.getBoolean(BaseConfigActivity.SHOW_GLOBAL, true);
 //        setArguments(args);
         return new NewGroupFragment();
     }
@@ -145,6 +153,8 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
             }
         }
 
+        Switch switchGlobal =  view.findViewById(R.id.switch_global);
+        switchGlobal.setChecked(mInitSwitchGlobal);
 
         EditText editGroup = view.findViewById(R.id.edit_group_name);
         editGroup.requestFocus();
