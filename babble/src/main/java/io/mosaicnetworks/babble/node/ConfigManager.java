@@ -123,6 +123,22 @@ public final class ConfigManager {
      * @param context Context. Used to call getFilesDir to find the path to the babble config dirs
      * @return an instance of ConfigManager
      */
+    public static ConfigManager getInstance(Context context, KeyPair keyPair) throws FileNotFoundException {
+        if (INSTANCE==null) {
+            Log.v("ConfigManager", "getInstance");
+            INSTANCE = new ConfigManager(context.getApplicationContext(), keyPair);
+        }
+        return INSTANCE;
+    }
+
+
+
+    /**
+     * Provides an instance of the static ConfigManager class, reusing one if available, calling the
+     * constructor if not.
+     * @param context Context. Used to call getFilesDir to find the path to the babble config dirs
+     * @return an instance of ConfigManager
+     */
     public static ConfigManager getInstance(Context context) throws FileNotFoundException {
         if (INSTANCE==null) {
             Log.v("ConfigManager", "getInstance");
@@ -132,12 +148,22 @@ public final class ConfigManager {
         return INSTANCE;
     }
 
+
     /**
      * Create an object to manage multiple Babble Configs
      * @param appContext the application context
      * @throws FileNotFoundException when the babble root dir cannot be created
      */
-    private ConfigManager(Context appContext) throws FileNotFoundException{
+    private ConfigManager(Context appContext) throws FileNotFoundException {
+        this(appContext, null);
+    }
+
+        /**
+         * Create an object to manage multiple Babble Configs
+         * @param appContext the application context
+         * @throws FileNotFoundException when the babble root dir cannot be created
+         */
+    private ConfigManager(Context appContext, KeyPair keyPair) throws FileNotFoundException{
 
         Log.v("ConfigManager", "constructor");
 
@@ -151,7 +177,11 @@ public final class ConfigManager {
 
         Log.v("ConfigManager", "got Package Name");
 
-        mKeyPair = new KeyPair(); //TODO:  how should the key be handled??
+        if ( keyPair == null) {
+            mKeyPair = new KeyPair(); //TODO:  how should the key be handled??
+        } else {
+            mKeyPair = keyPair;
+        }
 
         Log.v("ConfigManager", "got Key Pair");
 
