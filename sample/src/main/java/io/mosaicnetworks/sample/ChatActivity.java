@@ -134,8 +134,15 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
     @Override
     public void stateUpdated() {
 
-        Log.i("ChatActivity", "stateUpdated");
-
+        if (mMessageIndex==0) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    findViewById(R.id.relativeLayout_messages).setVisibility(View.VISIBLE);
+                    findViewById(R.id.linearLayout_empty_archive).setVisibility(View.GONE);
+                }
+            });
+        }
 
         List<Message> newMessagesTemp = new ArrayList<>();
 

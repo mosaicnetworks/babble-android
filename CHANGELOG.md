@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## UNRELEASED
+
+SECURITY:
+
+FEATURES:
+
+IMPROVEMENTS:
+
+- archive: Maintain group selections through configuration changes
+- archive: Remove contextual action bar when changing to another tab
+
+BUG FIXES:
+
+- archive: Select only one group on long click. Previously when long clicking
+  an archived group, every n'th group would be selected
 
 ## v0.4.1 (February 28, 2020)
 

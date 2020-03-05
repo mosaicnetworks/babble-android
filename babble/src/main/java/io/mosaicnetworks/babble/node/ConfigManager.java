@@ -123,7 +123,7 @@ public final class ConfigManager {
      * @param context Context. Used to call getFilesDir to find the path to the babble config dirs
      * @return an instance of ConfigManager
      */
-    public static ConfigManager getInstance(Context context) throws FileNotFoundException {
+    public static ConfigManager getInstance(Context context) {
         if (INSTANCE==null) {
             Log.v("ConfigManager", "getInstance");
             INSTANCE = new ConfigManager(context.getApplicationContext());
@@ -137,7 +137,7 @@ public final class ConfigManager {
      * @param appContext the application context
      * @throws FileNotFoundException when the babble root dir cannot be created
      */
-    private ConfigManager(Context appContext) throws FileNotFoundException{
+    private ConfigManager(Context appContext) {
 
         Log.v("ConfigManager", "constructor");
 
@@ -161,7 +161,7 @@ public final class ConfigManager {
             populateDirectories(babbleDir);
         } else { // First run, so we create the root dir - clearly no sub dirs yet
             if ( ( ! babbleDir.mkdirs() ) && (! babbleDir.exists())) {
-                throw new FileNotFoundException();
+                throw new RuntimeException("Could not make babble config directory");
             }
         }
     }
@@ -292,9 +292,8 @@ public final class ConfigManager {
      *Configure the service to create an archive group, overriding the default ports
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @param babblingPort the port used for Babble consensus
-     * @throws IllegalStateException if the service is currently running
      */
-    public String setGroupToArchive(ConfigDirectory configDirectory, String inetAddress, int babblingPort) throws  IOException{
+    public String setGroupToArchive(ConfigDirectory configDirectory, String inetAddress, int babblingPort) {
 
         Log.i("setGroupToArchive", configDirectory.directoryName);
 
@@ -557,7 +556,7 @@ public final class ConfigManager {
      * Amends the Babble Config TOML file. This function relies on mTomlDir being set.
      * @param configHashMapChanges A HashMap object containing the changed config data to be written the Toml File.
      */
-    public void amendTomlSettings(Map<String, Object> configHashMapChanges) throws IOException  {
+    public void amendTomlSettings(Map<String, Object> configHashMapChanges) {
         boolean hasChanged = false;
 
         Map<String, Object> configMap = readTomlFile();
@@ -584,7 +583,7 @@ public final class ConfigManager {
              } catch (IOException e)
             {
                 // Rethrow
-                throw e;
+                throw new RuntimeException("Could not ammend TOML file");
             }
         } else {
             Log.i("amendTomlSettings", "No changes, no write");

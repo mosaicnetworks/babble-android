@@ -45,7 +45,6 @@ public abstract class BabbleService<AppState extends BabbleState> {
     public enum State {
         STOPPED,
         RUNNING,
-        ARCHIVE_INIT,
         ARCHIVE,
     }
 
@@ -125,14 +124,14 @@ public abstract class BabbleService<AppState extends BabbleState> {
         }
 
         mBabbleNode = BabbleNode.create(new BlockConsumer() {
-                                            @Override
-                                            public Block onReceiveBlock(Block block) {
-                                                Log.i("ProcessBlock", "Process block");
-                                                Block processedBlock = state.processBlock(block);
-                                                notifyObservers();
-                                                return processedBlock;
-                                            }
-                                        }, configDirectory);
+            @Override
+            public Block onReceiveBlock(Block block) {
+                Log.i("ProcessBlock", "Process block");
+                Block processedBlock = state.processBlock(block);
+                notifyObservers();
+                return processedBlock;
+            }
+        }, configDirectory);
 
         this.mNetworkType = networkType;
         this.mIsArchive = (this.mNetworkType == 0) ;
@@ -153,7 +152,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
     }
 
     /**
-     * This is an asynchrnous call to start the service in archive mode
+     * This is an asynchronous call to start the service in archive mode
      * @param configDirectory
      * @param groupDescriptor
      */
@@ -163,40 +162,35 @@ public abstract class BabbleService<AppState extends BabbleState> {
             throw new IllegalStateException("Cannot start archive service which isn't stopped");
         }
 
-        mState = State.ARCHIVE_INIT;
+        mState = State.ARCHIVE;
         mIsArchive = true;
-            new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        mBabbleNode = BabbleNode.create(new BlockConsumer() {
-                            @Override
-                            public Block onReceiveBlock(Block block) {
-                                Log.i("ProcessBlock", "Process block");
-                                Block processedBlock = state.processBlock(block);
-                                notifyObservers();
-                                return processedBlock;
-                            }
-                        }, configDirectory);
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    mBabbleNode = BabbleNode.create(new BlockConsumer() {
+                        @Override
+                        public Block onReceiveBlock(Block block) {
+                            Log.i("ProcessBlock", "Process block");
+                            Block processedBlock = state.processBlock(block);
+                            notifyObservers();
+                            return processedBlock;
+                        }
+                    }, configDirectory);
 
-                    } catch (IllegalArgumentException ex) {
-                        //TODO: need more refined Babble exceptions
-                        state.reset();
+                } catch (IllegalArgumentException ex) {
+                    //TODO: need more refined Babble exceptions
+                    if (listener!=null) {
                         listener.onFailed();
-                        mState = State.STOPPED;
-                        return;
                     }
-
-                    // If the service has been force stopped then we shouldn't transition into
-                    // ARCHIVE
-                    if (mState==State.ARCHIVE_INIT) {
-                        mState = State.ARCHIVE;
-                        listener.onInitialised();
-                    } else {
-                        //we need to call stop on the now initialised babble node!!
-                        stop();
-                    }
+                    return;
                 }
-            }).start();
+
+                if (listener!=null) {
+                    listener.onInitialised();
+                }
+
+            }
+        }).start();
 
         mGroupDescriptor = groupDescriptor;
     }
@@ -211,9 +205,20 @@ public abstract class BabbleService<AppState extends BabbleState> {
             throw new IllegalStateException("Service is not running");
         }
 
-        if (mState==State.ARCHIVE_INIT) {
-            throw new IllegalStateException("Cannot leave while initialising archive");
-        }
+        //TODO: guard against babble node possibly null when in archive mode
+
+        if (mBabbleNode==null) {
+            //If an archive fails to load then the babble node can be null
+            mState = State.STOPPED;
+            mGroupDescriptor = null;
+            state.reset();
+            onStopped();
+
+            if (listener != null) {
+                listener.onComplete();
+            }
+
+        } else {
 
             mBabbleNode.leave(new LeaveResponseListener() {
                 @Override
@@ -228,22 +233,9 @@ public abstract class BabbleService<AppState extends BabbleState> {
                     }
                 }
             });
-
-        onStopped();
-    }
-
-    /**
-     * Forces the service to immediately stop
-     */
-    public void stop() {
-        if (mBabbleNode!=null) {
-            mBabbleNode.shutdown();
         }
 
-        mBabbleNode = null;
-        mState = State.STOPPED;
-        mGroupDescriptor = null;
-        state.reset();
+        onStopped();
     }
 
     /**

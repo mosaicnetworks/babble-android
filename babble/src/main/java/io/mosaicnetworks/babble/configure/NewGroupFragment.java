@@ -242,19 +242,9 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
 
         String configDirectory;
 
-
-        try {
             configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
 
             Log.v("startGroup", "Got ConfigManager ");
-
-        } catch (FileNotFoundException ex) {
-            //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
-            //This is probably a fatal error.
-            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
-            throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
-            // The app will terminate. But babble is unstartable from here.
-        }
 
 
 
