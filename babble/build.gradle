@@ -1,11 +1,3 @@
-plugins {
-    id "de.undercouch.download" version "4.0.2"
-}
-
-apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
-
 /*
  * MIT License
  *
@@ -30,91 +22,26 @@ apply plugin: 'com.jfrog.bintray'
  * SOFTWARE.
  */
 
+apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: io.mosaicnetworks.getbabblecore.GetBabbleCorePlugin
+
 //##################################################################################################
 // babble core configuration
 
 def babbleCoreVersion = "0.7.0"
 def repository = "https://github.com/mosaicnetworks/babble/releases/download"
-def protocol = "https"
+def method = "https"
 
 // def babbleCoreVersion = "develop_011243e4f3e102b75ae15cb5692314a7cecdbd87"
 // def repository = (System.getenv('GOPATH') == null ? System.properties['user.home'] + "/go" : System.getenv('GOPATH'))  + "/src/github.com/mosaicnetworks/babble/build/distmobile"
-// def protocol = "file"
+// def method = "file"
 
 //##################################################################################################
 
-def babbleDependency = "libs/babble-core/$babbleCoreVersion/classes.jar"
-
-task getBabbleCore {
-
-    def versionDirectory = "$projectDir/libs/babble-core/$babbleCoreVersion"
-    def versionDirectoryFile = new File(versionDirectory)
-    def releaseZipUrl = "$repository/v${babbleCoreVersion}/babble_${babbleCoreVersion}_android_library.zip"
-    def fileZipLoc = "$repository/babble_${babbleCoreVersion}_android_library.zip"
-    def downloadedFileName = "babble_${babbleCoreVersion}_android_library.zip"
-    def downloadFullPath = "$versionDirectory/tmp/$downloadedFileName"
-    def downloadFullPathFile = new File(downloadFullPath)
-    def aarFullPath = "$versionDirectory/tmp/babble_${babbleCoreVersion}_mobile.aar"
-    def aarFullPathFile = new File(aarFullPath)
-
-    if (versionDirectoryFile.exists()) {
-        print("Found babble-core version $babbleCoreVersion\n")
-    } else {
-        print("Could not find babble-core version $babbleCoreVersion in $versionDirectory\n")
-        versionDirectoryFile.mkdirs()
-
-        if (protocol=="file") {
-
-            print("Attempting to copy from $fileZipLoc\n")
-            copy {
-                from fileZipLoc
-                into "$versionDirectory/tmp"
-            }
-
-
-        } else if (protocol=="https") {
-
-            print("Attempting to download from $releaseZipUrl\n")
-
-            download {
-                src releaseZipUrl
-                dest downloadFullPath
-            }
-        }
-
-        copy {
-            from zipTree(downloadFullPathFile)
-            into "$versionDirectory/tmp"
-        }
-
-        copy {
-            from zipTree(aarFullPathFile)
-            into "$versionDirectory/tmp/aar-unzip"
-        }
-
-        copy {
-            from "$versionDirectory/tmp/aar-unzip/classes.jar"
-            into versionDirectory
-        }
-
-        copy {
-            from "$versionDirectory/tmp/aar-unzip/jni"
-            into "$versionDirectory/jni"
-        }
-
-        copy {
-            from "$versionDirectory/tmp/git.version"
-            into "$versionDirectory"
-        }
-
-
-        delete {
-            delete "$versionDirectory/tmp"
-        }
-
-    }
-}
-
+def localRepository = "$projectDir/libs/babble-core"
+def babbleJarDependency = "$localRepository/$babbleCoreVersion/classes.jar"
 
 android {
     compileSdkVersion 29
@@ -138,6 +65,13 @@ android {
         main {
             jniLibs.srcDirs = ["libs/babble-core/$babbleCoreVersion/jni"]
         }
+    }
+
+    getBabbleCore {
+        version = babbleCoreVersion
+        remoteRepo = repository
+        localRepo = "babble/libs/babble-core"
+        protocol = method
     }
 
 }
@@ -166,7 +100,7 @@ dependencies {
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     androidTestImplementation 'androidx.test:rules:1.2.0'
     implementation 'com.android.volley:volley:1.1.1'
-    implementation files(babbleDependency)
+    implementation files(babbleJarDependency)
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'

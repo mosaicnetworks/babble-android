@@ -22,4 +22,4 @@
  * SOFTWARE.
  */
 
-include ':sample', ':babble'
+include ':sample', ':babble', ':buildSrc'

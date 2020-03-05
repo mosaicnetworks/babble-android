@@ -27,50 +27,30 @@ package io.mosaicnetworks.babble.configure;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import io.mosaicnetworks.babble.node.BabbleService;
-import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.node.ConfigDirectory;
+import io.mosaicnetworks.babble.node.ConfigManager;
 
 public class ArchivedGroupsViewModel extends ViewModel {
 
-    //TODO: Review theses states for completeness; possibly extra state for leaving?
-    public enum State {
-        LIST,
-        LOADING,
-        LOADED,
-        FAILED,
-    }
+    private MutableLiveData<SelectableData<ConfigDirectory>> mArchivedList;
+    private ConfigManager mConfigManager;
 
-    private MutableLiveData<State> mState;
-    private BabbleService mBabbleService;
-    private String mConfigDirectory;
-    private GroupDescriptor mGroupDescriptor;
-
-    public ArchivedGroupsViewModel(BabbleService babbleService) {
+    public ArchivedGroupsViewModel(ConfigManager configManager) {
         super();
-        mBabbleService = babbleService;
+        mConfigManager = configManager;
 
-        mState = new MutableLiveData<>();
-        mState.setValue(State.LIST);
+        mArchivedList = new MutableLiveData<>();
+        loadArchiveList();
     }
 
-    public void loadArchive(String configDirectory, GroupDescriptor groupDescriptor) {
-        mState.setValue(State.LOADING);
-
-        mBabbleService.startArchive(configDirectory, groupDescriptor, new BabbleService.StartArchiveListener() {
-            @Override
-            public void onInitialised() {
-                mState.postValue(State.LOADED);
-            }
-
-            @Override
-            public void onFailed() {
-                mState.postValue(State.FAILED);
-            }
-        });
+    public void loadArchiveList() {
+        SelectableData<ConfigDirectory> data = new SelectableData<>();
+        data.addAll(mConfigManager.getDirectories());
+        mArchivedList.setValue(data);
     }
 
-    public MutableLiveData<State> getState() {
-        return mState;
+    public MutableLiveData<SelectableData<ConfigDirectory>> getArchivedList() {
+        return mArchivedList;
     }
 
 }
