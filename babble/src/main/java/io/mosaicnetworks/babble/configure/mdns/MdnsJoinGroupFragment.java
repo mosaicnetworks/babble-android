@@ -210,15 +210,8 @@ public class MdnsJoinGroupFragment extends Fragment implements ResponseListener 
     public void onReceivePeers(List<Peer> currentPeers) {
 
         ConfigManager configManager;
-        try {
             configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
-        } catch (FileNotFoundException ex) {
-            //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
-            //This is probably a fatal error.
-            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
-            throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
-            // The app will terminate. But babble is unstartable from here.
-        }
+
 
         BabbleService<?> babbleService = mListener.getBabbleService();
         GroupDescriptor groupDescriptor = new GroupDescriptor(mResolvedService.getGroupName(), mResolvedService.getGroupUid());

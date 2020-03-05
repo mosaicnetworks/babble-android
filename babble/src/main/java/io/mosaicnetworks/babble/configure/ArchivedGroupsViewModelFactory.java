@@ -27,19 +27,18 @@ package io.mosaicnetworks.babble.configure;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.node.ConfigManager;
 
 public class ArchivedGroupsViewModelFactory implements ViewModelProvider.Factory {
+    private ConfigManager mConfigManager;
 
-    private BabbleService mBabbleService;
-
-    public ArchivedGroupsViewModelFactory(BabbleService babbleService) {
-        mBabbleService = babbleService;
+    public ArchivedGroupsViewModelFactory(ConfigManager configManager) {
+        mConfigManager = configManager;
     }
 
     @Override
     @SuppressWarnings("unchecked")  //unchecked cast warning caused by the use of generics.
     public <T extends ViewModel> T create(Class<T> modelClass) {
-        return (T) new ArchivedGroupsViewModel(mBabbleService);
+        return (T) new ArchivedGroupsViewModel(mConfigManager);
     }
 }

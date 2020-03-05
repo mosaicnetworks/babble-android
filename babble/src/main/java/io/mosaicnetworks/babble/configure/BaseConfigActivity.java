@@ -182,17 +182,6 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-        // If an archive is loading and the user presses the back button. This activity will be
-        // destroyed, if in the meantime the service transitions into the "ARCHIVE" state, when the
-        // app is restarted the service won't be in the "STOPPED" or "ARCHIVE-INIT" state which this
-        // activity expects
-        getBabbleService().stop();
-    }
-
-    @Override
     public void onServiceSelected(ResolvedGroup resolvedGroup) {
 
         if (resolvedGroup instanceof MdnsResolvedGroup) {
@@ -226,6 +215,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         super.onStart();
         if (mFromGroup) {
             mFragmentManager.popBackStack();
+            ArchivedGroupsFragment.reloadArchive = true;
             mFromGroup = false;
         }
     }

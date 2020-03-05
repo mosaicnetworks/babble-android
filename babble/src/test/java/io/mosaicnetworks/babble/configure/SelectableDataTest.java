@@ -24,34 +24,30 @@
 
 package io.mosaicnetworks.babble.configure;
 
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import org.junit.Test;
 
-import io.mosaicnetworks.babble.node.ConfigDirectory;
-import io.mosaicnetworks.babble.node.ConfigManager;
+import java.util.Arrays;
+import java.util.List;
 
-public class ArchivedGroupsViewModel extends ViewModel {
+import static org.junit.Assert.assertEquals;
 
-    private MutableLiveData<SelectableData<ConfigDirectory>> mArchivedList;
-    private ConfigManager mConfigManager;
+public class SelectableDataTest {
 
-    public ArchivedGroupsViewModel(ConfigManager configManager) {
-        super();
-        mConfigManager = configManager;
-
-        mArchivedList = new MutableLiveData<>();
-        loadArchiveList();
+    @Test
+    public void createTest() {
+        SelectableData<Boolean> selectableData = new SelectableData<>();
+        selectableData.addAll(Arrays.asList(new Boolean[]{true, true, false}));
     }
 
-    public void loadArchiveList() {
-        SelectableData<ConfigDirectory> data = new SelectableData<>();
-        data.addAll(mConfigManager.getDirectories());
-        mArchivedList.setValue(data);
-    }
+    @Test
+    public void selectTest() {
+        SelectableData<Boolean> selectableData = new SelectableData<>();
+        selectableData.addAll(Arrays.asList(new Boolean[]{true, true, false}));
+        selectableData.select(1);
 
-    public MutableLiveData<SelectableData<ConfigDirectory>> getArchivedList() {
-        return mArchivedList;
-    }
+        List<Integer> selected = selectableData.getAllSelected();
 
+        assertEquals(1, selected.size());
+        assertEquals(Integer.valueOf(1), selected.get(0));
+    }
 }
-
