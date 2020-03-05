@@ -157,8 +157,8 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
         mResolvedService = (WebRTCResolvedService) resolvedServices.get(randomGenerator.nextInt(resolvedServices.size()));
 
 
-        final String peerIP = mResolvedService.getInetAddress().getHostAddress();
-        final int peerPort = mResolvedService.getPort();
+        //     final String peerIP = mResolvedService.getInetAddress().getHostAddress();
+        //     final int peerPort = mResolvedService.getPort();
 
         // Store moniker and host entered
         SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
@@ -166,41 +166,11 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
 
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("moniker", mMoniker);
-        editor.putString("host", peerIP);
+  //      editor.putString("host", peerIP);
         editor.apply();
 
-
-        getPeers(peerIP, peerPort);
-    }
-
-    private void getPeers(final String peerIP, final int peerPort) {
-        try {
-            mHttpGenesisPeerDiscoveryRequest = HttpPeerDiscoveryRequest.createGenesisPeersRequest(peerIP,
-                    peerPort, new ResponseListener() {
-                        @Override
-                        public void onReceivePeers(List<Peer> genesisPeers) {
-                            mGenesisPeers = genesisPeers;
-
-                            mHttpCurrentPeerDiscoveryRequest =
-                                    HttpPeerDiscoveryRequest.createCurrentPeersRequest(
-                                            peerIP, peerPort,
-                                            WebRTCJoinGroupFragment.this, getContext());
-
-                            mHttpCurrentPeerDiscoveryRequest.send();
-                        }
-
-                        @Override
-                        public void onFailure(Error error) {
-                            WebRTCJoinGroupFragment.this.onFailure(error);
-                        }
-                    }, getContext());
-        } catch (IllegalArgumentException ex) {
-            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.invalid_hostname_alert_title, R.string.invalid_hostname_alert_message);
-            return;
-        }
-
-        mLoadingDialog.show();
-        mHttpGenesisPeerDiscoveryRequest.send();
+        mGenesisPeers = mResolvedService.getInitialPeers();
+        onReceivePeers(mResolvedService.getCurrentPeers());
     }
 
     @Override
@@ -221,7 +191,9 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
         GroupDescriptor groupDescriptor = new GroupDescriptor(mResolvedService.getGroupName(), mResolvedService.getGroupUid());
 
         try {
-            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService.NETWORK_GLOBAL);
+            String ip = Utils.getIPAddr(getContext());
+            Log.i(TAG, "onReceivePeers: "+ip);
+            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, mMoniker, ip, BabbleService.NETWORK_GLOBAL);
             babbleService.start(configDir, groupDescriptor);
         } catch (IllegalStateException | CannotStartBabbleNodeException| IOException ex ) {
             //TODO: just catch IOException - this will mean the port is in use
