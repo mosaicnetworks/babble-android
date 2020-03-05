@@ -22,4 +22,25 @@
  * SOFTWARE.
  */
 
-include ':sample', ':babble', ':buildSrc'
+package io.mosaicnetworks.getbabblecore;
+
+import org.gradle.api.Project;
+import org.gradle.util.Configurable;
+import org.gradle.util.ConfigureUtil;
+
+
+import groovy.lang.Closure;
+
+public class GetBabbleCoreExtension implements Configurable<GetBabbleCoreExtension> {
+
+    public GetBabbleCoreExtension(Project project) {
+        //this.project = project;
+    }
+
+    @Override
+    public GetBabbleCoreExtension configure(Closure closure) {
+        GetBabbleCoreAction getBabbleCoreAction = ConfigureUtil.configure(closure, new GetBabbleCoreAction());
+        getBabbleCoreAction.execute();
+        return this;
+    }
+}

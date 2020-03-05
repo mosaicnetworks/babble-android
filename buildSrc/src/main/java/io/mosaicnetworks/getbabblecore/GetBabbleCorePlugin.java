@@ -22,4 +22,15 @@
  * SOFTWARE.
  */
 
-include ':sample', ':babble', ':buildSrc'
+package io.mosaicnetworks.getbabblecore;
+
+import org.gradle.api.Plugin;
+import org.gradle.api.Project;
+
+public class GetBabbleCorePlugin implements Plugin<Project> {
+
+    public void apply(Project project) {
+        project.getExtensions().create("getBabbleCore", GetBabbleCoreExtension.class, project);
+    }
+}
+
