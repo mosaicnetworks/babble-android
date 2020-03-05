@@ -50,7 +50,9 @@ import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.node.KeyPair;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
@@ -68,12 +70,19 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
 
     private static boolean mShowmDNS = true;
     private static boolean mShowP2P = true;
+    private static boolean mShowGlobal = true;
 
+
+
+    //TODO: This is a 3 way switch, is there is a better UX than 2 switches?
 
     //TODO: This variable is not currently exposed. It controls the initial value of the P2P / MDNS switch
     // true for P2P, false for MDNS.
     private static boolean mInitSwitchP2P = false;
 
+    //TODO: This variable is not currently exposed. It controls the initial value of the WebRTC switch
+    // true for WebRTC, false for MDNS/P2P.
+    private static boolean mInitSwitchGlobal = false;
 
 
     GroupDescriptor mGroupDescriptor;
@@ -94,6 +103,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
     public static NewGroupFragment newInstance(Bundle args) {
         mShowmDNS = args.getBoolean(BaseConfigActivity.SHOW_MDNS, true);
         mShowP2P = args.getBoolean(BaseConfigActivity.SHOW_P2P, true);
+        mShowGlobal = args.getBoolean(BaseConfigActivity.SHOW_GLOBAL, true);
 //        setArguments(args);
         return new NewGroupFragment();
     }
@@ -113,7 +123,11 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startGroup(view);
+                        try {
+                            startGroup(view);
+                        } catch (IllegalAccessError|FileNotFoundException ex) {
+                            //TODO: Add error handling here
+                        }
                     }
                 }
         );
@@ -145,6 +159,8 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
             }
         }
 
+        Switch switchGlobal =  view.findViewById(R.id.switch_global);
+        switchGlobal.setChecked(mInitSwitchGlobal);
 
         EditText editGroup = view.findViewById(R.id.edit_group_name);
         editGroup.requestFocus();
@@ -156,7 +172,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
     }
 
     // called when the user presses the start button
-    public void startGroup(View view) {
+    public void startGroup(View view) throws FileNotFoundException {
         Log.i("startGroup", "Starting Group ");
 
         //get moniker
@@ -178,14 +194,22 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
         // Get network type
         Switch switchP2P =  view.findViewById(R.id.switch_p2p);
         boolean isP2P = switchP2P.isChecked();
+
+        Switch switchWebRTC =  view.findViewById(R.id.switch_global);
+        boolean isWebRTC = switchWebRTC.isChecked();
+
         int networkType;
 
-        if (isP2P) {
-            mNetworkType = BabbleService.NETWORK_P2P;
-        } else {
-            mNetworkType = BabbleService.NETWORK_WIFI;
-        }
 
+        if (isWebRTC) {
+            mNetworkType = BabbleService.NETWORK_GLOBAL;
+        } else {
+            if (isP2P) {
+                mNetworkType = BabbleService.NETWORK_P2P;
+            } else {
+                mNetworkType = BabbleService.NETWORK_WIFI;
+            }
+        }
         mGroupDescriptor = new GroupDescriptor(groupName);
 
         //TODO: P2P - Need change the workflow here. We are launching a new instance, but we rely
@@ -203,8 +227,28 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
                 Log.i("startGroup", "Start Broadcasting P2P");
                 p2PService.startRegistration(mMoniker, groupName, BabbleService.BABBLE_VERSION, false);
                 //TODO: Turned off discovery for the lead peer, but may need to re-enable to trigger discovery.
+                break;
+            case BabbleService.NETWORK_GLOBAL:
+
+                WebRTCService webRTCService = WebRTCService.getInstance(getContext());
+                webRTCService.startRegistration(mMoniker, groupName, BabbleService.BABBLE_VERSION, false);
 
 
+                ip = Utils.getIPAddr(getContext());
+                String peersAddr = ip;
+
+                try {
+                    ConfigManager configManager = ConfigManager.getInstance(getContext());
+                    peersAddr = configManager.getPublicKey() + "@" + WebRTCService.mRelayServerAddress;
+                } catch (FileNotFoundException|IllegalAccessError ex) {
+                    Log.e("NewGroupFragment", "startGroup: "+ex.getMessage() );
+                    throw ex;
+                }
+
+
+                Log.i("startGroup", "WebRTC");
+                // N.B. WebRTC does not require a callback, so we call configAndStartBabble directly.
+                onNetworkInitialised(peersAddr, ip);
                 break;
             default:
                 ip = Utils.getIPAddr(getContext());
@@ -213,7 +257,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
 
                 // N.B. mDNS does not require a callback, so we call configAndStartBabble directly.
 
-                onNetworkInitialised(ip);
+                onNetworkInitialised(ip, ip);
         }
 
 
@@ -231,12 +275,12 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
 
 
 
-    public void onNetworkInitialised(String ip){
-        Log.i("startGroup", "onNetworkInitialised: "+ ip);
-        configAndStartBabble(ip);
+    public void onNetworkInitialised(String peersAddr, String babbleAddr){
+        Log.i("startGroup", "onNetworkInitialised: "+ peersAddr + " " + babbleAddr);
+        configAndStartBabble(peersAddr, babbleAddr);
     }
 
-    private void configAndStartBabble(String ip) {
+    private void configAndStartBabble(String peersAddr, String babbleAddr) {
         BabbleService<?> babbleService = mListener.getBabbleService();
         ConfigManager configManager;
 
@@ -250,7 +294,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
 
 
         try {
-            configDirectory = configManager.createConfigNewGroup(mGroupDescriptor, mMoniker, ip);
+            configDirectory = configManager.createConfigNewGroup(mGroupDescriptor, mMoniker, peersAddr, babbleAddr, mNetworkType);
             Log.i("startGroup", "configDirectory: " + configDirectory);
             //babbleService.createConfigNewGroup(moniker, Utils.getIPAddr(getContext()));
         } catch (IllegalArgumentException | CannotStartBabbleNodeException| IOException ex) {
@@ -279,7 +323,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
             throw ex;
         }
 
-        mListener.baseOnStartedNew(mMoniker);
+        mListener.baseOnStartedNew(mMoniker, mGroupDescriptor.getName());
 
     }
 

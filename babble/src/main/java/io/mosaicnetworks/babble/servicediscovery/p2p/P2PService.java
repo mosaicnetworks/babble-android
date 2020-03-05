@@ -284,7 +284,7 @@ public class P2PService implements ServiceAdvertiser{
                 return;
             }
 
-            mNetworkInitListener.onNetworkInitialised(ip);
+            mNetworkInitListener.onNetworkInitialised(ip, ip);
         }
 
     }

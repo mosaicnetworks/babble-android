@@ -35,6 +35,7 @@ import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
 
 /**
  * This is a singleton which provides a Messaging service. It extends the {@link BabbleService}
@@ -84,6 +85,10 @@ public final class MessagingService extends BabbleService<ChatState> {
             case BabbleService.NETWORK_NONE:
                 Log.i(TAG, "NONE / Archive");
                 return;
+            case BabbleService.NETWORK_GLOBAL:
+                Log.i(TAG, "Global / WebRTC");
+                mAdvertiser = WebRTCService.getInstance(mAppContext);
+                break;
             case BabbleService.NETWORK_WIFI:
                 Log.i(TAG, "WIFI / MDNS");
                 mAdvertiser = new MdnsAdvertiser(mGroupDescriptor, sDiscoveryPort, mAppContext);
