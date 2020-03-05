@@ -67,12 +67,12 @@ import io.mosaicnetworks.babble.utils.RandomString;
  */
 public class WebRTCService implements ServiceAdvertiser{
 
-    public static String mDiscoverServerIP = "192.168.0.2";
-    public static String mRelayServerAddress = "192.168.0.2";
-
+    public static String mDiscoverServerIP = "192.168.0.2";          //TODO: This is a local dev IP - needs a better default
+    public static String mRelayServerAddress = "192.168.0.2:8000";   //TODO: This is a local dev IP - needs a better default
     public static int mDiscoverServerPort = 8080;
-    public static String mDiscoverEndPoint = "groups";
-    public static String mRegisterEndPoint = "group";
+
+    private final static String mDiscoverEndPoint = "groups";
+    private final static String mRegisterEndPoint = "group";
 
     private PeersProvider peersProvider;
     private static RequestQueue mQueue;

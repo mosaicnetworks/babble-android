@@ -221,7 +221,7 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
         GroupDescriptor groupDescriptor = new GroupDescriptor(mResolvedService.getGroupName(), mResolvedService.getGroupUid());
 
         try {
-            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, mMoniker, Utils.getIPAddr(getContext()));
+            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService.NETWORK_GLOBAL);
             babbleService.start(configDir, groupDescriptor);
         } catch (IllegalStateException | CannotStartBabbleNodeException| IOException ex ) {
             //TODO: just catch IOException - this will mean the port is in use

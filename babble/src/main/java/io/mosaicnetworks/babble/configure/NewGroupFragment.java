@@ -304,7 +304,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
 
 
         try {
-            configDirectory = configManager.createConfigNewGroup(mGroupDescriptor, mMoniker, peersAddr, babbleAddr);
+            configDirectory = configManager.createConfigNewGroup(mGroupDescriptor, mMoniker, peersAddr, babbleAddr, mNetworkType);
             Log.i("startGroup", "configDirectory: " + configDirectory);
             //babbleService.createConfigNewGroup(moniker, Utils.getIPAddr(getContext()));
         } catch (IllegalArgumentException | CannotStartBabbleNodeException| IOException ex) {
