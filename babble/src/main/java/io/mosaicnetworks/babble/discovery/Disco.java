@@ -27,6 +27,7 @@ package io.mosaicnetworks.babble.discovery;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The Disco class maps the group class in the Disco go repo.
@@ -81,16 +82,16 @@ public final class Disco {
          * The peers
          */
         @SerializedName("Peers")
-        public final ArrayList<Peer> Peers;
+        public final List<Peer> Peers;
 
 
         @SerializedName("InitialPeers")
-         public final ArrayList<Peer> InitialPeers;
+         public final List<Peer> InitialPeers;
 
         /**
          * Constructor
          */
-        public Disco(String groupUID, String groupName, String appId, String pubKey, int lastUpdated,  ArrayList<Peer> peers,  ArrayList<Peer> initialPeers) {
+        public Disco(String groupUID, String groupName, String appId, String pubKey, int lastUpdated, List<Peer> peers, List<Peer> initialPeers) {
 
             if (groupUID==null || groupName==null || appId==null || pubKey==null ) {
                 throw new NullPointerException("Null arguments are not accepted");

@@ -391,7 +391,7 @@ public final class ConfigManager {
     private String createConfig(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor,
                                 String moniker, String inetAddress, int babblingPort, int networkType) throws CannotStartBabbleNodeException, IOException {
 
-        networkType = mNetworkType;
+        mNetworkType = networkType;
 
         String compositeGroupName = getCompositeConfigDir(groupDescriptor);
 
@@ -416,9 +416,12 @@ public final class ConfigManager {
 //               public Disco(String iD, String title,  ArrayList<Peer> peers,  ArrayList<Peer> initialPeers) {
 
             if (networkType == BabbleService.NETWORK_GLOBAL) {
-      //      mDisco = new Disco();   //TODO: JK NOW!!!!
+                Log.i("ConfigManager", "createConfig: Network type global" );
+                 mDisco = new Disco( groupDescriptor.getUid(), groupDescriptor.getName(), mAppId, mKeyPair.publicKey, 0, currentPeers, genesisPeers  );
+//      public Disco(String groupUID, String groupName, String appId, String pubKey, int lastUpdated,  ArrayList<Peer> peers,  ArrayList<Peer> initialPeers) {
 
         } else {
+                Log.i("ConfigManager", "createConfig: Network type not global" );
             mDisco = null;
         }
 
