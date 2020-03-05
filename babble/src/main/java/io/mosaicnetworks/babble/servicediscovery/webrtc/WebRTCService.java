@@ -67,7 +67,9 @@ import io.mosaicnetworks.babble.utils.RandomString;
  */
 public class WebRTCService implements ServiceAdvertiser{
 
-    public static String mDiscoverServerIP = "192.168.1.19";
+    public static String mDiscoverServerIP = "192.168.0.2";
+    public static String mRelayServerAddress = "192.168.0.2";
+
     public static int mDiscoverServerPort = 8080;
     public static String mDiscoverEndPoint = "groups";
     public static String mRegisterEndPoint = "group";

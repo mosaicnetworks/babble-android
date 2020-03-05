@@ -25,5 +25,5 @@
 package io.mosaicnetworks.babble.configure;
 
 public interface OnNetworkInitialised {
-    void onNetworkInitialised(String ip);
+    void onNetworkInitialised(String peersAddr, String babbleAddr);
 }

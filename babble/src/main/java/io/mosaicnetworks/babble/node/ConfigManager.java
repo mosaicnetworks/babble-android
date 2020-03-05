@@ -288,8 +288,8 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String inetAddress)  throws CannotStartBabbleNodeException, IOException {
-        return createConfigNewGroup(groupDescriptor, moniker, inetAddress, DEFAULT_BABBLING_PORT);
+    public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String peersInetAddress, String babbleInetAddress)  throws CannotStartBabbleNodeException, IOException {
+        return createConfigNewGroup(groupDescriptor, moniker, peersInetAddress, babbleInetAddress, DEFAULT_BABBLING_PORT);
     }
 
     /**
@@ -300,13 +300,13 @@ public final class ConfigManager {
      * //@param discoveryPort the port used by the HttpPeerDiscoveryServer //TODO: how to deal with this
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
+    public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String peersInetAddress, String babbleInetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
         List<Peer> genesisPeers = new ArrayList<>();
-        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
+        genesisPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress + ":" + babblingPort, moniker));
         List<Peer> currentPeers = new ArrayList<>();
-        currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
+        currentPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress + ":" + babblingPort, moniker));
 
-        return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, inetAddress, babblingPort);
+        return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, babbleInetAddress, babblingPort);
     }
 
     /**
@@ -796,7 +796,13 @@ public final class ConfigManager {
     }
 
 
-
+    public String getPublicKey() throws IllegalAccessError {
+        if (mKeyPair != null) {
+            return mKeyPair.publicKey;
+        } else {
+            throw  new IllegalAccessError();
+        }
+    }
 
     private void populateDirectories(File babbleDir) {
         ArrayList<String> directories = new ArrayList<>();
