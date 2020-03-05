@@ -326,18 +326,22 @@ public class WebRTCService implements ServiceAdvertiser{
 //        Disco groupObject = new Disco();
 
         final String PostBody;
+  /*
         try {
+  */
             ConfigManager configManager = ConfigManager.getInstance(null);
             Disco disco = configManager.getDisco();
             Gson gson = new Gson();
             PostBody = gson.toJson(disco);
 
             Log.i(TAG, "advertise: " + PostBody);
+
+/*
         } catch (FileNotFoundException ex) {
             Log.e(TAG, "advertise: " + ex.getMessage() );
             throw new IllegalArgumentException("Config Manager not initialised");
         }
-
+*/
 
         Log.i(TAG, "getDiscovery: "+ url.toString());
         StringRequest request = new StringRequest(Request.Method.POST, url.toString(),

@@ -237,14 +237,15 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
                 ip = Utils.getIPAddr(getContext());
                 String peersAddr = ip;
 
-                try {
+     //           try {
                     ConfigManager configManager = ConfigManager.getInstance(getContext());
                     peersAddr = configManager.getPublicKey() + "@" + WebRTCService.mRelayServerAddress;
+       /*
                 } catch (FileNotFoundException|IllegalAccessError ex) {
                     Log.e("NewGroupFragment", "startGroup: "+ex.getMessage() );
                     throw ex;
                 }
-
+*/
 
                 Log.i("startGroup", "WebRTC");
                 // N.B. WebRTC does not require a callback, so we call configAndStartBabble directly.

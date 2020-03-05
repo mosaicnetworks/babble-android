@@ -177,8 +177,12 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
     public void onReceivePeers(List<Peer> currentPeers) {
 
         ConfigManager configManager;
-        try {
+  //      try {
+
             configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
+
+
+ /*
         } catch (FileNotFoundException ex) {
             //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
             //This is probably a fatal error.
@@ -186,7 +190,7 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
             throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
             // The app will terminate. But babble is unstartable from here.
         }
-
+*/
         BabbleService<?> babbleService = mListener.getBabbleService();
         GroupDescriptor groupDescriptor = new GroupDescriptor(mResolvedService.getGroupName(), mResolvedService.getGroupUid());
 
