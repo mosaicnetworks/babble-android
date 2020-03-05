@@ -48,6 +48,8 @@ public class MainActivity extends BaseConfigActivity {
 
         super.onCreate(savedInstanceState);
 
+        setTitle("Babble Sample App");
+
 // If you wish to change the Babble Configuration Backup Policy uncomment the code below:
 
 //        ConfigManager.setConfigDirectoryBackupPolicy(
