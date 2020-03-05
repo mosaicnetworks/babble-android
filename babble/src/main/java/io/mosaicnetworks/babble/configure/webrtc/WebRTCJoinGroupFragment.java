@@ -57,8 +57,8 @@ import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedService;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCResolvedService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
@@ -78,8 +78,8 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
     private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
-    private MdnsResolvedGroup mResolvedGroup;
-    private MdnsResolvedService mResolvedService;
+    private WebRTCResolvedGroup mResolvedGroup;
+    private WebRTCResolvedService mResolvedService;
     private static Random randomGenerator = new Random();
 
     public WebRTCJoinGroupFragment() {
@@ -95,7 +95,7 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
     public static WebRTCJoinGroupFragment newInstance(ResolvedGroup resolvedGroup) {
         Log.i(TAG, "newInstance: "+ resolvedGroup.getGroupName());
         WebRTCJoinGroupFragment webRTCJoinGroupFragment = new WebRTCJoinGroupFragment();
-        webRTCJoinGroupFragment.mResolvedGroup = (MdnsResolvedGroup) resolvedGroup;
+        webRTCJoinGroupFragment.mResolvedGroup = (WebRTCResolvedGroup) resolvedGroup;
         return webRTCJoinGroupFragment;
     }
 
@@ -154,7 +154,7 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
 
         //We are choosing a random resolved service - if we try again we may get a different
         //service.
-        mResolvedService = (MdnsResolvedService) resolvedServices.get(randomGenerator.nextInt(resolvedServices.size()));
+        mResolvedService = (WebRTCResolvedService) resolvedServices.get(randomGenerator.nextInt(resolvedServices.size()));
 
 
         final String peerIP = mResolvedService.getInetAddress().getHostAddress();

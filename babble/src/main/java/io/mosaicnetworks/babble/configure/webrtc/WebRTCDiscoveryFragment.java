@@ -40,13 +40,13 @@ import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsServicesListView;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCServicesListView;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 
 public class WebRTCDiscoveryFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private MdnsServicesListView mServiceListView;
+    private WebRTCServicesListView mServiceListView;
     public SwipeRefreshLayout mSwipeRefreshServiceSearch;
     private SwipeRefreshLayout mSwipeRefreshDiscoveryFailed;
     private SwipeRefreshLayout mSwipeRefreshServicesDisplaying;
@@ -73,7 +73,7 @@ public class WebRTCDiscoveryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_mdns_discovery, container, false);
+        final View view = inflater.inflate(R.layout.fragment_webrtc_discovery, container, false);
 
         mServiceListView = view.findViewById(R.id.servicesListView);
         mSwipeRefreshServiceSearch = view.findViewById(R.id.swipeRefresh_service_search);

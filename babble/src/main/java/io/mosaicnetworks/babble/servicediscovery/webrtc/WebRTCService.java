@@ -24,34 +24,40 @@
 
 package io.mosaicnetworks.babble.servicediscovery.webrtc;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.IntentFilter;
-import android.content.res.Resources;
-import android.net.wifi.WpsInfo;                                     //TODO: Remove
-import android.net.wifi.p2p.WifiP2pConfig;                           //TODO: Remove
-import android.net.wifi.p2p.WifiP2pDevice;                           //TODO: Remove
-import android.net.wifi.p2p.WifiP2pManager;                          //TODO: Remove
-import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;             //TODO: Remove
-import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;          //TODO: Remove
 import android.util.Log;
 
-import androidx.core.util.Consumer;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 
+import java.io.OutputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import io.mosaicnetworks.babble.configure.OnNetworkInitialised;
+import io.mosaicnetworks.babble.discovery.Disco;
+import io.mosaicnetworks.babble.discovery.Peer;
+import io.mosaicnetworks.babble.discovery.PeersProvider;
+import io.mosaicnetworks.babble.discovery.ResponseListener;
 import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
-import io.mosaicnetworks.babble.servicediscovery.p2p.WifiDirectBroadcastReceiver;  //TODO: Remove
 import io.mosaicnetworks.babble.utils.RandomString;
 
 // import android.net.wifi.WifiManager;
@@ -61,14 +67,18 @@ import io.mosaicnetworks.babble.utils.RandomString;
  */
 public class WebRTCService implements ServiceAdvertiser{
 
+    public static String mDiscoverServerIP = "192.168.1.19";
+    public static int mDiscoverServerPort = 8080;
+    public static String mDiscoverEndPoint = "groups";
+    public static String mRegisterEndPoint = "group";
+
+    private PeersProvider peersProvider;
+    private static RequestQueue mQueue;
+
+
     private ServiceDiscoveryListener mServiceDiscoveryListener;
     private OnNetworkInitialised mNetworkInitListener;
     private WebRTCConnected mP2PConnected;
-
-    // Service type should not need to change, but other values are available at:
-    // http://www.dns-sd.org/ServiceTypes.html
-    private final static String P2P_SERVICE_TYPE = "_presence._tcp";
-//    private final static String P2P_SERVICE_TYPE = "_babble._tcp";
 
 
     // Keys used for the hash map in DNS text file
@@ -90,8 +100,6 @@ public class WebRTCService implements ServiceAdvertiser{
     public static boolean mGroupCreated = false;  //TODO: verify this is set to false on exit.
 
 
-
-    private final static String WIFI_DIRECT_IP_PREFIX = "192.168.49.";
     private static String mMoniker = "Moniker";
 
     public static boolean getIsDiscovering() {
@@ -107,11 +115,6 @@ public class WebRTCService implements ServiceAdvertiser{
 
     private static WebRTCService INSTANCE;
     private Context mAppContext;
-//    private WifiManager mWifiMgr;
-    private WifiP2pManager mWifiP2pMgr;
-    private WifiP2pManager.Channel mChannel;
-    public BroadcastReceiver mReceiver;
-    public IntentFilter mIntentFilter;
 
     private final Map<String, WebRTCResolvedService> mResolvedServices = new HashMap<>();
     private List<WebRTCResolvedGroup> mResolvedGroups;  //TODO: Look to make this final
@@ -128,6 +131,7 @@ public class WebRTCService implements ServiceAdvertiser{
     public static WebRTCService getInstance(Context context) {
         if (INSTANCE == null) {
             INSTANCE = new WebRTCService(context.getApplicationContext());
+             mQueue = Volley.newRequestQueue(context.getApplicationContext());
         }
         return INSTANCE;
     }
@@ -136,7 +140,7 @@ public class WebRTCService implements ServiceAdvertiser{
     private WebRTCService(Context context) {
         mAppContext = context;
         Log.i(TAG,"Constructed");
-        initP2P();
+        initWebRTC();
     }
 
 
@@ -160,31 +164,56 @@ public class WebRTCService implements ServiceAdvertiser{
         this.mResolvedGroups = resolvedGroups;
     }
 
-    protected void initP2P(){
-        // mWifiMgr = (WifiManager) mAppContext.getSystemService(Context.WIFI_SERVICE);
-        //       mWifiMgr.setWifiEnabled(false);
-        // This is deprecated in API 29 and on. 3rd party apps may no longer turn WiFi on or off.
-        //TODO: Remove all the mWifiMgr code which has been commented out for now.
+    protected void initWebRTC(){
+           //Init WebRTC
+        Log.i(TAG, "initWebRTC: ");
+    }
 
-        mWifiP2pMgr = (WifiP2pManager) mAppContext.getApplicationContext().getSystemService(Context.WIFI_P2P_SERVICE);
-        Log.i(TAG, "Got manager" );
+    private void getDiscovery(){
 
-        mChannel = mWifiP2pMgr.initialize(mAppContext, mAppContext.getMainLooper(), null);
-        Log.i(TAG, "Initialised manager" );
+        Log.i(TAG, "getDiscovery: ");
+        URL url;
 
-        mReceiver = new WifiDirectBroadcastReceiver(mWifiP2pMgr, mChannel, mAppContext);
-        Log.i(TAG, "Created Receiver" );
-
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        Log.i(TAG, "Added intent actions" );
+        try {
+            url = new URL("http", mDiscoverServerIP, mDiscoverServerPort, mDiscoverEndPoint);
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "getDiscovery: Invalid Host" );
+            throw new IllegalArgumentException("Invalid host");
+        }
 
 
+        Log.i(TAG, "getDiscovery: "+ url.toString());
+        StringRequest request = new StringRequest(Request.Method.GET, url.toString(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i(TAG, "onResponse: "+ response);
+                        //TODO: move this off the UI thread
+                        Gson gson = new Gson();
+                        Disco[] disco = gson.fromJson(response, Disco[].class);
+
+                        Log.i(TAG, "onResponse: Disco unpacked" );
+
+ //                       mQueue.stop();
+ //                       responseListener.onReceivePeers(new ArrayList<>(Arrays.asList(peers)));
+                    }
+
+
+
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "onErrorResponse: "+ error.toString());
+                //TODO: error handling
+   //             mQueue.stop();
+    //            responseListener.onFailure(ResponseListener.Error.CONNECTION_ERROR);
+            }
+        })      ;
+
+        mQueue.add(request);
 
     }
+
 
 
     public void stopRegistration(){
@@ -196,87 +225,16 @@ public class WebRTCService implements ServiceAdvertiser{
         //  Create a string map containing information about your service.
 
         Log.i(TAG, "startRegistration()");
-        HashMap<String,String> record = new HashMap<String,String>();
-
-        mServiceName = new RandomString(32).nextString();
-        record.put(GROUP_LABEL, groupName);
-        record.put(GROUP_ID_LABEL, mServiceName);
-        // This is a bit chicken and egg.
-        // But we know what the address of the leader will be, so it is safe to do this.
-        record.put(HOST_LABEL, DEFAULT_IP_ADDRESS);
-        record.put(PORT_LABEL, String.valueOf(SERVER_PORT));
-        record.put(APP_LABEL, mAppContext.getPackageName());
-        record.put(MONIKER_LABEL, moniker); // "John Doe" + (int) (Math.random() * 1000));
-        record.put(DNS_VERSION_LABEL, DNS_VERSION);
-        record.put(BABBLE_VERSION_LABEL, babbleVersion);
-
-        // Service information.  Pass it an instance name, service type
-        // _protocol._transportlayer , and the map containing
-        // information other devices will want once they connect to this one.
-//        WifiP2pDnsSdServiceInfo serviceInfo =
-  //              WifiP2pDnsSdServiceInfo.newInstance(mServiceName, P2P_SERVICE_TYPE, record);
-
-        WifiP2pDnsSdServiceInfo serviceInfo =
-                WifiP2pDnsSdServiceInfo.newInstance("_Babble", P2P_SERVICE_TYPE, record);
-
-        // Add the local service, sending the service info, network channel,
-        // and listener that will be used to indicate success or failure of
-        // the request.
-        mWifiP2pMgr.addLocalService(mChannel, serviceInfo, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                // Command successful! Code isn't necessarily needed here,
-                // Unless you want to update the UI or add logging statements.
-                Log.i(TAG,"Added local service");
-                mGroupCreated = false;
-                createGroup(0);
-         //       onInitialiseNetworkCallback();   //TODO: JK - Review and remove
-            }
-
-            @Override
-            public void onFailure(int arg0) {
-                // Command failed.  Check for P2P_UNSUPPORTED, ERROR, or BUSY
-                Log.i(TAG,"Failed to add local service");
-            }
-        });
 
         if (startDiscoverService) {
             discoverService();
         }
     }
 
-    public void onInitialiseNetworkCallback() {
-        if (this.mNetworkInitListener != null) {
-            String ip = getLocalIPAddress();
-            Log.i(TAG,"IP" + ip);
-
-            // This is a strange one. Some devices do initialise their group quite happily.
-            // And some don't. This checks to see if the IP is set, and calls the fallback
-            // createGroup code if not.
-            //TODO: JK prevent infinite loop here. CreateGroup will call this function. If it succeeds
-            //      whilst failing to set the IP we have an infinite loop.
-            if ( (ip == null) ) { // || (!mGroupCreated )) {
-                Log.i(TAG,"Null IP - Pausing");
 
 
 
 
-                new android.os.Handler().postDelayed(
-                        new Runnable() {
-                            public void run() {
-                                Log.i(TAG,"Retry onInitialiseNetworkCallback");
-                                onInitialiseNetworkCallback();
-                            }
-                        },
-                        RETRY_DELAY_MS);
-
-                return;
-            }
-
-            mNetworkInitListener.onNetworkInitialised(ip);
-        }
-
-    }
 
 
     public void createGroup(final int count) {
@@ -285,58 +243,6 @@ public class WebRTCService implements ServiceAdvertiser{
         if (mGroupCreated) {
             return ; // onInitialiseNetworkCallback();
         }
-
-        mWifiP2pMgr.createGroup(mChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                Log.i(TAG, "P2PAdvertise: Successfully created group");
-                mGroupCreated = true;
-                onInitialiseNetworkCallback();
-            }
-
-            @Override
-            public void onFailure(int arg0) {
-
-                String errType = "Unknown error";
-
-                switch (arg0) {
-                    case   WifiP2pManager.P2P_UNSUPPORTED:
-                        errType = "Unsupported";
-                        break;
-
-                    case WifiP2pManager.ERROR:
-                        errType = "Error";
-                        break;
-
-                    case WifiP2pManager.BUSY:
-                        errType = "Busy";
-                        break;
-                }
-
-                Log.e(TAG, "P2PAdvertise: Error creating group: " + errType + "("+arg0+")");
-
-
-                if ( ( arg0 == WifiP2pManager.BUSY )  && (! mGroupCreated ) ){
-
-                    if (count > RETRY_LIMIT) {
-                        //TODO: error handle
-                        onInitialiseNetworkCallback();
-                        return;
-                    }
-
-                    new android.os.Handler().postDelayed(
-                            new Runnable() {
-                                public void run() {
-                                    Log.i(TAG,"Retry createGroup");
-                                    createGroup(count+1);
-                                }
-                            },
-                            RETRY_DELAY_MS);
-                }
-
-
-            }
-        });
 
     }
 
@@ -358,297 +264,72 @@ public class WebRTCService implements ServiceAdvertiser{
 
     public void discoverService() {
         Log.i(TAG, "discoverService()");
-        WifiP2pManager.DnsSdTxtRecordListener txtListener = new WifiP2pManager.DnsSdTxtRecordListener() {
 
-            public void onDnsSdTxtRecordAvailable(
-                    String fullDomain, Map record, WifiP2pDevice device) {
-                Log.i(TAG, "DnsSdTxtRecord available -" + record.toString());
+        getDiscovery();
 
-                String groupId = device.deviceAddress;
-
-
-                //TODO: Restore this deduplicating code. Or at least stop it suppressing all entries.
-           /*
-                if (mResolvedServices.containsKey(groupId)) {
-                    //we already have this service
-                    Log.i(TAG, "We already have this service " + groupId);
-                    //TODO: remove this hacky way to force screen update
-                    mServiceDiscoveryListener.onServiceListUpdated(true);
-                    return;
-                };
-*/
-                try {
-                    WebRTCResolvedService resolvedService = new WebRTCResolvedService(groupId, record);
-
-
-                    if (!resolvedService.getAppIdentifier().equals(mAppContext.getPackageName())) {
-                        //The service is not for this app, we'll skip it
-                        return;  //TODO: this may need to be modified if multiple apps share babble
-                    }
-                    WebRTCResolvedGroup resolvedGroup = new WebRTCResolvedGroup(resolvedService);
-                    mResolvedGroups.add(resolvedGroup);
-                    resolvedService.setResolvedGroup(resolvedGroup);
-                    mResolvedServices.put(groupId, resolvedService);
-                    mServiceDiscoveryListener.onServiceListUpdated(true);
-
-                } catch (UnknownHostException ex) {
-
-                    Log.i(TAG,ex.getMessage());  //TODO: Implement proper error handling
-
-                    return;
-                }
-
-            }
-        };
-
-        WifiP2pManager.DnsSdServiceResponseListener servListener = new WifiP2pManager.DnsSdServiceResponseListener() {
-            @Override
-            public void onDnsSdServiceAvailable(String instanceName, String registrationType,
-                                                WifiP2pDevice resourceType) {
-
-                // We always set a TXT file, so in a correctly functioning environment,
-                // the TXT file should always be available.
-                Log.i(TAG,"Found " + instanceName + " " + registrationType);
-/*
-
-                // Update the device name with the human-friendly version from
-                // the DnsTxtRecord, assuming one arrived.
-                resourceType.deviceName =  textRecords
-                        .containsKey(resourceType.deviceAddress) ? (String) textRecords
-                        .get(resourceType.deviceAddress).get(MONIKER_LABEL) : resourceType.deviceName;
-
-
-                if (textRecords.containsKey(resourceType.deviceAddress)) {
-
-
-                    Map map = textRecords.get(resourceType.deviceAddress);
-
-
-
-                    resourceType.deviceName =  (String) map.get(GROUP_LABEL);
-
-                    Log.i(TAG, "deviceName " + resourceType.deviceName);
-                    Log.i(TAG, PORT_LABEL + ": " + map.get(PORT_LABEL));
-                    Log.i(TAG, MONIKER_LABEL + ": " + map.get(MONIKER_LABEL));
-                    Log.i(TAG, DNS_VERSION_LABEL + ": " + map.get(DNS_VERSION_LABEL));
-                    Log.i(TAG, GROUP_LABEL + ": " + map.get(GROUP_LABEL));
-                    Log.i(TAG, BABBLE_VERSION_LABEL + ": " + map.get(BABBLE_VERSION_LABEL));
-
-
-                    if (mServiceDiscoveryListener != null) {
-                        mServiceDiscoveryListener.onServiceListUpdated(false); //TODO: set this correctly, we just assume it changed
-                    }
-
-
-                } else {
-                    Log.i(TAG, "txt record not found, using default: " + resourceType.deviceName);
-                }
-
-
-
-
-                // Add to the custom adapter defined specifically for showing
-                // wifi devices.
-
- /*
-                WiFiDirectServicesList fragment = (WiFiDirectServicesList) getFragmentManager()
-                        .findFragmentById(R.id.frag_peerlist);
-                WiFiDevicesAdapter adapter = ((WiFiDevicesAdapter) fragment
-                        .getListAdapter());
-
-                adapter.add(resourceType);
-                adapter.notifyDataSetChanged();
-
-  * /
-
-                Log.i(TAG, "deviceAddress " + resourceType.deviceAddress);
-                Log.i(TAG, "primaryDeviceType " + resourceType.primaryDeviceType);
-//                Log.i(TAG, "secondaryDeviceType " + resourceType.secondaryDeviceType);
-                Log.i(TAG, "registrationType " + registrationType);
-                Log.i(TAG, "status " + resourceType.status);
-                Log.i(TAG, "instanceName " + instanceName);
-                Log.i(TAG, "  ---   ---   --- " );
-
-
-*/
-
-            }
-        };
-
-        mWifiP2pMgr.setDnsSdResponseListeners(mChannel, servListener, txtListener);
-
-        WifiP2pDnsSdServiceRequest serviceRequest = WifiP2pDnsSdServiceRequest.newInstance();
-        mWifiP2pMgr.addServiceRequest(mChannel,
-                serviceRequest,
-                new WifiP2pManager.ActionListener() {
-                    @Override
-                    public void onSuccess() {
-                        // Success!
-                        Log.i(TAG,"mWifiP2pMgr.addServiceRequest success");
-                    }
-
-                    @Override
-                    public void onFailure(int code) {
-                        // Command failed.  Check for P2P_UNSUPPORTED, ERROR, or BUSY
-
-                        Log.i(TAG,"mWifiP2pMgr.addServiceRequest fail ("+Integer.toString(code));
-                        if (mServiceDiscoveryListener != null) {
-                            mServiceDiscoveryListener.onStartDiscoveryFailed();
-                        }
-                    }
-                });
-
-
-        mWifiP2pMgr.discoverServices(mChannel, new WifiP2pManager.ActionListener() {
-
-            @Override
-            public void onSuccess() {
-                // Success!
-                Log.i(TAG,"mWifiP2pMgr.discoverServices success");
-                setIsDiscovering(true);
-            }
-
-            @Override
-            public void onFailure(int code) {
-                // Command failed.  Check for P2P_UNSUPPORTED, ERROR, or BUSY
-                if (code == WifiP2pManager.P2P_UNSUPPORTED) {
-                    Log.i(TAG, "P2P isn't supported on this device.");
-                } else {
-                    Log.i(TAG, "P2P error. " + Integer.toString(code));
-                }
-
-                if (mServiceDiscoveryListener != null) {
-                    mServiceDiscoveryListener.onStartDiscoveryFailed();
-                }
-
-            }
-        });
-
-    }
-
-
-    public void connectToPeer(String deviceAddress, final String peerIP, final int peerPort) {
-
-        Log.i(TAG,"WebRTCService.connectToPeer: "+ deviceAddress);
-
-        if (mResolvedServices.containsKey(deviceAddress)) {
-            WebRTCResolvedService prs = mResolvedServices.get(deviceAddress);
-
-            WifiP2pConfig config = new WifiP2pConfig();
-            config.deviceAddress = deviceAddress;
-            config.wps.setup = WpsInfo.PBC;
-            config.groupOwnerIntent = 0; //TODO: WifiP2pConfig.GROUP_OWNER_INTENT_MIN for API >= 30
-            mWifiP2pMgr.connect(mChannel, config,new WifiP2pManager.ActionListener() {
-
-                @Override
-                public void onSuccess() {
-
-                    Log.i(TAG,"mWifiP2pMgr.connect succeeded.");
-
-
-                    getClientIP(peerIP, peerPort, 0);
-
-                }
-
-                @Override
-                public void onFailure(int reason) {
-                    Log.i(TAG,"mWifiP2pMgr.connect failed. Retry.");
-                }
-            });
-
-        } else {
-            throw new Resources.NotFoundException("Selected Peer not discovered");
-        }
-
-    }
-
-
-    private void getClientIP(final String peerIP, final int peerPort, final int count) {
-
-        Log.i(TAG,"getClientIP");
-
-        String ip = getLocalIPAddress();
-        Log.i(TAG,"IP: " + ip);
-
-        if (  ( (ip == null) || (ip.equals(DEFAULT_IP_ADDRESS)) ) && ( count < RETRY_LIMIT )) {
-
-            new android.os.Handler().postDelayed(
-                    new Runnable() {
-                        public void run() {
-                            Log.i(TAG,"Retry getClientIP");
-                            getClientIP(peerIP, peerPort, count+1);
-                        }
-                    },
-                    RETRY_DELAY_MS);
-            return;
-        }
-
-
-        //Callback
-        if ( mP2PConnected != null) {
-            mP2PConnected.onConnected(peerIP, peerPort);
-        }
 
     }
 
 
 
-    private String getLocalIPAddress() {
-        try {
 
-
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-                NetworkInterface intf = en.nextElement();
-                String interfaceName = intf.getDisplayName();
-                Log.i(TAG,"Interface: " + interfaceName);
-                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-                    InetAddress inetAddress = enumIpAddr.nextElement();
-                    String ipStr = getDottedDecimalIP(inetAddress.getAddress());
-                                     Log.i(TAG,"IP: "+ipStr);
-                    if (!inetAddress.isLoopbackAddress()) {
-                        if (inetAddress instanceof Inet4Address) {
-                            if (ipStr.startsWith(WIFI_DIRECT_IP_PREFIX)) {
-                                Log.i(TAG,"Using interface: " + interfaceName);
-                                Log.i(TAG,"Using address: " + ipStr);
-                                return ipStr;
-                            }
-                        }
-
-                    }
-                }
-            }
-
-        } catch (SocketException ex) {
-            //Log.e("AndroidNetworkAddressFactory", "getLocalIPAddress()", ex);
-        } catch (NullPointerException ex) {
-            //Log.e("AndroidNetworkAddressFactory", "getLocalIPAddress()", ex);
-        }
-        return null;
-    }
-
-    private String getDottedDecimalIP(byte[] ipAddr) {
-        //convert to dotted decimal notation:
-        String ipAddrStr = "";
-        for (int i=0; i<ipAddr.length; i++) {
-            if (i > 0) {
-                ipAddrStr += ".";
-            }
-            ipAddrStr += ipAddr[i]&0xFF;
-        }
-        return ipAddrStr;
-    }
 
     @Override
     public void advertise() {
         // Do nothing. It is implicit in the starting a Wifi Direct node
-        Log.i(TAG,"P2P advertise, does nothing");
+        Log.i(TAG,"WebRTC advertise");
+
+        URL url;
+
+        try {
+            url = new URL("http", mDiscoverServerIP, mDiscoverServerPort, mRegisterEndPoint);
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "getDiscovery: Invalid Host" );
+            throw new IllegalArgumentException("Invalid host");
+        }
+
+        Log.i(TAG, "getDiscovery: "+ url.toString());
+        StringRequest request = new StringRequest(Request.Method.POST, url.toString(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i(TAG, "onResponse: "+ response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.i(TAG, "onErrorResponse: "+ error.toString());
+                //TODO: error handling
+                //             mQueue.stop();
+                //            responseListener.onFailure(ResponseListener.Error.CONNECTION_ERROR);
+            }
+        })  {
+                @Override
+                public byte[] getBody() throws AuthFailureError {  //TODO: Replace this hard coded version with a dynamic version
+
+//                    ID=Generated UUID - property of
+
+//                    peersProvider.getCurrentPeers();
+//                    peersProvider.getGenesisPeers();
+
+
+                    String your_string_json = "{\"ID\":\"2\",\"Title\":\"New Title\",\"Description\":\"New Desc\",\"Peers\":[{\"NetAddr\":\"Peer1Addr\",\"PubKeyHex\":\"XXXYYY\",\"Moniker\":\"Peer1\"}],\"InitialPeers\":[{\"NetAddr\":\"Peer1Addr\",\"PubKeyHex\":\"XXXYYY\",\"Moniker\":\"Peer1\"}]}";
+                return your_string_json.getBytes();
+            }
+        }
+
+                ;
+
+        mQueue.add(request);
+
+
     }
 
     @Override
     public void stopAdvertising() {
         // Do nothing. It is implicit in the starting a Wifi Direct node
         mGroupCreated = false;
-        Log.i(TAG,"P2P stop advertise, does nothing");
+        Log.i(TAG,"WebRTC stop advertise, does nothing");
     }
 
     @Override

@@ -51,6 +51,7 @@
     <string name="service_discovery_start_fail_message">Please refresh to try again</string>
     <string name="searching_services">Searching for services</string>
     <string name="discovery_start_failed">Failed to start mDNS\nPlease refresh to try again</string>
+    <string name="webrtc_discovery_start_failed">Failed to start mDNS\nPlease refresh to try again</string>
     <string name="p2p_discovery_start_failed">Failed to start P2P\nPlease refresh to try again</string>
     <string name="group_name">Group name</string>
     <string name="no_service_alert_title">No service</string>

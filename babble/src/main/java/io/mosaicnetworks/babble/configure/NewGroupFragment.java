@@ -51,6 +51,7 @@ import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
@@ -188,14 +189,22 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
         // Get network type
         Switch switchP2P =  view.findViewById(R.id.switch_p2p);
         boolean isP2P = switchP2P.isChecked();
+
+        Switch switchWebRTC =  view.findViewById(R.id.switch_global);
+        boolean isWebRTC = switchWebRTC.isChecked();
+
         int networkType;
 
-        if (isP2P) {
-            mNetworkType = BabbleService.NETWORK_P2P;
-        } else {
-            mNetworkType = BabbleService.NETWORK_WIFI;
-        }
 
+        if (isWebRTC) {
+            mNetworkType = BabbleService.NETWORK_GLOBAL;
+        } else {
+            if (isP2P) {
+                mNetworkType = BabbleService.NETWORK_P2P;
+            } else {
+                mNetworkType = BabbleService.NETWORK_WIFI;
+            }
+        }
         mGroupDescriptor = new GroupDescriptor(groupName);
 
         //TODO: P2P - Need change the workflow here. We are launching a new instance, but we rely
@@ -213,8 +222,15 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
                 Log.i("startGroup", "Start Broadcasting P2P");
                 p2PService.startRegistration(mMoniker, groupName, BabbleService.BABBLE_VERSION, false);
                 //TODO: Turned off discovery for the lead peer, but may need to re-enable to trigger discovery.
+                break;
+            case BabbleService.NETWORK_GLOBAL:
+                WebRTCService webRTCService = WebRTCService.getInstance(getContext());
+                webRTCService.startRegistration(mMoniker, groupName, BabbleService.BABBLE_VERSION, false);
+                ip = Utils.getIPAddr(getContext());
 
-
+                Log.i("startGroup", "WebRTC");
+                // N.B. WebRTC does not require a callback, so we call configAndStartBabble directly.
+                onNetworkInitialised(ip);
                 break;
             default:
                 ip = Utils.getIPAddr(getContext());
