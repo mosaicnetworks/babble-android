@@ -170,7 +170,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
                 //If it loads when we're on a different tab then abort. This does mean it's possible
                 //for a configuration change to cause an abort
                 if (isResumed()) {
-                    mListener.onArchiveLoaded(mMoniker);
+                    mListener.onArchiveLoaded(mMoniker, "Archive");   //TODO: Set this to something more meaningful
                 } else {
                     mListener.getBabbleService().leave(null);
                     mViewModel.getState().setValue(ArchivedGroupsViewModel.State.LIST);

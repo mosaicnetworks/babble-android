@@ -212,7 +212,7 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
         }
 
         mLoadingDialog.dismiss();
-        mListener.baseOnJoined(mMoniker);
+        mListener.baseOnJoined(mMoniker, groupDescriptor.getName());
     }
 
     @Override

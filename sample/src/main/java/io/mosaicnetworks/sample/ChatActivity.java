@@ -66,6 +66,9 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         Intent intent = getIntent();
         mMoniker = intent.getStringExtra("MONIKER");
         mArchiveMode = intent.getBooleanExtra("ARCHIVE_MODE", false);
+        String group = intent.getStringExtra("GROUP");
+
+        setTitle(mMoniker +" in Group " + group );
 
         initialiseAdapter();
         mMessagingService.registerObserver(this);

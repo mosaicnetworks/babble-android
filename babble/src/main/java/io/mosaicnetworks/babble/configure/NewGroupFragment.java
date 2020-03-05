@@ -333,7 +333,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
             throw ex;
         }
 
-        mListener.baseOnStartedNew(mMoniker);
+        mListener.baseOnStartedNew(mMoniker, mGroupDescriptor.getName());
 
     }
 
