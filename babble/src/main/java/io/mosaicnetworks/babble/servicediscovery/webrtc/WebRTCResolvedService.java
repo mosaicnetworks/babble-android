@@ -31,8 +31,10 @@ import com.google.common.net.InetAddresses;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 
@@ -53,36 +55,33 @@ public final class WebRTCResolvedService implements ResolvedService {
     private final String mAppIdentifier;
     private final String mGroupName;
     private final String mGroupUid;
+    private final String mPubKey;
+
+    private final List<Peer> mInitialPeers;
+
+    private final List<Peer> mCurrentPeers;
+
+    public final int mLastUpdated;
+
     private WebRTCResolvedGroup mResolvedGroup;
-    private final Map<String, byte[]> mServiceAttributes;
+
+
     private boolean mAssignedGroup = false;
 
     /**
      * Initialise from service info
      */
-    public WebRTCResolvedService(String uuID, Map map) throws UnknownHostException {
+    public WebRTCResolvedService(String groupUid, String groupName, String appIdentifier, String pubKey, int lastUpdated, List<Peer> initialPeers, List<Peer> currentPeers, InetAddress inetAddress, int port) throws UnknownHostException {
+        mCurrentPeers = currentPeers;
+        mInitialPeers = initialPeers;
+        mAppIdentifier = appIdentifier;
+        mGroupName = groupName;
+        mGroupUid = groupUid;
+        mPubKey = pubKey;
+        mLastUpdated = lastUpdated;
+        mInetAddress = inetAddress;
+        mPort = port;
 
-        /*
-
-    public final static String PORT_LABEL = "port";
-    public final static String MONIKER_LABEL = "moniker";
-    public final static String DNS_VERSION_LABEL = "textvers";
-    private final static String DNS_VERSION = "0.0.1";
-    public final static String BABBLE_VERSION_LABEL = "babblevers";
-
-    public final static String GROUP_LABEL = "group";
-
-         */
-
-   //     mInetAddress =  InetAddresses.forString((String) map.get(WebRTCService.HOST_LABEL));
-        mInetAddress =  InetAddresses.forString((String) map.get(WebRTCService.HOST_LABEL));
-        mPort = Integer.parseInt((String) map.get(WebRTCService.PORT_LABEL));
-
-        mServiceAttributes = new HashMap<>(); //nsdServiceInfo.getAttributes();
-
-        mAppIdentifier = (String) map.get(WebRTCService.APP_LABEL);
-        mGroupName = (String) map.get(WebRTCService.GROUP_LABEL);
-        mGroupUid = uuID;
     }
 
     /**
@@ -148,4 +147,21 @@ public final class WebRTCResolvedService implements ResolvedService {
     public int getPort() {
         return mPort;
     }
+
+
+    public List<Peer> getCurrentPeers() {
+        return mCurrentPeers;
+    }
+
+
+    public String getPubKey() {
+        return mPubKey;
+    }
+
+    public List<Peer> getInitialPeers() {
+        return mInitialPeers;
+    }
+
+
+
 }

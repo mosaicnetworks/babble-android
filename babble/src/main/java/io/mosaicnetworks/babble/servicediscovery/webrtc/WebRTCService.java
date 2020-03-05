@@ -36,6 +36,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -50,12 +51,14 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.mosaicnetworks.babble.configure.OnNetworkInitialised;
 import io.mosaicnetworks.babble.discovery.Disco;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
+import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.utils.RandomString;
@@ -192,11 +195,39 @@ public class WebRTCService implements ServiceAdvertiser{
                         Log.i(TAG, "onResponse: "+ response);
                         //TODO: move this off the UI thread
                         Gson gson = new Gson();
-                        Disco[] disco = gson.fromJson(response, Disco[].class);
+                        Disco[] discos = gson.fromJson(response, Disco[].class);
 
                         Log.i(TAG, "onResponse: Disco unpacked" );
 
- //                       mQueue.stop();
+                        int i;
+                        for (i = 0; i < discos.length; i++) {
+
+                            try {
+                                WebRTCResolvedService webRTCResolvedService =
+                                        new WebRTCResolvedService(discos[i].GroupUID,
+                                                discos[i].GroupName,
+                                                discos[i].AppID,
+                                                discos[i].PubKey,
+                                                discos[i].LastUpdated,
+                                                discos[i].InitialPeers,
+                                                discos[i].Peers,
+                                                null,
+                                                0
+                                                );
+
+                                WebRTCResolvedGroup webRTCResolvedGroup = new WebRTCResolvedGroup(webRTCResolvedService);
+                                mResolvedGroups.add(webRTCResolvedGroup);
+                                webRTCResolvedService.setResolvedGroup(webRTCResolvedGroup);
+                                mResolvedServices.put(discos[i].GroupUID, webRTCResolvedService);
+                                mServiceDiscoveryListener.onServiceListUpdated(true);
+
+                            } catch (UnknownHostException e) {
+                                e.printStackTrace();
+                            }
+//   public WebRTCResolvedService(String groupUid, String groupName, String appIdentifier, String pubKey, int lastUpdated, Peer[] initialPeers, Peer[] currentPeers, InetAddress inetAddress, int port) throws UnknownHostException {
+//
+                        }
+                            //                       mQueue.stop();
  //                       responseListener.onReceivePeers(new ArrayList<>(Arrays.asList(peers)));
                     }
 
@@ -278,7 +309,6 @@ public class WebRTCService implements ServiceAdvertiser{
 
     @Override
     public void advertise() {
-        // Do nothing. It is implicit in the starting a Wifi Direct node
         Log.i(TAG,"WebRTC advertise");
 
         URL url;
@@ -289,6 +319,25 @@ public class WebRTCService implements ServiceAdvertiser{
             Log.e(TAG, "getDiscovery: Invalid Host" );
             throw new IllegalArgumentException("Invalid host");
         }
+
+        // Build body before launching the request for cleaner tidy up
+
+        //        public Disco(String iD, String title,  ArrayList<Peer> peers,  ArrayList<Peer> initialPeers) {
+//        Disco groupObject = new Disco();
+
+        final String PostBody;
+        try {
+            ConfigManager configManager = ConfigManager.getInstance(null);
+            Disco disco = configManager.getDisco();
+            Gson gson = new Gson();
+            PostBody = gson.toJson(disco);
+
+            Log.i(TAG, "advertise: " + PostBody);
+        } catch (FileNotFoundException ex) {
+            Log.e(TAG, "advertise: " + ex.getMessage() );
+            throw new IllegalArgumentException("Config Manager not initialised");
+        }
+
 
         Log.i(TAG, "getDiscovery: "+ url.toString());
         StringRequest request = new StringRequest(Request.Method.POST, url.toString(),
@@ -307,16 +356,8 @@ public class WebRTCService implements ServiceAdvertiser{
             }
         })  {
                 @Override
-                public byte[] getBody() throws AuthFailureError {  //TODO: Replace this hard coded version with a dynamic version
-
-//                    ID=Generated UUID - property of
-
-//                    peersProvider.getCurrentPeers();
-//                    peersProvider.getGenesisPeers();
-
-
-                    String your_string_json = "{\"ID\":\"2\",\"Title\":\"New Title\",\"Description\":\"New Desc\",\"Peers\":[{\"NetAddr\":\"Peer1Addr\",\"PubKeyHex\":\"XXXYYY\",\"Moniker\":\"Peer1\"}],\"InitialPeers\":[{\"NetAddr\":\"Peer1Addr\",\"PubKeyHex\":\"XXXYYY\",\"Moniker\":\"Peer1\"}]}";
-                return your_string_json.getBytes();
+                public byte[] getBody() throws AuthFailureError {
+                     return PostBody.getBytes();
             }
         }
 

@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
+import io.mosaicnetworks.babble.discovery.Disco;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
 
@@ -118,6 +119,7 @@ public final class ConfigManager {
     private ArrayList<ConfigDirectory> mDirectories = new ArrayList<>();
     private KeyPair mKeyPair;
 
+    private Disco mDisco;
 
     /**
      * Provides an instance of the static ConfigManager class, reusing one if available, calling the
@@ -287,7 +289,6 @@ public final class ConfigManager {
     /**b
      * Configure the service to create a new group using the default ports
      * @param moniker node moniker
-     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
     public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String peersInetAddress, String babbleInetAddress, int networkType)  throws CannotStartBabbleNodeException, IOException {
@@ -297,7 +298,6 @@ public final class ConfigManager {
     /**
      * Configure the service to create a new group, overriding the default ports
      * @param moniker node moniker
-     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @param babblingPort the port used for Babble consensus
      * //@param discoveryPort the port used by the HttpPeerDiscoveryServer //TODO: how to deal with this
      * @throws IllegalStateException if the service is currently running
@@ -410,6 +410,18 @@ public final class ConfigManager {
 
         // private key -- does not overwrite
         writePrivateKey(fullPath, mKeyPair.privateKey);
+
+
+        // If we are a WebRTC/Global type, build the disco object for use later.
+//               public Disco(String iD, String title,  ArrayList<Peer> peers,  ArrayList<Peer> initialPeers) {
+
+            if (networkType == BabbleService.NETWORK_GLOBAL) {
+      //      mDisco = new Disco();   //TODO: JK NOW!!!!
+
+        } else {
+            mDisco = null;
+        }
+
 
         return fullPath;
     }
@@ -819,6 +831,11 @@ public final class ConfigManager {
             throw  new IllegalAccessError();
         }
     }
+
+    public Disco getDisco() {
+        return mDisco;
+    }
+
 
     private void populateDirectories(File babbleDir) {
         ArrayList<String> directories = new ArrayList<>();

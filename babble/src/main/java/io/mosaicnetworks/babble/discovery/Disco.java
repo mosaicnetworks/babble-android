@@ -28,23 +28,57 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
+/**
+ * The Disco class maps the group class in the Disco go repo.
+ *
+ * The Go structure is:
+ *
+ * type group struct {
+ * 	GroupUID     string        `json:"GroupUID"`
+ * 	GroupName    string        `json:"GroupName"`
+ * 	AppID        string        `json:"AppID"`
+ * 	PubKey       string        `json:"PubKey"`
+ * 	LastUpdated  int64         `json:"LastUpdated"`
+ * 	Peers        []*peers.Peer `json:"Peers"`
+ * 	GenesisPeers []*peers.Peer `json:"InitialPeers"`
+ * }
+ */
 public final class Disco {
 
-
         /**
-         * The peer's public key
+         * Unique Group Identifier
          */
-        @SerializedName("ID")
-        public final String ID;
+        @SerializedName("GroupUID")
+        public final String GroupUID;
 
         /**
-         * The peer's network address
+         * The Group Name
          */
-        @SerializedName("Title")
-        public final String Title;
+        @SerializedName("GroupName")
+        public final String GroupName;
 
         /**
-         * The peer's moniker
+         * App ID
+         */
+        @SerializedName("AppID")
+        public final String AppID;
+
+        /**
+         * The Public Key of the Group Creator
+         */
+        @SerializedName("PubKey")
+        public final String PubKey;
+
+        /**
+         * The Last Update for this Group in Unix Time in seconds
+         */
+        @SerializedName("LastUpdated")
+        public final int LastUpdated;
+
+
+
+    /**
+         * The peers
          */
         @SerializedName("Peers")
         public final ArrayList<Peer> Peers;
@@ -56,14 +90,17 @@ public final class Disco {
         /**
          * Constructor
          */
-        public Disco(String iD, String title,  ArrayList<Peer> peers,  ArrayList<Peer> initialPeers) {
+        public Disco(String groupUID, String groupName, String appId, String pubKey, int lastUpdated,  ArrayList<Peer> peers,  ArrayList<Peer> initialPeers) {
 
-            if (iD==null || title==null ) {
+            if (groupUID==null || groupName==null || appId==null || pubKey==null ) {
                 throw new NullPointerException("Null arguments are not accepted");
             }
 
-            this.ID = iD;
-            this.Title = title;
+            this.GroupUID = groupUID;
+            this.GroupName = groupName;
+            this.AppID = appId;
+            this.PubKey = pubKey;
+            this.LastUpdated = lastUpdated;
             this.Peers = peers;
             this.InitialPeers = initialPeers;
         }
