@@ -296,9 +296,13 @@ public final class ConfigManager {
     public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String peersInetAddress, String babbleInetAddress, int babblingPort, int networkType) throws CannotStartBabbleNodeException, IOException{
 
         List<Peer> genesisPeers = new ArrayList<>();
-        genesisPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress + ":" + babblingPort, moniker));
+
+        // Only append port if no @ in the NetAddr - i.e. not WebRTC
+        String suffix = peersInetAddress.startsWith("0X") ? "" : ":" + babblingPort;
+
+        genesisPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress +suffix, moniker));
         List<Peer> currentPeers = new ArrayList<>();
-        currentPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress + ":" + babblingPort, moniker));
+        currentPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress + suffix, moniker));
 
         return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, babbleInetAddress, babblingPort, networkType);
     }

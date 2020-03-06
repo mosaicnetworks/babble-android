@@ -178,10 +178,7 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
 
         ConfigManager configManager;
   //      try {
-
             configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
-
-
  /*
         } catch (FileNotFoundException ex) {
             //This error is thrown by ConfigManager when it fails to read / create a babble root dir.

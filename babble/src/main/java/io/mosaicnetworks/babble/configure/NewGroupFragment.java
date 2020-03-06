@@ -239,7 +239,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
 
      //           try {
                     ConfigManager configManager = ConfigManager.getInstance(getContext());
-                    peersAddr = configManager.getPublicKey() + "@" + WebRTCService.mRelayServerAddress;
+                    peersAddr = configManager.getPublicKey() ; // + "@" + WebRTCService.mRelayServerName;
        /*
                 } catch (FileNotFoundException|IllegalAccessError ex) {
                     Log.e("NewGroupFragment", "startGroup: "+ex.getMessage() );

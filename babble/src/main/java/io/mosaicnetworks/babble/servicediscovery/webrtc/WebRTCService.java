@@ -70,8 +70,10 @@ import io.mosaicnetworks.babble.utils.RandomString;
  */
 public class WebRTCService implements ServiceAdvertiser{
 
-    public static String mDiscoverServerIP = "192.168.0.2";          //TODO: This is a local dev IP - needs a better default
-    public static String mRelayServerAddress = "192.168.0.2:8000";   //TODO: This is a local dev IP - needs a better default
+    public static String mDiscoverServerIP = "192.168.1.19";          //TODO: This is a local dev IP - needs a better default
+    public static String mRelayServerAddress = "192.168.1.19:9090";   //TODO: This is a local dev IP - needs a better default
+    public static String mRelayServerName = "dev";   //TODO: This is a local dev IP - needs a better default
+
     public static int mDiscoverServerPort = 8080;
 
     private final static String mDiscoverEndPoint = "groups";
