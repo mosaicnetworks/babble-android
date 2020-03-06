@@ -49,8 +49,8 @@ android {
     defaultConfig {
         minSdkVersion 21       // nsdServiceInfo.getAttributes requires API 21
         targetSdkVersion 29
-        versionCode 12
-        versionName "0.4.1"
+        versionCode 13
+        versionName "0.4.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -119,7 +119,7 @@ artifacts {
     archives sourcesJar
 }
 
-version '0.4.1'
+version '0.4.2'
 
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
