@@ -40,7 +40,7 @@ public class MainActivity extends BaseConfigActivity {
         // Control which tabs are shown.
         setShowArchive(true);
         setShowmDNS(true);
-        setShowP2P(true);
+        setShowP2P(false);
 
         // Show all versions of each group in the archive tab
         setShowAllArchiveVersions(true);

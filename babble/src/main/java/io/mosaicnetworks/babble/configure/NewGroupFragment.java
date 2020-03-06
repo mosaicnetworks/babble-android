@@ -135,6 +135,7 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
             } else {
                     switchP2P.setChecked(false);
                     switchP2P.setEnabled(false);
+                    switchP2P.setVisibility(View.GONE);
             }
 
 
