@@ -26,5 +26,8 @@
     <string name="app_name">BabbleSample</string>
     <string name="hint_enter_a_message">Enter a message</string>
     <string name="no_messages_in_archive">This archive is empty</string>
+    <string name="stats_title">Stats</string>
+    <string name="ip_title">IP Address</string>
+    <string name="monikers_title">Participants</string>
 
 </resources>

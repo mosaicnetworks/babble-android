@@ -152,8 +152,6 @@ public final class MessagingService extends BabbleService<ChatState> {
     }
 
 
-
-
 }
 
 
