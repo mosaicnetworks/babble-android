@@ -201,10 +201,16 @@ public class WebRTCService implements ServiceAdvertiser{
 
                         Log.i(TAG, "onResponse: Disco unpacked" );
 
+
+                        mResolvedGroups.clear();
+
                         int i;
                         for (i = 0; i < discos.length; i++) {
 
                             try {
+
+                                Log.i(TAG, "onResponse: " + discos[i].GroupName);
+
                                 WebRTCResolvedService webRTCResolvedService =
                                         new WebRTCResolvedService(discos[i].GroupUID,
                                                 discos[i].GroupName,
@@ -217,11 +223,12 @@ public class WebRTCService implements ServiceAdvertiser{
                                                 0
                                                 );
 
+
+
                                 WebRTCResolvedGroup webRTCResolvedGroup = new WebRTCResolvedGroup(webRTCResolvedService);
                                 mResolvedGroups.add(webRTCResolvedGroup);
                                 webRTCResolvedService.setResolvedGroup(webRTCResolvedGroup);
                                 mResolvedServices.put(discos[i].GroupUID, webRTCResolvedService);
-                                mServiceDiscoveryListener.onServiceListUpdated(true);
 
                             } catch (UnknownHostException e) {
                                 e.printStackTrace();
@@ -229,7 +236,9 @@ public class WebRTCService implements ServiceAdvertiser{
 //   public WebRTCResolvedService(String groupUid, String groupName, String appIdentifier, String pubKey, int lastUpdated, Peer[] initialPeers, Peer[] currentPeers, InetAddress inetAddress, int port) throws UnknownHostException {
 //
                         }
-                            //                       mQueue.stop();
+                        mServiceDiscoveryListener.onServiceListUpdated(true);
+
+                        //                       mQueue.stop();
  //                       responseListener.onReceivePeers(new ArrayList<>(Arrays.asList(peers)));
                     }
 

@@ -54,7 +54,7 @@ public final class NodeConfig {
         private int mSlowHeartbeat = 200;
         private boolean mStore = true;
         private String mLogLevel = "info";
-        private int mTcpTimeout = 1000;
+        private int mTcpTimeout = 10000;
         private int mMaxPool = 2;
         private int mCacheSize = 50000;
         private int mSyncLimit = 1000;

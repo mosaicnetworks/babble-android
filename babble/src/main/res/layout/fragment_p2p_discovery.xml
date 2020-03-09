@@ -64,7 +64,7 @@
             android:id="@+id/textView_service_search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/searching_services"
+            android:text="@string/p2p_searching_services"
             android:textAlignment="center" />
     </LinearLayout>
 

@@ -103,11 +103,12 @@ public class WebRTCDiscoveryFragment extends Fragment {
                     @Override
                     public void onRefresh() {
 
-                        //do nothing ;)
+                        mServiceListView.refreshDiscovery();
 
-                        if (mSwipeRefreshServicesDisplaying.isRefreshing()) {
-                            mSwipeRefreshServicesDisplaying.setRefreshing(false);
-                        }
+
+             //           if (mSwipeRefreshServicesDisplaying.isRefreshing()) {
+             //               mSwipeRefreshServicesDisplaying.setRefreshing(false);
+             //           }
                     }
                 }
         );
@@ -156,12 +157,12 @@ public class WebRTCDiscoveryFragment extends Fragment {
 
             @Override
             public void onServiceSelectedFailure() {
-                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_discovery_resolve_fail_title, R.string.service_discovery_resolve_fail_message);
+                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_webrtc_discovery_resolve_fail_title, R.string.service_discovery_resolve_fail_message);
             }
 
             @Override
             public void onDiscoveryStartFailure() {
-                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
+                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_webrtc_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
 
                 mSwipeRefreshServiceSearch.setVisibility(View.GONE);
                 mSwipeRefreshDiscoveryFailed.setVisibility(View.VISIBLE);

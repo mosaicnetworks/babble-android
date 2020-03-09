@@ -47,7 +47,7 @@ public class WebRTCServicesListView extends RecyclerView {
 
     private List<WebRTCResolvedGroup> mServiceInfoList = new ArrayList<>();
     private ServicesListListener mServicesListListener;
-    private WebRTCService mP2PService;
+    private WebRTCService mWebRTCService;
     private boolean mPrevIsEmpty = true;
 
     public WebRTCServicesListView(Context context) {
@@ -80,23 +80,28 @@ public class WebRTCServicesListView extends RecyclerView {
         setAdapter(adapter);
 
 
-        mP2PService = WebRTCService.getInstance(context);
+        mWebRTCService = WebRTCService.getInstance(context);
 
-        mP2PService.setResolvedGroups(mServiceInfoList);
+        mWebRTCService.setResolvedGroups(mServiceInfoList);
 
-        mP2PService.registerServiceDiscoveryListener(new ServiceDiscoveryListener() {
+        mWebRTCService.registerServiceDiscoveryListener(new ServiceDiscoveryListener() {
                  @Override
                  public void onServiceListUpdated(boolean groupCountChange) {
 
 
-                     Log.i("P2PServicesListView", "onServiceListUpdated: ");
+                     Log.i("WebRTCServicesListView", "onServiceListUpdated: ");
+
+
+
                      // let the adapter know
                      Handler mainHandler = new Handler(context.getMainLooper());
 
                      Runnable myRunnable = new Runnable() {
                          @Override
                          public void run() {
+                             Log.i("WebRTCServicesListView", "run: ");
                              Objects.requireNonNull(getAdapter()).notifyDataSetChanged();
+                             Log.i("WebRTCServicesListView", "ran: ");
                          }
                      };
                      mainHandler.post(myRunnable);
@@ -105,18 +110,23 @@ public class WebRTCServicesListView extends RecyclerView {
                      // know
                      //TODO: can we use the groupCountChange (or a suitable return) to make this easier?
                      final boolean curIsEmpty = mServiceInfoList.isEmpty();
-                     if (mPrevIsEmpty ^ curIsEmpty) {
+
+                     Log.i("WebRTCServicesListView", "isEmpty: "+curIsEmpty);
+
+                     //TODO: This check has just been commented out. We could be more efficient.
+ //                    if (mPrevIsEmpty ^ curIsEmpty) {
                          //service list info's empty status has changed
 
                          Runnable emptyStatus = new Runnable() {
                              @Override
                              public void run() {
+                                 Log.i("WebRTCServicesListView", "emptyStatus: ");
                                  mServicesListListener.onListEmptyStatusChange(curIsEmpty);
                              }
                          };
                          mainHandler.post(emptyStatus);
 
-                     }
+   //                  }
 
                      mPrevIsEmpty = curIsEmpty;
 
@@ -124,6 +134,7 @@ public class WebRTCServicesListView extends RecyclerView {
 
                  @Override
                  public void onStartDiscoveryFailed() {
+                     Log.i("WebRTCServicesListView", "onStartDiscoveryFailed");
                      mServicesListListener.onDiscoveryStartFailure();
                  }
 
@@ -133,14 +144,18 @@ public class WebRTCServicesListView extends RecyclerView {
 
     public void startDiscovery(ServicesListListener servicesListListener) {
         mServicesListListener = servicesListListener;
-        mP2PService.discoverService();
-
-
- //       mMdnsDiscovery.discoverServices();
+        mWebRTCService.discoverService();
     }
 
+
+    public void refreshDiscovery() {
+        Log.i("WebRTCServicesListView", "redfreshDiscovery: ");
+        mWebRTCService.discoverService();
+    }
+
+
     public void stopDiscovery() {
-        mP2PService.stopDiscoverService();
+        mWebRTCService.stopDiscoverService();
     }
 
 }
