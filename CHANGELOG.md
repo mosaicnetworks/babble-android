@@ -16,7 +16,6 @@ IMPROVEMENTS:
 
 BUG FIXES:
 
-
 ## v0.4.2 (March 6, 2020)
 
 SECURITY:
