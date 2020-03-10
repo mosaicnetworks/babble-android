@@ -48,7 +48,9 @@ import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -228,6 +230,16 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Map map = gson.fromJson(mMessagingService.getStats(), Map.class);
+
+        if (map.containsKey("time"))  // Convert Unix nano seconds to a real date time
+        {
+            String timeStr = (String) map.get("time");
+            Date currentTime = new Date(Long.parseLong(timeStr)  / 1000000L);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            String dateString = formatter.format(currentTime);
+            map.put("time", dateString);
+        }
+
 
         String rawStats = gson.toJson(map);
 
