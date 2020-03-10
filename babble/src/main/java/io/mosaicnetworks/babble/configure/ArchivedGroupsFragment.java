@@ -129,7 +129,7 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
             String configDir = mConfigManager.getTomlDir();
             mBabbleService.startArchive(configDir, new GroupDescriptor("Archived Group"), null); //TODO: need to get a proper group descriptor
-            mListener.onArchiveLoaded(mMoniker);
+            mListener.onArchiveLoaded(mMoniker, "Archived Group");
         }
     }
 

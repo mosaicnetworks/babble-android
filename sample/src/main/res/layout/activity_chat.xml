@@ -33,6 +33,89 @@
     android:gravity="center"
     android:orientation="vertical">
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/statusLine"
+        android:textAlignment="center"
+        android:background="@color/colorPrimary"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleStatusLabels"
+            android:textColor="@color/colorStatsLabel"
+            android:textAlignment="center"
+            android:text="State: ">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleStatus"
+            android:textColor="@color/colorStats"
+            android:textAlignment="center"
+            android:text="Status">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleEventsLabels"
+            android:textColor="@color/colorStatsLabel"
+            android:textAlignment="center"
+            android:text="Events: ">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleEvents"
+            android:textColor="@color/colorStats"
+            android:textAlignment="center"
+            android:text="Events">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleTransactionsLabels"
+            android:textColor="@color/colorStatsLabel"
+            android:textAlignment="center"
+            android:text="Trans: ">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleTransactions"
+            android:textColor="@color/colorStats"
+            android:textAlignment="center"
+            android:text="Transactions">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleUndeterminedLabels"
+            android:textColor="@color/colorStatsLabel"
+            android:textAlignment="center"
+            android:text="Undetermined: ">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleUndetermined"
+            android:textColor="@color/colorStats"
+            android:textAlignment="center"
+            android:text="Undetermined">
+        </TextView>
+    </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/relativeLayout_messages"
         android:layout_width="match_parent"

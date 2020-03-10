@@ -26,13 +26,22 @@ package io.mosaicnetworks.sample;
 
 import android.content.Context;
 import android.content.Intent;
+
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
 import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.messages.MessageInput;
@@ -41,14 +50,18 @@ import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.ServiceObserver;
+import io.mosaicnetworks.babble.utils.DialogUtils;
+import io.mosaicnetworks.babble.utils.Utils;
 
 /**
  * This is the central UI component. It receives messages from the {@link MessagingService} and
  * displays them as a list.
  */
-public class ChatActivity extends AppCompatActivity implements ServiceObserver {
+public class ChatActivity extends AppCompatActivity implements ServiceObserver, StatsObserver  {
 
     private MessagesListAdapter<Message> mAdapter;
     private String mMoniker;
@@ -66,6 +79,9 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         Intent intent = getIntent();
         mMoniker = intent.getStringExtra("MONIKER");
         mArchiveMode = intent.getBooleanExtra("ARCHIVE_MODE", false);
+        String group = intent.getStringExtra("GROUP");
+
+        setTitle(mMoniker +" in Group " + group );
 
         initialiseAdapter();
         mMessagingService.registerObserver(this);
@@ -174,6 +190,72 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         mMessageIndex = mMessageIndex + newMessages.size();
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_chat, menu);
+        return true;
+    }
+
+
+    public void showChatters(MenuItem menuItem) {
+        Gson gson = new Gson();
+        Peer[] peers = gson.fromJson(mMessagingService.getMonikerList(), Peer[].class);
+
+        String join = "";
+        String peerlist = "Chatters in this Group: ";
+
+        for (int i=0; i< peers.length; i++ ) {
+            peerlist = peerlist + join + peers[i].moniker;
+            join = ", ";
+        }
+
+        showMessage(peerlist, R.string.monikers_title, Toast.LENGTH_LONG);
+    }
+
+
+
+    public void showIP(MenuItem menuItem) {
+        Context context = getApplicationContext();
+        String ip = "Your IP is: "+ Utils.getIPAddr(context);
+
+        showMessage(ip, R.string.ip_title, Toast.LENGTH_LONG);
+    }
+
+
+    public void showStats(MenuItem menuItem) {
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Map map = gson.fromJson(mMessagingService.getStats(), Map.class);
+
+        String stats = gson.toJson(map);
+
+        showMessage(stats, R.string.stats_title, Toast.LENGTH_LONG);
+    }
+
+
+
+    private void showMessage (String message, @StringRes int titleId, int duration) {
+        //  showMessageToast( message, duration);
+        ShowMessageDialog(message, titleId);
+
+    }
+
+    private void ShowMessageDialog (String message, @StringRes int titleId) {
+
+        DialogUtils.displayOkAlertDialogText(this,titleId,message) ;
+    }
+
+    private void showMessageToast(String message, int duration) {
+        Context context = getApplicationContext();
+        CharSequence text = message;
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+    }
+
+
+
     /**
      * When back is pressed we should leave the group. The {@link #onDestroy()} method will handle
      * unregistering from the service
@@ -189,5 +271,37 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         mMessagingService.removeObserver(this);
 
         super.onDestroy();
+    }
+
+
+    public void pollStats(MenuItem menuItem) {
+
+        LinearLayout linearLayoutStatusLine = findViewById(R.id.statusLine);
+
+        if (mMessagingService.getStatusPolling()) {
+            mMessagingService.stopStatsPolling();
+            linearLayoutStatusLine.setVisibility(View.GONE);
+
+            Log.i("ChatActivity", "pollStats: stopping");
+        } else {
+            linearLayoutStatusLine.setVisibility(View.VISIBLE);
+            mMessagingService.registerStatsObserver(this);
+            mMessagingService.startStatsPolling();
+            Log.i("ChatActivity", "pollStats: starting");
+        }
+
+    }
+
+
+
+    @Override
+    public void statsUpdated(Map map) {
+        Log.i("ChatActivity", "statsUpdated");
+        Log.i("ChatActivity", (String) map.get("time"));
+        ((TextView) findViewById(R.id.babbleStatus)).setText((String) map.get("state"));
+        ((TextView) findViewById(R.id.babbleEvents)).setText((String) map.get("consensus_events"));
+        ((TextView) findViewById(R.id.babbleTransactions)).setText((String) map.get("consensus_transactions"));
+        ((TextView) findViewById(R.id.babbleUndetermined)).setText((String) map.get("undetermined_events"));
+
     }
 }

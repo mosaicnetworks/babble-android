@@ -288,4 +288,13 @@ public abstract class BabbleService<AppState extends BabbleState> {
         }
     }
 
+    public String getMonikerList() {
+        return mBabbleNode.getCurrentPeers();
+    }
+
+
+    public String getStats() {
+        return mBabbleNode.getStats();
+    }
+
 }
