@@ -83,7 +83,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
         mArchiveMode = intent.getBooleanExtra("ARCHIVE_MODE", false);
         String group = intent.getStringExtra("GROUP");
 
-        setTitle(group + "(" + mMoniker + ")");
+        setTitle(group + " (" + mMoniker + ")");
 
         initialiseAdapter();
         mMessagingService.registerObserver(this);

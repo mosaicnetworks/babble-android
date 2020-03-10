@@ -29,5 +29,5 @@
     <color name="colorAccent">#448AFF</color>
     <color name="gray_light">#e8e8e8</color>
     <color name="colorStatsLabel">#ffffff</color>
-    <color name="colorStats">#FF9800</color>
+    <color name="colorStats">#FFEB3B</color>
 </resources>
