@@ -83,10 +83,13 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
         mArchiveMode = intent.getBooleanExtra("ARCHIVE_MODE", false);
         String group = intent.getStringExtra("GROUP");
 
-        setTitle(mMoniker +" in Group " + group );
+        setTitle(group + "(" + mMoniker + ")");
 
         initialiseAdapter();
         mMessagingService.registerObserver(this);
+
+        setPollStats(mMessagingService.getStatusPolling());
+
 
         Log.i("ChatActivity", "registerObserver");
 
@@ -206,14 +209,15 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
         Peer[] peers = gson.fromJson(mMessagingService.getMonikerList(), Peer[].class);
 
         String join = "";
-        String peerlist = "Chatters in this Group: ";
+        String peerList = this.getResources().getString(R.string.monikers_preamble);
 
         for (int i=0; i< peers.length; i++ ) {
-            peerlist = peerlist + join + peers[i].moniker;
-            join = ", ";
+            peerList = peerList + join + peers[i].moniker;
+            join = ",\n";
         }
 
-        showMessage(peerlist, R.string.monikers_title, Toast.LENGTH_LONG);
+        DialogUtils.displayOkAlertDialogText(this,R.string.monikers_title,peerList) ;
+
     }
 
 
@@ -222,7 +226,8 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
         Context context = getApplicationContext();
         String ip = "Your IP is: "+ Utils.getIPAddr(context);
 
-        showMessage(ip, R.string.ip_title, Toast.LENGTH_LONG);
+        DialogUtils.displayOkAlertDialogText(this,R.string.ip_title,ip) ;
+
     }
 
 
@@ -248,28 +253,10 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
                 .replace('"', '\0')
                 .replace(',', '\0');
 
-        showMessage(stats, R.string.stats_title, Toast.LENGTH_LONG);
+        DialogUtils.displayOkAlertDialogText(this,R.string.stats_title,stats) ;
     }
 
 
-
-    private void showMessage (String message, @StringRes int titleId, int duration) {
-        //  showMessageToast( message, duration);
-        ShowMessageDialog(message, titleId);
-
-    }
-
-    private void ShowMessageDialog (String message, @StringRes int titleId) {
-
-        DialogUtils.displayOkAlertDialogText(this,titleId,message) ;
-    }
-
-    private void showMessageToast(String message, int duration) {
-        Context context = getApplicationContext();
-        CharSequence text = message;
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-    }
 
 
 
@@ -286,19 +273,23 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
     @Override
     protected void onDestroy() {
         mMessagingService.removeObserver(this);
-
+        mMessagingService.removeStatsObserver();
         super.onDestroy();
     }
 
 
     public void pollStats(MenuItem menuItem) {
+        setPollStats(! mMessagingService.getStatusPolling());
+    }
 
+
+    private void setPollStats(boolean enable) {
         LinearLayout linearLayoutStatusLine = findViewById(R.id.statusLine);
 
-        if (mMessagingService.getStatusPolling()) {
+        if (! enable) {
             mMessagingService.stopStatsPolling();
             linearLayoutStatusLine.setVisibility(View.GONE);
-
+            mMessagingService.removeStatsObserver();
             Log.i("ChatActivity", "pollStats: stopping");
         } else {
             linearLayoutStatusLine.setVisibility(View.VISIBLE);
@@ -306,8 +297,9 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
             mMessagingService.startStatsPolling();
             Log.i("ChatActivity", "pollStats: starting");
         }
-
     }
+
+
 
 
 

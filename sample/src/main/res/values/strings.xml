@@ -30,4 +30,9 @@
     <string name="ip_title">IP Address</string>
     <string name="monikers_title">Participants</string>
     <string name="toggle_poll_stats">Toggle Poll Stats</string>
+    <string name="monikers_preamble">"Participants in this Group: \n"</string>
+    <string name="poll_stats_state_label">"State: "</string>
+    <string name="poll_stats_trans_label">"Trans: "</string>
+    <string name="poll_stats_events_label">"Events: "</string>
+    <string name="poll_stats_undetermined_label">"Undetermined: "</string>
 </resources>

@@ -168,6 +168,12 @@ The stats polling code follows from here on:
         mStatsObserver = statsObserver;
     }
 
+    public void removeStatsObserver() {
+        mStatsObserver = null;
+    }
+
+
+
     public boolean getStatusPolling() { return IsStatsPolling; }
     public void stopStatsPolling(){
         IsStatsPolling = false;
