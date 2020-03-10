@@ -229,7 +229,12 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Map map = gson.fromJson(mMessagingService.getStats(), Map.class);
 
-        String stats = gson.toJson(map);
+        String rawStats = gson.toJson(map);
+
+        String stats = rawStats.replace('{', '\0')
+                .replace('}', '\0')
+                .replace('"', '\0')
+                .replace(',', '\0');
 
         showMessage(stats, R.string.stats_title, Toast.LENGTH_LONG);
     }
