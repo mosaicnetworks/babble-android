@@ -43,6 +43,35 @@ def method = "https"
 def localRepository = "$projectDir/libs/babble-core"
 def babbleJarDependency = "$localRepository/$babbleCoreVersion/classes.jar"
 
+
+def getGitHashShort = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+def getGitHash = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse',  'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+def getGitBranch() {
+    def branch = ""
+    def proc = "git rev-parse --abbrev-ref HEAD".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    branch
+}
+
+
 android {
     compileSdkVersion 29
 
@@ -51,6 +80,9 @@ android {
         targetSdkVersion 29
         versionCode 13
         versionName "0.4.2"
+        buildConfigField "String", "GitHash", "\"${getGitHash()}\""
+        buildConfigField "String", "GitHashShort", "\"${getGitHashShort()}\""
+        buildConfigField "String", "GitBranch", "\"${getGitBranch()}\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

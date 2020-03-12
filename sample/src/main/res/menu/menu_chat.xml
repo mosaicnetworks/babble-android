@@ -30,8 +30,7 @@
     <item
         android:id="@+id/iconHamburger"
         android:icon="@drawable/hamburger"
-        app:showAsAction="ifRoom|withText"
-        android:title="Other">
+        app:showAsAction="ifRoom|withText">
         <menu>
             <item
                 android:icon="@drawable/chatters"

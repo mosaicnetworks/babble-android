@@ -27,11 +27,15 @@ package io.mosaicnetworks.sample;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.configure.BaseConfigActivity;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.utils.DialogUtils;
+import io.mosaicnetworks.babble.utils.Utils;
 
 public class MainActivity extends BaseConfigActivity {
 
@@ -95,4 +99,50 @@ public class MainActivity extends BaseConfigActivity {
         intent.putExtra("GROUP", group);
         startActivity(intent);
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+
+    public void aboutDialog(MenuItem menuItem) {
+
+        String preBlock = "<dl>";
+        String postBlock = "</dl>\n";
+        String prelabel = "<dt><b>";
+        String postlabel = "</b></dt>";
+        String predata = "<dd>";
+        String postdata = "</dd>\n";
+
+
+
+        String aboutText = "<hr>"+preBlock
+                +prelabel+"App ID"+postlabel+predata + io.mosaicnetworks.sample.BuildConfig.APPLICATION_ID + postdata
+                +prelabel+"Version Code"+postlabel+predata + io.mosaicnetworks.sample.BuildConfig.VERSION_CODE +postdata
+                +prelabel+"Version Name"+postlabel+predata + io.mosaicnetworks.sample.BuildConfig.VERSION_NAME + postdata
+                +prelabel+"Git Hash"+postlabel+predata + io.mosaicnetworks.sample.BuildConfig.GitHash + postdata
+                +prelabel+"Git Branch"+postlabel+predata + io.mosaicnetworks.sample.BuildConfig.GitBranch+postdata
+                +postBlock
+                +"<hr>\n"
+                +preBlock
+                +prelabel+ "Babble Package"+postlabel+predata + io.mosaicnetworks.babble.BuildConfig.LIBRARY_PACKAGE_NAME + postdata
+                +prelabel+ "Version Code"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.VERSION_CODE + postdata
+                +prelabel+ "Version Name"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.VERSION_NAME+ postdata
+                +prelabel+ "Git Hash"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitHash+ postdata
+                +prelabel+ "Git Hash Short"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitHashShort+ postdata
+                +prelabel+ "Git Branch"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitBranch +postdata+postBlock
+                +"\n<hr>\n"
+                +preBlock
+                +prelabel+"IP Address"+postlabel+predata+ Utils.getIPAddr(this)+postdata
+                +postBlock + "\n<hr>\n";
+
+        DialogUtils.displayOkAlertDialogHTML(this, R.string.about_title, aboutText);
+    }
+
+
+
 }
