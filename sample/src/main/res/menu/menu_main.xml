@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ MIT License
   ~
@@ -22,18 +23,20 @@
   ~ SOFTWARE.
   -->
 
-<resources>
-    <string name="app_name">Babble Chat</string>
-    <string name="hint_enter_a_message">Enter a message</string>
-    <string name="no_messages_in_archive">This archive is empty</string>
-    <string name="stats_title">Stats</string>
-    <string name="ip_title">IP Address</string>
-    <string name="monikers_title">Participants</string>
-    <string name="toggle_poll_stats">Toggle Poll Stats</string>
-    <string name="monikers_preamble">"Participants in this Group: \n\n"</string>
-    <string name="poll_stats_state_label">"State: "</string>
-    <string name="poll_stats_trans_label">"Trans: "</string>
-    <string name="poll_stats_events_label">"Events: "</string>
-    <string name="poll_stats_undetermined_label">"Undetermined: "</string>
-    <string name="about_title">About</string>
-</resources>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <item
+        android:id="@+id/iconHamburger"
+        android:icon="@drawable/hamburger"
+        app:showAsAction="ifRoom|withText">
+        <menu>
+            <item
+                android:icon="@drawable/info"
+                android:id="@+id/menuAbout"
+                android:onClick="aboutDialog"
+                android:title="@string/about_title"></item>
+        </menu>
+    </item>
+</menu>

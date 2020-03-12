@@ -22,18 +22,8 @@
   ~ SOFTWARE.
   -->
 
-<resources>
-    <string name="app_name">Babble Chat</string>
-    <string name="hint_enter_a_message">Enter a message</string>
-    <string name="no_messages_in_archive">This archive is empty</string>
-    <string name="stats_title">Stats</string>
-    <string name="ip_title">IP Address</string>
-    <string name="monikers_title">Participants</string>
-    <string name="toggle_poll_stats">Toggle Poll Stats</string>
-    <string name="monikers_preamble">"Participants in this Group: \n\n"</string>
-    <string name="poll_stats_state_label">"State: "</string>
-    <string name="poll_stats_trans_label">"Trans: "</string>
-    <string name="poll_stats_events_label">"Events: "</string>
-    <string name="poll_stats_undetermined_label">"Undetermined: "</string>
-    <string name="about_title">About</string>
-</resources>
+<vector android:height="24dp" android:tint="#FF5415"
+    android:viewportHeight="24.0" android:viewportWidth="24.0"
+    android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="#FF000000" android:pathData="M11,17h2v-6h-2v6zM12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2zM12,20c-4.41,0 -8,-3.59 -8,-8s3.59,-8 8,-8 8,3.59 8,8 -3.59,8 -8,8zM11,9h2L13,7h-2v2z"/>
+</vector>
