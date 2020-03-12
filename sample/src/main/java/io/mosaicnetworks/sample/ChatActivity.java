@@ -51,6 +51,7 @@ import com.stfalcon.chatkit.messages.MessagesListAdapter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -246,16 +247,31 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
         }
 
 
-        String rawStats = gson.toJson(map);
 
-        String stats = rawStats.replace('{', '\0')
-                .replace('}', '\0')
-                .replace('"', '\0')
-                .replace(',', '\0');
+        boolean plainText = false;
+        if (plainText) {
+            String rawStats = gson.toJson(map);
 
-        DialogUtils.displayOkAlertDialogText(this,R.string.stats_title,stats) ;
+            String stats = rawStats.replace('{', '\0')
+                    .replace('}', '\0')
+                    .replace('"', '\0')
+                    .replace(',', '\0');
+
+            DialogUtils.displayOkAlertDialogText(this, R.string.stats_title, stats);
+        } else {
+            Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
+            String html = "<table>\n";
+
+            while(itr.hasNext()) {
+                Map.Entry<String, String> entry = itr.next();
+                html = html + "<tr><td><font color=\"#0000ff\">" + entry.getKey() + "</font></td><td><font color=\"#ff0000\"> " + entry.getValue() + "</font></td></tr>\n";
+            }
+
+            html = html + "</table>\n";
+
+            DialogUtils.displayOkAlertDialogHTML(this, R.string.stats_title, html);
+        }
     }
-
 
 
 
