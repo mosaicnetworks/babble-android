@@ -25,9 +25,14 @@
 package io.mosaicnetworks.sample;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.IOException;
+import java.util.Map;
 
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
 
@@ -146,6 +151,55 @@ public final class MessagingService extends BabbleService<ChatState> {
         MessagingService.sDiscoveryPort = discoveryPort;
     }
 
+
+/*
+
+The stats polling code follows from here on:
+ */
+
+
+    private StatsObserver mStatsObserver;
+    public final int mPollingInterval = 5000;
+    private boolean IsStatsPolling = false;
+    private Gson gson = new GsonBuilder().create();
+
+
+    public void registerStatsObserver(StatsObserver statsObserver) {
+        mStatsObserver = statsObserver;
+    }
+
+    public void removeStatsObserver() {
+        mStatsObserver = null;
+    }
+
+
+
+    public boolean getStatusPolling() { return IsStatsPolling; }
+    public void stopStatsPolling(){
+        IsStatsPolling = false;
+    }
+
+    public void startStatsPolling(){
+        final android.os.Handler handler = new Handler();
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (! IsStatsPolling) { return ; }
+                if (mStatsObserver == null) { IsStatsPolling = false; return ;}
+                if (mBabbleNode == null) {IsStatsPolling = false; return ;}
+
+                mBabbleNode.getStats();
+                Map map = gson.fromJson(mBabbleNode.getStats(), Map.class);
+
+                mStatsObserver.statsUpdated(map);
+                handler.postDelayed(this, mPollingInterval);
+            }
+        };
+
+        IsStatsPolling = true;
+        handler.postDelayed(runnable, 0);
+    }
 
 
 

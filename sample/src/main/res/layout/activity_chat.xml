@@ -33,6 +33,89 @@
     android:gravity="center"
     android:orientation="vertical">
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/statusLine"
+        android:textAlignment="center"
+        android:background="@color/colorPrimary"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleStatusLabels"
+            android:textColor="@color/colorStatsLabel"
+            android:textAlignment="center"
+            android:text="@string/poll_stats_state_label">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleStatus"
+            android:textColor="@color/colorStats"
+            android:textAlignment="center"
+            android:text="">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleEventsLabels"
+            android:textColor="@color/colorStatsLabel"
+            android:textAlignment="center"
+            android:text="@string/poll_stats_events_label">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleEvents"
+            android:textColor="@color/colorStats"
+            android:textAlignment="center"
+            android:text="">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleTransactionsLabels"
+            android:textColor="@color/colorStatsLabel"
+            android:textAlignment="center"
+            android:text="@string/poll_stats_trans_label">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleTransactions"
+            android:textColor="@color/colorStats"
+            android:textAlignment="center"
+            android:text="">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleUndeterminedLabels"
+            android:textColor="@color/colorStatsLabel"
+            android:textAlignment="center"
+            android:text="@string/poll_stats_undetermined_label">
+        </TextView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/babbleUndetermined"
+            android:textColor="@color/colorStats"
+            android:textAlignment="center"
+            android:text="">
+        </TextView>
+    </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/relativeLayout_messages"
         android:layout_width="match_parent"

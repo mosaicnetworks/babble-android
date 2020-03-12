@@ -1,5 +1,21 @@
 # CHANGELOG
+## UNRELEASED v0.4.3 (March 13, 2020)
 
+SECURITY:
+
+FEATURES:
+
+- Sample App: Added hamburger menu to chat to how additional information and status 
+
+IMPROVEMENTS:
+
+- Sample App: added title to the chat screen
+- Sample App: changed colours from teal
+
+BUG FIXES:
+
+
+  
 ## v0.4.2 (March 6, 2020)
 
 SECURITY:

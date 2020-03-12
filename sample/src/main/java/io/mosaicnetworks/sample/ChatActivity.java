@@ -26,29 +26,44 @@ package io.mosaicnetworks.sample;
 
 import android.content.Context;
 import android.content.Intent;
+
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
 import com.stfalcon.chatkit.commons.ImageLoader;
 import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.ServiceObserver;
+import io.mosaicnetworks.babble.utils.DialogUtils;
+import io.mosaicnetworks.babble.utils.Utils;
 
 /**
  * This is the central UI component. It receives messages from the {@link MessagingService} and
  * displays them as a list.
  */
-public class ChatActivity extends AppCompatActivity implements ServiceObserver {
+public class ChatActivity extends AppCompatActivity implements ServiceObserver, StatsObserver  {
 
     private MessagesListAdapter<Message> mAdapter;
     private String mMoniker;
@@ -66,9 +81,15 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         Intent intent = getIntent();
         mMoniker = intent.getStringExtra("MONIKER");
         mArchiveMode = intent.getBooleanExtra("ARCHIVE_MODE", false);
+        String group = intent.getStringExtra("GROUP");
+
+        setTitle(group + " (" + mMoniker + ")");
 
         initialiseAdapter();
         mMessagingService.registerObserver(this);
+
+        setPollStats(mMessagingService.getStatusPolling());
+
 
         Log.i("ChatActivity", "registerObserver");
 
@@ -174,6 +195,71 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
         mMessageIndex = mMessageIndex + newMessages.size();
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_chat, menu);
+        return true;
+    }
+
+
+    public void showChatters(MenuItem menuItem) {
+        Gson gson = new Gson();
+        Peer[] peers = gson.fromJson(mMessagingService.getMonikerList(), Peer[].class);
+
+        String join = "";
+        String peerList = this.getResources().getString(R.string.monikers_preamble);
+
+        for (int i=0; i< peers.length; i++ ) {
+            peerList = peerList + join + peers[i].moniker;
+            join = ",\n";
+        }
+
+        DialogUtils.displayOkAlertDialogText(this,R.string.monikers_title,peerList) ;
+
+    }
+
+
+
+    public void showIP(MenuItem menuItem) {
+        Context context = getApplicationContext();
+        String ip = "Your IP is: "+ Utils.getIPAddr(context);
+
+        DialogUtils.displayOkAlertDialogText(this,R.string.ip_title,ip) ;
+
+    }
+
+
+    public void showStats(MenuItem menuItem) {
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Map map = gson.fromJson(mMessagingService.getStats(), Map.class);
+
+        if (map.containsKey("time"))  // Convert Unix nano seconds to a real date time
+        {
+            String timeStr = (String) map.get("time");
+            Date currentTime = new Date(Long.parseLong(timeStr)  / 1000000L);
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            String dateString = formatter.format(currentTime);
+            map.put("time", dateString);
+        }
+
+
+        String rawStats = gson.toJson(map);
+
+        String stats = rawStats.replace('{', '\0')
+                .replace('}', '\0')
+                .replace('"', '\0')
+                .replace(',', '\0');
+
+        DialogUtils.displayOkAlertDialogText(this,R.string.stats_title,stats) ;
+    }
+
+
+
+
+
     /**
      * When back is pressed we should leave the group. The {@link #onDestroy()} method will handle
      * unregistering from the service
@@ -187,7 +273,44 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver {
     @Override
     protected void onDestroy() {
         mMessagingService.removeObserver(this);
-
+        mMessagingService.removeStatsObserver();
         super.onDestroy();
+    }
+
+
+    public void pollStats(MenuItem menuItem) {
+        setPollStats(! mMessagingService.getStatusPolling());
+    }
+
+
+    private void setPollStats(boolean enable) {
+        LinearLayout linearLayoutStatusLine = findViewById(R.id.statusLine);
+
+        if (! enable) {
+            mMessagingService.stopStatsPolling();
+            linearLayoutStatusLine.setVisibility(View.GONE);
+            mMessagingService.removeStatsObserver();
+            Log.i("ChatActivity", "pollStats: stopping");
+        } else {
+            linearLayoutStatusLine.setVisibility(View.VISIBLE);
+            mMessagingService.registerStatsObserver(this);
+            mMessagingService.startStatsPolling();
+            Log.i("ChatActivity", "pollStats: starting");
+        }
+    }
+
+
+
+
+
+    @Override
+    public void statsUpdated(Map map) {
+        Log.i("ChatActivity", "statsUpdated");
+        Log.i("ChatActivity", (String) map.get("time"));
+        ((TextView) findViewById(R.id.babbleStatus)).setText((String) map.get("state"));
+        ((TextView) findViewById(R.id.babbleEvents)).setText((String) map.get("consensus_events"));
+        ((TextView) findViewById(R.id.babbleTransactions)).setText((String) map.get("consensus_transactions"));
+        ((TextView) findViewById(R.id.babbleUndetermined)).setText((String) map.get("undetermined_events"));
+
     }
 }

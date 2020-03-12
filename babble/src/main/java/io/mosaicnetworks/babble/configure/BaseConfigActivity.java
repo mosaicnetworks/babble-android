@@ -199,14 +199,14 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     }
 
     @Override
-    public void baseOnJoined(String moniker) {
-        onJoined(moniker);
+    public void baseOnJoined(String moniker, String group) {
+        onJoined(moniker, group);
         mFromGroup = true;
     }
 
     @Override
-    public void baseOnStartedNew(String moniker) {
-        onStartedNew(moniker);
+    public void baseOnStartedNew(String moniker, String group) {
+        onStartedNew(moniker, group);
         mFromGroup = true;
     }
 
@@ -223,11 +223,11 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     @Override
     public abstract BabbleService getBabbleService();
 
-    public abstract void onJoined(String moniker);
+    public abstract void onJoined(String moniker, String group);
 
-    public abstract void onStartedNew(String moniker);
+    public abstract void onStartedNew(String moniker, String group);
 
     @Override
-    public abstract void onArchiveLoaded(String moniker);
+    public abstract void onArchiveLoaded(String moniker, String group);
 
 }

@@ -257,7 +257,7 @@ public class P2PJoinGroupFragment extends Fragment implements ResponseListener, 
         }
 
         mLoadingDialog.dismiss();
-        mListener.baseOnJoined(mMoniker);
+        mListener.baseOnJoined(mMoniker, groupDescriptor.getName());
     }
 
     @Override
