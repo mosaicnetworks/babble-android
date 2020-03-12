@@ -5,7 +5,8 @@ SECURITY:
 
 FEATURES:
 
-- Sample App: Added hamburger menu to chat to how additional information and status 
+- Sample App: Added hamburger menu to chat screen to how additional information and status 
+- Sample App: Added hamburger menu to front screen to display version information
 
 IMPROVEMENTS:
 
