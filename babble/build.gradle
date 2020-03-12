@@ -83,6 +83,9 @@ android {
         buildConfigField "String", "GitHash", "\"${getGitHash()}\""
         buildConfigField "String", "GitHashShort", "\"${getGitHashShort()}\""
         buildConfigField "String", "GitBranch", "\"${getGitBranch()}\""
+        buildConfigField "String", "BabbleVersion", "\"${babbleCoreVersion}\""
+        buildConfigField "String", "BabbleRepo", "\"${repository}\""
+        buildConfigField "String", "BabbleMethod", "\"${method}\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

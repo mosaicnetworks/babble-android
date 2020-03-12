@@ -134,8 +134,15 @@ public class MainActivity extends BaseConfigActivity {
                 +prelabel+ "Version Name"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.VERSION_NAME+ postdata
                 +prelabel+ "Git Hash"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitHash+ postdata
                 +prelabel+ "Git Hash Short"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitHashShort+ postdata
-                +prelabel+ "Git Branch"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitBranch +postdata+postBlock
-                +"\n<hr>\n"
+                +prelabel+ "Git Branch"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitBranch +postdata
+                +postBlock
+                +"<hr>\n"
+                +preBlock
+                +prelabel+ "Babble Version"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.BabbleVersion +postdata
+                +prelabel+ "Babble Repo"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.BabbleRepo +postdata
+                +prelabel+ "Babble Method"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.BabbleMethod +postdata
+
+                +postBlock+"\n<hr>\n"
                 +preBlock
                 +prelabel+"IP Address"+postlabel+predata+ Utils.getIPAddr(this)+postdata
                 +postBlock + "\n<hr>\n";
