@@ -24,16 +24,11 @@
 
 package io.mosaicnetworks.babble.configure;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AlertDialog;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,22 +36,21 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Switch;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import androidx.annotation.NonNull;
+
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleService;
-import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.service.BabbleService2;
+import io.mosaicnetworks.babble.service.BabbleServiceBinder;
+import io.mosaicnetworks.babble.service.ServiceAdvertiser;
+import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser2;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
-
-
-
-
 
 /**
  * This fragment enables the user to configure the {@link BabbleService} to create a new group.
@@ -64,37 +58,28 @@ import io.mosaicnetworks.babble.utils.Utils;
  * interface to handle interaction events. Use the {@link NewGroupFragment#newInstance} factory
  * method to create an instance of this fragment.
  */
-public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
+public class NewGroupFragment extends BabbleServiceBinder {
 
     private static boolean mShowmDNS = true;
     private static boolean mShowP2P = true;
-
-
-    //TODO: This variable is not currently exposed. It controls the initial value of the P2P / MDNS switch
-    // true for P2P, false for MDNS.
-    private static boolean mInitSwitchP2P = false;
-
-
-
-    GroupDescriptor mGroupDescriptor;
-    int mNetworkType;
-    String mMoniker;
-
+    private String mConfigDirectory;
+    private ProgressDialog mLoadingDialog;
+    private GroupDescriptor mGroupDescriptor;
+    private String mMoniker;
     private OnFragmentInteractionListener mListener;
+    private ServiceAdvertiser mServiceAdvertiser;
 
-    public NewGroupFragment() {
-    }
+    public NewGroupFragment() { }
 
     /**
      * Use this factory method to create a new instance of
      * this fragment.
      *
-     * @return A new instance of fragment NewGroupFragment.
+     * @return A new instance of fragment NewGroupServiceFragment.
      */
     public static NewGroupFragment newInstance(Bundle args) {
         mShowmDNS = args.getBoolean(BaseConfigActivity.SHOW_MDNS, true);
         mShowP2P = args.getBoolean(BaseConfigActivity.SHOW_P2P, true);
-//        setArguments(args);
         return new NewGroupFragment();
     }
 
@@ -126,26 +111,22 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
 
         // If only one discovery tab is shown then set and then disable the toggle switch to only
         // allow a valid selection.
-
         Switch switchP2P =  view.findViewById(R.id.switch_p2p);
         if (mShowmDNS) {
-            if ( mShowP2P) {
-                switchP2P.setChecked(mInitSwitchP2P);
+            if (mShowP2P) {
+                switchP2P.setChecked(false);
                 switchP2P.setEnabled(true);
             } else {
                     switchP2P.setChecked(false);
                     switchP2P.setEnabled(false);
                     switchP2P.setVisibility(View.GONE);
             }
-
-
         } else {
             if (mShowP2P) {
                 switchP2P.setChecked(true);
                 switchP2P.setEnabled(false);
             }
         }
-
 
         EditText editGroup = view.findViewById(R.id.edit_group_name);
         editGroup.requestFocus();
@@ -158,7 +139,6 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
 
     // called when the user presses the start button
     public void startGroup(View view) {
-        Log.i("startGroup", "Starting Group ");
 
         //get moniker
         EditText editMoniker = view.findViewById(R.id.edit_moniker);
@@ -168,6 +148,13 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
             return;
         }
 
+        // Store moniker entered
+        SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
+                BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("moniker", mMoniker);
+        editor.apply();
+
         //get group name
         EditText editGroupName = view.findViewById(R.id.edit_group_name);
         String groupName = editGroupName.getText().toString();
@@ -175,115 +162,63 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
             DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.no_group_name_alert_title, R.string.no_group_name_alert_message);
             return;
         }
+        mGroupDescriptor = new GroupDescriptor(groupName);
 
         // Get network type
         Switch switchP2P =  view.findViewById(R.id.switch_p2p);
         boolean isP2P = switchP2P.isChecked();
-        int networkType;
 
         if (isP2P) {
-            mNetworkType = BabbleService.NETWORK_P2P;
+
+            //TODO: P2P - Need change the workflow here. We are launching a new instance, but we rely
+            //      on having started Wifi Direct up.
+
+            P2PService p2PService = P2PService.getInstance(getContext());
+            p2PService.registerOnNetworkInitialised(new OnNetworkInitialised() {
+                @Override
+                public void onNetworkInitialised(String ip) {
+                    configAndStartBabble(ip);
+                }
+            });
+
+            // This will call back onNetworkInitialised
+            p2PService.startRegistration(mMoniker, groupName, BabbleService.BABBLE_VERSION, false);
+            //TODO: Turned off discovery for the lead peer, but may need to re-enable to trigger discovery.
+
+            //TODO: finish this line: mServiceAdvertiser =
+
         } else {
-            mNetworkType = BabbleService.NETWORK_WIFI;
+            mServiceAdvertiser = new MdnsAdvertiser2(mGroupDescriptor,
+                    getContext().getApplicationContext());
+            configAndStartBabble(Utils.getIPAddr(getContext()));
         }
-
-        mGroupDescriptor = new GroupDescriptor(groupName);
-
-        //TODO: P2P - Need change the workflow here. We are launching a new instance, but we rely
-        //      on having started Wifi Direct up.
-
-
-        String ip = "";
-
-        switch (mNetworkType) {
-            case BabbleService.NETWORK_P2P:
-                P2PService p2PService = P2PService.getInstance(getContext());
-                p2PService.registerOnNetworkInitialised(this);
-
-                // This will call back onNetworkInitialised
-                Log.i("startGroup", "Start Broadcasting P2P");
-                p2PService.startRegistration(mMoniker, groupName, BabbleService.BABBLE_VERSION, false);
-                //TODO: Turned off discovery for the lead peer, but may need to re-enable to trigger discovery.
-
-
-                break;
-            default:
-                ip = Utils.getIPAddr(getContext());
-
-                Log.i("startGroup", "mDNS");
-
-                // N.B. mDNS does not require a callback, so we call configAndStartBabble directly.
-
-                onNetworkInitialised(ip);
-        }
-
-
-        // Store moniker entered
-        SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
-                BaseConfigActivity.PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("moniker", mMoniker);
-        editor.apply();
-
-
-
-    }
-
-
-
-    public void onNetworkInitialised(String ip){
-        Log.i("startGroup", "onNetworkInitialised: "+ ip);
-        configAndStartBabble(ip);
     }
 
     private void configAndStartBabble(String ip) {
-        BabbleService<?> babbleService = mListener.getBabbleService();
-        ConfigManager configManager;
-
-        String configDirectory;
-
-            configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
-
-            Log.v("startGroup", "Got ConfigManager ");
-
-
-
-
-        try {
-            configDirectory = configManager.createConfigNewGroup(mGroupDescriptor, mMoniker, ip);
-            Log.i("startGroup", "configDirectory: " + configDirectory);
-            //babbleService.createConfigNewGroup(moniker, Utils.getIPAddr(getContext()));
-        } catch (IllegalArgumentException | CannotStartBabbleNodeException| IOException ex) {
-            //TODO: just catch IOException - this will mean the port is in use
-            //we'll assume this is caused by the node taking a while to leave a previous group,
-            //though it could be that another application is using the port - in which case
-            //we'll keep getting stuck here until the port is available!
-            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
-            return;
-        }
-
-        Log.i("startGroup", "configDirectory: " + configDirectory);
-
-
-        try {
-            babbleService.start(configDirectory, mGroupDescriptor, mNetworkType);
-        } catch (IllegalArgumentException ex) {
-            //we'll assume this is caused by the node taking a while to leave a previous group,
-            //though it could be that another application is using the port or WiFi is turned off -
-            // in which case we'll keep getting stuck here until the port is available or WiFi is
-            // turned on!
-            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
-            return;
-        } catch (Exception ex) {
-            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
-            throw ex;
-        }
-
-        mListener.baseOnStartedNew(mMoniker, mGroupDescriptor.getName());
-
+        ConfigManager configManager =
+                ConfigManager.getInstance(getContext().getApplicationContext());
+        mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, mMoniker, ip);
+        startBabbleService();
     }
 
+    public void startBabbleService() {
+        getActivity().startService(new Intent(getActivity(), BabbleService2.class));
+        mLoadingDialog = DialogUtils.displayLoadingDialog(getContext());
+        mLoadingDialog.show();
+        doBindService();
+    }
+
+    @Override
+    protected void onServiceConnected() {
+        mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
+        mListener.baseOnStartedNew(mMoniker, mGroupDescriptor.getName());
+        mLoadingDialog.dismiss();
+    }
+
+    @Override
+    protected void onServiceDisconnected() {
+        //Do nothing
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -294,6 +229,12 @@ public class NewGroupFragment extends Fragment implements OnNetworkInitialised {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        doUnbindService();
     }
 
     @Override

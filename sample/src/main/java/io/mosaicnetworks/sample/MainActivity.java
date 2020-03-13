@@ -30,12 +30,13 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.util.Objects;
-
 import io.mosaicnetworks.babble.configure.BaseConfigActivity;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
+
+import io.mosaicnetworks.babble.service.BabbleService2;
+
 
 public class MainActivity extends BaseConfigActivity {
 
@@ -48,6 +49,8 @@ public class MainActivity extends BaseConfigActivity {
 
         // Show all versions of each group in the archive tab
         setShowAllArchiveVersions(true);
+
+        BabbleService2.setAppState(new ChatState());
 
         super.onCreate(savedInstanceState);
 
@@ -84,22 +87,20 @@ public class MainActivity extends BaseConfigActivity {
 
     @Override
     public void onStartedNew(String moniker, String group) {
-        Intent intent = new Intent(this, ChatActivity.class);
+        Intent intent = new Intent(this, ChatActivityAndroidService.class);
         intent.putExtra("MONIKER", moniker);
         intent.putExtra("ARCHIVE_MODE", false);
         intent.putExtra("GROUP", group);
         startActivity(intent);
     }
 
-    @Override
     public void onArchiveLoaded(String moniker, String group) {
-        Intent intent = new Intent(this, ChatActivity.class);
+        Intent intent = new Intent(this, ChatActivityAndroidService.class);
         intent.putExtra("MONIKER", moniker);
         intent.putExtra("ARCHIVE_MODE", true);
         intent.putExtra("GROUP", group);
         startActivity(intent);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -134,15 +135,19 @@ public class MainActivity extends BaseConfigActivity {
                 +prelabel+ "Version Name"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.VERSION_NAME+ postdata
                 +prelabel+ "Git Hash"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitHash+ postdata
                 +prelabel+ "Git Hash Short"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitHashShort+ postdata
-                +prelabel+ "Git Branch"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitBranch +postdata+postBlock
-                +"\n<hr>\n"
+                +prelabel+ "Git Branch"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitBranch +postdata
+                +postBlock
+                +"<hr>\n"
+                +preBlock
+                +prelabel+ "Babble Version"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.BabbleVersion +postdata
+                +prelabel+ "Babble Repo"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.BabbleRepo +postdata
+                +prelabel+ "Babble Method"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.BabbleMethod +postdata
+
+                +postBlock+"\n<hr>\n"
                 +preBlock
                 +prelabel+"IP Address"+postlabel+predata+ Utils.getIPAddr(this)+postdata
                 +postBlock + "\n<hr>\n";
 
         DialogUtils.displayOkAlertDialogHTML(this, R.string.about_title, aboutText);
     }
-
-
-
 }

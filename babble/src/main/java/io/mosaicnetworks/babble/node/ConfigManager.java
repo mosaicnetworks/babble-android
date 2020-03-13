@@ -252,13 +252,13 @@ public final class ConfigManager {
 
 
 
-    /**b
+    /**
      * Configure the service to create a new group using the default ports
      * @param moniker node moniker
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String inetAddress)  throws CannotStartBabbleNodeException, IOException {
+    public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String inetAddress) {
         return createConfigNewGroup(groupDescriptor, moniker, inetAddress, DEFAULT_BABBLING_PORT);
     }
 
@@ -270,7 +270,7 @@ public final class ConfigManager {
      * //@param discoveryPort the port used by the HttpPeerDiscoveryServer //TODO: how to deal with this
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
+    public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String inetAddress, int babblingPort) {
         List<Peer> genesisPeers = new ArrayList<>();
         genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
         List<Peer> currentPeers = new ArrayList<>();
@@ -354,7 +354,7 @@ public final class ConfigManager {
     }
 
     private String createConfig(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor,
-                                String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException {
+                                String moniker, String inetAddress, int babblingPort) {
 
         String compositeGroupName = getCompositeConfigDir(groupDescriptor);
 
@@ -446,7 +446,7 @@ public final class ConfigManager {
      * @param compositeGroupName is the sub-directory of the babble sub-directory of the local storage as passed to the constructor
      * @return the composite path where the babble.toml file was written
      */
-    public String writeBabbleTomlFiles(NodeConfig nodeConfig, String compositeGroupName, String inetAddress, int port, String moniker) throws CannotStartBabbleNodeException, IOException {
+    public String writeBabbleTomlFiles(NodeConfig nodeConfig, String compositeGroupName, String inetAddress, int port, String moniker) {
 
         //TODO: add inetAddress, port and moniker to nodeConfig??
         Map<String, Object> babble = new HashMap<>();
@@ -459,7 +459,7 @@ public final class ConfigManager {
             // We have a clash.
             switch (sConfigDirectoryBackupPolicy) {
                 case ABORT:
-                    throw new CannotStartBabbleNodeException("Config directory already exists and we have ABORT policy");
+                    throw new IllegalArgumentException("Config directory already exists and we have ABORT policy");
                 case COMPLETE_BACKUP:
                 case SINGLE_BACKUP:
                     // Rename
@@ -472,7 +472,7 @@ public final class ConfigManager {
         }
 
         if   ( ( ! babbleDir.mkdirs() ) && (! babbleDir.exists())) {
-            throw new CannotStartBabbleNodeException("Cannot create new Config directory (no previous backup)");
+            throw new IllegalArgumentException("Cannot create new Config directory (no previous backup)");
         }
 
         babble.put("datadir", mTomlDir) ;
@@ -535,7 +535,7 @@ public final class ConfigManager {
      * Writes the Babble Config TOML file. This function relies on mTomlDir being set.
      * @param configHashMap A HashMap object containing the config data to be written the Toml File.
      */
-    protected void writeTomlFile(Map<String, Object> configHashMap) throws IOException {
+    protected void writeTomlFile(Map<String, Object> configHashMap) {
         Log.i("writeTomlFile", mTomlDir);
 
         try {
@@ -546,7 +546,7 @@ public final class ConfigManager {
         } catch (IOException e) {
             // Log and rethrow
             Log.e("writeTomlFile", e.toString());
-            throw e;
+            throw new RuntimeException(e.toString());
         }
 
     }
@@ -576,16 +576,9 @@ public final class ConfigManager {
         }
 
         if (hasChanged) {
-            try {
                 writeTomlFile(configMap);
                 Log.i("amendTomlSettings", configMap.toString());
 
-             } catch (IOException e)
-            {
-                // Rethrow
-                throw new RuntimeException("Could not ammend TOML file");
-            }
-        } else {
             Log.i("amendTomlSettings", "No changes, no write");
         }
 
@@ -695,7 +688,7 @@ public final class ConfigManager {
         }
     }
     
-    private void renameConfigDirectory(String oldSubConfigDir, int newSuffix) throws CannotStartBabbleNodeException {
+    private void renameConfigDirectory(String oldSubConfigDir, int newSuffix) {
         File oldFile = new File(sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir);
         File newFile = new File(sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir + newSuffix);
         
@@ -704,11 +697,11 @@ public final class ConfigManager {
         
         if (!(oldFile.renameTo(newFile))) {
             Log.d("Rename ","Fails");
-            throw new CannotStartBabbleNodeException("Cannot backup the old configuration directory");
+            throw new RuntimeException("Cannot backup the old configuration directory");
         }
     }
 
-    private void backupOldConfigs(String compositeName) throws CannotStartBabbleNodeException {
+    private void backupOldConfigs(String compositeName) {
         
         if (sConfigDirectoryBackupPolicy == ConfigDirectoryBackupPolicy.SINGLE_BACKUP) {
 
