@@ -210,9 +210,22 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         mFromGroup = true;
     }
 
+    /*
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mFromGroup) {
+            mFragmentManager.popBackStack();
+        }
+    }
+
+     */
+
     @Override
     protected void onStart() {
         super.onStart();
+
         if (mFromGroup) {
             mFragmentManager.popBackStack();
             ArchivedGroupsFragment.reloadArchive = true;

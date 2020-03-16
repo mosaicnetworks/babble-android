@@ -25,6 +25,7 @@
 package io.mosaicnetworks.babble.configure;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -51,6 +52,8 @@ import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.service.BabbleService2;
+import io.mosaicnetworks.babble.service.BabbleServiceBinder;
 import io.mosaicnetworks.babble.utils.Utils;
 
 /**
@@ -58,7 +61,7 @@ import io.mosaicnetworks.babble.utils.Utils;
  * Use the {@link ArchivedGroupsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAdapter.ItemClickListener {
+public class ArchivedGroupsFragment extends BabbleServiceBinder implements ArchivedGroupsAdapter.ItemClickListener {
 
     public static boolean reloadArchive = false;
     private OnFragmentInteractionListener mListener;
@@ -71,7 +74,6 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
     private RecyclerView mRvArchivedGroups;
     private LinearLayout mLinearLayoutNoArchives;
     private String mMoniker;
-    private BabbleService mBabbleService;
 
     /**
      * Use this factory method to create a new instance of
@@ -89,7 +91,6 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
         mConfigManager = ConfigManager.getInstance(getContext().getApplicationContext());
 
         initActionModeCallback();
-        mBabbleService = mListener.getBabbleService();
 
         mViewModel = ViewModelProviders.of(this, new ArchivedGroupsViewModelFactory(mConfigManager)).get(ArchivedGroupsViewModel.class);
     }
@@ -126,10 +127,9 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
 
             mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), ConfigManager.DEFAULT_BABBLING_PORT);
             mMoniker = mConfigManager.getMoniker();
-
-            String configDir = mConfigManager.getTomlDir();
-            mBabbleService.startArchive(configDir, new GroupDescriptor("Archived Group"), null); //TODO: need to get a proper group descriptor
-            mListener.onArchiveLoaded(mMoniker, "Archived Group");
+            getActivity().startService(new Intent(getActivity(), BabbleService2.class));
+            //TODO: should we display a loading dialog in case the user clicks again?
+            doBindService();
         }
     }
 
@@ -205,6 +205,18 @@ public class ArchivedGroupsFragment extends Fragment implements ArchivedGroupsAd
                 mActionMode = null;
             }
         };
+    }
+
+    @Override
+    protected void onServiceConnected() {
+        mBoundService.startArchive(mConfigManager.getTomlDir(), new GroupDescriptor("Archived Group"), null); //TODO: need to get a proper group descriptor
+        mListener.onArchiveLoaded(mMoniker, "Archived Group");
+        doUnbindService();
+    }
+
+    @Override
+    protected void onServiceDisconnected() {
+
     }
 
     @Override

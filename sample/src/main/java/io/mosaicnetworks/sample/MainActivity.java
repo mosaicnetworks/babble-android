@@ -30,12 +30,13 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.util.Objects;
-
 import io.mosaicnetworks.babble.configure.BaseConfigActivity;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
+
+import io.mosaicnetworks.babble.service.BabbleService2;
+
 
 public class MainActivity extends BaseConfigActivity {
 
@@ -48,6 +49,8 @@ public class MainActivity extends BaseConfigActivity {
 
         // Show all versions of each group in the archive tab
         setShowAllArchiveVersions(true);
+
+        BabbleService2.setAppState(new ChatState());
 
         super.onCreate(savedInstanceState);
 
@@ -84,22 +87,20 @@ public class MainActivity extends BaseConfigActivity {
 
     @Override
     public void onStartedNew(String moniker, String group) {
-        Intent intent = new Intent(this, ChatActivity.class);
+        Intent intent = new Intent(this, ChatActivityAndroidService.class);
         intent.putExtra("MONIKER", moniker);
         intent.putExtra("ARCHIVE_MODE", false);
         intent.putExtra("GROUP", group);
         startActivity(intent);
     }
 
-    @Override
     public void onArchiveLoaded(String moniker, String group) {
-        Intent intent = new Intent(this, ChatActivity.class);
+        Intent intent = new Intent(this, ChatActivityAndroidService.class);
         intent.putExtra("MONIKER", moniker);
         intent.putExtra("ARCHIVE_MODE", true);
         intent.putExtra("GROUP", group);
         startActivity(intent);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -149,7 +150,4 @@ public class MainActivity extends BaseConfigActivity {
 
         DialogUtils.displayOkAlertDialogHTML(this, R.string.about_title, aboutText);
     }
-
-
-
 }

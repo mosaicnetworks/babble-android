@@ -25,6 +25,7 @@
 package io.mosaicnetworks.babble.utils;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.webkit.WebView;
 
@@ -65,13 +66,25 @@ public class DialogUtils {
 
         String fullhtml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
                 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>\n" +
-                html + "\n</body>\n</html>" ;
+                html + "\n</body>\n</html>";
 
         WebView view = new WebView(context);
         view.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
         view.setPadding(10, 10, 10, 10);
         dialog.setView(view);
         dialog.show();
+    }
+
+    public static ProgressDialog displayLoadingDialog(Context context) {
+        ProgressDialog loadingDialog = new ProgressDialog(context);
+        loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        loadingDialog.setTitle("Loading chat");
+        loadingDialog.setMessage("Loading. Please wait...");
+        loadingDialog.setIndeterminate(true);
+        loadingDialog.setCanceledOnTouchOutside(false);
+
+        return loadingDialog;
+
     }
 
 
