@@ -117,9 +117,9 @@ public class NewGroupFragment extends BabbleServiceBinder {
                 switchP2P.setChecked(false);
                 switchP2P.setEnabled(true);
             } else {
-                    switchP2P.setChecked(false);
-                    switchP2P.setEnabled(false);
-                    switchP2P.setVisibility(View.GONE);
+                switchP2P.setChecked(false);
+                switchP2P.setEnabled(false);
+                switchP2P.setVisibility(View.GONE);
             }
         } else {
             if (mShowP2P) {
@@ -210,9 +210,19 @@ public class NewGroupFragment extends BabbleServiceBinder {
 
     @Override
     protected void onServiceConnected() {
-        mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
-        mListener.baseOnStartedNew(mMoniker, mGroupDescriptor.getName());
-        mLoadingDialog.dismiss();
+        try {
+            mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
+            mListener.baseOnStartedNew(mMoniker, mGroupDescriptor.getName());
+        } catch (IllegalArgumentException ex) {
+            // we'll assume this is caused by the node taking a while to leave a previous group,
+            // though it could be that another application is using the port or WiFi is turned off -
+            // in which case we'll keep getting stuck here until the port is available or WiFi is
+            // turned on!
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
+            mLoadingDialog.dismiss();
+            getActivity().stopService(new Intent(getActivity(), BabbleService2.class));
+        }
+        doUnbindService();
     }
 
     @Override
@@ -234,6 +244,9 @@ public class NewGroupFragment extends BabbleServiceBinder {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (mLoadingDialog!=null) {
+            mLoadingDialog.dismiss();
+        }
         doUnbindService();
     }
 
