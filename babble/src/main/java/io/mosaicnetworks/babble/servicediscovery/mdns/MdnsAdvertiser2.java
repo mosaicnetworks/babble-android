@@ -91,7 +91,6 @@ public class MdnsAdvertiser2 implements ServiceAdvertiser {
 
         try {
             mHttpPeerDiscoveryServer.start();
-            Log.d("MY-TAG", "advertise: Success");
         } catch (IOException ex) {
             //Probably the port is in use, we'll continue without the discovery service
             return false;

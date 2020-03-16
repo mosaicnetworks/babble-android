@@ -49,7 +49,7 @@ public class TabsFragment extends Fragment {
     ViewPager2 viewPager;
 
     private static boolean mShowmDNS = true;
-    private static boolean mShowP2P = true;
+    private static boolean mShowP2P = false;
     private static boolean mShowArchive = true;
     private static boolean mShowAllArchiveVersions = true;
 
