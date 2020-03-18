@@ -24,6 +24,7 @@
 
 package io.mosaicnetworks.babble.configure;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -54,6 +55,7 @@ import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.service.BabbleServiceBinder;
+import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
 /**
@@ -74,6 +76,7 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
     private RecyclerView mRvArchivedGroups;
     private LinearLayout mLinearLayoutNoArchives;
     private String mMoniker;
+    private ProgressDialog mLoadingDialog;
 
     /**
      * Use this factory method to create a new instance of
@@ -128,7 +131,8 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
             mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), ConfigManager.DEFAULT_BABBLING_PORT);
             mMoniker = mConfigManager.getMoniker();
             getActivity().startService(new Intent(getActivity(), BabbleService2.class));
-            //TODO: should we display a loading dialog in case the user clicks again?
+            mLoadingDialog = DialogUtils.displayLoadingDialog(getContext());
+            mLoadingDialog.show();
             doBindService();
         }
     }
@@ -209,8 +213,14 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
 
     @Override
     protected void onServiceConnected() {
-        mBoundService.startArchive(mConfigManager.getTomlDir(), new GroupDescriptor("Archived Group"), null); //TODO: need to get a proper group descriptor
-        mListener.onArchiveLoaded(mMoniker, "Archived Group");
+        try {
+            mBoundService.startArchive(mConfigManager.getTomlDir(), new GroupDescriptor("Archived Group"), null); //TODO: need to get a proper group descriptor
+            mListener.onArchiveLoaded(mMoniker, "Archived Group");
+        } catch (IllegalArgumentException ex) {
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
+            getActivity().stopService(new Intent(getActivity(), BabbleService2.class));
+        }
+
         doUnbindService();
     }
 
@@ -271,5 +281,8 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (mLoadingDialog!=null) {
+            mLoadingDialog.dismiss();
+        }
     }
 }

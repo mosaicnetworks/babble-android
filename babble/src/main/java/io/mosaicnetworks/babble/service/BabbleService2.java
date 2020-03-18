@@ -247,7 +247,9 @@ public class BabbleService2 extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mServiceAdvertiser.stopAdvertising();
+        if (mServiceAdvertiser!=null) {
+            mServiceAdvertiser.stopAdvertising();
+        }
     }
 
     //#############
