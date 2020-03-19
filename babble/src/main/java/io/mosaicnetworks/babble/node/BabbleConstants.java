@@ -63,10 +63,49 @@ public class BabbleConstants {
      */
     public static String BABBLE_ROOTDIR() {return INSTANCE.BABBLE_ROOTDIR;}
 
+    /**
+     * The subfolder within a configuration folder that contains the badger_db database
+     */
+    public static String DB_SUBDIR() {return INSTANCE.DB_SUBDIR;}
+
+
+    /**
+     * The name of the configuration file for babble. It will be in the root of the babble
+     * configuration folder
+     */
+    public static String BABBLE_TOML() {return INSTANCE.BABBLE_TOML;}
+
+    /**
+     * The name of the peers file for babble. It will be in the root of the babble
+     * configuration folder
+     */
+    public static String PEERS_JSON() {return INSTANCE.PEERS_JSON;}
+
+    /**
+     * The name of the initial peers file for babble. It will be in the root of the babble
+     * configuration folder
+     */
+    public static String PEERS_GENESIS_JSON() {return INSTANCE.PEERS_GENESIS_JSON;}
+
+    /**
+     * The name of the file containing the babble private key. It will be in the root of the babble
+     * configuration folder
+     */
+    public static String PRIV_KEY() {return INSTANCE.PRIV_KEY;}
+
+
 
     public final int BABBLE_PORT;
     public final String APP_ID;
     public final String BABBLE_ROOTDIR;
+    public final String DB_SUBDIR;
+
+    public final String BABBLE_TOML;
+    public final String PEERS_JSON;
+    public final String PEERS_GENESIS_JSON;
+    public final String PRIV_KEY;
+
+
     private static BabbleConstants INSTANCE;
 
 
@@ -97,6 +136,12 @@ public class BabbleConstants {
 
         BABBLE_PORT = context.getResources().getInteger(R.integer.babble_port);
         BABBLE_ROOTDIR = context.getResources().getString(R.string.babble_root_dir);
+        DB_SUBDIR = context.getResources().getString(R.string.babble_db_subdir);
+
+        BABBLE_TOML = context.getResources().getString(R.string.babble_toml);
+        PEERS_JSON = context.getResources().getString(R.string.babble_peers_json);
+        PEERS_GENESIS_JSON = context.getResources().getString(R.string.babble_peers_genesis_json);
+        PRIV_KEY = context.getResources().getString(R.string.babble_priv_key);
 
 
         String appId = context.getResources().getString(R.string.babble_app_id);

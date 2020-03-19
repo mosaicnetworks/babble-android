@@ -31,4 +31,9 @@
     <integer name="babble_port">6666</integer>
     <string name="babble_app_id"></string>
     <string name="babble_root_dir">babble</string>
+    <string name="babble_db_subdir">badger_db</string>
+    <string name="babble_toml">babble.toml</string>
+    <string name="babble_peers_json">peers.json</string>
+    <string name="babble_peers_genesis_json">peers.genesis.json</string>
+    <string name="babble_priv_key">priv_key</string>
 </resources>

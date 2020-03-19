@@ -62,35 +62,6 @@ public final class ConfigManager {
      */
     public enum ConfigDirectoryBackupPolicy  {DELETE, SINGLE_BACKUP, COMPLETE_BACKUP, ABORT}
 
-    /**
-     * The subfolder within a configuration folder that contains the badger_db database
-     */
-    public final static String DB_SUBDIR = "badger_db";
-
-    /**
-     * The name of the configuration file for babble. It will be in the root of the babble
-     * configuration folder
-     */
-    public final static String BABBLE_TOML = "babble.toml";
-
-    /**
-     * The name of the peers file for babble. It will be in the root of the babble
-     * configuration folder
-     */
-    public final static String PEERS_JSON = "peers.json";
-
-    /**
-     * The name of the initial peers file for babble. It will be in the root of the babble
-     * configuration folder
-     */
-    public final static String PEERS_GENESIS_JSON = "peers.genesis.json";
-
-    /**
-     * The name of the file containing the babble private key. It will be in the root of the babble
-     * configuration folder
-     */
-    public final static String PRIV_KEY = "priv_key";
-
 // These variables are static to allow them to be set in the initialisation of any app.
 // As ConfigManager is invoked from within BabbleService, it would otherwise not be possible to
 // amend these app wide values without passing them into BabbleService.
@@ -301,7 +272,7 @@ public final class ConfigManager {
         //TODO: possibly move these amendments into the backup config processing to avoid having to
         //      set them here
         configChanges.put("datadir", mTomlDir);
-        configChanges.put("db",  mTomlDir + File.separator+ DB_SUBDIR);
+        configChanges.put("db",  mTomlDir + File.separator+ BabbleConstants.DB_SUBDIR());
 
 
         amendTomlSettings(configChanges);
@@ -373,7 +344,7 @@ public final class ConfigManager {
      */
     public void writePrivateKey(String targetDir, String privateKeyHex) {
         try {
-            FileWriter fileWriter = new FileWriter(new File(targetDir, PRIV_KEY) );
+            FileWriter fileWriter = new FileWriter(new File(targetDir, BabbleConstants.PRIV_KEY()) );
             fileWriter.write(privateKeyHex);
             fileWriter.close();
         } catch (Exception e) {
@@ -393,7 +364,7 @@ public final class ConfigManager {
 
             Log.i("writePeersJsonFiles", "JSON " + gson.toJson(currentPeers));
 
-            FileWriter fileWriter = new FileWriter(new File(targetDir, PEERS_JSON));
+            FileWriter fileWriter = new FileWriter(new File(targetDir, BabbleConstants.PEERS_JSON()));
             gson.toJson(currentPeers, fileWriter);
             fileWriter.close();
         } catch (Exception e) {
@@ -401,7 +372,7 @@ public final class ConfigManager {
         }
 
         try {
-            FileWriter fileWriter = new FileWriter(new File(targetDir, PEERS_GENESIS_JSON));
+            FileWriter fileWriter = new FileWriter(new File(targetDir, BabbleConstants.PEERS_GENESIS_JSON()));
             gson.toJson(genesisPeers, fileWriter);
             fileWriter.close();
         } catch (Exception e) {
@@ -443,7 +414,7 @@ public final class ConfigManager {
 
         setTomlDir(compositeGroupName);
 
-        File babbleDir = new File(mTomlDir, DB_SUBDIR);
+        File babbleDir = new File(mTomlDir, BabbleConstants.DB_SUBDIR());
         if (babbleDir.exists()){
             // We have a clash.
             switch (sConfigDirectoryBackupPolicy) {
@@ -465,7 +436,7 @@ public final class ConfigManager {
         }
 
         babble.put("datadir", mTomlDir) ;
-        babble.put("db",  mTomlDir + File.separator + DB_SUBDIR) ;
+        babble.put("db",  mTomlDir + File.separator + BabbleConstants.DB_SUBDIR()) ;
 
         babble.put("log", nodeConfig.logLevel);
         babble.put("listen", inetAddress + ":" + port);
@@ -508,7 +479,7 @@ public final class ConfigManager {
      */
 
     protected Map<String, Object> readTomlFile(){
-        File tomlFile =  new File(mTomlDir, BABBLE_TOML);
+        File tomlFile =  new File(mTomlDir, BabbleConstants.BABBLE_TOML());
 
         Toml toml = new Toml().read(tomlFile);
 
@@ -529,7 +500,7 @@ public final class ConfigManager {
 
         try {
             TomlWriter tomlWriter = new TomlWriter();
-            tomlWriter.write(configHashMap, new File(mTomlDir, BABBLE_TOML));
+            tomlWriter.write(configHashMap, new File(mTomlDir, BabbleConstants.BABBLE_TOML()));
 
             Log.i("writeTomlFile", "Wrote toml file");
         } catch (IOException e) {
