@@ -51,7 +51,7 @@ import io.mosaicnetworks.babble.node.Block;
 import io.mosaicnetworks.babble.node.BlockConsumer;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.node.LeaveResponseListener;
-import io.mosaicnetworks.babble.node.ServiceObserver;
+import io.mosaicnetworks.babble.node.NodeStateChangeHandler;
 
 import static androidx.core.app.NotificationCompat.PRIORITY_LOW;
 
@@ -69,6 +69,7 @@ public class BabbleService2 extends Service {
     private static BabbleState mAppState;
     private ServiceAdvertiser mServiceAdvertiser;
     private boolean mIsArchive = false;
+    private BabbleNode.State mNodeState;
 
     /**
      * Start the service
@@ -94,7 +95,12 @@ public class BabbleService2 extends Service {
                 notifyObservers();
                 return processedBlock;
             }
-        }, configDirectory);
+        }, configDirectory, new NodeStateChangeHandler() {
+            @Override
+            public void onStateChanged(BabbleNode.State state) {
+                mNodeState = state;
+            }
+        });
 
         mBabbleNode.run();
         mServiceAdvertiser.advertise(mBabbleNode.getGenesisPeers(), mBabbleNode.getCurrentPeers());
@@ -125,7 +131,12 @@ public class BabbleService2 extends Service {
                             notifyObservers();
                             return processedBlock;
                         }
-                    }, configDirectory);
+                    }, configDirectory, new NodeStateChangeHandler() {
+                        @Override
+                        public void onStateChanged(BabbleNode.State state) {
+                            mNodeState = state;
+                        }
+                    });
 
                 } catch (IllegalArgumentException ex) {
                     //TODO: need more refined Babble exceptions
@@ -207,6 +218,18 @@ public class BabbleService2 extends Service {
         mBabbleNode.submitTx(tx.toBytes());
     }
 
+    public BabbleNode.State getNodeState() {
+        return mNodeState;
+    }
+
+    public String getMonikerList() {
+        return mBabbleNode.getCurrentPeers();
+    }
+
+    public String getStats() {
+        return mBabbleNode.getStats();
+    }
+
 
     //###########
     // service specific stuff
@@ -255,14 +278,14 @@ public class BabbleService2 extends Service {
     //#############
     // observer stuff
 
-    private List<ServiceObserver> mObservers = new ArrayList<>();;
+    private List<ServiceObserver2> mObservers = new ArrayList<>();;
 
     /**
      * Register an observer
      * @param serviceObserver the observer to be registered, the observer must implement the
-     * {@link ServiceObserver} interface
+     * {@link ServiceObserver2} interface
      */
-    public void registerObserver(ServiceObserver serviceObserver) {
+    public void registerObserver(ServiceObserver2 serviceObserver) {
         if (!mObservers.contains(serviceObserver)) {
             mObservers.add(serviceObserver);
         }
@@ -271,14 +294,14 @@ public class BabbleService2 extends Service {
     /**
      * Remove an observer
      * @param messageObserver the observer to be removed, the observer must implement the
-     *                        {@link ServiceObserver} interface
+     *                        {@link ServiceObserver2} interface
      */
-    public void removeObserver(ServiceObserver messageObserver) {
+    public void removeObserver(ServiceObserver2 messageObserver) {
         mObservers.remove(messageObserver);
     }
 
     private void notifyObservers() {
-        for (ServiceObserver observer: mObservers) {
+        for (ServiceObserver2 observer: mObservers) {
             observer.stateUpdated();
         }
     }

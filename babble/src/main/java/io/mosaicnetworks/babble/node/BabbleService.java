@@ -131,7 +131,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
                 notifyObservers();
                 return processedBlock;
             }
-        }, configDirectory);
+        }, configDirectory, null);
 
         this.mNetworkType = networkType;
         this.mIsArchive = (this.mNetworkType == 0) ;
@@ -175,7 +175,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
                             notifyObservers();
                             return processedBlock;
                         }
-                    }, configDirectory);
+                    }, configDirectory, null);
 
                 } catch (IllegalArgumentException ex) {
                     //TODO: need more refined Babble exceptions
