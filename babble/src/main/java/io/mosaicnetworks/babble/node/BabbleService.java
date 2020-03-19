@@ -30,6 +30,8 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.mosaicnetworks.babble.BuildConfig;
+
 /**
  * This is a wrapper around {@link BabbleNode} to allow the node to run as a pseudo service. Beyond
  * what a {@link BabbleNode} provides, this class:
@@ -70,10 +72,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
 
     protected int mNetworkType;
 
-    //TODO: populate this from Gradle
-    public final static String BABBLE_VERSION = "0.6.2";
-
-
+    public final static String BABBLE_VERSION = BuildConfig.BabbleVersion;
 
     /**
      * The underlying app state, to which babble transactions are applied
