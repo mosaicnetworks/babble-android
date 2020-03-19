@@ -62,46 +62,6 @@ public final class ConfigManager {
      */
     public enum ConfigDirectoryBackupPolicy  {DELETE, SINGLE_BACKUP, COMPLETE_BACKUP, ABORT}
 
-    /**
-     * The default babbling port. This can be overridden when configuring the service
-     */
-    public static final int DEFAULT_BABBLING_PORT = 6666;
-
-    /**
-     * The subfolder of the file store for the app that contains all of the babble-go configuration
-     * files and badger_db databases
-     */
-    public final static String BABBLE_ROOTDIR = "babble";
-
-    /**
-     * The subfolder within a configuration folder that contains the badger_db database
-     */
-    public final static String DB_SUBDIR = "badger_db";
-
-    /**
-     * The name of the configuration file for babble. It will be in the root of the babble
-     * configuration folder
-     */
-    public final static String BABBLE_TOML = "babble.toml";
-
-    /**
-     * The name of the peers file for babble. It will be in the root of the babble
-     * configuration folder
-     */
-    public final static String PEERS_JSON = "peers.json";
-
-    /**
-     * The name of the initial peers file for babble. It will be in the root of the babble
-     * configuration folder
-     */
-    public final static String PEERS_GENESIS_JSON = "peers.genesis.json";
-
-    /**
-     * The name of the file containing the babble private key. It will be in the root of the babble
-     * configuration folder
-     */
-    public final static String PRIV_KEY = "priv_key";
-
 // These variables are static to allow them to be set in the initialisation of any app.
 // As ConfigManager is invoked from within BabbleService, it would otherwise not be possible to
 // amend these app wide values without passing them into BabbleService.
@@ -155,7 +115,7 @@ public final class ConfigManager {
 
         Log.v("ConfigManager", "got Key Pair");
 
-        File babbleDir = new File(sRootDir, BABBLE_ROOTDIR);
+        File babbleDir = new File(sRootDir, BabbleConstants.BABBLE_ROOTDIR());
 
         if (babbleDir.exists()) {
             populateDirectories(babbleDir);
@@ -259,7 +219,7 @@ public final class ConfigManager {
      * @throws IllegalStateException if the service is currently running
      */
     public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String inetAddress) {
-        return createConfigNewGroup(groupDescriptor, moniker, inetAddress, DEFAULT_BABBLING_PORT);
+        return createConfigNewGroup(groupDescriptor, moniker, inetAddress, BabbleConstants.BABBLE_PORT());
     }
 
     /**
@@ -285,7 +245,7 @@ public final class ConfigManager {
      * @throws IllegalStateException if the service is currently running
      */
     public String setGroupToArchive(ConfigDirectory configDirectory, String inetAddress)  throws  IOException {
-        return setGroupToArchive(configDirectory, inetAddress, DEFAULT_BABBLING_PORT);
+        return setGroupToArchive(configDirectory, inetAddress, BabbleConstants.BABBLE_PORT());
     }
 
     /**
@@ -312,7 +272,7 @@ public final class ConfigManager {
         //TODO: possibly move these amendments into the backup config processing to avoid having to
         //      set them here
         configChanges.put("datadir", mTomlDir);
-        configChanges.put("db",  mTomlDir + File.separator+ DB_SUBDIR);
+        configChanges.put("db",  mTomlDir + File.separator+ BabbleConstants.DB_SUBDIR());
 
 
         amendTomlSettings(configChanges);
@@ -336,7 +296,7 @@ public final class ConfigManager {
      * @throws IllegalStateException if the service is currently running
      */
     public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor, String moniker, String inetAddress) throws CannotStartBabbleNodeException, IOException {
-        return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, inetAddress, DEFAULT_BABBLING_PORT);
+        return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, inetAddress, BabbleConstants.BABBLE_PORT());
     }
 
     /**
@@ -384,7 +344,7 @@ public final class ConfigManager {
      */
     public void writePrivateKey(String targetDir, String privateKeyHex) {
         try {
-            FileWriter fileWriter = new FileWriter(new File(targetDir, PRIV_KEY) );
+            FileWriter fileWriter = new FileWriter(new File(targetDir, BabbleConstants.PRIV_KEY()) );
             fileWriter.write(privateKeyHex);
             fileWriter.close();
         } catch (Exception e) {
@@ -404,7 +364,7 @@ public final class ConfigManager {
 
             Log.i("writePeersJsonFiles", "JSON " + gson.toJson(currentPeers));
 
-            FileWriter fileWriter = new FileWriter(new File(targetDir, PEERS_JSON));
+            FileWriter fileWriter = new FileWriter(new File(targetDir, BabbleConstants.PEERS_JSON()));
             gson.toJson(currentPeers, fileWriter);
             fileWriter.close();
         } catch (Exception e) {
@@ -412,7 +372,7 @@ public final class ConfigManager {
         }
 
         try {
-            FileWriter fileWriter = new FileWriter(new File(targetDir, PEERS_GENESIS_JSON));
+            FileWriter fileWriter = new FileWriter(new File(targetDir, BabbleConstants.PEERS_GENESIS_JSON()));
             gson.toJson(genesisPeers, fileWriter);
             fileWriter.close();
         } catch (Exception e) {
@@ -434,7 +394,7 @@ public final class ConfigManager {
       * @param compositeName the directory name for the config folder. NB this must be the composite version, not the human readable one.
      */
     public void setTomlDir(String compositeName) {
-        mTomlDir = sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + compositeName;
+        mTomlDir = sRootDir + File.separator + BabbleConstants.BABBLE_ROOTDIR() + File.separator + compositeName;
         this.mTomlDir = mTomlDir;
     }
 
@@ -454,7 +414,7 @@ public final class ConfigManager {
 
         setTomlDir(compositeGroupName);
 
-        File babbleDir = new File(mTomlDir, DB_SUBDIR);
+        File babbleDir = new File(mTomlDir, BabbleConstants.DB_SUBDIR());
         if (babbleDir.exists()){
             // We have a clash.
             switch (sConfigDirectoryBackupPolicy) {
@@ -476,7 +436,7 @@ public final class ConfigManager {
         }
 
         babble.put("datadir", mTomlDir) ;
-        babble.put("db",  mTomlDir + File.separator + DB_SUBDIR) ;
+        babble.put("db",  mTomlDir + File.separator + BabbleConstants.DB_SUBDIR()) ;
 
         babble.put("log", nodeConfig.logLevel);
         babble.put("listen", inetAddress + ":" + port);
@@ -519,7 +479,7 @@ public final class ConfigManager {
      */
 
     protected Map<String, Object> readTomlFile(){
-        File tomlFile =  new File(mTomlDir, BABBLE_TOML);
+        File tomlFile =  new File(mTomlDir, BabbleConstants.BABBLE_TOML());
 
         Toml toml = new Toml().read(tomlFile);
 
@@ -540,7 +500,7 @@ public final class ConfigManager {
 
         try {
             TomlWriter tomlWriter = new TomlWriter();
-            tomlWriter.write(configHashMap, new File(mTomlDir, BABBLE_TOML));
+            tomlWriter.write(configHashMap, new File(mTomlDir, BabbleConstants.BABBLE_TOML()));
 
             Log.i("writeTomlFile", "Wrote toml file");
         } catch (IOException e) {
@@ -660,7 +620,8 @@ public final class ConfigManager {
             return false;
         }
 
-        File dir = new File(sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir);
+        File dir = new File(sRootDir + File.separator + BabbleConstants.BABBLE_ROOTDIR() +
+                File.separator + subConfigDir);
 
         return deleteDir(dir);
     }
@@ -689,8 +650,10 @@ public final class ConfigManager {
     }
     
     private void renameConfigDirectory(String oldSubConfigDir, int newSuffix) {
-        File oldFile = new File(sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir);
-        File newFile = new File(sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir + newSuffix);
+        File oldFile = new File(sRootDir + File.separator + BabbleConstants.BABBLE_ROOTDIR() +
+                File.separator + oldSubConfigDir);
+        File newFile = new File(sRootDir + File.separator + BabbleConstants.BABBLE_ROOTDIR() +
+                File.separator + oldSubConfigDir + newSuffix);
         
         Log.d("Rename ", oldFile.getAbsolutePath());
         Log.d("Rename ", newFile.getAbsolutePath());
@@ -730,7 +693,7 @@ public final class ConfigManager {
         }
 
         Log.d("backupOldConfigs POP", compositeName);
-        populateDirectories(new File(sRootDir, BABBLE_ROOTDIR));
+        populateDirectories(new File(sRootDir, BabbleConstants.BABBLE_ROOTDIR()));
     }
 
 
@@ -754,7 +717,7 @@ public final class ConfigManager {
         }
 
         // Rebuild directory list after pruning backups
-        populateDirectories(new File(sRootDir, BABBLE_ROOTDIR));
+        populateDirectories(new File(sRootDir, BabbleConstants.BABBLE_ROOTDIR()));
     }
 
 

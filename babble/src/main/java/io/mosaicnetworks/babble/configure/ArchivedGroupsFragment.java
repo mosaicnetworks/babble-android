@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
@@ -128,7 +129,7 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
 
             ConfigDirectory configDirectory = mArchivedList.get(position);
 
-            mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), ConfigManager.DEFAULT_BABBLING_PORT);
+            mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), BabbleConstants.BABBLE_PORT());
             mMoniker = mConfigManager.getMoniker();
             getActivity().startService(new Intent(getActivity(), BabbleService2.class));
             mLoadingDialog = DialogUtils.displayLoadingDialog(getContext());
