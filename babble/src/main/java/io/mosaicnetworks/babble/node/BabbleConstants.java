@@ -57,9 +57,16 @@ public class BabbleConstants {
      */
     public static String APP_ID() {return INSTANCE.APP_ID;}
 
+    /**
+     * The subfolder of the file store for the app that contains all of the babble-go configuration
+     * files and badger_db databases
+     */
+    public static String BABBLE_ROOTDIR() {return INSTANCE.BABBLE_ROOTDIR;}
+
 
     public final int BABBLE_PORT;
     public final String APP_ID;
+    public final String BABBLE_ROOTDIR;
     private static BabbleConstants INSTANCE;
 
 
@@ -89,6 +96,8 @@ public class BabbleConstants {
         Context appContext = context.getApplicationContext();
 
         BABBLE_PORT = context.getResources().getInteger(R.integer.babble_port);
+        BABBLE_ROOTDIR = context.getResources().getString(R.string.babble_root_dir);
+
 
         String appId = context.getResources().getString(R.string.babble_app_id);
         if (appId.equals("")) {

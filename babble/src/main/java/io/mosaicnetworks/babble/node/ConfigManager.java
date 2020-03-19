@@ -63,12 +63,6 @@ public final class ConfigManager {
     public enum ConfigDirectoryBackupPolicy  {DELETE, SINGLE_BACKUP, COMPLETE_BACKUP, ABORT}
 
     /**
-     * The subfolder of the file store for the app that contains all of the babble-go configuration
-     * files and badger_db databases
-     */
-    public final static String BABBLE_ROOTDIR = "babble";
-
-    /**
      * The subfolder within a configuration folder that contains the badger_db database
      */
     public final static String DB_SUBDIR = "badger_db";
@@ -150,7 +144,7 @@ public final class ConfigManager {
 
         Log.v("ConfigManager", "got Key Pair");
 
-        File babbleDir = new File(sRootDir, BABBLE_ROOTDIR);
+        File babbleDir = new File(sRootDir, BabbleConstants.BABBLE_ROOTDIR());
 
         if (babbleDir.exists()) {
             populateDirectories(babbleDir);
@@ -429,7 +423,7 @@ public final class ConfigManager {
       * @param compositeName the directory name for the config folder. NB this must be the composite version, not the human readable one.
      */
     public void setTomlDir(String compositeName) {
-        mTomlDir = sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + compositeName;
+        mTomlDir = sRootDir + File.separator + BabbleConstants.BABBLE_ROOTDIR() + File.separator + compositeName;
         this.mTomlDir = mTomlDir;
     }
 
@@ -655,7 +649,8 @@ public final class ConfigManager {
             return false;
         }
 
-        File dir = new File(sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + subConfigDir);
+        File dir = new File(sRootDir + File.separator + BabbleConstants.BABBLE_ROOTDIR() +
+                File.separator + subConfigDir);
 
         return deleteDir(dir);
     }
@@ -684,8 +679,10 @@ public final class ConfigManager {
     }
     
     private void renameConfigDirectory(String oldSubConfigDir, int newSuffix) {
-        File oldFile = new File(sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir);
-        File newFile = new File(sRootDir + File.separator + BABBLE_ROOTDIR + File.separator + oldSubConfigDir + newSuffix);
+        File oldFile = new File(sRootDir + File.separator + BabbleConstants.BABBLE_ROOTDIR() +
+                File.separator + oldSubConfigDir);
+        File newFile = new File(sRootDir + File.separator + BabbleConstants.BABBLE_ROOTDIR() +
+                File.separator + oldSubConfigDir + newSuffix);
         
         Log.d("Rename ", oldFile.getAbsolutePath());
         Log.d("Rename ", newFile.getAbsolutePath());
@@ -725,7 +722,7 @@ public final class ConfigManager {
         }
 
         Log.d("backupOldConfigs POP", compositeName);
-        populateDirectories(new File(sRootDir, BABBLE_ROOTDIR));
+        populateDirectories(new File(sRootDir, BabbleConstants.BABBLE_ROOTDIR()));
     }
 
 
@@ -749,7 +746,7 @@ public final class ConfigManager {
         }
 
         // Rebuild directory list after pruning backups
-        populateDirectories(new File(sRootDir, BABBLE_ROOTDIR));
+        populateDirectories(new File(sRootDir, BabbleConstants.BABBLE_ROOTDIR()));
     }
 
 

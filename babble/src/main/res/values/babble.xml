@@ -30,4 +30,5 @@
 <resources>
     <integer name="babble_port">6666</integer>
     <string name="babble_app_id"></string>
+    <string name="babble_root_dir">babble</string>
 </resources>
