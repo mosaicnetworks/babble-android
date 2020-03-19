@@ -39,7 +39,6 @@ import io.mosaicnetworks.babble.configure.p2p.P2PJoinGroupFragment;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PResolvedGroup;
 
 /**
@@ -187,12 +186,14 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     @Override
     public void onServiceSelected(ResolvedGroup resolvedGroup) {
 
-        if (resolvedGroup instanceof MdnsResolvedGroup) {
+
+        //TODO: JK20Mar   this instanceof stuff will break
+        if (resolvedGroup instanceof ResolvedGroup) {
             Log.i(TAG, "onServiceSelected: MDNS item selected");
             MdnsJoinGroupFragment mJoinGroupMdnsFragment = MdnsJoinGroupFragment.newInstance(resolvedGroup);
             replaceFragment(mJoinGroupMdnsFragment, true);
         } else {
-            if (resolvedGroup instanceof P2PResolvedGroup) {
+            if (resolvedGroup instanceof ResolvedGroup) {
 
                 Log.i(TAG, "onServiceSelected: P2P item selected");
                 P2PJoinGroupFragment mJoinGroupP2PFragment = P2PJoinGroupFragment.newInstance(resolvedGroup);

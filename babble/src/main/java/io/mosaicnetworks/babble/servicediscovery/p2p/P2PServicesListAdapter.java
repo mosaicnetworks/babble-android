@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 public class P2PServicesListAdapter extends RecyclerView.Adapter<P2PServicesListAdapter.ViewHolder> {
 
@@ -55,11 +56,11 @@ public class P2PServicesListAdapter extends RecyclerView.Adapter<P2PServicesList
         }
     }
 
-    private List<P2PResolvedGroup> mData;
+    private List<ResolvedGroup> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    public P2PServicesListAdapter(Context context, List<P2PResolvedGroup> data) {
+    public P2PServicesListAdapter(Context context, List<ResolvedGroup> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -90,7 +91,7 @@ public class P2PServicesListAdapter extends RecyclerView.Adapter<P2PServicesList
     }
 
     // convenience method for getting data at click position
-    public P2PResolvedGroup getItem(int id) {
+    public ResolvedGroup getItem(int id) {
         return mData.get(id);
     }
 

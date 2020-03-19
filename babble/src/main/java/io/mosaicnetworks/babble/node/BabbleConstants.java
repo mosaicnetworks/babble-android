@@ -47,6 +47,17 @@ public class BabbleConstants {
     public static int BABBLE_PORT() {return INSTANCE.BABBLE_PORT;}
 
     /**
+     * The port used by the discovery end point. NB not the WebRTC disco
+     * server
+     *
+     * Set in {@link io.mosaicnetworks.babble.R.integer#babble_discovery_port}
+     *
+     * @return the discovery port
+     */
+    public static int DISCOVERY_PORT() {return INSTANCE.DISCOVERY_PORT;}
+
+
+    /**
      * The app id used by Babble identify itself (and ignore other app Ids).
      * If this field is set to an empty string, this is set to the app package
      * name.
@@ -93,9 +104,73 @@ public class BabbleConstants {
      */
     public static String PRIV_KEY() {return INSTANCE.PRIV_KEY;}
 
+    /**
+     * The service type to use for discovery
+     */
+    public static String SERVICE_TYPE() {return INSTANCE.SERVICE_TYPE;}
+
+    /**
+     * The service type to use for p2p discovery
+     */
+    public static String P2P_SERVICE_TYPE() {return INSTANCE.P2P_SERVICE_TYPE;}
+
+
+
+    /*----------------------------------------------------------------------------*/
+    //           Network Type
+    /*----------------------------------------------------------------------------*/
+
+
+    /**
+     * Archive discovery type
+     */
+    public final static int NETWORK_NONE = 0;
+    /**
+     * mDNS / WiFi discovery type
+     */
+    public final static int NETWORK_WIFI = 1;
+    /**
+     * P2P / WiFi Direct discovery type
+     *
+     */
+    public final static int NETWORK_P2P = 2;
+    /**
+     * Global / WebRTC discovery type
+     */
+    public final static int NETWORK_GLOBAL = 3;
+
+
+
+    /*----------------------------------------------------------------------------*/
+    //           DNS TXT Constants
+    /*----------------------------------------------------------------------------*/
+
+
+    public final static String DNS_TXT_HOST_LABEL = "host";
+    public final static String DNS_TXT_PORT_LABEL = "port";
+    public final static String DNS_TXT_MONIKER_LABEL = "moniker";
+    public final static String DNS_TXT_DNS_VERSION_LABEL = "textvers";
+    public final static String DNS_TXT_BABBLE_VERSION_LABEL = "babblevers";
+    public final static String DNS_TXT_GROUP_ID_LABEL = "groupid";
+    public final static String DNS_TXT_APP_LABEL = "app";
+    public final static String DNS_TXT_GROUP_LABEL = "group";
+    public final static String DNS_TXT_CURRENT_PEERS_LABEL = "peers";
+    public final static String DNS_TXT_INITIAL_PEERS_LABEL = "initpeers";
+
+
+
+    public final static int P2P_RETRY_DELAY_MS = 1000;
+    public final static int P2P_RETRY_LIMIT = 4;
+
+    public final static String DEFAULT_P2P_IP_PREFIX = "192.168.49.";
+    public final static String DEFAULT_P2P_IP_ADDRESS = DEFAULT_P2P_IP_PREFIX+"1";
+
+
+
 
 
     public final int BABBLE_PORT;
+    public final int DISCOVERY_PORT;
     public final String APP_ID;
     public final String BABBLE_ROOTDIR;
     public final String DB_SUBDIR;
@@ -104,6 +179,8 @@ public class BabbleConstants {
     public final String PEERS_JSON;
     public final String PEERS_GENESIS_JSON;
     public final String PRIV_KEY;
+    public final String SERVICE_TYPE;
+    public final String P2P_SERVICE_TYPE;
 
 
     private static BabbleConstants INSTANCE;
@@ -135,6 +212,7 @@ public class BabbleConstants {
         Context appContext = context.getApplicationContext();
 
         BABBLE_PORT = context.getResources().getInteger(R.integer.babble_port);
+        DISCOVERY_PORT = context.getResources().getInteger(R.integer.babble_discovery_port);
         BABBLE_ROOTDIR = context.getResources().getString(R.string.babble_root_dir);
         DB_SUBDIR = context.getResources().getString(R.string.babble_db_subdir);
 
@@ -143,6 +221,8 @@ public class BabbleConstants {
         PEERS_GENESIS_JSON = context.getResources().getString(R.string.babble_peers_genesis_json);
         PRIV_KEY = context.getResources().getString(R.string.babble_priv_key);
 
+        SERVICE_TYPE = context.getResources().getString(R.string.babble_service_type);
+        P2P_SERVICE_TYPE = context.getResources().getString(R.string.babble_p2p_service_type);
 
         String appId = context.getResources().getString(R.string.babble_app_id);
         if (appId.equals("")) {

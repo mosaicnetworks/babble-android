@@ -31,9 +31,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AlertDialog;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,7 +40,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -58,11 +55,11 @@ import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.servicediscovery.InterfaceResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.InterfaceResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PConnected;
-import io.mosaicnetworks.babble.servicediscovery.p2p.P2PResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.p2p.P2PResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
@@ -85,8 +82,8 @@ public class P2PJoinGroupFragment extends Fragment implements ResponseListener, 
     private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
-    private P2PResolvedGroup mResolvedGroup;
-    private P2PResolvedService mResolvedService;
+    private ResolvedGroup mResolvedGroup;
+    private ResolvedService mResolvedService;
 
     public P2PJoinGroupFragment() {
 
@@ -102,7 +99,7 @@ public class P2PJoinGroupFragment extends Fragment implements ResponseListener, 
     public static P2PJoinGroupFragment newInstance(ResolvedGroup resolvedGroup) {
         Log.i(TAG, "newInstance: "+ resolvedGroup.getGroupName());
         P2PJoinGroupFragment p2PJoinGroupFragment = new P2PJoinGroupFragment();
-        p2PJoinGroupFragment.mResolvedGroup = (P2PResolvedGroup) resolvedGroup;
+        p2PJoinGroupFragment.mResolvedGroup = resolvedGroup;
         return  p2PJoinGroupFragment;
     }
 
@@ -162,9 +159,9 @@ public class P2PJoinGroupFragment extends Fragment implements ResponseListener, 
 
 
         // For P2P only one node advertises.
-        mResolvedService = (P2PResolvedService) resolvedServices.get(0);
+        mResolvedService =  resolvedServices.get(0);
         final String peerIP = mResolvedService.getInetAddress().getHostAddress();
-        final int peerPort = mResolvedService.getPort();
+        final int peerPort = mResolvedService.getDiscoveryPort();
         final String deviceAddress = mResolvedService.getGroupUid();
 
         // Store moniker and host entered

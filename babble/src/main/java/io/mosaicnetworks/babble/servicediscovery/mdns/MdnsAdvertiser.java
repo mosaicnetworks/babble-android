@@ -30,38 +30,39 @@ import android.net.nsd.NsdServiceInfo;
 
 import java.util.Objects;
 
+import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.utils.RandomString;
 
 public class MdnsAdvertiser implements ServiceAdvertiser  {
 
-    public static final String SERVICE_TYPE = "_babble._tcp.";
-    public static final String APP_IDENTIFIER = "appIdentifier";
-    public static final String GROUP_NAME = "groupName";
-    public static final String GROUP_UID = "groupUid";
     private NsdManager mNsdManager;
     private NsdManager.RegistrationListener mRegistrationListener;
     private String mServiceName;
     private NsdServiceInfo mServiceInfo = new NsdServiceInfo();
     private Context mAppContext;
 
-    public MdnsAdvertiser(GroupDescriptor groupDescriptor, int port, Context context) {
+    public MdnsAdvertiser(GroupDescriptor groupDescriptor, int port, Context context, String currentPeers,
+                          String initPeers) {
         initializeRegistrationListener();
 
         mAppContext = context.getApplicationContext();
-        mServiceInfo.setServiceType(SERVICE_TYPE);
+        mServiceInfo.setServiceType(BabbleConstants.SERVICE_TYPE());
         mServiceName = new RandomString(32).nextString();
         mServiceInfo.setServiceName(mServiceName);
-        mServiceInfo.setAttribute(APP_IDENTIFIER, mAppContext.getPackageName());
+        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_APP_LABEL, BabbleConstants.APP_ID());
         // https://developer.android.com/studio/build/application-id note: The application ID
         // used to be directly tied to your code's package name; so some Android APIs use the term
         // "package name" in their method names and parameter names, but this is actually your
         // application ID. For example, the Context.getPackageName() method
         // returns your application ID
-        mServiceInfo.setAttribute(GROUP_NAME, groupDescriptor.getName());
-        mServiceInfo.setAttribute(GROUP_UID, groupDescriptor.getUid());
+        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_LABEL, groupDescriptor.getName());
+        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_ID_LABEL, groupDescriptor.getUid());
         mServiceInfo.setPort(port);
+        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_CURRENT_PEERS_LABEL, currentPeers);
+        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_INITIAL_PEERS_LABEL, initPeers);
+
     }
 
     public void advertise() {

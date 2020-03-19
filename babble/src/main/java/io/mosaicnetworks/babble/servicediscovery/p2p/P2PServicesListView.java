@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
 
@@ -45,7 +46,7 @@ public class P2PServicesListView extends RecyclerView {
 
 
 
-    private List<P2PResolvedGroup> mServiceInfoList = new ArrayList<>();
+    private List<ResolvedGroup> mServiceInfoList = new ArrayList<>();
     private ServicesListListener mServicesListListener;
     private P2PService mP2PService;
     private boolean mPrevIsEmpty = true;

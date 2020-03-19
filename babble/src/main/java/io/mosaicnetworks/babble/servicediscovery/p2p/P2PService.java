@@ -50,6 +50,9 @@ import java.util.List;
 import java.util.Map;
 
 import io.mosaicnetworks.babble.configure.OnNetworkInitialised;
+import io.mosaicnetworks.babble.node.BabbleConstants;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.utils.RandomString;
@@ -78,31 +81,16 @@ public class P2PService implements ServiceAdvertiser{
 
     // Service type should not need to change, but other values are available at:
     // http://www.dns-sd.org/ServiceTypes.html
-    private final static String P2P_SERVICE_TYPE = "_presence._tcp";
+//    private final static String P2P_SERVICE_TYPE = "_presence._tcp";
 //    private final static String P2P_SERVICE_TYPE = "_babble._tcp";
 
 
     // Keys used for the hash map in DNS text file
-    public final static String HOST_LABEL = "host";
-    public final static String PORT_LABEL = "port";
-    public final static String MONIKER_LABEL = "moniker";
-    public final static String DNS_VERSION_LABEL = "textvers";
-    private final static String DNS_VERSION = "0.0.1";
-    public final static String BABBLE_VERSION_LABEL = "babblevers";
-    public final static String GROUP_ID_LABEL = "groupid";
-    public final static String DEFAULT_IP_ADDRESS = "192.168.49.1";
-    public final static String APP_LABEL = "app";
-    public final static String GROUP_LABEL = "group";
-    final static public int SERVER_PORT = 8988;
-    final static private String TAG = "P2PService";
-    public static final int RETRY_DELAY_MS = 1000;
-    public static final int RETRY_LIMIT = 4;
 
+    private final static String TAG = "P2PService";
+    private final static String DNS_VERSION = "0.0.1";
     public static boolean mGroupCreated = false;  //TODO: verify this is set to false on exit.
 
-
-
-    private final static String WIFI_DIRECT_IP_PREFIX = "192.168.49.";
     private static String mMoniker = "Moniker";
 
     public static boolean getIsDiscovering() {
@@ -124,8 +112,8 @@ public class P2PService implements ServiceAdvertiser{
     public BroadcastReceiver mReceiver;
     public IntentFilter mIntentFilter;
 
-    private final Map<String, P2PResolvedService> mResolvedServices = new HashMap<>();
-    private List<P2PResolvedGroup> mResolvedGroups;  //TODO: Look to make this final
+    private final Map<String, ResolvedService> mResolvedServices = new HashMap<>();
+    private List<ResolvedGroup> mResolvedGroups;  //TODO: Look to make this final
 //    final HashMap<String, Map> textRecords = new HashMap<>();
 
     private String mServiceName ;
@@ -167,7 +155,7 @@ public class P2PService implements ServiceAdvertiser{
     }
 
 
-    public void setResolvedGroups(List<P2PResolvedGroup> resolvedGroups) {
+    public void setResolvedGroups(List<ResolvedGroup> resolvedGroups) {
         this.mResolvedGroups = resolvedGroups;
     }
 
@@ -210,16 +198,16 @@ public class P2PService implements ServiceAdvertiser{
         HashMap<String,String> record = new HashMap<String,String>();
 
         mServiceName = new RandomString(32).nextString();
-        record.put(GROUP_LABEL, groupName);
-        record.put(GROUP_ID_LABEL, mServiceName);
+        record.put(BabbleConstants.DNS_TXT_GROUP_LABEL, groupName);
+        record.put(BabbleConstants.DNS_TXT_GROUP_ID_LABEL, mServiceName);
         // This is a bit chicken and egg.
         // But we know what the address of the leader will be, so it is safe to do this.
-        record.put(HOST_LABEL, DEFAULT_IP_ADDRESS);
-        record.put(PORT_LABEL, String.valueOf(SERVER_PORT));
-        record.put(APP_LABEL, mAppContext.getPackageName());
-        record.put(MONIKER_LABEL, moniker); // "John Doe" + (int) (Math.random() * 1000));
-        record.put(DNS_VERSION_LABEL, DNS_VERSION);
-        record.put(BABBLE_VERSION_LABEL, babbleVersion);
+        record.put(BabbleConstants.DNS_TXT_HOST_LABEL, BabbleConstants.DEFAULT_P2P_IP_ADDRESS);
+        record.put(BabbleConstants.DNS_TXT_PORT_LABEL, String.valueOf(BabbleConstants.DISCOVERY_PORT()));
+        record.put(BabbleConstants.DNS_TXT_APP_LABEL, BabbleConstants.APP_ID());
+        record.put(BabbleConstants.DNS_TXT_MONIKER_LABEL, moniker); // "John Doe" + (int) (Math.random() * 1000));
+        record.put(BabbleConstants.DNS_TXT_DNS_VERSION_LABEL, DNS_VERSION);
+        record.put(BabbleConstants.DNS_TXT_BABBLE_VERSION_LABEL, babbleVersion);
 
         // Service information.  Pass it an instance name, service type
         // _protocol._transportlayer , and the map containing
@@ -228,7 +216,7 @@ public class P2PService implements ServiceAdvertiser{
   //              WifiP2pDnsSdServiceInfo.newInstance(mServiceName, P2P_SERVICE_TYPE, record);
 
         WifiP2pDnsSdServiceInfo serviceInfo =
-                WifiP2pDnsSdServiceInfo.newInstance("_Babble", P2P_SERVICE_TYPE, record);
+                WifiP2pDnsSdServiceInfo.newInstance("_Babble", BabbleConstants.P2P_SERVICE_TYPE(), record);
 
         // Add the local service, sending the service info, network channel,
         // and listener that will be used to indicate success or failure of
@@ -279,7 +267,7 @@ public class P2PService implements ServiceAdvertiser{
                                 onInitialiseNetworkCallback();
                             }
                         },
-                        RETRY_DELAY_MS);
+                        BabbleConstants.P2P_RETRY_DELAY_MS);
 
                 return;
             }
@@ -329,7 +317,7 @@ public class P2PService implements ServiceAdvertiser{
 
                 if ( ( arg0 == WifiP2pManager.BUSY )  && (! mGroupCreated ) ){
 
-                    if (count > RETRY_LIMIT) {
+                    if (count > BabbleConstants.P2P_RETRY_LIMIT) {
                         //TODO: error handle
                         onInitialiseNetworkCallback();
                         return;
@@ -342,7 +330,7 @@ public class P2PService implements ServiceAdvertiser{
                                     createGroup(count+1);
                                 }
                             },
-                            RETRY_DELAY_MS);
+                            BabbleConstants.P2P_RETRY_DELAY_MS);
                 }
 
 
@@ -376,7 +364,7 @@ public class P2PService implements ServiceAdvertiser{
                 Log.i(TAG, "DnsSdTxtRecord available -" + record.toString());
 
                 String groupId = device.deviceAddress;
-
+                record.put(BabbleConstants.DNS_TXT_GROUP_ID_LABEL, groupId);  //TODO: JK20Mar review this line
 
                 //TODO: Restore this deduplicating code. Or at least stop it suppressing all entries.
            /*
@@ -388,26 +376,26 @@ public class P2PService implements ServiceAdvertiser{
                     return;
                 };
 */
-                try {
-                    P2PResolvedService resolvedService = new P2PResolvedService(groupId, record);
+       //         try {
+                    ResolvedService resolvedService = ResolvedServiceP2PFactory.NewJoinResolvedService("p2p", record);
 
 
-                    if (!resolvedService.getAppIdentifier().equals(mAppContext.getPackageName())) {
+                    if (!resolvedService.getAppIdentifier().equals(BabbleConstants.APP_ID())) {
                         //The service is not for this app, we'll skip it
                         return;  //TODO: this may need to be modified if multiple apps share babble
                     }
-                    P2PResolvedGroup resolvedGroup = new P2PResolvedGroup(resolvedService);
+                    ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService);
                     mResolvedGroups.add(resolvedGroup);
                     resolvedService.setResolvedGroup(resolvedGroup);
                     mResolvedServices.put(groupId, resolvedService);
                     mServiceDiscoveryListener.onServiceListUpdated(true);
 
-                } catch (UnknownHostException ex) {
+           /*     } catch (UnknownHostException ex) {
 
                     Log.i(TAG,ex.getMessage());  //TODO: Implement proper error handling
 
                     return;
-                }
+                } */
 
             }
         };
@@ -481,7 +469,7 @@ public class P2PService implements ServiceAdvertiser{
         Log.i(TAG,"P2PService.connectToPeer: "+ deviceAddress);
 
         if (mResolvedServices.containsKey(deviceAddress)) {
-            P2PResolvedService prs = mResolvedServices.get(deviceAddress);
+            ResolvedService prs = mResolvedServices.get(deviceAddress);
 
             WifiP2pConfig config = new WifiP2pConfig();
             config.deviceAddress = deviceAddress;
@@ -519,7 +507,7 @@ public class P2PService implements ServiceAdvertiser{
         String ip = getLocalIPAddress();
         Log.i(TAG,"IP: " + ip);
 
-        if (  ( (ip == null) || (ip.equals(DEFAULT_IP_ADDRESS)) ) && ( count < RETRY_LIMIT )) {
+        if (  ( (ip == null) || (ip.equals(BabbleConstants.DEFAULT_P2P_IP_ADDRESS)) ) && ( count < BabbleConstants.P2P_RETRY_LIMIT)) {
 
             new android.os.Handler().postDelayed(
                     new Runnable() {
@@ -528,7 +516,7 @@ public class P2PService implements ServiceAdvertiser{
                             getClientIP(peerIP, peerPort, count+1);
                         }
                     },
-                    RETRY_DELAY_MS);
+                    BabbleConstants.P2P_RETRY_DELAY_MS);
             return;
         }
 
@@ -556,7 +544,7 @@ public class P2PService implements ServiceAdvertiser{
                                      Log.i(TAG,"IP: "+ipStr);
                     if (!inetAddress.isLoopbackAddress()) {
                         if (inetAddress instanceof Inet4Address) {
-                            if (ipStr.startsWith(WIFI_DIRECT_IP_PREFIX)) {
+                            if (ipStr.startsWith(BabbleConstants.DEFAULT_P2P_IP_PREFIX)) {
                                 Log.i(TAG,"Using interface: " + interfaceName);
                                 Log.i(TAG,"Using address: " + ipStr);
                                 return ipStr;

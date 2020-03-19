@@ -34,6 +34,10 @@ import org.junit.runner.RunWith;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import io.mosaicnetworks.babble.node.BabbleConstants;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(AndroidJUnit4.class)
@@ -55,9 +59,9 @@ public class ResolvedServiceTest {
         nsdServiceInfo.setServiceName(serviceName);
         nsdServiceInfo.setHost(inetAddress);
         nsdServiceInfo.setPort(port);
-        nsdServiceInfo.setAttribute(MdnsAdvertiser.APP_IDENTIFIER, appIdentifier);
-        nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_NAME, groupName);
-        nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_UID, groupUid);
+        nsdServiceInfo.setAttribute(BabbleConstants.DNS_TXT_APP_LABEL, appIdentifier);
+        nsdServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_LABEL, groupName);
+        nsdServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_ID_LABEL, groupUid);
 
         MdnsResolvedService resolvedService = new MdnsResolvedService(nsdServiceInfo);
 
@@ -84,13 +88,12 @@ public class ResolvedServiceTest {
         nsdServiceInfo.setServiceName(serviceName);
         nsdServiceInfo.setHost(inetAddress);
         nsdServiceInfo.setPort(port);
-        nsdServiceInfo.setAttribute(MdnsAdvertiser.APP_IDENTIFIER, appIdentifier);
-        nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_NAME, groupName);
-        nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_UID, groupUid);
+        nsdServiceInfo.setAttribute(BabbleConstants.DNS_TXT_APP_LABEL, appIdentifier);
+        nsdServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_LABEL, groupName);
+        nsdServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_ID_LABEL, groupUid);
+        ResolvedService resolvedService = ResolvedServiceMdnsFactory.NewJoinResolvedService("dp", nsdServiceInfo);
 
-        MdnsResolvedService resolvedService = new MdnsResolvedService(nsdServiceInfo);
-
-        MdnsResolvedGroup resolvedGroup = new MdnsResolvedGroup(resolvedService);
+        ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService);
 
         resolvedService.setResolvedGroup(resolvedGroup);
 
@@ -114,13 +117,12 @@ public class ResolvedServiceTest {
         nsdServiceInfo.setServiceName(serviceName);
         nsdServiceInfo.setHost(inetAddress);
         nsdServiceInfo.setPort(port);
-        nsdServiceInfo.setAttribute(MdnsAdvertiser.APP_IDENTIFIER, appIdentifier);
-        nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_NAME, groupName);
-        nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_UID, groupUid);
+        nsdServiceInfo.setAttribute(BabbleConstants.DNS_TXT_APP_LABEL, appIdentifier);
+        nsdServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_LABEL, groupName);
+        nsdServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_ID_LABEL, groupUid);
+        ResolvedService resolvedService = ResolvedServiceMdnsFactory.NewJoinResolvedService("dp", nsdServiceInfo);
 
-        MdnsResolvedService resolvedService = new MdnsResolvedService(nsdServiceInfo);
-
-        MdnsResolvedGroup resolvedGroup = new MdnsResolvedGroup(resolvedService);
+        ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService);
 
         resolvedService.setResolvedGroup(resolvedGroup);
         resolvedService.setResolvedGroup(resolvedGroup); //should throw an IllegalStateException

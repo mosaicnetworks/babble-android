@@ -65,11 +65,6 @@ public abstract class BabbleService<AppState extends BabbleState> {
         this.mNetworkType = mNetworkType;
     }
 
-    public final static int NETWORK_WIFI = 1;
-    public final static int NETWORK_P2P = 2;
-    public final static int NETWORK_NONE = 0;
-
-
     protected int mNetworkType;
 
     public final static String BABBLE_VERSION = BuildConfig.BabbleVersion;
@@ -92,7 +87,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * @throws IllegalStateException if the service is currently running
      */
     public void start(String configDirectory, GroupDescriptor groupDescriptor) {
-        start(configDirectory, groupDescriptor, NETWORK_WIFI);  // Defaults to the original mDNS configuration
+        start(configDirectory, groupDescriptor, BabbleConstants.NETWORK_WIFI);  // Defaults to the original mDNS configuration
     }
 
 
@@ -100,7 +95,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * Start the service
      *
      * @param configDirectory The full path to the babble configuration directory
-     * @param networkType BabbleService.NETWORK_NONE for archive, NETWORK_WIFI or NETWORK_P2P for mDNS or WiFi Direct
+     * @param networkType BabbleConstants.NETWORK_NONE for archive, NETWORK_WIFI or NETWORK_P2P for mDNS or WiFi Direct
      * @throws IllegalStateException if the service is currently running
      */
     public void start(String configDirectory, int networkType) {
@@ -114,7 +109,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
      *
      * @param configDirectory The full path to the babble configuration directory
      * @param groupDescriptor The group descriptor
-     * @param networkType BabbleService.NETWORK_NONE for archive, NETWORK_WIFI or NETWORK_P2P for mDNS or WiFi Direct
+     * @param networkType BabbleConstants.NETWORK_NONE for archive, NETWORK_WIFI or NETWORK_P2P for mDNS or WiFi Direct
      * @throws IllegalStateException if the service is currently running
      */
     public void start(String configDirectory, GroupDescriptor groupDescriptor, int networkType) {

@@ -41,6 +41,7 @@ import androidx.annotation.NonNull;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
@@ -189,7 +190,9 @@ public class NewGroupFragment extends BabbleServiceBinder {
 
         } else {
             mServiceAdvertiser = new MdnsAdvertiser2(mGroupDescriptor,
-                    getContext().getApplicationContext());
+                    getContext().getApplicationContext(),
+                    "", ""
+                    );  //TODO: JK20March
             configAndStartBabble(Utils.getIPAddr(getContext()));
         }
     }

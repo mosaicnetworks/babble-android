@@ -107,7 +107,7 @@ public final class ConfigManager {
 
         Log.v("ConfigManager", "got FilesDir");
 
-        mAppId = appContext.getPackageName();
+        mAppId = BabbleConstants.APP_ID();  //TODO: JK20Mar remove this variable and use constant direct
 
         Log.v("ConfigManager", "got Package Name");
 

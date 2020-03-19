@@ -36,6 +36,8 @@ import java.util.Map;
 
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
 
+import io.mosaicnetworks.babble.discovery.PeersFactory;
+import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser;
@@ -48,7 +50,7 @@ import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;
 public final class MessagingService extends BabbleService<ChatState> {
 
     private static final String TAG = "MessagingService";
-    private static int sDiscoveryPort = 8988;
+    private static int sDiscoveryPort = BabbleConstants.DISCOVERY_PORT();
 
     private static MessagingService INSTANCE;
 //    private MdnsAdvertiser mMdnsAdvertiser;
@@ -86,14 +88,15 @@ public final class MessagingService extends BabbleService<ChatState> {
 
 
         switch (mNetworkType) {
-            case BabbleService.NETWORK_NONE:
+            case BabbleConstants.NETWORK_NONE:
                 Log.i(TAG, "NONE / Archive");
                 return;
-            case BabbleService.NETWORK_WIFI:
+            case BabbleConstants.NETWORK_WIFI:
                 Log.i(TAG, "WIFI / MDNS");
-                mAdvertiser = new MdnsAdvertiser(mGroupDescriptor, sDiscoveryPort, mAppContext);
+                mAdvertiser = new MdnsAdvertiser(mGroupDescriptor, sDiscoveryPort, mAppContext, mBabbleNode.getCurrentPeers(),
+                        mBabbleNode.getGenesisPeers() );
                 break;
-            case BabbleService.NETWORK_P2P:
+            case BabbleConstants.NETWORK_P2P:
                 Log.i(TAG, "P2P");
                 mAdvertiser = P2PService.getInstance(mAppContext);
                 break;

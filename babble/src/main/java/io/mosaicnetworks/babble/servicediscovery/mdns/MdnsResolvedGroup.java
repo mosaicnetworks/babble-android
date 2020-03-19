@@ -27,7 +27,8 @@ package io.mosaicnetworks.babble.servicediscovery.mdns;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.InterfaceResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.InterfaceResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 
 /**
@@ -35,7 +36,7 @@ import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
  * group UID and group name can be added to the group as they're discovered. Services can be removed
  * from the group as and when they are lost.
  */
-public final class MdnsResolvedGroup implements ResolvedGroup {
+public final class MdnsResolvedGroup  {
 
     private final String mGroupName;
     private final String mGroupUid;
@@ -48,7 +49,7 @@ public final class MdnsResolvedGroup implements ResolvedGroup {
     public MdnsResolvedGroup(ResolvedService resolvedService) {
         mGroupName = resolvedService.getGroupName();
         mGroupUid = resolvedService.getGroupUid();
-        mResolvedServices.add((MdnsResolvedService)resolvedService);
+        mResolvedServices.add(resolvedService);
     }
 
     /**
@@ -68,7 +69,7 @@ public final class MdnsResolvedGroup implements ResolvedGroup {
             throw new IllegalArgumentException("Cannot add service: Service group name does not match this group's name");
         }
 
-        mResolvedServices.add((MdnsResolvedService)resolvedService);
+        mResolvedServices.add(resolvedService);
     }
 
     /**

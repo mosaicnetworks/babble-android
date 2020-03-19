@@ -29,6 +29,7 @@
 -->
 <resources>
     <integer name="babble_port">6666</integer>
+    <integer name="babble_discovery_port">8988</integer>
     <string name="babble_app_id"></string>
     <string name="babble_root_dir">babble</string>
     <string name="babble_db_subdir">badger_db</string>
@@ -36,4 +37,6 @@
     <string name="babble_peers_json">peers.json</string>
     <string name="babble_peers_genesis_json">peers.genesis.json</string>
     <string name="babble_priv_key">priv_key</string>
+    <string name="babble_service_type">_babble._tcp.</string>
+    <string name="babble_p2p_service_type">_presence._tcp</string>
 </resources>

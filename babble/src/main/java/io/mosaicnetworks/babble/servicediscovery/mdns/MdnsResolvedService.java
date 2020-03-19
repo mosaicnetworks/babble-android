@@ -30,12 +30,8 @@ import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.util.Map;
 
+import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
-
-import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.APP_IDENTIFIER;
-import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.GROUP_NAME;
-import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.GROUP_UID;
 
 /**
  * A class representing service information for network service discovery. Unlike the
@@ -44,18 +40,16 @@ import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.GROU
  *
  * Several instances of this class may refer to the same group that are advertised by a different
  * hosts. Instances of the {@link MdnsResolvedGroup} class can be used to hold a collection of
- * {@link MdnsResolvedService} that represent the same group. In this sense a {@link MdnsResolvedService} is
- * assigned to a group. This assignment can be set by calling the
- * {@link #setResolvedGroup(MdnsResolvedGroup)} method.
+ * {@link MdnsResolvedService} that represent the same group.
  */
-public final class MdnsResolvedService implements ResolvedService {
+public final class MdnsResolvedService  {
     
     private final InetAddress mInetAddress;
     private final int mPort;
     private final String mAppIdentifier;
     private final String mGroupName;
     private final String mGroupUid;
-    private MdnsResolvedGroup mResolvedGroup;
+    private ResolvedGroup mResolvedGroup;
     private final Map<String, byte[]> mServiceAttributes;
     private boolean mAssignedGroup = false;
 
@@ -67,9 +61,9 @@ public final class MdnsResolvedService implements ResolvedService {
         mInetAddress = nsdServiceInfo.getHost();
         mPort = nsdServiceInfo.getPort();
         mServiceAttributes = nsdServiceInfo.getAttributes(); //Min Level API 21
-        mAppIdentifier = extractStringAttribute(APP_IDENTIFIER);
-        mGroupName = extractStringAttribute(GROUP_NAME);
-        mGroupUid = extractStringAttribute(GROUP_UID);
+        mAppIdentifier = extractStringAttribute(BabbleConstants.DNS_TXT_APP_LABEL);
+        mGroupName = extractStringAttribute(BabbleConstants.DNS_TXT_GROUP_LABEL);
+        mGroupUid = extractStringAttribute(BabbleConstants.DNS_TXT_GROUP_ID_LABEL);
     }
 
 
@@ -90,7 +84,7 @@ public final class MdnsResolvedService implements ResolvedService {
      * Get the group to which this instance has been assigned
      * @return the reoslved group
      */
-    public MdnsResolvedGroup getResolvedGroup() {
+    public ResolvedGroup getResolvedGroup() {
         return mResolvedGroup;
     }
 
@@ -105,7 +99,7 @@ public final class MdnsResolvedService implements ResolvedService {
             throw new IllegalStateException("This service has already been assigned to a group");
         }
 
-        mResolvedGroup = (MdnsResolvedGroup) resolvedGroup;
+        mResolvedGroup = resolvedGroup;
         mAssignedGroup = true;
 
     }

@@ -31,13 +31,10 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
+import io.mosaicnetworks.babble.node.BabbleConstants;
+import io.mosaicnetworks.babble.servicediscovery.InterfaceResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.InterfaceResolvedService;
 import com.google.common.net.InetAddresses;
-
-import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.APP_IDENTIFIER;
-import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.GROUP_NAME;
-import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.GROUP_UID;
 
 /**
  * A class representing service information for network service discovery. Unlike the
@@ -49,7 +46,7 @@ import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.GROU
  * {@link P2PResolvedService} that represent the same group. In this sense a {@link P2PResolvedService} is
  * assigned to a group. This assignment can be set by calling the
  */
-public final class P2PResolvedService implements ResolvedService {
+public final class P2PResolvedService implements InterfaceResolvedService {
 
     private final InetAddress mInetAddress ;
     private final int mPort;
@@ -67,24 +64,24 @@ public final class P2PResolvedService implements ResolvedService {
 
         /*
 
-    public final static String PORT_LABEL = "port";
-    public final static String MONIKER_LABEL = "moniker";
-    public final static String DNS_VERSION_LABEL = "textvers";
+    public final static String DNS_TXT_PORT_LABEL = "port";
+    public final static String DNS_TXT_MONIKER_LABEL = "moniker";
+    public final static String DNS_TXT_DNS_VERSION_LABEL = "textvers";
     private final static String DNS_VERSION = "0.0.1";
-    public final static String BABBLE_VERSION_LABEL = "babblevers";
+    public final static String DNS_TXT_BABBLE_VERSION_LABEL = "babblevers";
 
-    public final static String GROUP_LABEL = "group";
+    public final static String DNS_TXT_GROUP_LABEL = "group";
 
          */
 
-   //     mInetAddress =  InetAddresses.forString((String) map.get(P2PService.HOST_LABEL));
-        mInetAddress =  InetAddresses.forString((String) map.get(P2PService.HOST_LABEL));
-        mPort = Integer.parseInt((String) map.get(P2PService.PORT_LABEL));
+   //     mInetAddress =  InetAddresses.forString((String) map.get(P2PService.DNS_TXT_HOST_LABEL));
+        mInetAddress =  InetAddresses.forString((String) map.get(BabbleConstants.DNS_TXT_HOST_LABEL));
+        mPort = Integer.parseInt((String) map.get(BabbleConstants.DNS_TXT_PORT_LABEL));
 
         mServiceAttributes = new HashMap<>(); //nsdServiceInfo.getAttributes();
 
-        mAppIdentifier = (String) map.get(P2PService.APP_LABEL);
-        mGroupName = (String) map.get(P2PService.GROUP_LABEL);
+        mAppIdentifier = (String) map.get(BabbleConstants.DNS_TXT_APP_LABEL);
+        mGroupName = (String) map.get(BabbleConstants.DNS_TXT_GROUP_LABEL);
         mGroupUid = uuID;
     }
 
@@ -92,7 +89,7 @@ public final class P2PResolvedService implements ResolvedService {
      * Get the group to which this instance has been assigned
      * @return the reoslved group
      */
-    public ResolvedGroup getResolvedGroup() {
+    public InterfaceResolvedGroup getResolvedGroup() {
         return mResolvedGroup;
     }
 
@@ -101,7 +98,7 @@ public final class P2PResolvedService implements ResolvedService {
      * in an {@link IllegalStateException}.
      * @param resolvedGroup the group to which the service should be assigned
      */
-    public void setResolvedGroup(ResolvedGroup resolvedGroup) {
+    public void setResolvedGroup(InterfaceResolvedGroup resolvedGroup) {
 
         if (mAssignedGroup) {
             throw new IllegalStateException("This service has already been assigned to a group");

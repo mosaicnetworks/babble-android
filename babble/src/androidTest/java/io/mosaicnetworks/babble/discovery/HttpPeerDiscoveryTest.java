@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import io.mosaicnetworks.babble.node.BabbleConstants;
+
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
@@ -46,13 +48,13 @@ public class HttpPeerDiscoveryTest {
             }
         }
 
-        HttpPeerDiscoveryServer httpPeerDiscoveryServer = new HttpPeerDiscoveryServer("localhost", 8988, new MockPeersProvider());
+        HttpPeerDiscoveryServer httpPeerDiscoveryServer = new HttpPeerDiscoveryServer("localhost", BabbleConstants.DISCOVERY_PORT(), new MockPeersProvider());
         httpPeerDiscoveryServer.start();
 
         String host = "localhost";
 
         HttpPeerDiscoveryRequest httpPeerDiscoveryRequest =
-                HttpPeerDiscoveryRequest.createCurrentPeersRequest(host, 8988, new ResponseListener() {
+                HttpPeerDiscoveryRequest.createCurrentPeersRequest(host, BabbleConstants.DISCOVERY_PORT(), new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
                 mRcvPeers = peers;

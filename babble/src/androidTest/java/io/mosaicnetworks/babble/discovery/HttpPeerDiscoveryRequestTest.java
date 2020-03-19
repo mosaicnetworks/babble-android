@@ -13,6 +13,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import fi.iki.elonen.NanoHTTPD;
+import io.mosaicnetworks.babble.node.BabbleConstants;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -46,13 +47,13 @@ public class HttpPeerDiscoveryRequestTest {
         }
 
         MockHttpPeerDiscoveryServer mockHttpPeerDiscoveryServer = new MockHttpPeerDiscoveryServer(
-                "localhost", 8988, new PeersGet(), 0);
+                "localhost", BabbleConstants.DISCOVERY_PORT(), new PeersGet(), 0);
         mockHttpPeerDiscoveryServer.start();
 
         String host = "localhost";
 
         HttpPeerDiscoveryRequest httpPeerDiscoveryRequest =
-                HttpPeerDiscoveryRequest.createCurrentPeersRequest(host, 8988, new ResponseListener() {
+                HttpPeerDiscoveryRequest.createCurrentPeersRequest(host, BabbleConstants.DISCOVERY_PORT(), new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
                 mRcvPeers = peers;
@@ -89,7 +90,7 @@ public class HttpPeerDiscoveryRequestTest {
         String host = "198.51.100.255"; // should be an unreachable ip address
 
         HttpPeerDiscoveryRequest httpPeerDiscoveryRequest =
-                HttpPeerDiscoveryRequest.createCurrentPeersRequest(host, 8988, new ResponseListener() {
+                HttpPeerDiscoveryRequest.createCurrentPeersRequest(host, BabbleConstants.DISCOVERY_PORT(), new ResponseListener() {
             @Override
             public void onReceivePeers(List<Peer> peers) {
             }
