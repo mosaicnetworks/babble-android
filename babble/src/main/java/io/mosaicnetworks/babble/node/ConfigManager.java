@@ -63,11 +63,6 @@ public final class ConfigManager {
     public enum ConfigDirectoryBackupPolicy  {DELETE, SINGLE_BACKUP, COMPLETE_BACKUP, ABORT}
 
     /**
-     * The default babbling port. This can be overridden when configuring the service
-     */
-    public static final int DEFAULT_BABBLING_PORT = 6666;
-
-    /**
      * The subfolder of the file store for the app that contains all of the babble-go configuration
      * files and badger_db databases
      */
@@ -259,7 +254,7 @@ public final class ConfigManager {
      * @throws IllegalStateException if the service is currently running
      */
     public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String inetAddress) {
-        return createConfigNewGroup(groupDescriptor, moniker, inetAddress, DEFAULT_BABBLING_PORT);
+        return createConfigNewGroup(groupDescriptor, moniker, inetAddress, BabbleConstants.BABBLE_PORT());
     }
 
     /**
@@ -285,7 +280,7 @@ public final class ConfigManager {
      * @throws IllegalStateException if the service is currently running
      */
     public String setGroupToArchive(ConfigDirectory configDirectory, String inetAddress)  throws  IOException {
-        return setGroupToArchive(configDirectory, inetAddress, DEFAULT_BABBLING_PORT);
+        return setGroupToArchive(configDirectory, inetAddress, BabbleConstants.BABBLE_PORT());
     }
 
     /**
@@ -336,7 +331,7 @@ public final class ConfigManager {
      * @throws IllegalStateException if the service is currently running
      */
     public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor, String moniker, String inetAddress) throws CannotStartBabbleNodeException, IOException {
-        return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, inetAddress, DEFAULT_BABBLING_PORT);
+        return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, inetAddress, BabbleConstants.BABBLE_PORT());
     }
 
     /**
