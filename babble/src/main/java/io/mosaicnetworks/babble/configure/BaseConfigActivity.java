@@ -187,13 +187,14 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     public void onServiceSelected(ResolvedGroup resolvedGroup) {
 
 
-        //TODO: JK20Mar   this instanceof stuff will break
-        if (resolvedGroup instanceof ResolvedGroup) {
+        // TODO: JK20Mar   this is a temporary hack
+        // At the moment the DataProviders are hardcoded as we don't yet have a DiscoveryDataController
+        if (resolvedGroup.getDataProviderId().equals("mdns")) {
             Log.i(TAG, "onServiceSelected: MDNS item selected");
             MdnsJoinGroupFragment mJoinGroupMdnsFragment = MdnsJoinGroupFragment.newInstance(resolvedGroup);
             replaceFragment(mJoinGroupMdnsFragment, true);
         } else {
-            if (resolvedGroup instanceof ResolvedGroup) {
+            if (resolvedGroup.getDataProviderId().equals("p2p")) {
 
                 Log.i(TAG, "onServiceSelected: P2P item selected");
                 P2PJoinGroupFragment mJoinGroupP2PFragment = P2PJoinGroupFragment.newInstance(resolvedGroup);
