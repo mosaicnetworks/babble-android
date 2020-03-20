@@ -87,7 +87,8 @@ public final class BabbleNode implements PeersProvider {
 
     private final Node mNode;
 
-    public static BabbleNode create(final BlockConsumer blockConsumer, String configDir) {
+    public static BabbleNode create(final BlockConsumer blockConsumer, String configDir,
+                                    final NodeStateChangeHandler stateChangeHandler) {
 
         Log.i("BabbleNode.create", configDir);
         Node node = Mobile.new_(
@@ -113,7 +114,9 @@ public final class BabbleNode implements PeersProvider {
                 new mobile.StateChangeHandler() {
                     @Override
                     public void onStateChanged(final int state) {
-                        System.out.println("BabbleState " + State.fromValue(state));
+                        if (stateChangeHandler!=null) {
+                            stateChangeHandler.onStateChanged(State.fromValue(state));
+                        }
                     }
                 },
                 new mobile.ExceptionHandler() {
