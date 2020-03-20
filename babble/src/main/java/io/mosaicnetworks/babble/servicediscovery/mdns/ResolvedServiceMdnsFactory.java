@@ -74,9 +74,22 @@ public abstract class ResolvedServiceMdnsFactory {
     private static Map<String, String> convertAttributeMap(Map<String, byte[]> serviceAttributes) {
         Map<String, String> stringMap = new HashMap<>();
 
+        if (serviceAttributes == null ) {
+            Log.e("ResolvedServMdnsFac", "convertAttributeMap: serviceAttribute is null" );
+            return stringMap;
+        }
         for (Map.Entry<String,byte[]> entry : serviceAttributes.entrySet())
         {
-            stringMap.put(entry.getKey(), new String(entry.getValue(), Charset.forName("UTF-8"))  );
+
+            byte[] bytesValue = entry.getValue();
+
+            //Need to explicitly check for null, as it causes an error in string construction
+            if (bytesValue == null) {
+                stringMap.put(entry.getKey(), "");
+
+            } else {
+                stringMap.put(entry.getKey(), new String(bytesValue, Charset.forName("UTF-8")));
+            }
         }
 
         return stringMap;
