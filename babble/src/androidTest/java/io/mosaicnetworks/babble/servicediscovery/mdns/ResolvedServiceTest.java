@@ -63,10 +63,10 @@ public class ResolvedServiceTest {
         nsdServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_LABEL, groupName);
         nsdServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_ID_LABEL, groupUid);
 
-        MdnsResolvedService resolvedService = new MdnsResolvedService(nsdServiceInfo);
+        ResolvedService resolvedService = ResolvedServiceMdnsFactory.NewJoinResolvedService("mdns", nsdServiceInfo);
 
         assertEquals(inetAddress, resolvedService.getInetAddress());
-        assertEquals(port, resolvedService.getPort());
+        assertEquals(port, resolvedService.getDiscoveryPort());
         assertEquals(appIdentifier, resolvedService.getAppIdentifier());
         assertEquals(groupName, resolvedService.getGroupName());
         assertEquals(groupUid, resolvedService.getGroupUid());

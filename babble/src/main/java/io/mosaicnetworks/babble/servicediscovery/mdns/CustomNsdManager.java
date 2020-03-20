@@ -34,6 +34,8 @@ import java.net.InetAddress;
 import java.util.Iterator;
 import java.util.Map;
 
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
+
 public class CustomNsdManager {
     private static final String TAG = "CustomNsdManager";
     private NsdManager mNsdManager;
@@ -72,9 +74,9 @@ public class CustomNsdManager {
 
                     @Override
                     public void onServiceResolved(NsdServiceInfo nsdServiceInfo) {
-                        MdnsResolvedService resolvedService;
+                        ResolvedService resolvedService;
                         try {
-                            resolvedService = new MdnsResolvedService(nsdServiceInfo);
+                            resolvedService = ResolvedServiceMdnsFactory.NewJoinResolvedService("mdns", nsdServiceInfo);
                             // No error so we make stock return
                             listener.onServiceResolved(nsdServiceInfo);
                         } catch (IllegalArgumentException ex) {

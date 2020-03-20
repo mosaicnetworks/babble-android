@@ -25,7 +25,6 @@
 package io.mosaicnetworks.babble.configure;
 
 import io.mosaicnetworks.babble.node.BabbleService;
-import io.mosaicnetworks.babble.servicediscovery.InterfaceResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 /**

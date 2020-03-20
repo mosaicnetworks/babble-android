@@ -39,7 +39,6 @@ import io.mosaicnetworks.babble.configure.p2p.P2PJoinGroupFragment;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.p2p.P2PResolvedGroup;
 
 /**
  * This activity complements the {@link BabbleService}. It consists of a set of fragments which

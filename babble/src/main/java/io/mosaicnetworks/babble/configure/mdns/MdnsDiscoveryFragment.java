@@ -38,7 +38,6 @@ import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
-import io.mosaicnetworks.babble.servicediscovery.InterfaceResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsServicesListView;

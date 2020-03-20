@@ -52,6 +52,8 @@ import java.util.Map;
 import io.mosaicnetworks.babble.configure.OnNetworkInitialised;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.utils.RandomString;
 
@@ -108,8 +110,8 @@ public class P2PService2 implements ServiceAdvertiser {
     public BroadcastReceiver mReceiver;
     public IntentFilter mIntentFilter;
 
-    private final Map<String, P2PResolvedService> mResolvedServices = new HashMap<>();
-    private List<P2PResolvedGroup> mResolvedGroups;  //TODO: Look to make this final
+    private final Map<String, ResolvedService> mResolvedServices = new HashMap<>();
+    private List<ResolvedGroup> mResolvedGroups;  //TODO: Look to make this final
 //    final HashMap<String, Map> textRecords = new HashMap<>();
 
 
@@ -149,7 +151,7 @@ public class P2PService2 implements ServiceAdvertiser {
     }
 
 
-    public void setResolvedGroups(List<P2PResolvedGroup> resolvedGroups) {
+    public void setResolvedGroups(List<ResolvedGroup> resolvedGroups) {
         this.mResolvedGroups = resolvedGroups;
     }
 
@@ -370,26 +372,26 @@ public class P2PService2 implements ServiceAdvertiser {
                     return;
                 };
 */
-                try {
-                    P2PResolvedService resolvedService = new P2PResolvedService(groupId, record);
+   //             try {
+                    ResolvedService resolvedService = ResolvedServiceP2PFactory.NewJoinResolvedService("p2p", record);
 
 
                     if (!resolvedService.getAppIdentifier().equals(BabbleConstants.APP_ID())) {
                         //The service is not for this app, we'll skip it
                         return;  //TODO: this may need to be modified if multiple apps share babble
                     }
-                    P2PResolvedGroup resolvedGroup = new P2PResolvedGroup(resolvedService);
+                    ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService);
                     mResolvedGroups.add(resolvedGroup);
                     resolvedService.setResolvedGroup(resolvedGroup);
                     mResolvedServices.put(groupId, resolvedService);
                     mServiceDiscoveryListener.onServiceListUpdated(true);
 
-                } catch (UnknownHostException ex) {
+            /*    } catch (UnknownHostException ex) {
 
                     Log.i(TAG,ex.getMessage());  //TODO: Implement proper error handling
 
                     return;
-                }
+                } */
 
             }
         };
@@ -463,7 +465,7 @@ public class P2PService2 implements ServiceAdvertiser {
         Log.i(TAG,"P2PService2.connectToPeer: "+ deviceAddress);
 
         if (mResolvedServices.containsKey(deviceAddress)) {
-            P2PResolvedService prs = mResolvedServices.get(deviceAddress);
+            ResolvedService prs = mResolvedServices.get(deviceAddress);
 
             WifiP2pConfig config = new WifiP2pConfig();
             config.deviceAddress = deviceAddress;
