@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## UNRELEASED v0.4.3 (March 23, 2020)
+## v0.4.3 (March 23, 2020)
 
 SECURITY:
 
