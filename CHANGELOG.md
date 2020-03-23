@@ -1,16 +1,18 @@
 # CHANGELOG
-## UNRELEASED v0.4.3 (March 20, 2020)
+
+## UNRELEASED v0.4.3 (March 23, 2020)
 
 SECURITY:
 
 FEATURES:
 
-- Sample App: Added hamburger menu to chat screen to how additional information and status 
+- Sample App: Added hamburger menu to chat screen to show additional information and status 
 - Sample App: Added hamburger menu to front screen to display version information
 - Parameters: Added babble.xml to allow overriding of some or all parameters in an app. 
 
 IMPROVEMENTS:
 
+- Babble Library: Implemented BabbleService as an Android Service
 - Sample App: added title to the chat screen
 - Sample App: changed colours from teal
 
