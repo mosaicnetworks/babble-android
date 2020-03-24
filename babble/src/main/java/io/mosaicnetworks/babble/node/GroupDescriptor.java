@@ -26,6 +26,7 @@ package io.mosaicnetworks.babble.node;
 
 import java.util.UUID;
 
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.utils.RandomString;
 
 public final class GroupDescriptor {
@@ -33,15 +34,39 @@ public final class GroupDescriptor {
     private final String mName;
     private final String mUid;
 
+    public String getMoniker() {
+        return mMoniker;
+    }
+
+    public void setMoniker(String moniker) {
+        this.mMoniker = moniker;
+    }
+
+    private String mMoniker; //TODO: make final
+    private final ResolvedGroup mResolvedGroup;
+
+    //TODO: Deprecate this constructor
     public GroupDescriptor(String name, String uid) {
         mName = name;
         mUid = uid;
+        mResolvedGroup = null;
     }
 
+    //TODO: Deprecate this constructor
     public GroupDescriptor(String name) {
         mName = name;
         mUid = new RandomString().nextString();
+        mResolvedGroup = null;
     }
+
+
+    public GroupDescriptor(ResolvedGroup resolvedGroup, String moniker) {
+        mResolvedGroup = resolvedGroup;
+        mName = mResolvedGroup.getGroupName();
+        mUid = mResolvedGroup.getGroupUid();
+        mMoniker = moniker;
+    }
+
 
     public String getName() {
         return mName;
@@ -51,5 +76,7 @@ public final class GroupDescriptor {
         return mUid;
     }
 
-
+    public ResolvedGroup getResolvedGroup() {
+        return mResolvedGroup;
+    }
 }

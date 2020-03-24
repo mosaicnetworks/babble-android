@@ -59,7 +59,7 @@ public class MdnsDiscoveryFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment.
      *
-     * @return A new instance of fragment MdnsDiscoveryFragment.
+     * @return A new instance of fragment DiscoveryFragment.
      */
     public static MdnsDiscoveryFragment newInstance() {
         return new MdnsDiscoveryFragment();

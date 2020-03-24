@@ -43,9 +43,9 @@
     <string name="ok_button">OK</string>
     <string name="babble_init_fail_title">Failed to start Babble</string>
     <string name="babble_init_fail_message">Please try again in a few seconds!\n\nIf this message keeps appearing, please check your WiFi connection</string>
-    <string name="service_discovery_resolve_fail_title">Unable to resolve mDNS service</string>
+    <string name="service_discovery_resolve_fail_title">Unable to resolve service</string>
     <string name="service_discovery_resolve_fail_message">Please try again in a few seconds!</string>
-    <string name="service_discovery_start_fail_title">Failed to start mDNS discovery</string>
+    <string name="service_discovery_start_fail_title">Failed to start discovery</string>
     <string name="service_p2p_discovery_resolve_fail_title">Unable to resolve P2P service</string>
     <string name="service_p2p_discovery_start_fail_title">Failed to start P2P discovery</string>
     <string name="service_discovery_start_fail_message">Please refresh to try again</string>

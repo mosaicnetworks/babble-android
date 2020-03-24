@@ -33,12 +33,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.mdns.MdnsJoinGroupFragment;
 import io.mosaicnetworks.babble.configure.p2p.P2PJoinGroupFragment;
+import io.mosaicnetworks.babble.discovery.DiscoveryDataController;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.servicediscovery.JoinGroupConfirmation;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
+import io.mosaicnetworks.babble.servicediscovery.ServicesListView;
 
 /**
  * This activity complements the {@link BabbleService}. It consists of a set of fragments which
@@ -46,12 +53,20 @@ import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
  * {@link BaseConfigActivity#getBabbleService()}, {@link BaseConfigActivity#onJoined(String)} and
  * {@link BaseConfigActivity#onStartedNew(String)} methods.
  */
-public abstract class BaseConfigActivity extends AppCompatActivity implements OnFragmentInteractionListener {
+public abstract class BaseConfigActivity extends AppCompatActivity implements OnFragmentInteractionListener, JoinGroupConfirmation {
 
     /**
      * Key for the bundle used to pass the visibility flag for the mDNS tab to the fragment
      */
     public static final String SHOW_MDNS ="SHOW_MDNS";
+
+
+    /**
+     * Key for the bundle used to pass the visibility flag for the mDNS tab to the fragment
+     */
+    public static final String SHOW_COMBINED ="SHOW_COMBINED";
+
+
 
     /**
      * Key for the bundle used to pass the visibility flag for the P2P tab to the fragment
@@ -72,12 +87,34 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     private FragmentManager mFragmentManager;
     private Boolean mFromGroup = false;
     private boolean mShowmDNS = true;
-    private boolean mShowP2P = true;
+    private boolean mShowP2P = false;
+
+
+    private boolean mShowCombined = true;
     private boolean mShowArchive = true;
     private boolean mTooLateToChangeShowTabs = false;
     private boolean mShowAllArchiveVersions = true;
+    private List<ResolvedGroup> mResolvedGroups;
+    private ResolvedGroupManager mResolvedGroupManager;
+    private DiscoveryDataController mDiscoveryDataController;
+
     public static final String PREFERENCE_FILE_KEY = "babbleandroid";
     private static final String TAG = "BaseConfigActivity";
+
+
+    /**
+     * Controls whether to show the Combined tab. Must be called before
+     * {@link BaseConfigActivity#onCreate(Bundle)} method is called as the parameters are used in
+     * {@link BaseConfigActivity#onCreate(Bundle)}.
+     * @param showCombined true to show the mDNS tab, false to hide
+     * @throws IllegalStateException if the OnCreate event handler has already been run
+     */
+    public void setShowCombined(boolean showCombined) {
+        if (mTooLateToChangeShowTabs) throw new IllegalStateException();
+        this.mShowCombined = showCombined;
+    }
+
+
 
     /**
      * Controls whether to show the mDNS tab. Must be called before
@@ -132,7 +169,37 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base_config);
 
+// BEGIN general initialisation block
+    // This block contains some code that will need to be run if using the library without
+    // the standard UX.
         BabbleConstants.initialise(this);
+
+        // We create an array list which we need to set on the ServiceListView when it is created.
+        mResolvedGroups = new ArrayList<>();
+
+        // servicesListView.getResolvedGroupList(mResolvedGroups);
+
+
+        /*
+        ServicesListView servicesListView = findViewById(R.id.servicesListView);
+        Log.i(TAG,"  Get ResolvedGroup List from ServicesListView");
+        mResolvedGroups =  servicesListView.getResolvedGroupList();
+        mResolvedGroupManager.registerServicesListUpdater(servicesListView);
+        servicesListView.registerServicesListListener(mDiscoveryDataController);
+
+         */
+
+        Log.i(TAG,"  Create ResolvedGroupManager");
+        mResolvedGroupManager = new ResolvedGroupManager(this, mResolvedGroups);
+        Log.i(TAG,"  Create DiscoveryDataController");
+        mDiscoveryDataController = new DiscoveryDataController(this, mResolvedGroupManager);
+        Log.i(TAG,"  Register with DiscoveryTestActivity as JoinGroupConfirmation");
+        mDiscoveryDataController.registerJoinGroupConfirmation(this);
+        Log.i(TAG,"  Register with DiscoveryTestActivity as OnFragmentInteractionListener(");
+        mDiscoveryDataController.registerOnFragmentInteractionListener(this);
+
+        Log.i(TAG,"END setUpBabble()");
+// END general initialisation block
 
         mFragmentManager = getSupportFragmentManager();
 
@@ -145,9 +212,9 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
             Bundle bundle = new Bundle();
             bundle.putBoolean(SHOW_MDNS, mShowmDNS);
             bundle.putBoolean(SHOW_P2P, mShowP2P);
+            bundle.putBoolean(SHOW_COMBINED, mShowCombined);
             bundle.putBoolean(SHOW_ARCHIVE, mShowArchive);
             bundle.putBoolean(SHOW_ALL_ARCHIVE, mShowAllArchiveVersions);
-
             addFragment(TabsFragment.newInstance(bundle));
         }
     }

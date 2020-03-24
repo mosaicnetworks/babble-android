@@ -22,14 +22,13 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure.p2p;
+package io.mosaicnetworks.babble.servicediscovery;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -39,20 +38,17 @@ import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
-import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
-import io.mosaicnetworks.babble.servicediscovery.p2p.P2PServicesListView;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 
-public class P2PDiscoveryFragment extends Fragment {
+public class DiscoveryFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private P2PServicesListView mServiceListView;
-    private LinearLayout mLinearLayoutServiceSearch;
+    private ServicesListView mServiceListView;
+    public SwipeRefreshLayout mSwipeRefreshServiceSearch;
     private SwipeRefreshLayout mSwipeRefreshDiscoveryFailed;
     private SwipeRefreshLayout mSwipeRefreshServicesDisplaying;
 
-    public P2PDiscoveryFragment() {
+    public DiscoveryFragment() {
         // Required empty public constructor
     }
 
@@ -62,8 +58,8 @@ public class P2PDiscoveryFragment extends Fragment {
      *
      * @return A new instance of fragment DiscoveryFragment.
      */
-    public static P2PDiscoveryFragment newInstance() {
-        return new P2PDiscoveryFragment();
+    public static DiscoveryFragment newInstance() {
+        return new DiscoveryFragment();
     }
 
     @Override
@@ -74,10 +70,10 @@ public class P2PDiscoveryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_p2p_discovery, container, false);
+        final View view = inflater.inflate(R.layout.fragment_mdns_discovery, container, false);
 
         mServiceListView = view.findViewById(R.id.servicesListView);
-        mLinearLayoutServiceSearch = view.findViewById(R.id.linearLayout_service_search);
+        mSwipeRefreshServiceSearch = view.findViewById(R.id.swipeRefresh_service_search);
         mSwipeRefreshDiscoveryFailed = view.findViewById(R.id.swiperefresh_discovery_failed);
         mSwipeRefreshServicesDisplaying = view.findViewById(R.id.swiperefresh_services_displaying);
 
@@ -86,7 +82,7 @@ public class P2PDiscoveryFragment extends Fragment {
                     @Override
                     public void onRefresh() {
 
-                        mLinearLayoutServiceSearch.setVisibility(View.VISIBLE);
+                        mSwipeRefreshServiceSearch.setVisibility(View.VISIBLE);
                         mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
                         mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
 
@@ -108,6 +104,20 @@ public class P2PDiscoveryFragment extends Fragment {
 
                         if (mSwipeRefreshServicesDisplaying.isRefreshing()) {
                             mSwipeRefreshServicesDisplaying.setRefreshing(false);
+                        }
+                    }
+                }
+        );
+
+        mSwipeRefreshServiceSearch.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+
+                        //do nothing ;)
+
+                        if (mSwipeRefreshServiceSearch.isRefreshing()) {
+                            mSwipeRefreshServiceSearch.setRefreshing(false);
                         }
                     }
                 }
@@ -143,14 +153,14 @@ public class P2PDiscoveryFragment extends Fragment {
 
             @Override
             public void onServiceSelectedFailure() {
-                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_p2p_discovery_resolve_fail_title, R.string.service_discovery_resolve_fail_message);
+                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_discovery_resolve_fail_title, R.string.service_discovery_resolve_fail_message);
             }
 
             @Override
             public void onDiscoveryStartFailure() {
-                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_p2p_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
+                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
 
-                mLinearLayoutServiceSearch.setVisibility(View.GONE);
+                mSwipeRefreshServiceSearch.setVisibility(View.GONE);
                 mSwipeRefreshDiscoveryFailed.setVisibility(View.VISIBLE);
                 mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
             }
@@ -158,11 +168,11 @@ public class P2PDiscoveryFragment extends Fragment {
             @Override
             public void onListEmptyStatusChange(boolean empty) {
                 if (empty) {
-                    mLinearLayoutServiceSearch.setVisibility(View.VISIBLE);
+                    mSwipeRefreshServiceSearch.setVisibility(View.VISIBLE);
                     mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
                     mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
                 } else {
-                    mLinearLayoutServiceSearch.setVisibility(View.GONE);
+                    mSwipeRefreshServiceSearch.setVisibility(View.GONE);
                     mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
                     mSwipeRefreshServicesDisplaying.setVisibility(View.VISIBLE);
                 }
@@ -170,6 +180,7 @@ public class P2PDiscoveryFragment extends Fragment {
         });
 
     }
+
 
 
     @Override
@@ -183,7 +194,7 @@ public class P2PDiscoveryFragment extends Fragment {
 
         super.onPause();
 
-        mLinearLayoutServiceSearch.setVisibility(View.VISIBLE);
+        mSwipeRefreshServiceSearch.setVisibility(View.VISIBLE);
         mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
         mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
 

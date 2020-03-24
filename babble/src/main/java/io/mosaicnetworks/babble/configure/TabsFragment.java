@@ -40,6 +40,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.configure.combined.DiscoveryFragment;
 import io.mosaicnetworks.babble.configure.mdns.MdnsDiscoveryFragment;
 import io.mosaicnetworks.babble.configure.p2p.P2PDiscoveryFragment;
 
@@ -48,6 +49,8 @@ public class TabsFragment extends Fragment {
     GroupCollectionAdapter groupCollectionAdapter;
     ViewPager2 viewPager;
 
+
+    private static boolean mShowCombined = true;
     private static boolean mShowmDNS = true;
     private static boolean mShowP2P = false;
     private static boolean mShowArchive = true;
@@ -58,6 +61,7 @@ public class TabsFragment extends Fragment {
     private static int mTabmDNS;
     private static int mTabP2P;
     private static int mTabArchive;
+    private static int mTabCombined;
 
     private static final String TAG="TabsFragment";
 
@@ -76,6 +80,8 @@ public class TabsFragment extends Fragment {
     public static TabsFragment newInstance(Bundle args) {
         TabsFragment fragment = new TabsFragment();
 
+
+        mShowCombined = args.getBoolean(BaseConfigActivity.SHOW_COMBINED, true);
         mShowmDNS = args.getBoolean(BaseConfigActivity.SHOW_MDNS, true);
         mShowP2P = args.getBoolean(BaseConfigActivity.SHOW_P2P, true);
         mShowArchive = args.getBoolean(BaseConfigActivity.SHOW_ARCHIVE, true);
@@ -91,6 +97,7 @@ public class TabsFragment extends Fragment {
 
         int idx = 0;
 
+        if (mShowCombined) { mTabCombined = idx; idx++;} else { mTabCombined = -1;}
 
         if (mP2PFirstTab){
             if (mShowP2P) { mTabP2P = idx; idx++;} else { mTabP2P = -1;}
@@ -149,6 +156,10 @@ public class TabsFragment extends Fragment {
                     } else {
                         if (position == mTabArchive) {
                             tab.setText(R.string.archived_tab);
+                        } else {
+                            if (position == mTabCombined) {
+                                tab.setText(R.string.live_tab);
+                            }
                         }
                     }
                 }
@@ -169,7 +180,7 @@ public class TabsFragment extends Fragment {
         public Fragment createFragment(int position) {
 
           /*  switch (position) {
-                case 0: return MdnsDiscoveryFragment.newInstance();
+                case 0: return DiscoveryFragment.newInstance();
                 case 1: return ArchivedGroupsFragment.newInstance();
             } */
 
@@ -186,6 +197,11 @@ public class TabsFragment extends Fragment {
                         Bundle args = new Bundle();
                         args.putBoolean(BaseConfigActivity.SHOW_ALL_ARCHIVE, mShowAllArchiveVersions);
                         return ArchivedGroupsFragment.newInstance(args);
+                    } else {
+                        if (position == mTabCombined) {
+                            Log.i(TAG, "createFragment:  Create Combined tab");
+                            return DiscoveryFragment.newInstance();
+                        }
                     }
                 }
             }
@@ -199,6 +215,7 @@ public class TabsFragment extends Fragment {
             if (mShowmDNS) itemCount++;
             if (mShowP2P) itemCount++;
             if (mShowArchive) itemCount++;
+            if (mShowCombined) itemCount++;
 
             return itemCount;
         }

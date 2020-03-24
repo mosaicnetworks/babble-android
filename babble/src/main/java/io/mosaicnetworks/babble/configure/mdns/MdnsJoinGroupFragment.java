@@ -88,7 +88,7 @@ public class MdnsJoinGroupFragment extends Fragment implements ResponseListener 
      * Use this factory method to create a new instance of
      * this fragment.
      *
-     * @return A new instance of fragment MdnsJoinGroupFragment.
+     * @return A new instance of fragment JoinGroupFragment.
      */
     public static MdnsJoinGroupFragment newInstance(ResolvedGroup resolvedGroup) {
         Log.i(TAG, "newInstance: "+ resolvedGroup.getGroupName());
