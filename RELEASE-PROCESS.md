@@ -20,14 +20,18 @@ all the tests and create a commit.
 6. Update version, versionName and versionCode in the babble build.gradle
 file. NOTE: there are THREE parameters here, all of which must be incremented.
 
-7. Update the version number in the Quickstart section of README.md.
+7. Update versionName and versionCode in the sample build.gradle.
 
-8. Create a git commit - e.g. "Bumped version to 0.2.6".
+8. Update the version number in the Quickstart section of README.md.
 
-9. Create a git tag e.g. "v0.2.6"
+9. Create a git commit - e.g. "Bumped version to 0.2.6".
 
-10. Merge master into develop (this should be a fast forward merge).
+10. Create a git tag e.g. "v0.2.6"
 
-11. Push the develop and master branches and tags to github.
+11. Merge master into develop (this should be a fast forward merge).
 
-12. Upload to bintray ```gradlew bintrayUpload```.
+12. Push the develop and master branches and tags to github.
+
+13. Upload to bintray ```gradlew bintrayUpload```.
+
+14. Upload sample app to Google Play.
