@@ -29,6 +29,7 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/custom_border"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:gravity="center"

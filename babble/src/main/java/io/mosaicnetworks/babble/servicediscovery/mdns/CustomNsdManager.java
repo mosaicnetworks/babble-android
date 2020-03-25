@@ -41,9 +41,11 @@ public class CustomNsdManager {
     private NsdManager mNsdManager;
     private boolean AttemptStockResolveFirst = true;
     private static final int RESOLVE_TIMEOUT = 12000;
+    private final String mDataProviderId;
     // private static final int RESOLVE_TIMEOUT = 0;
 
-    public CustomNsdManager(Context context) {
+    public CustomNsdManager(Context context, String dataProviderId) {
+        mDataProviderId = dataProviderId;
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
     }
 

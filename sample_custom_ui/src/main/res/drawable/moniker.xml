@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ MIT License
   ~
@@ -22,26 +21,13 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   ~ SOFTWARE.
   -->
-<!--
 
-// See babble/node/BabbleConstants.java for descriptions of this fields
-
--->
-<resources>
-    <string name="app_title">Babble Android</string>
-    <integer name="babble_port">6666</integer>
-    <integer name="babble_discovery_port">8988</integer>
-    <string name="babble_app_id"></string>
-    <string name="babble_root_dir">babble</string>
-    <string name="babble_db_subdir">badger_db</string>
-    <string name="babble_toml">babble.toml</string>
-    <string name="babble_peers_json">peers.json</string>
-    <string name="babble_peers_genesis_json">peers.genesis.json</string>
-    <string name="babble_priv_key">priv_key</string>
-    <string name="babble_service_type">_babble._tcp.</string>
-    <string name="babble_p2p_service_type">_presence._tcp</string>
-    <string name="babble_disco_discovery_address">192.168.0.2</string>
-    <integer name="babble_disco_discovery_port">8080</integer>
-    <string name="babble_disco_discovery_endpoint">groups</string>
-    <integer name="babble_disco_discovery_polling_interval">60</integer>
-</resources>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="24dp"
+        android:height="24dp" android:tint="#FF5415"
+        android:viewportWidth="24.0"
+        android:viewportHeight="24.0">
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M17.63,5.84C17.27,5.33 16.67,5 16,5L5,5.01C3.9,5.01 3,5.9 3,7v10c0,1.1 0.9,1.99 2,1.99L16,19c0.67,0 1.27,-0.33 1.63,-0.84L22,12l-4.37,-6.16z"/>
+</vector>

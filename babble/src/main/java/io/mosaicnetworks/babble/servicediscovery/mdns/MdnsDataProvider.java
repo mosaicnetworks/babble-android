@@ -27,84 +27,115 @@ package io.mosaicnetworks.babble.servicediscovery.mdns;
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
+import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.mosaicnetworks.babble.node.BabbleConstants;
+
+import io.mosaicnetworks.babble.discovery.DiscoveryDataProvider;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
-import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
+import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 
-/**
- * This class encapsulates the MDNS discover process. There is a bug in released versions of
- * Android prior to 7.0 which means that the TXT records are not returned.
- *
- * There is a custom class CustomNsdManager that can be used in place of NsdManager that wraps
- * NsdManager substituting an alternative resolving mechanism as appropriate.
- *
- * To switch between CustomNdsManager and NdsManager change the declaration of mNsdManager and
- * its assignment in the constructor. The alternative version is commented out. All other calls
- * can remain the same.
- */
-public class MdnsDiscovery {
-    private static final String TAG = "MdnsDiscovery";
-
-    private final Map<String, ResolvedService> mResolvedServices = new HashMap<>();
-    private final List<ResolvedGroup> mResolvedGroups;
+public class MdnsDataProvider implements DiscoveryDataProvider {
+    private String mUid;
+    private final String TAG = "MdsnDataProvider";
+    private ResolvedGroupManager mResolvedGroupManager;
     private CustomNsdManager mNsdManager;
     private NsdManager.DiscoveryListener mDiscoveryListener;
-    private boolean mDiscoveryActive = false;
-    private ServiceDiscoveryListener mServiceDiscoveryListener;
 
-    private final String mPackageName;
+    private String mPackageName;
+    private final Map<String, ResolvedService> mResolvedServices = new HashMap<>();
+    private final List<ResolvedGroup> mResolvedGroupList = new ArrayList<>();
+
+    private boolean mIsDiscovering = false;
 
 
-
-
-    public MdnsDiscovery(Context context, List<ResolvedGroup> resolvedGroups,
-                         ServiceDiscoveryListener serviceDiscoveryListener) {
+    public MdnsDataProvider(Context context) {
         Context appContext = context.getApplicationContext();
-        mNsdManager = new CustomNsdManager(context, "mdns");   //The 2nd parameter is hacked in place to prevent compilation errors
+        mPackageName =  appContext.getPackageName() ;
 
-        mResolvedGroups = resolvedGroups;
-        mServiceDiscoveryListener = serviceDiscoveryListener;
-        mPackageName =  BabbleConstants.APP_ID() ;  //TODO: JK20Mar remove this variable
 
-        initializeDiscoveryListener(serviceDiscoveryListener);
-
+        Log.i(TAG, "MdnsDataProvider: Created");
     }
 
-    public void discoverServices() {
+
+    /**
+     * Called from DiscoveryDataController to assign a unique id to this data provider.
+     * @param uid
+     */
+    @Override
+    public void setUid(String uid){
+        this.mUid = uid;
+    }
+
+    @Override
+    public void startDiscovery(Context context,  ResolvedGroupManager resolvedGroupManager) {
+        Log.i(TAG, "startDiscovery: ");
+
+
+        this.mResolvedGroupManager = resolvedGroupManager;
+        mNsdManager = new CustomNsdManager(context, mUid);
+
+//        mResolvedGroups = resolvedGroups;
+//        mServiceDiscoveryListener = serviceDiscoveryListener;
+
+        initializeDiscoveryListener();
+
         mNsdManager.discoverServices(
-                BabbleConstants.SERVICE_TYPE(), NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
+                ResolvedService.SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
 
+
+        mIsDiscovering = true;
     }
 
+    @Override
     public void stopDiscovery() {
-        if (mDiscoveryActive) {
-            mNsdManager.stopServiceDiscovery(mDiscoveryListener);
-        }
+        mIsDiscovering = false;
     }
 
-    private void initializeDiscoveryListener(final ServiceDiscoveryListener serviceDiscoveryListener) {
+    @Override
+    public void selectedDiscoveryResolveGroup(ResolvedGroup resolvedGroup) {
+        Log.i(TAG, "selectedDiscoveryResolveGroup: selected " + resolvedGroup.getGroupName());
+    }
+
+    @Override
+    public ServiceAdvertiser getAdvertiser() {
+        return null;
+    };
+
+
+    private void pushListToResolvedGroupManager() {
+        mResolvedGroupManager.setList(mUid, mResolvedGroupList);
+    }
+
+
+    private void initializeDiscoveryListener() {
+
         mDiscoveryListener = new NsdManager.DiscoveryListener() {
             @Override
             public void onDiscoveryStarted(String regType) {
-                mDiscoveryActive = true;
+                mIsDiscovering = true;
             }
             @Override
             public void onServiceFound(NsdServiceInfo discoveredServiceInfo) {
-                if (discoveredServiceInfo.getServiceType().equals(BabbleConstants.SERVICE_TYPE())) {
+                String serviceName = discoveredServiceInfo.getServiceName();
+                Log.i(TAG, "onServiceFound: "+serviceName);
+                //TODO: if statement commented out to help testing
+//                if (discoveredServiceInfo.getServiceType().equals(ServiceAdvertiser.SERVICE_TYPE)) {
 
-                    if (mResolvedServices.containsKey(discoveredServiceInfo.getServiceName())) {
+                    if (mResolvedServices.containsKey(serviceName)) {
                         //we already have this service
+                        Log.i(TAG, "onServiceFound: Already found "+serviceName);  //TODO: remove this debug line
                         return;
                     };
 
                     resolveService(discoveredServiceInfo);
-                }
+  //              }
             }
             @Override
             public void onServiceLost(NsdServiceInfo serviceInfo) {
@@ -115,23 +146,22 @@ public class MdnsDiscovery {
                     mResolvedServices.remove(serviceInfo.getServiceName());
 
                     if (empty) {
-                        mResolvedGroups.remove(lostService.getResolvedGroup());
+                        mResolvedGroupList.remove(lostService.getResolvedGroup());
+                        pushListToResolvedGroupManager();
                     }
-
-                    serviceDiscoveryListener.onServiceListUpdated(empty);
                 }
 
             }
             @Override
             public void onDiscoveryStopped(String serviceType) {
-                mDiscoveryActive = false;
+                mIsDiscovering = false;
                 mResolvedServices.clear();
-                mResolvedGroups.clear();
-                serviceDiscoveryListener.onServiceListUpdated(true);
+                mResolvedGroupList.clear();
+                pushListToResolvedGroupManager();
             }
             @Override
             public void onStartDiscoveryFailed(String serviceType, int errorCode) {
-                serviceDiscoveryListener.onStartDiscoveryFailed();
+                pushListToResolvedGroupManager();
             }
             @Override
             public void onStopDiscoveryFailed(String serviceType, int errorCode) {
@@ -141,7 +171,13 @@ public class MdnsDiscovery {
     }
 
 
+
     private void resolveService(final NsdServiceInfo serviceInfo) {
+
+
+        String serviceName = serviceInfo.getServiceName();
+
+        Log.i(TAG, "resolveService: " + serviceName);
 
         mNsdManager.resolveService(serviceInfo, new NsdManager.ResolveListener() {
             @Override
@@ -153,46 +189,54 @@ public class MdnsDiscovery {
             public void onServiceResolved(NsdServiceInfo nsdServiceInfo) {
 
                 //TODO: is this check needed?
-                if (mResolvedServices.containsKey(nsdServiceInfo.getServiceName())) {
+                String serviceName = serviceInfo.getServiceName();
+                Log.i(TAG, "onServiceResolved: "+ serviceName);
+                if (mResolvedServices.containsKey(serviceName)) {
                     //we already have this service
+                    Log.i(TAG, "onServiceResolved: Already got "+ serviceName);
                     return;
                 };
 
                 ResolvedService resolvedService;
-                try {     //TODO: JK20Mar specify the data provider here
-                    resolvedService = ResolvedServiceMdnsFactory.NewJoinResolvedService("mdns", nsdServiceInfo);
-
+                try {
+                    resolvedService = ResolvedServiceMdnsFactory.NewJoinResolvedService(mUid, nsdServiceInfo);
                 } catch (IllegalArgumentException ex) {
                     //The txt record doesn't even have the attributes we need, so we'll try the alternate method
                     onResolveFailed(serviceInfo, 97);
+                    Log.e(TAG, "onServiceResolved: failed to resolve" );
                     return;
                 }
 
+
                 if (!resolvedService.getAppIdentifier().equals(mPackageName)) {
                     //The service is not for this app, we'll skip it
-                    return;
+                    Log.e(TAG, "onServiceResolved: package mismatch "+ mPackageName + " to " + resolvedService.getAppIdentifier() );
+            //TODO: Restore this line to restore app check.
+          //          return;
                 }
 
                 mResolvedServices.put(nsdServiceInfo.getServiceName(), resolvedService);
 
-                for (ResolvedGroup group:mResolvedGroups) {
+                for (ResolvedGroup group:mResolvedGroupList) {
                     if (group.getGroupUid().equals(resolvedService.getGroupUid())) {
                         resolvedService.setResolvedGroup(group);
                         group.addService(resolvedService);
 
-                        mServiceDiscoveryListener.onServiceListUpdated(true);
+                        pushListToResolvedGroupManager();
                         return;
                     }
                 }
 
                 //no matching group - create a new group
                 ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService);
-                mResolvedGroups.add(resolvedGroup);
+                mResolvedGroupList.add(resolvedGroup);
                 resolvedService.setResolvedGroup(resolvedGroup);
-                mServiceDiscoveryListener.onServiceListUpdated(false);
+                pushListToResolvedGroupManager();
 
             }
         });
     }
+
+
 
 }

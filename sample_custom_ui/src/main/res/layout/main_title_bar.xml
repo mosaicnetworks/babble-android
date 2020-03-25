@@ -22,26 +22,41 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   ~ SOFTWARE.
   -->
-<!--
 
-// See babble/node/BabbleConstants.java for descriptions of this fields
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/title_bar"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:gravity="center_vertical"
+    android:orientation="vertical" >
 
--->
-<resources>
-    <string name="app_title">Babble Android</string>
-    <integer name="babble_port">6666</integer>
-    <integer name="babble_discovery_port">8988</integer>
-    <string name="babble_app_id"></string>
-    <string name="babble_root_dir">babble</string>
-    <string name="babble_db_subdir">badger_db</string>
-    <string name="babble_toml">babble.toml</string>
-    <string name="babble_peers_json">peers.json</string>
-    <string name="babble_peers_genesis_json">peers.genesis.json</string>
-    <string name="babble_priv_key">priv_key</string>
-    <string name="babble_service_type">_babble._tcp.</string>
-    <string name="babble_p2p_service_type">_presence._tcp</string>
-    <string name="babble_disco_discovery_address">192.168.0.2</string>
-    <integer name="babble_disco_discovery_port">8080</integer>
-    <string name="babble_disco_discovery_endpoint">groups</string>
-    <integer name="babble_disco_discovery_polling_interval">60</integer>
-</resources>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="29dp"
+            android:layout_height="28dp"
+            android:maxWidth="1dp"
+            android:src="@mipmap/ic_launcher" />
+
+        <TextView
+            android:id="@+id/title_bar_viewname"
+            android:layout_width="wrap_content"
+            android:layout_height="16dp"
+            android:layout_weight="0.07"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="10sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+</LinearLayout>

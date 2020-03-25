@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ MIT License
   ~
@@ -22,26 +21,20 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   ~ SOFTWARE.
   -->
-<!--
 
-// See babble/node/BabbleConstants.java for descriptions of this fields
-
--->
 <resources>
-    <string name="app_title">Babble Android</string>
-    <integer name="babble_port">6666</integer>
-    <integer name="babble_discovery_port">8988</integer>
-    <string name="babble_app_id"></string>
-    <string name="babble_root_dir">babble</string>
-    <string name="babble_db_subdir">badger_db</string>
-    <string name="babble_toml">babble.toml</string>
-    <string name="babble_peers_json">peers.json</string>
-    <string name="babble_peers_genesis_json">peers.genesis.json</string>
-    <string name="babble_priv_key">priv_key</string>
-    <string name="babble_service_type">_babble._tcp.</string>
-    <string name="babble_p2p_service_type">_presence._tcp</string>
-    <string name="babble_disco_discovery_address">192.168.0.2</string>
-    <integer name="babble_disco_discovery_port">8080</integer>
-    <string name="babble_disco_discovery_endpoint">groups</string>
-    <integer name="babble_disco_discovery_polling_interval">60</integer>
+    <string name="app_name">Custom UI Sample App</string>
+    <string name="about_title">About</string>
+    <string name="monikers_title">Chatters</string>
+    <string name="stats_title">Stats</string>
+    <string name="ip_title">IP Address</string>
+    <string name="toggle_poll_stats">Toggle Stats Polling</string>
+    <string name="label_submit">Submit</string>
+    <string name="label_cancel">Cancel</string>
+    <string name="edit_moniker_title">Edit Moniker</string>
+    <string name="label_enter_moniker">Enter Moniker</string>
+    <string name="global_tab">Global</string>
+    <string name="edit_protocol_title">Change Chat Type</string>
+    <string name="menu_title">Menu</string>
+    <string name="new_group">New Group</string>
 </resources>

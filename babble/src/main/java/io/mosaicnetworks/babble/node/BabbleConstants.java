@@ -114,6 +114,43 @@ public class BabbleConstants {
      */
     public static String P2P_SERVICE_TYPE() {return INSTANCE.P2P_SERVICE_TYPE;}
 
+    /**
+     * The port used by the disco WebRTC end point.
+     *
+     * Set in {@link io.mosaicnetworks.babble.R.integer#babble_disco_discovery_port}
+     *
+     * @return the disco discovery port
+     */
+    public static int DISCO_DISCOVERY_PORT() {return INSTANCE.DISCO_DISCOVERY_PORT;}
+
+
+    /**
+     * The polling interval for the disco WebRTC end point.
+     *
+     * Set in {@link io.mosaicnetworks.babble.R.integer#babble_disco_discovery_polling_interval}
+     *
+     * @return the disco discovery port
+     */
+    public static int DISCO_DISCOVERY_POLLING_INTERVAL() {return INSTANCE.DISCO_DISCOVERY_POLLING_INTERVAL;}
+
+
+    /**
+     * The address used by the disco WebRTC end point.
+     *
+     * Set in {@link io.mosaicnetworks.babble.R.string#babble_disco_discovery_address}
+     *
+     * @return the WebRTC address
+     */
+    public static String DISCO_DISCOVERY_ADDRESS() {return INSTANCE.DISCO_DISCOVERY_ADDRESS;}
+
+    /**
+     * The address used by the disco WebRTC end point.
+     *
+     * Set in {@link io.mosaicnetworks.babble.R.string#babble_disco_discovery_endpoint}
+     *
+     * @return the WebRTC endpoint
+     */
+    public static String DISCO_DISCOVERY_ENDPOINT() {return INSTANCE.DISCO_DISCOVERY_ENDPOINT;}
 
 
     /*----------------------------------------------------------------------------*/
@@ -175,6 +212,12 @@ public class BabbleConstants {
     public final String BABBLE_ROOTDIR;
     public final String DB_SUBDIR;
 
+    public final String DISCO_DISCOVERY_ADDRESS;
+    public final int DISCO_DISCOVERY_PORT;
+    public final String DISCO_DISCOVERY_ENDPOINT;
+    public final int DISCO_DISCOVERY_POLLING_INTERVAL;
+
+
     public final String BABBLE_TOML;
     public final String PEERS_JSON;
     public final String PEERS_GENESIS_JSON;
@@ -224,12 +267,29 @@ public class BabbleConstants {
         SERVICE_TYPE = context.getResources().getString(R.string.babble_service_type);
         P2P_SERVICE_TYPE = context.getResources().getString(R.string.babble_p2p_service_type);
 
+        DISCO_DISCOVERY_ADDRESS = context.getResources().getString(R.string.babble_disco_discovery_address);
+        DISCO_DISCOVERY_PORT = context.getResources().getInteger(R.integer.babble_disco_discovery_port);
+        DISCO_DISCOVERY_ENDPOINT = context.getResources().getString(R.string.babble_disco_discovery_endpoint);
+        DISCO_DISCOVERY_POLLING_INTERVAL = context.getResources().getInteger(R.integer.babble_disco_discovery_polling_interval);
+
         String appId = context.getResources().getString(R.string.babble_app_id);
         if (appId.equals("")) {
             APP_ID = appContext.getPackageName();
         } else {
             APP_ID = appId;
         }
+    }
+
+    public static int getNetworkDescription(int networkType) {
+
+        switch (networkType) {
+            case NETWORK_NONE: return R.string.archived_tab;
+            case NETWORK_P2P: return R.string.p2p_tab;
+            case NETWORK_WIFI: return R.string.wifi_tab;
+            case NETWORK_GLOBAL: return R.string.global_tab;
+        }
+
+        return R.string.other_tab;
     }
 
 

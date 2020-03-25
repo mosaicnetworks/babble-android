@@ -314,4 +314,9 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     @Override
     public abstract void onArchiveLoaded(String moniker, String group);
 
+
+    @Override
+    public void joinRequested(DiscoveryDataController discoveryDataController, ResolvedGroup resolvedGroup) {
+        //TODO: JK25Mar populate this
+    }
 }
