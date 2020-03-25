@@ -47,6 +47,7 @@ import java.util.Map;
 
 
 import io.mosaicnetworks.babble.discovery.DiscoveryDataProvider;
+import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
@@ -194,4 +195,8 @@ public class WebRTCDataProvider implements DiscoveryDataProvider {
         mResolvedGroupManager.setList(mUid, mResolvedGroups);
     }
 
+    @Override
+    public int getNetworkType() {
+        return BabbleConstants.NETWORK_GLOBAL;
+    }
 }

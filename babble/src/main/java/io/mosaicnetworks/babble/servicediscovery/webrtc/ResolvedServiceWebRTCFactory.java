@@ -77,7 +77,7 @@ public abstract class ResolvedServiceWebRTCFactory {
         List<Peer> currentPeers = new ArrayList<>();
         currentPeers.add(new Peer(publicKey, publicKey, moniker));
 
-        String appId = context.getApplicationContext().getPackageName();
+        String appId = BabbleConstants.APP_ID();
         String groupUid = new RandomString().nextString();
 
         return new ResolvedService(

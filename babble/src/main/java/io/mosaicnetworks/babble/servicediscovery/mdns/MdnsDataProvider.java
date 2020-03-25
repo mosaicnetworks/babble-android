@@ -36,6 +36,7 @@ import java.util.Map;
 
 
 import io.mosaicnetworks.babble.discovery.DiscoveryDataProvider;
+import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
@@ -57,7 +58,7 @@ public class MdnsDataProvider implements DiscoveryDataProvider {
 
     public MdnsDataProvider(Context context) {
         Context appContext = context.getApplicationContext();
-        mPackageName =  appContext.getPackageName() ;
+        mPackageName =  BabbleConstants.APP_ID() ;
 
 
         Log.i(TAG, "MdnsDataProvider: Created");
@@ -237,6 +238,9 @@ public class MdnsDataProvider implements DiscoveryDataProvider {
         });
     }
 
-
+    @Override
+    public int getNetworkType() {
+        return BabbleConstants.NETWORK_WIFI;
+    }
 
 }

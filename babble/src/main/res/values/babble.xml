@@ -41,7 +41,8 @@
     <string name="babble_service_type">_babble._tcp.</string>
     <string name="babble_p2p_service_type">_presence._tcp</string>
     <string name="babble_disco_discovery_address">192.168.0.2</string>
+    <string name="babble_disco_relay_address">192.168.0.2:9090</string>
     <integer name="babble_disco_discovery_port">8080</integer>
     <string name="babble_disco_discovery_endpoint">groups</string>
-    <integer name="babble_disco_discovery_polling_interval">60</integer>
+    <integer name="babble_disco_discovery_polling_interval">10</integer>
 </resources>

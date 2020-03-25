@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,11 +39,13 @@ import android.widget.Switch;
 
 import androidx.annotation.NonNull;
 
+import java.io.IOException;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService2;
@@ -69,6 +72,7 @@ public class NewGroupFragment extends BabbleServiceBinder {
     private String mMoniker;
     private OnFragmentInteractionListener mListener;
     private ServiceAdvertiser mServiceAdvertiser;
+    private int mNetworkType = BabbleConstants.NETWORK_NONE;
 
     public NewGroupFragment() { }
 
@@ -99,7 +103,7 @@ public class NewGroupFragment extends BabbleServiceBinder {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startGroup(view);
+                            startGroup(view);
                     }
                 }
         );
@@ -139,7 +143,7 @@ public class NewGroupFragment extends BabbleServiceBinder {
     }
 
     // called when the user presses the start button
-    public void startGroup(View view) {
+    public void startGroup(View view){
 
         //get moniker
         EditText editMoniker = view.findViewById(R.id.edit_moniker);
@@ -173,12 +177,12 @@ public class NewGroupFragment extends BabbleServiceBinder {
 
             //TODO: P2P - Need change the workflow here. We are launching a new instance, but we rely
             //      on having started Wifi Direct up.
-
+            mNetworkType = BabbleConstants.NETWORK_P2P;
             P2PService p2PService = P2PService.getInstance(getContext());
             p2PService.registerOnNetworkInitialised(new OnNetworkInitialised() {
                 @Override
-                public void onNetworkInitialised(String ip) {
-                    configAndStartBabble(ip);
+                public void onNetworkInitialised(String ip){
+                    configAndStartBabble(ip, ip);
                 }
             });
 
@@ -189,18 +193,29 @@ public class NewGroupFragment extends BabbleServiceBinder {
             //TODO: finish this line: mServiceAdvertiser =
 
         } else {
+            mNetworkType = BabbleConstants.NETWORK_WIFI;
             mServiceAdvertiser = new MdnsAdvertiser2(mGroupDescriptor,
                     getContext().getApplicationContext(),
                     "", ""
                     );  //TODO: JK20March
-            configAndStartBabble(Utils.getIPAddr(getContext()));
+            String ip = Utils.getIPAddr(getContext());
+            configAndStartBabble(ip, ip);
         }
     }
 
-    private void configAndStartBabble(String ip) {
+    public void onNetworkInitialised(String peersAddr, String babbleAddr){
+        Log.i("startGroup", "onNetworkInitialised: "+ peersAddr + " " + babbleAddr);
+        configAndStartBabble(peersAddr, babbleAddr);
+    }
+
+    private void configAndStartBabble(String peersAddr, String babbleAddr)  {
         ConfigManager configManager =
                 ConfigManager.getInstance(getContext().getApplicationContext());
-        mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, mMoniker, ip);
+       try {
+           mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, peersAddr, babbleAddr, mNetworkType);
+       } catch (CannotStartBabbleNodeException|IOException ex) {
+           //TODO: think about this error handling
+       }
         startBabbleService();
     }
 

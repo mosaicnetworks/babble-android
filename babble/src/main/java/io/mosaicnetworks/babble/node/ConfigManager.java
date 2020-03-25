@@ -45,6 +45,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import io.mosaicnetworks.babble.discovery.Peer;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.Disco;
 
 /**
  * ConfigManager is a singleton class that manages the babble configuration files used by babble-go
@@ -71,10 +72,27 @@ public final class ConfigManager {
 
     private String mTomlDir = "";
     private String mMoniker = "";
-    private final String mAppId;
     private static ConfigDirectoryBackupPolicy sConfigDirectoryBackupPolicy = ConfigDirectoryBackupPolicy.SINGLE_BACKUP;
     private ArrayList<ConfigDirectory> mDirectories = new ArrayList<>();
     private KeyPair mKeyPair;
+    private int mNetworkType = BabbleConstants.NETWORK_NONE;
+
+    private Disco mDisco;  //TODO: Review if we need this specific protocol variable
+
+    /**
+     * Provides an instance of the static ConfigManager class, reusing one if available, calling the
+     * constructor if not.
+     * @param context Context. Used to call getFilesDir to find the path to the babble config dirs
+     * @return an instance of ConfigManager
+     */
+    public static ConfigManager getInstance(Context context, KeyPair keyPair) {
+        if (INSTANCE==null) {
+            Log.v("ConfigManager", "getInstance");
+            INSTANCE = new ConfigManager(context.getApplicationContext(), keyPair);
+        }
+
+        return INSTANCE;
+    }
 
 
     /**
@@ -86,18 +104,19 @@ public final class ConfigManager {
     public static ConfigManager getInstance(Context context) {
         if (INSTANCE==null) {
             Log.v("ConfigManager", "getInstance");
-            INSTANCE = new ConfigManager(context.getApplicationContext());
+            INSTANCE = new ConfigManager(context.getApplicationContext(), null);
         }
 
         return INSTANCE;
     }
+
 
     /**
      * Create an object to manage multiple Babble Configs
      * @param appContext the application context
      * @throws FileNotFoundException when the babble root dir cannot be created
      */
-    private ConfigManager(Context appContext) {
+    private ConfigManager(Context appContext, KeyPair keyPair) {
 
         Log.v("ConfigManager", "constructor");
 
@@ -107,11 +126,14 @@ public final class ConfigManager {
 
         Log.v("ConfigManager", "got FilesDir");
 
-        mAppId = BabbleConstants.APP_ID();  //TODO: JK20Mar remove this variable and use constant direct
 
         Log.v("ConfigManager", "got Package Name");
 
-        mKeyPair = new KeyPair(); //TODO:  how should the key be handled??
+        if ( keyPair == null) {
+            mKeyPair = new KeyPair(); //TODO:  how should the key be handled??
+        } else {
+            mKeyPair = keyPair;
+        }
 
         Log.v("ConfigManager", "got Key Pair");
 
@@ -215,28 +237,33 @@ public final class ConfigManager {
     /**
      * Configure the service to create a new group using the default ports
      * @param moniker node moniker
-     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String inetAddress) {
-        return createConfigNewGroup(groupDescriptor, moniker, inetAddress, BabbleConstants.BABBLE_PORT());
+    public String createConfigNewGroup(GroupDescriptor groupDescriptor,  String peersInetAddress,
+                                       String babbleInetAddress, int networkType)  throws CannotStartBabbleNodeException, IOException {
+        return createConfigNewGroup(groupDescriptor,  peersInetAddress, babbleInetAddress, BabbleConstants.BABBLE_PORT(), networkType);
     }
 
     /**
      * Configure the service to create a new group, overriding the default ports
      * @param moniker node moniker
-     * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @param babblingPort the port used for Babble consensus
      * //@param discoveryPort the port used by the HttpPeerDiscoveryServer //TODO: how to deal with this
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker, String inetAddress, int babblingPort) {
-        List<Peer> genesisPeers = new ArrayList<>();
-        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
-        List<Peer> currentPeers = new ArrayList<>();
-        currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
+    public String createConfigNewGroup(GroupDescriptor groupDescriptor,  String peersInetAddress, String babbleInetAddress, int babblingPort, int networkType) throws CannotStartBabbleNodeException, IOException{
 
-        return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, inetAddress, babblingPort);
+        List<Peer> genesisPeers = new ArrayList<>();
+
+        // Only append port if no @ in the NetAddr - i.e. not WebRTC
+        String suffix = peersInetAddress.startsWith("0X") ? "" : ":" + babblingPort;
+
+
+        genesisPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress +suffix, groupDescriptor.getMoniker()));
+        List<Peer> currentPeers = new ArrayList<>();
+        currentPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress + suffix, groupDescriptor.getMoniker()));
+
+        return createConfig(genesisPeers, currentPeers, groupDescriptor,  babbleInetAddress, babblingPort, networkType);
     }
 
     /**
@@ -256,7 +283,7 @@ public final class ConfigManager {
     public String setGroupToArchive(ConfigDirectory configDirectory, String inetAddress, int babblingPort) {
 
         Log.i("setGroupToArchive", configDirectory.directoryName);
-
+        mNetworkType = BabbleConstants.NETWORK_NONE;
         setTomlDir(configDirectory.directoryName);
 
         Log.i("configArchive:tomlDir", mTomlDir);
@@ -295,8 +322,8 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor, String moniker, String inetAddress) throws CannotStartBabbleNodeException, IOException {
-        return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, inetAddress, BabbleConstants.BABBLE_PORT());
+    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor,  String inetAddress, int networkType) throws CannotStartBabbleNodeException, IOException {
+        return createConfig(genesisPeers, currentPeers, groupDescriptor,  inetAddress, BabbleConstants.BABBLE_PORT(), networkType);
     }
 
     /**
@@ -309,26 +336,42 @@ public final class ConfigManager {
      * //@param discoveryPort the port used by the {HttpPeerDiscoveryServer} //TODO: deal with discovery
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor, String moniker, String inetAddress, int babblingPort) throws CannotStartBabbleNodeException, IOException{
-        return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, inetAddress, babblingPort); //TODO: group name
+    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor,  String inetAddress, int babblingPort, int networkType) throws CannotStartBabbleNodeException, IOException{
+        return createConfig(genesisPeers, currentPeers, groupDescriptor,  inetAddress, babblingPort, networkType); //TODO: group name
     }
 
     private String createConfig(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor,
-                                String moniker, String inetAddress, int babblingPort) {
+                                String inetAddress, int babblingPort, int networkType) throws CannotStartBabbleNodeException, IOException {
+
+        mNetworkType = networkType;
 
         String compositeGroupName = getCompositeConfigDir(groupDescriptor);
 
-        NodeConfig nodeConfig = new NodeConfig.Builder().build();
-        mMoniker = moniker;
+        NodeConfig nodeConfig = new NodeConfig.Builder()
+                .webrtc(networkType == BabbleConstants.NETWORK_GLOBAL)
+                .signalAddress(networkType == BabbleConstants.NETWORK_GLOBAL ? BabbleConstants.DISCO_RELAY_ADDRESS() : "")
+                .build();
+
+        mMoniker = groupDescriptor.getMoniker();
         //TODO: is there a cleaner way of obtaining the path?
         // It is stored in mTomlDir which has getTomlDir and setTomlDir getter and setters
-        String fullPath = writeBabbleTomlFiles(nodeConfig, compositeGroupName, inetAddress, babblingPort, moniker);
+        String fullPath = writeBabbleTomlFiles(nodeConfig, compositeGroupName, inetAddress, babblingPort, mMoniker);
         Log.v("Config.createConfig", "Full Path:" + fullPath);
 
         writePeersJsonFiles(fullPath, genesisPeers, currentPeers);
 
         // private key -- does not overwrite
         writePrivateKey(fullPath, mKeyPair.privateKey);
+        // If we are a WebRTC/Global type, build the disco object for use later.
+        if (networkType == BabbleConstants.NETWORK_GLOBAL) {
+            Log.i("ConfigManager", "createConfig: Network type global" );
+            mDisco = new Disco( groupDescriptor.getUid(), groupDescriptor.getName(),
+                    BabbleConstants.APP_ID(), mKeyPair.publicKey, 0, -1,
+                    currentPeers, genesisPeers  );
+        } else {
+            Log.i("ConfigManager", "createConfig: Network type not global" );
+            mDisco = null;
+        }
 
         return fullPath;
     }
@@ -442,7 +485,10 @@ public final class ConfigManager {
         babble.put("listen", inetAddress + ":" + port);
         babble.put("advertise", inetAddress + ":" + port);
         babble.put("no-service", nodeConfig.noService);
-
+        if (!nodeConfig.signalAddr.equals("")) {  // Only set if set
+            babble.put("signal-addr", nodeConfig.signalAddr);
+        }
+        babble.put("webrtc", nodeConfig.webrtc);
         if (!nodeConfig.serviceListen.equals("")) {  // Only set if set
             babble.put("service-listen", nodeConfig.serviceListen);
         }
@@ -609,7 +655,8 @@ public final class ConfigManager {
         //TODO: the encodeDescription method is lossy e.g. "My-Group" and "MyGroup" will be mapped to "MyGroup"
         //      We should consider the limitations imposed by MDNS (this should all be done in the
         //      GroupDescriptor)
-        return mAppId + "_" + trimmedUnique + "_" + ConfigDirectory.encodeDescription(groupDescriptor.getName()) + "_";
+        return BabbleConstants.APP_ID() + "_" + trimmedUnique + "_" +
+                ConfigDirectory.encodeDescription(groupDescriptor.getName()) + "_";
     }
 
     private boolean deleteDirectory(String subConfigDir) {
@@ -721,6 +768,17 @@ public final class ConfigManager {
     }
 
 
+    public String getPublicKey() throws IllegalAccessError {
+        if (mKeyPair != null) {
+            return mKeyPair.publicKey;
+        } else {
+            throw  new IllegalAccessError();
+        }
+    }
+
+    public Disco getDisco() {
+        return mDisco;
+    }
 
 
     private void populateDirectories(File babbleDir) {

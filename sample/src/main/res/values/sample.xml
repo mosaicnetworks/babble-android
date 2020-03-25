@@ -23,12 +23,6 @@
   ~ SOFTWARE.
   -->
 
-<!--
-The values in this file will overwrite the equivalent values specified in the babble module.
-You only need to include the values that you are overriding.
--->
-
 <resources>
-    <string name="app_title">Babble Sample App</string>
-    <string name="babble_app_id">io.mosaicnetworks.sample_custom_ui</string>
+    <string name="babble_app_id">io.mosaicnetworks.sample</string>
 </resources>

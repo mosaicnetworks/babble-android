@@ -37,6 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
+import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
@@ -48,6 +49,7 @@ import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.RandomString;
+import io.mosaicnetworks.babble.utils.Utils;
 
 public class DiscoveryDataController implements ServicesListListener {
 
@@ -214,6 +216,7 @@ public class DiscoveryDataController implements ServicesListListener {
         DiscoveryDataProvider discoveryDataProvider = mDiscoveryDataProviders.get(dataProviderId);
         discoveryDataProvider.selectedDiscoveryResolveGroup(resolvedGroup);
 
+
         // Turn off Discovery for all DiscoveryDataProviders
         stopDiscovery();
 
@@ -229,10 +232,13 @@ public class DiscoveryDataController implements ServicesListListener {
         GroupDescriptor groupDescriptor = new GroupDescriptor(resolvedGroup, moniker);
         ResolvedService resolvedService = resolvedGroup.getRandomService();
 
+
+
         try {
             String configDir = configManager.createConfigJoinGroup(resolvedService.getInitialPeers(),
-                    resolvedService.getCurrentPeers(), groupDescriptor, resolvedGroup.getMoniker(),
-                    resolvedService.getInetString());
+                    resolvedService.getCurrentPeers(), groupDescriptor,
+                    Utils.getIPAddr(mContext), discoveryDataProvider.getNetworkType()               // NB live pull of IP
+            );                                                                                      // InetAddress goes in peers file not here
             babbleService.start(configDir, groupDescriptor);
         } catch (IllegalStateException | CannotStartBabbleNodeException | IOException ex ) {
             //TODO: just catch IOException - this will mean the port is in use

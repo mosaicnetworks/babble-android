@@ -144,6 +144,16 @@ public class BabbleConstants {
     public static String DISCO_DISCOVERY_ADDRESS() {return INSTANCE.DISCO_DISCOVERY_ADDRESS;}
 
     /**
+     * The address including port used by the disco relay server.
+     *
+     * Set in {@link io.mosaicnetworks.babble.R.string#babble_disco_relay_address}
+     *
+     * @return the WebRTC address
+     */
+    public static String DISCO_RELAY_ADDRESS() {return INSTANCE.DISCO_RELAY_ADDRESS;}
+
+
+    /**
      * The address used by the disco WebRTC end point.
      *
      * Set in {@link io.mosaicnetworks.babble.R.string#babble_disco_discovery_endpoint}
@@ -216,7 +226,7 @@ public class BabbleConstants {
     public final int DISCO_DISCOVERY_PORT;
     public final String DISCO_DISCOVERY_ENDPOINT;
     public final int DISCO_DISCOVERY_POLLING_INTERVAL;
-
+    public final String DISCO_RELAY_ADDRESS;
 
     public final String BABBLE_TOML;
     public final String PEERS_JSON;
@@ -271,6 +281,9 @@ public class BabbleConstants {
         DISCO_DISCOVERY_PORT = context.getResources().getInteger(R.integer.babble_disco_discovery_port);
         DISCO_DISCOVERY_ENDPOINT = context.getResources().getString(R.string.babble_disco_discovery_endpoint);
         DISCO_DISCOVERY_POLLING_INTERVAL = context.getResources().getInteger(R.integer.babble_disco_discovery_polling_interval);
+        DISCO_RELAY_ADDRESS = context.getResources().getString(R.string.babble_disco_relay_address);
+
+
 
         String appId = context.getResources().getString(R.string.babble_app_id);
         if (appId.equals("")) {

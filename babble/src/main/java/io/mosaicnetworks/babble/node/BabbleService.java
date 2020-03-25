@@ -87,7 +87,7 @@ public abstract class BabbleService<AppState extends BabbleState> {
      * @throws IllegalStateException if the service is currently running
      */
     public void start(String configDirectory, GroupDescriptor groupDescriptor) {
-        start(configDirectory, groupDescriptor, BabbleConstants.NETWORK_WIFI);  // Defaults to the original mDNS configuration
+        start(configDirectory, groupDescriptor, mNetworkType);  // Defaults to the original mDNS configuration
     }
 
 

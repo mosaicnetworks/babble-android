@@ -65,4 +65,5 @@ public interface DiscoveryDataProvider {
      */
     ServiceAdvertiser getAdvertiser();
 
+    int getNetworkType();
 }
