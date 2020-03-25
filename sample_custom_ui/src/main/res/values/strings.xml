@@ -37,4 +37,11 @@
     <string name="edit_protocol_title">Change Chat Type</string>
     <string name="menu_title">Menu</string>
     <string name="new_group">New Group</string>
+    <string name="hint_enter_a_message">Enter a message</string>
+    <string name="no_messages_in_archive">This archive is empty</string>
+    <string name="monikers_preamble">"Participants in this Group: \n\n"</string>
+    <string name="poll_stats_state_label">"State: "</string>
+    <string name="poll_stats_trans_label">"Trans: "</string>
+    <string name="poll_stats_events_label">"Events: "</string>
+    <string name="poll_stats_undetermined_label">"Undetermined: "</string>
 </resources>

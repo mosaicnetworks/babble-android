@@ -25,6 +25,7 @@
 package io.mosaicnetworks.babble.servicediscovery;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +53,7 @@ public class ResolvedGroupManager {
 
 
     public void setList(String uid, List<ResolvedGroup> resolvedGroups){
+        Log.i("ResolvedGroupManager", "setList: ");
         groupsLock.lock();
         try {
             mIndividualResolvedGroups.put(uid, resolvedGroups);
@@ -78,14 +80,17 @@ public class ResolvedGroupManager {
 
     private void rebuildCombinedList(){
         // This function should be called from within the locked sections of other functions
-
         mCombinedResolvedGroups.clear();
         for (Map.Entry<String, List<ResolvedGroup>> entry : mIndividualResolvedGroups.entrySet()) {
             mCombinedResolvedGroups.addAll(entry.getValue());
         }
 
+        Log.i("ResolvedGroupManager", "rebuildCombinedList: "+mIndividualResolvedGroups.size());
+
         if (mServicesListUpdater != null) {
             mServicesListUpdater.onServiceListUpdated(mContext, true);
+        } else {
+            Log.e("ResolvedGroupManager", "rebuildCombinedList: mServicesListUpdater is null" );
         }
 
     }

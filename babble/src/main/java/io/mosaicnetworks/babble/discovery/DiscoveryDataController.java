@@ -27,20 +27,26 @@ package io.mosaicnetworks.babble.discovery;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.servicediscovery.JoinGroupConfirmation;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
+import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.RandomString;
 
 public class DiscoveryDataController implements ServicesListListener {
@@ -217,14 +223,16 @@ public class DiscoveryDataController implements ServicesListListener {
 
         //TODO: Change this to use a Service
 
-        String moniker = "TBA"; //TODO: pull this in...
+        String moniker = resolvedGroup.getMoniker();
 
         ConfigManager configManager = ConfigManager.getInstance(mContext);
         GroupDescriptor groupDescriptor = new GroupDescriptor(resolvedGroup, moniker);
+        ResolvedService resolvedService = resolvedGroup.getRandomService();
 
-/*
         try {
-            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, mMoniker, Utils.getIPAddr(getContext()));
+            String configDir = configManager.createConfigJoinGroup(resolvedService.getInitialPeers(),
+                    resolvedService.getCurrentPeers(), groupDescriptor, resolvedGroup.getMoniker(),
+                    resolvedService.getInetString());
             babbleService.start(configDir, groupDescriptor);
         } catch (IllegalStateException | CannotStartBabbleNodeException | IOException ex ) {
             //TODO: just catch IOException - this will mean the port is in use
@@ -232,20 +240,22 @@ public class DiscoveryDataController implements ServicesListListener {
             //though it could be that another application is using the port or WiFi is turned off -
             // in which case we'll keep getting stuck here until the port is available or WiFi is
             // turned on!
-            mLoadingDialog.dismiss();
-            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
+ //           mLoadingDialog.dismiss();
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(mContext), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             return;
         } catch (Exception ex) {
             //TODO: Review this. The duplicate dialog function feels overkill.
-            mLoadingDialog.dismiss();
-            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
+ //           mLoadingDialog.dismiss();
+            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(mContext),
+                    R.string.babble_init_fail_title,
+                    "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
             throw ex;
         }
 
-        mLoadingDialog.dismiss();
-        mListener.baseOnJoined(mMoniker, groupDescriptor.getName());
+ //       mLoadingDialog.dismiss();
 
-        */
+
+        mOnFragmentInteractionListener.baseOnJoined(resolvedGroup.getMoniker(), groupDescriptor.getName());
 
     }
 

@@ -27,6 +27,7 @@ package io.mosaicnetworks.babble.servicediscovery;
 import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -89,6 +90,9 @@ public class ServicesListView extends RecyclerView implements ServicesListUpdate
 
     public void onServiceListUpdated(Context context, boolean groupCountChange) {
         // let the adapter know
+
+        Log.i("ServiceListView", "onServiceListUpdated: ");
+
         Handler mainHandler = new Handler(context.getMainLooper());
 
         Runnable myRunnable = new Runnable() {
@@ -104,7 +108,7 @@ public class ServicesListView extends RecyclerView implements ServicesListUpdate
         //TODO: can we use the groupCountChange (or a suitable return) to make this easier?
 
         //TODO: Uncomment this
-        /*
+
         final boolean curIsEmpty = mResolvedGroupList.isEmpty();
         if (mPrevIsEmpty ^ curIsEmpty) {
             //service list info's empty status has changed
@@ -120,7 +124,6 @@ public class ServicesListView extends RecyclerView implements ServicesListUpdate
         }
 
         mPrevIsEmpty = curIsEmpty;
-        */
 
     }
 

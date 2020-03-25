@@ -26,6 +26,7 @@ package io.mosaicnetworks.sample_custom_ui;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,7 +41,7 @@ import android.widget.RadioGroup;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.List;
 
@@ -48,6 +49,7 @@ import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.discovery.DiscoveryDataController;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.servicediscovery.JoinGroupConfirmation;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
@@ -88,21 +90,46 @@ public class MainActivity extends AppCompatActivity  implements JoinGroupConfirm
     // This will become the ServicesListView List when we wire it up
     private List<ResolvedGroup> mResolvedGroups;
 
+    public SwipeRefreshLayout mSwipeRefreshServiceSearch;
+    private SwipeRefreshLayout mSwipeRefreshDiscoveryFailed;
+    private SwipeRefreshLayout mSwipeRefreshServicesDisplaying;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        BabbleService2.setAppState(new ChatState());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Log.i(TAG, "onCreate: Started");
         initMoniker();
 
+        setUpUI();
+
         setUpBabble();
+
+
 
 
         if (mMoniker.equals("")) {
             editMonikerClick(null);
         }
+
+    }
+
+    private void setUpUI() {
+        mSwipeRefreshServiceSearch = findViewById(io.mosaicnetworks.babble.R.id.swipeRefresh_service_search);
+        mSwipeRefreshDiscoveryFailed = findViewById(io.mosaicnetworks.babble.R.id.swiperefresh_discovery_failed);
+        mSwipeRefreshServicesDisplaying = findViewById(io.mosaicnetworks.babble.R.id.swiperefresh_services_displaying);
+        mSwipeRefreshServiceSearch.setVisibility(View.GONE);
+        mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
+        mSwipeRefreshServicesDisplaying.setVisibility(View.VISIBLE);
+
+        //TODO: JK25Mar amend this to work properly - currently it is forcing the display of results.
+
 
     }
 
@@ -156,6 +183,8 @@ public class MainActivity extends AppCompatActivity  implements JoinGroupConfirm
 
 
         String uidWebRTC = mDiscoveryDataController.registerDiscoveryProvider(webRTCDataProvider);
+
+        mDiscoveryDataController.startDiscovery();
 
     }
 
@@ -388,20 +417,35 @@ public class MainActivity extends AppCompatActivity  implements JoinGroupConfirm
         return MessagingService.getInstance(this);
     }
 
+
+
+
     @Override
     public void baseOnJoined(String moniker, String group) {
-
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("MONIKER", moniker);
+        intent.putExtra("ARCHIVE_MODE", false);
+        intent.putExtra("GROUP", group);
+        startActivity(intent);
     }
 
     @Override
     public void baseOnStartedNew(String moniker, String group) {
-
+        Intent intent = new Intent(this, ChatActivityAndroidService.class);
+        intent.putExtra("MONIKER", moniker);
+        intent.putExtra("ARCHIVE_MODE", false);
+        intent.putExtra("GROUP", group);
+        startActivity(intent);
     }
 
-    @Override
     public void onArchiveLoaded(String moniker, String group) {
-
+        Intent intent = new Intent(this, ChatActivityAndroidService.class);
+        intent.putExtra("MONIKER", moniker);
+        intent.putExtra("ARCHIVE_MODE", true);
+        intent.putExtra("GROUP", group);
+        startActivity(intent);
     }
+
 
     @Override
     public void onServiceSelected(ResolvedGroup resolvedGroup) {

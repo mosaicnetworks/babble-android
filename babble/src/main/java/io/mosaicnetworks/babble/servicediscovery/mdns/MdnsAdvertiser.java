@@ -28,8 +28,10 @@ import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 
+import java.util.List;
 import java.util.Objects;
 
+import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
@@ -102,6 +104,13 @@ public class MdnsAdvertiser implements ServiceAdvertiser  {
 
     public String getServiceName() {
         return mServiceName;
+    }
+
+    @Override
+    public void updateAdvertising(List<Peer> peers, int lastBlockIndex) {
+        //Do Nothing
+
+        //TODO: Stop mDNS, change TXT file and restart mDNS
     }
 }
 

@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.mosaicnetworks.babble.configure.OnNetworkInitialised;
+import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
@@ -593,6 +594,10 @@ public class P2PService implements ServiceAdvertiser{
         return mServiceName;
     }
 
+    @Override
+    public void updateAdvertising(List<Peer> peers, int lastBlockIndex) {
+            //Do nothing
 
-
+        //TODO: potentially update the DNS TXT record with amended peers.
+    }
 }

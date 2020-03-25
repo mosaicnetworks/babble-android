@@ -26,10 +26,14 @@ package io.mosaicnetworks.babble.servicediscovery;
 
 import android.content.Context;
 
+import java.util.List;
+
+import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 
 public interface ServiceAdvertiser {
     public void advertise();
     public void stopAdvertising();
     public String getServiceName();
+    public void updateAdvertising(List<Peer> peers, int lastBlockIndex);
 }

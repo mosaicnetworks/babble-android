@@ -159,6 +159,8 @@ public class WebRTCDataProvider implements DiscoveryDataProvider {
 
                             mResolvedGroups.add(resolvedGroup);
                             mDiscos.put(disco.GroupUID, disco);
+
+                            Log.i(TAG, "onResponse: Added Group");
                         }
                         pushListToResolvedGroupManager();
                     }
