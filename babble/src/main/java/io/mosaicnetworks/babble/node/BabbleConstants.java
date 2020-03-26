@@ -287,10 +287,11 @@ public class BabbleConstants {
 
         String appId = context.getResources().getString(R.string.babble_app_id);
         if (appId.equals("")) {
-            APP_ID = appContext.getPackageName();
-        } else {
-            APP_ID = appId;
+            appId = appContext.getPackageName();
         }
+        //TODO: Underscores in the AppID breaks ConfigManager parsing of directory names.
+        //      Removing them means the code works, but there is probably a neater solution
+        APP_ID = appId.replaceAll("_", "-");
     }
 
     public static int getNetworkDescription(int networkType) {
