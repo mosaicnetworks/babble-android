@@ -112,14 +112,14 @@ public class MainActivity extends BaseConfigActivity {
 
     public void aboutDialog(MenuItem menuItem) {
 
-        String preBlock = "<dl>";
-        String postBlock = "</dl>\n";
-        String prelabel = "<dt><b>";
-        String postlabel = "</b></dt>";
-        String predata = "<dd>";
-        String postdata = "</dd>\n";
 
-
+        String preBlock = "<table style=\"border-collapse:collapse;border-spacing:0;\">";
+        String postBlock = "</table>\n";
+        String predata = "<td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;\">";
+        String prelabel = "<tr><td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;\">";
+        String postlabel = "</td>";
+        String postdata = "</td></tr>\n";
+        String databreak = "<tr><td colspan=\"2\" style=\"border-style:none;\">&nbsp;</td></tr>";
 
         String aboutText = "<hr>"+preBlock
                 +prelabel+"App ID"+postlabel+predata + io.mosaicnetworks.sample.BuildConfig.APPLICATION_ID + postdata
@@ -127,24 +127,19 @@ public class MainActivity extends BaseConfigActivity {
                 +prelabel+"Version Name"+postlabel+predata + io.mosaicnetworks.sample.BuildConfig.VERSION_NAME + postdata
                 +prelabel+"Git Hash"+postlabel+predata + io.mosaicnetworks.sample.BuildConfig.GitHash + postdata
                 +prelabel+"Git Branch"+postlabel+predata + io.mosaicnetworks.sample.BuildConfig.GitBranch+postdata
-                +postBlock
-                +"<hr>\n"
-                +preBlock
+                +databreak
                 +prelabel+ "Babble Package"+postlabel+predata + io.mosaicnetworks.babble.BuildConfig.LIBRARY_PACKAGE_NAME + postdata
                 +prelabel+ "Version Code"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.VERSION_CODE + postdata
                 +prelabel+ "Version Name"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.VERSION_NAME+ postdata
                 +prelabel+ "Git Hash"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitHash+ postdata
                 +prelabel+ "Git Hash Short"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitHashShort+ postdata
                 +prelabel+ "Git Branch"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.GitBranch +postdata
-                +postBlock
-                +"<hr>\n"
-                +preBlock
+                +databreak
                 +prelabel+ "Babble Version"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.BabbleVersion +postdata
                 +prelabel+ "Babble Repo"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.BabbleRepo +postdata
                 +prelabel+ "Babble Method"+postlabel+predata+ io.mosaicnetworks.babble.BuildConfig.BabbleMethod +postdata
 
-                +postBlock+"\n<hr>\n"
-                +preBlock
+                +databreak
                 +prelabel+"IP Address"+postlabel+predata+ Utils.getIPAddr(this)+postdata
                 +postBlock + "\n<hr>\n";
 
