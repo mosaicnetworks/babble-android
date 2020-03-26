@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity  implements JoinGroupConfirm
         Log.i(TAG, "  Register with DiscoveryTestActivity as OnFragmentInteractionListener(");
         mDiscoveryDataController.registerOnFragmentInteractionListener(this);
 
+        mDiscoveryDataController.setMoniker(mMoniker);
 
         Log.i(TAG, "  Register DiscoveryDataController as ServicesListListener");
         servicesListView.registerServicesListListener(mDiscoveryDataController);
@@ -377,6 +378,10 @@ public class MainActivity extends AppCompatActivity  implements JoinGroupConfirm
         }
 
         setTitle(title);
+
+        if (mDiscoveryDataController != null) {
+            mDiscoveryDataController.setMoniker(mMoniker);
+        }
     }
 
     /**

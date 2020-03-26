@@ -61,6 +61,11 @@ public class DiscoveryDataController implements ServicesListListener {
     private boolean mIsDiscovering = false;
     private Context mContext;
 
+    public void setMoniker(String moniker) {
+        this.mMoniker = moniker;
+    }
+
+    private String mMoniker;
 
     public DiscoveryDataController(Context context, ResolvedGroupManager mResolvedGroupManager) {
         this.mResolvedGroupManager = mResolvedGroupManager;
@@ -212,6 +217,7 @@ public class DiscoveryDataController implements ServicesListListener {
 
         Log.i("DiscDataController", "joinGroup: Joined " + resolvedGroup.getGroupName());
 
+        resolvedGroup.setMoniker(mMoniker);
         String dataProviderId = resolvedGroup.getDataProviderId();
         DiscoveryDataProvider discoveryDataProvider = mDiscoveryDataProviders.get(dataProviderId);
         discoveryDataProvider.selectedDiscoveryResolveGroup(resolvedGroup);
@@ -226,10 +232,8 @@ public class DiscoveryDataController implements ServicesListListener {
 
         //TODO: Change this to use a Service
 
-        String moniker = resolvedGroup.getMoniker();
-
         ConfigManager configManager = ConfigManager.getInstance(mContext);
-        GroupDescriptor groupDescriptor = new GroupDescriptor(resolvedGroup, moniker);
+        GroupDescriptor groupDescriptor = new GroupDescriptor(resolvedGroup, mMoniker);
         ResolvedService resolvedService = resolvedGroup.getRandomService();
 
 
@@ -261,7 +265,7 @@ public class DiscoveryDataController implements ServicesListListener {
  //       mLoadingDialog.dismiss();
 
 
-        mOnFragmentInteractionListener.baseOnJoined(resolvedGroup.getMoniker(), groupDescriptor.getName());
+        mOnFragmentInteractionListener.baseOnJoined(mMoniker, groupDescriptor.getName());
 
     }
 

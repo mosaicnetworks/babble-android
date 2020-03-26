@@ -24,6 +24,10 @@
 
 package io.mosaicnetworks.babble.node;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * An immutable class which holds the configuration passed to a node during it's construction
  */
@@ -410,6 +414,41 @@ public final class NodeConfig {
         noService = builder.mNoService;
         webrtc = builder.mWebRTC;
         signalAddr = builder.mSignalAddr;
+    }
+
+
+    public Map<String, Object> getTomlMap(String mTomlDir, String inetAddress, String moniker) {
+        Map<String, Object> babble = new HashMap<>();
+        babble.put("datadir", mTomlDir) ;
+        babble.put("db",  mTomlDir + File.separator + BabbleConstants.DB_SUBDIR()) ;
+
+        babble.put("log", this.logLevel);
+        babble.put("listen", inetAddress );
+        babble.put("advertise", inetAddress );
+        babble.put("no-service", this.noService);
+        if (!this.signalAddr.equals("")) {  // Only set if set
+            babble.put("signal-addr", this.signalAddr);
+        }
+        babble.put("webrtc", this.webrtc);
+        if (!this.serviceListen.equals("")) {  // Only set if set
+            babble.put("service-listen", this.serviceListen);
+        }
+        babble.put("heartbeat", this.heartbeat + "ms");
+        babble.put("slow-heartbeat", this.slowHeartbeat + "ms");
+        babble.put("max-pool", this.maxPool);
+        babble.put("timeout", this.tcpTimeout + "ms");
+        babble.put("join_timeout", this.joinTimeout);
+        babble.put("sync-limit", this.syncLimit);
+        babble.put("fast-sync", this.enableFastSync);
+        babble.put("store", this.store);
+        babble.put("cache-size", this.cacheSize);
+        babble.put("bootstrap", this.bootstrap);
+        babble.put("maintenance-mode", this.maintenanceMode);
+        babble.put("suspend-limit", this.suspendLimit);
+        babble.put("moniker", moniker);
+        babble.put("loadpeers", this.loadPeers);
+        
+        return babble;
     }
 
 

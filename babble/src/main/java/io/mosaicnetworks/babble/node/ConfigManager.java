@@ -236,7 +236,6 @@ public final class ConfigManager {
 
     /**
      * Configure the service to create a new group using the default ports
-     * @param moniker node moniker
      * @throws IllegalStateException if the service is currently running
      */
     public String createConfigNewGroup(GroupDescriptor groupDescriptor,  String peersInetAddress,
@@ -246,7 +245,6 @@ public final class ConfigManager {
 
     /**
      * Configure the service to create a new group, overriding the default ports
-     * @param moniker node moniker
      * @param babblingPort the port used for Babble consensus
      * //@param discoveryPort the port used by the HttpPeerDiscoveryServer //TODO: how to deal with this
      * @throws IllegalStateException if the service is currently running
@@ -318,7 +316,6 @@ public final class ConfigManager {
      * Configure the service to join an existing group using the default ports
      * @param genesisPeers list of genesis peers
      * @param currentPeers list of current peers
-     * @param moniker node moniker
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
@@ -330,7 +327,6 @@ public final class ConfigManager {
      *
      * @param genesisPeers list of genesis peers
      * @param currentPeers list of current peers
-     * @param moniker node moniker
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @param babblingPort the port used for Babble consensus
      * //@param discoveryPort the port used by the {HttpPeerDiscoveryServer} //TODO: deal with discovery
@@ -452,7 +448,7 @@ public final class ConfigManager {
     public String writeBabbleTomlFiles(NodeConfig nodeConfig, String compositeGroupName, String inetAddress, int port, String moniker) {
 
         //TODO: add inetAddress, port and moniker to nodeConfig??
-        Map<String, Object> babble = new HashMap<>();
+
 
 
         setTomlDir(compositeGroupName);
@@ -478,34 +474,9 @@ public final class ConfigManager {
             throw new IllegalArgumentException("Cannot create new Config directory (no previous backup)");
         }
 
-        babble.put("datadir", mTomlDir) ;
-        babble.put("db",  mTomlDir + File.separator + BabbleConstants.DB_SUBDIR()) ;
-
-        babble.put("log", nodeConfig.logLevel);
-        babble.put("listen", inetAddress + ":" + port);
-        babble.put("advertise", inetAddress + ":" + port);
-        babble.put("no-service", nodeConfig.noService);
-        if (!nodeConfig.signalAddr.equals("")) {  // Only set if set
-            babble.put("signal-addr", nodeConfig.signalAddr);
-        }
-        babble.put("webrtc", nodeConfig.webrtc);
-        if (!nodeConfig.serviceListen.equals("")) {  // Only set if set
-            babble.put("service-listen", nodeConfig.serviceListen);
-        }
-        babble.put("heartbeat", nodeConfig.heartbeat + "ms");
-        babble.put("slow-heartbeat", nodeConfig.slowHeartbeat + "ms");
-        babble.put("max-pool", nodeConfig.maxPool);
-        babble.put("timeout", nodeConfig.tcpTimeout + "ms");
-        babble.put("join_timeout", nodeConfig.joinTimeout);
-        babble.put("sync-limit", nodeConfig.syncLimit);
-        babble.put("fast-sync", nodeConfig.enableFastSync);
-        babble.put("store", nodeConfig.store);
-        babble.put("cache-size", nodeConfig.cacheSize);
-        babble.put("bootstrap", nodeConfig.bootstrap);
-        babble.put("maintenance-mode", nodeConfig.maintenanceMode);
-        babble.put("suspend-limit", nodeConfig.suspendLimit);
-        babble.put("moniker", moniker);
-        babble.put("loadpeers", nodeConfig.loadPeers);
+        Map<String, Object> babble = nodeConfig.getTomlMap(mTomlDir,inetAddress + ":" + port, moniker );
+        // Logic to build the map was relocated from here to NodeConfig where it more naturally sits
+        //TODO: remove the comment above once everyone has seen it
 
         writeTomlFile(babble);
 
@@ -701,12 +672,12 @@ public final class ConfigManager {
                 File.separator + oldSubConfigDir);
         File newFile = new File(sRootDir + File.separator + BabbleConstants.BABBLE_ROOTDIR() +
                 File.separator + oldSubConfigDir + newSuffix);
-        
-        Log.d("Rename ", oldFile.getAbsolutePath());
-        Log.d("Rename ", newFile.getAbsolutePath());
-        
+
         if (!(oldFile.renameTo(newFile))) {
-            Log.d("Rename ","Fails");
+            Log.i("Rename ", oldFile.getAbsolutePath());
+            Log.i("Rename ", newFile.getAbsolutePath());
+
+            Log.e("Rename ","Fails");
             throw new RuntimeException("Cannot backup the old configuration directory");
         }
     }
