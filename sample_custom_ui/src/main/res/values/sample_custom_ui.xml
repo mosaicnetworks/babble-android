@@ -30,5 +30,5 @@ You only need to include the values that you are overriding.
 
 <resources>
     <string name="app_title">Babble Sample App</string>
-    <string name="babble_app_id">io.mosaicnetworks.sample_custom_ui</string>
+    <string name="babble_app_id">io.mosaicnetworks.samplecustomui</string>
 </resources>

@@ -689,6 +689,7 @@ public final class ConfigManager {
             Log.d("backupOldConfigs SINGLE", compositeName);
             for (ConfigDirectory d : mDirectories) {
                 if ((d.isBackup) && (d.directoryName.startsWith(compositeName))) {
+                    Log.i("ConfigManager", "backupOldConfigs: delete "+ d.directoryName);
                     deleteDirectory(d.directoryName);
                 }
             }

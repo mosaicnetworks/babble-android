@@ -31,6 +31,7 @@
     <string name="app_title">Babble Android</string>
     <integer name="babble_port">6666</integer>
     <integer name="babble_discovery_port">8988</integer>
+    <!-- Do not put an underscore in the babble_app_id - it breaks composite file naming -->
     <string name="babble_app_id"></string>
     <string name="babble_root_dir">babble</string>
     <string name="babble_db_subdir">badger_db</string>
