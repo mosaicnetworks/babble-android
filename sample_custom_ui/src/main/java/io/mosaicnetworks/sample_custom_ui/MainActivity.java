@@ -44,12 +44,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.List;
+import java.util.Objects;
 
 import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.discovery.DiscoveryDataController;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.service.BabbleService2;
+import io.mosaicnetworks.babble.service.BabbleServiceBinderActivity;
 import io.mosaicnetworks.babble.servicediscovery.JoinGroupConfirmation;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
@@ -73,7 +75,7 @@ import io.mosaicnetworks.babble.utils.Utils;
  * In the Hamburger menu on the Main Activity, the user can change the protocol or moniker. But
  * it has been removed from the regular, new and join process.
  */
-public class MainActivity extends AppCompatActivity  implements JoinGroupConfirmation,
+public class MainActivity extends BabbleServiceBinderActivity implements JoinGroupConfirmation,
         OnFragmentInteractionListener {
 
     private final String TAG = "MainActivity";
@@ -456,4 +458,33 @@ public class MainActivity extends AppCompatActivity  implements JoinGroupConfirm
     public void onServiceSelected(ResolvedGroup resolvedGroup) {
 
     }
+
+    @Override
+    protected void onServiceConnected() {
+
+        /*
+
+        try {
+            mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
+            mListener.baseOnStartedNew(mMoniker, mGroupDescriptor.getName());
+        } catch (IllegalArgumentException ex) {
+            // we'll assume this is caused by the node taking a while to leave a previous group,
+            // though it could be that another application is using the port or WiFi is turned off -
+            // in which case we'll keep getting stuck here until the port is available or WiFi is
+            // turned on!
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), io.mosaicnetworks.babble.R.string.babble_init_fail_title, io.mosaicnetworks.babble.R.string.babble_init_fail_message);
+            mLoadingDialog.dismiss();
+            getActivity().stopService(new Intent(getActivity(), BabbleService2.class));
+        }
+        doUnbindService();
+
+        */
+    }
+
+    @Override
+    protected void onServiceDisconnected() {
+        //Do nothing
+    }
+
+
 }
