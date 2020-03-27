@@ -327,4 +327,13 @@ public class BabbleService2 extends Service {
 
     //##############################################################################################
 
+    public String getMonikerList() {
+        return mBabbleNode.getCurrentPeers();
+    }
+
+
+    public String getStats() {
+        return mBabbleNode.getStats();
+    }
+
 }

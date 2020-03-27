@@ -78,7 +78,7 @@ public class MainActivity extends BaseConfigActivity {
 
     @Override
     public void onJoined(String moniker, String group) {
-        Intent intent = new Intent(this, ChatActivity.class);
+        Intent intent = new Intent(this, ChatActivityAndroidService.class);
         intent.putExtra("MONIKER", moniker);
         intent.putExtra("ARCHIVE_MODE", false);
         intent.putExtra("GROUP", group);
