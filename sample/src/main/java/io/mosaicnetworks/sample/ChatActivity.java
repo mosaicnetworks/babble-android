@@ -39,14 +39,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
-import com.stfalcon.chatkit.commons.ImageLoader;
-import com.stfalcon.chatkit.messages.MessageInput;
-import com.stfalcon.chatkit.messages.MessagesList;
-import com.stfalcon.chatkit.messages.MessagesListAdapter;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -59,6 +54,10 @@ import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.ServiceObserver;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
+import io.mosaicnetworks.sample.chatkit.commons.ImageLoader;
+import io.mosaicnetworks.sample.chatkit.messages.MessageInput;
+import io.mosaicnetworks.sample.chatkit.messages.MessagesList;
+import io.mosaicnetworks.sample.chatkit.messages.MessagesListAdapter;
 
 /**
  * This is the central UI component. It receives messages from the {@link MessagingService} and

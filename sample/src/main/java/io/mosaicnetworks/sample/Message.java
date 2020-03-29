@@ -32,13 +32,13 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import com.stfalcon.chatkit.commons.models.IMessage;
-import com.stfalcon.chatkit.commons.models.IUser;
 
 import java.io.IOException;
 import java.util.Date;
 
 import io.mosaicnetworks.babble.node.BabbleTx;
+import io.mosaicnetworks.sample.chatkit.commons.models.IMessage;
+import io.mosaicnetworks.sample.chatkit.commons.models.IUser;
 
 
 class UnixEraDateTypeAdapter extends TypeAdapter<Date> {
