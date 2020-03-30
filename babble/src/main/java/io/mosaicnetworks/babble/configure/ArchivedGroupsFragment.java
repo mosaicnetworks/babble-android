@@ -255,6 +255,10 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
         if (mActionMode!=null) {
             mActionMode.finish();
         }
+
+        if (mLoadingDialog!=null) {
+            mLoadingDialog.dismiss();
+        }
     }
 
     @Override
