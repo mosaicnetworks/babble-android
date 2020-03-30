@@ -174,7 +174,9 @@ public class BabbleService2 extends Service {
             throw new IllegalStateException("Service is not running");
         }
 
-        mServiceAdvertiser.stopAdvertising();
+        if (mServiceAdvertiser!=null) {
+            mServiceAdvertiser.stopAdvertising();
+        }
 
         if (mBabbleNode==null) {
             //If an archive fails to load then the babble node can be null
