@@ -123,7 +123,7 @@
         android:background="@color/white"
         tools:context=".ChatActivityAndroidService">
 
-        <com.stfalcon.chatkit.messages.MessagesList
+        <io.mosaicnetworks.sample.chatkit.messages.MessagesList
             android:id="@+id/messagesList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -137,7 +137,7 @@
             android:layout_marginRight="16dp"
             android:background="@color/gray_light"/>
 
-        <com.stfalcon.chatkit.messages.MessageInput
+        <io.mosaicnetworks.sample.chatkit.messages.MessageInput
             android:id="@+id/input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
