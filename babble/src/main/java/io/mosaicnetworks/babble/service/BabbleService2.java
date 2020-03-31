@@ -44,7 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.mosaicnetworks.babble.node.BabbleNode;
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.BabbleState;
 import io.mosaicnetworks.babble.node.BabbleTx;
 import io.mosaicnetworks.babble.node.Block;
@@ -61,6 +60,13 @@ public class BabbleService2 extends Service {
         STOPPED,
         RUNNING,
         ARCHIVE,
+    }
+
+    public interface StartArchiveListener {
+
+        void onInitialised();
+
+        void onFailed();
     }
 
     private BabbleNode mBabbleNode;
@@ -107,7 +113,7 @@ public class BabbleService2 extends Service {
      * @param groupDescriptor
      */
     public void startArchive(final String configDirectory, GroupDescriptor groupDescriptor,
-                             final BabbleService.StartArchiveListener listener) {
+                             final StartArchiveListener listener) {
         if (mState!=State.STOPPED) {
             throw new IllegalStateException("Cannot start archive service which isn't stopped");
         }

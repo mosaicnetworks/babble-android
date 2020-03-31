@@ -30,7 +30,6 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
 import android.view.View;
@@ -40,11 +39,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.configure.mdns.MdnsJoinGroupFragment;
-import io.mosaicnetworks.babble.configure.p2p.P2PJoinGroupFragment;
 import io.mosaicnetworks.babble.discovery.DiscoveryDataController;
 import io.mosaicnetworks.babble.node.BabbleConstants;
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
@@ -54,7 +50,6 @@ import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.JoinGroupConfirmation;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
-import io.mosaicnetworks.babble.servicediscovery.ServicesListView;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 
 /**
@@ -270,22 +265,10 @@ public abstract class BaseConfigActivity extends BabbleServiceBinderActivity imp
 
     @Override
     public void onServiceSelected(ResolvedGroup resolvedGroup) {
-
-
-        // TODO: JK20Mar   this is a temporary hack
-        // At the moment the DataProviders are hardcoded as we don't yet have a DiscoveryDataController
-        if (resolvedGroup.getDataProviderId().equals("mdns")) {
-            Log.i(TAG, "onServiceSelected: MDNS item selected");
-            MdnsJoinGroupFragment mJoinGroupMdnsFragment = MdnsJoinGroupFragment.newInstance(resolvedGroup);
-            replaceFragment(mJoinGroupMdnsFragment, true);
-        } else {
-            if (resolvedGroup.getDataProviderId().equals("p2p")) {
-
-                Log.i(TAG, "onServiceSelected: P2P item selected");
-                P2PJoinGroupFragment mJoinGroupP2PFragment = P2PJoinGroupFragment.newInstance(resolvedGroup);
-                replaceFragment(mJoinGroupP2PFragment, true);
-            }
-        }
+        // The different join fragments have been replaced by a single fragment //TODO: delete this comment
+        Log.i(TAG, "onServiceSelected: Item selected");
+        JoinGroupFragment joinGroupFragment = JoinGroupFragment.newInstance(resolvedGroup);
+        replaceFragment(joinGroupFragment, true);
     }
 
     @Override

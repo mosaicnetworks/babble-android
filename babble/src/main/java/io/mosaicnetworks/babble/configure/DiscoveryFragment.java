@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure.combined;
+package io.mosaicnetworks.babble.configure;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -37,7 +37,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListView;
@@ -73,7 +72,7 @@ public class DiscoveryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_mdns_discovery, container, false);
+        final View view = inflater.inflate(R.layout.fragment_discovery, container, false);
 
         mServiceListView = view.findViewById(R.id.servicesListView);
         mSwipeRefreshServiceSearch = view.findViewById(R.id.swipeRefresh_service_search);

@@ -607,7 +607,7 @@ public final class ConfigManager {
 
     /**
      * The directory name is composite with the parts separated by underscores.
-     * The first part is the appId as set in BabbleService, which may or may not be the FQDN
+     * The first part is the appId as set in BabbleService2, which may or may not be the FQDN
      * The 2nd part is a unique id as generated in getUniqueId. Currently this is 16 characters
      * The 3rd part is a narrative description field with spaces converted to minus signs and
      * input limit to spaces, letters and numbers only.

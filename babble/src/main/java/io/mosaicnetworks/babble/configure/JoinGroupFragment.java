@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure.combined;
+package io.mosaicnetworks.babble.configure;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -45,13 +45,10 @@ import java.util.Objects;
 import java.util.Random;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.configure.BaseConfigActivity;
-import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 import io.mosaicnetworks.babble.node.BabbleConstants;
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;

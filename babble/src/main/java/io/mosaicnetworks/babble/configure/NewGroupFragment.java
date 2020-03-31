@@ -42,24 +42,22 @@ import androidx.annotation.NonNull;
 import java.io.IOException;
 import java.util.Objects;
 
+import io.mosaicnetworks.babble.BuildConfig;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleConstants;
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.service.BabbleServiceBinderFragment;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
-import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser2;
-import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedServiceMdnsFactory;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
 /**
- * This fragment enables the user to configure the {@link BabbleService} to create a new group.
+ * This fragment enables the user to configure the {@link BabbleService2} to create a new group.
  * Activities that contain this fragment must implement the {@link OnFragmentInteractionListener}
  * interface to handle interaction events. Use the {@link NewGroupFragment#newInstance} factory
  * method to create an instance of this fragment.
@@ -189,7 +187,7 @@ public class NewGroupFragment extends BabbleServiceBinderFragment {
             });
 
             // This will call back onNetworkInitialised
-            p2PService.startRegistration(mMoniker, groupName, BabbleService.BABBLE_VERSION, false);
+            p2PService.startRegistration(mMoniker, groupName, BuildConfig.BabbleVersion, false);
             //TODO: Turned off discovery for the lead peer, but may need to re-enable to trigger discovery.
 
             //TODO: finish this line: mServiceAdvertiser =

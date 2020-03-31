@@ -40,8 +40,6 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.configure.combined.DiscoveryFragment;
-import io.mosaicnetworks.babble.configure.mdns.MdnsDiscoveryFragment;
 
 public class TabsFragment extends Fragment {
 
@@ -50,13 +48,9 @@ public class TabsFragment extends Fragment {
 
 
     private static boolean mShowCombined = true;
-    private static boolean mShowmDNS = true;
-    private static boolean mShowP2P = false;
     private static boolean mShowArchive = true;
     private static boolean mShowAllArchiveVersions = true;
 
-
-    private static int mTabmDNS;
     private static int mTabArchive;
     private static int mTabCombined;
 
@@ -77,10 +71,7 @@ public class TabsFragment extends Fragment {
     public static TabsFragment newInstance(Bundle args) {
         TabsFragment fragment = new TabsFragment();
 
-
         mShowCombined = args.getBoolean(BaseConfigActivity.SHOW_COMBINED, true);
-        mShowmDNS = args.getBoolean(BaseConfigActivity.SHOW_MDNS, true);
-        mShowP2P = args.getBoolean(BaseConfigActivity.SHOW_P2P, true);
         mShowArchive = args.getBoolean(BaseConfigActivity.SHOW_ARCHIVE, true);
         mShowAllArchiveVersions = args.getBoolean(BaseConfigActivity.SHOW_ALL_ARCHIVE, true);
         fragment.setArguments(args);
@@ -95,9 +86,6 @@ public class TabsFragment extends Fragment {
         int idx = 0;
 
         if (mShowCombined) { mTabCombined = idx; idx++;} else { mTabCombined = -1;}
-
-        if (mShowmDNS) { mTabmDNS = idx; idx++;}  else {mTabmDNS = -1;}
-
         if (mShowArchive) { mTabArchive = idx; idx++;}  else {mTabArchive = -1;}
 
 
@@ -132,16 +120,6 @@ public class TabsFragment extends Fragment {
             @Override
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
 
- /*               switch (position) {
-                    case 0: tab.setText(R.string.live_tab);
-                        break;
-                    case 1: tab.setText(R.string.archived_tab);
-                }  */
-
-                // These are not compile time constants so we cannot use a switch
-                if (position == mTabmDNS) {
-                    tab.setText(R.string.wifi_tab);
-                } else {
 
                         if (position == mTabArchive) {
                             tab.setText(R.string.archived_tab);
@@ -150,10 +128,6 @@ public class TabsFragment extends Fragment {
                                 tab.setText(R.string.live_tab);
                             }
                         }
-
-                }
-
-
 
             }}).attach();
     }
@@ -168,15 +142,6 @@ public class TabsFragment extends Fragment {
         @Override
         public Fragment createFragment(int position) {
 
-          /*  switch (position) {
-                case 0: return DiscoveryFragment.newInstance();
-                case 1: return ArchivedGroupsFragment.newInstance();
-            } */
-
-            if (position == mTabmDNS) {
-                Log.i(TAG, "createFragment:  Create mDNS tab");
-                return MdnsDiscoveryFragment.newInstance();
-            } else {
 
                     if (position == mTabArchive) {
                         Log.i(TAG, "createFragment:  Create Archive tab");
@@ -190,18 +155,14 @@ public class TabsFragment extends Fragment {
                         }
                     }
 
-            }
-
             return null;  //TODO: This function is defined as @NonNull - should we throw an exception instead?
         }
 
         @Override
         public int getItemCount() {
             int itemCount = 0;
-            if (mShowmDNS) itemCount++;
             if (mShowArchive) itemCount++;
             if (mShowCombined) itemCount++;
-
             return itemCount;
         }
     }

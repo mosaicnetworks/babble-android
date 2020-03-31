@@ -24,7 +24,6 @@
 
 package io.mosaicnetworks.babble.configure;
 
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 /**
@@ -34,14 +33,14 @@ public interface OnFragmentInteractionListener {
 
 
     /**
-     * This method will be called when the {@link BabbleService} has successfully joined a group.
+     * This method will be called when the {@link io.mosaicnetworks.babble.service.BabbleService2} has successfully joined a group.
      *
      * @param moniker the moniker chosen by the user
      */
     void baseOnJoined(String moniker, String group);
 
     /**
-     * This method will be called when the {@link BabbleService} has successfully started a new
+     * This method will be called when the {@link io.mosaicnetworks.babble.service.BabbleService2} has successfully started a new
      * group.
      *
      * @param moniker the moniker chosen by the user
@@ -49,7 +48,7 @@ public interface OnFragmentInteractionListener {
     void baseOnStartedNew(String moniker, String group);
 
     /**
-     * This method will be called when the {@link BabbleService} has loaded an archive group
+     * This method will be called when the {@link io.mosaicnetworks.babble.service.BabbleService2} has loaded an archive group
      * @param moniker the moniker as chosen previous by the user.
      */
     void onArchiveLoaded(String moniker, String group);

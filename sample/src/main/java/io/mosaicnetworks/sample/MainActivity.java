@@ -31,7 +31,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import io.mosaicnetworks.babble.configure.BaseConfigActivity;
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.utils.DialogUtils;
@@ -80,10 +79,9 @@ public class MainActivity extends BaseConfigActivity {
         //TODO: JK27Mar  Copy from sample_custom_ui version
     }
 
-
     @Override
-    public BabbleService getBabbleService() {
-        return null;
+    public void startBabblingActivity() {
+        //TODO: JK29Mar  Populate this
     }
 
 

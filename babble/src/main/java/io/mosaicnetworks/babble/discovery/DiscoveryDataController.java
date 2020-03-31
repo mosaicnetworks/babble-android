@@ -38,7 +38,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.OnBabbleConfigWritten;
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
