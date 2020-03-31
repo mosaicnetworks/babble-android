@@ -747,6 +747,7 @@ public class MessageHolders {
 
         protected ViewGroup bubble;
         protected TextView text;
+        protected TextView from;
 
         @Deprecated
         public IncomingTextMessageViewHolder(View itemView) {
@@ -768,6 +769,10 @@ public class MessageHolders {
 
             if (text != null) {
                 text.setText(message.getText());
+            }
+
+            if (from != null) {
+                from.setText(message.getUser().getName());
             }
         }
 
@@ -795,6 +800,7 @@ public class MessageHolders {
         private void init(View itemView) {
             bubble = (ViewGroup) itemView.findViewById(R.id.bubble);
             text = (TextView) itemView.findViewById(R.id.messageText);
+            from = itemView.findViewById(R.id.messageFrom);
         }
     }
 

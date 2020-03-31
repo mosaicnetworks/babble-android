@@ -172,23 +172,7 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
             });
         }
 
-        List<Message> newMessagesTemp = new ArrayList<>();
-
-        for (Message m : ((ChatState) mBoundService.getAppState()).getMessagesFromIndex(mMessageIndex)) {
-
-            if (m.author.equals(mMoniker)) {
-                newMessagesTemp.add(m);
-            } else {
-                if (m.author.equals(Message.SYSTEM_MESSAGE_AUTHOR)) {
-                    newMessagesTemp.add(m);
-                } else {
-                    newMessagesTemp.add(new Message(m.author+ ":\n" + m.text, m.author, m.date));
-                }
-            }
-
-        }
-
-        final List<Message> newMessages = newMessagesTemp;
+        final List<Message> newMessages = ((ChatState) mBoundService.getAppState()).getMessagesFromIndex(mMessageIndex);
 
         runOnUiThread(new Runnable() {
             @Override
