@@ -208,7 +208,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
             configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
 
 
-        BabbleService<?> babbleService = mListener.getBabbleService();
+//        BabbleService<?> babbleService = mListener.getBabbleService();
         GroupDescriptor groupDescriptor = new GroupDescriptor(mResolvedService.getGroupName(), mResolvedService.getGroupUid());
 
         int networkType = BabbleConstants.NETWORK_WIFI;  //TODO: Set this correctly.
@@ -216,7 +216,11 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
 
         try {
             String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, Utils.getIPAddr(getContext()), networkType);
-            babbleService.start(configDir, groupDescriptor);
+
+            mLoadingDialog.dismiss();
+            mListener.baseOnJoined(mMoniker, groupDescriptor.getName());
+
+  //          babbleService.start(configDir, groupDescriptor);
         } catch (IllegalStateException | CannotStartBabbleNodeException| IOException ex ) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
@@ -233,8 +237,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
             throw ex;
         }
 
-        mLoadingDialog.dismiss();
-        mListener.baseOnJoined(mMoniker, groupDescriptor.getName());
+
     }
 
     @Override

@@ -42,7 +42,6 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.combined.DiscoveryFragment;
 import io.mosaicnetworks.babble.configure.mdns.MdnsDiscoveryFragment;
-import io.mosaicnetworks.babble.configure.p2p.P2PDiscoveryFragment;
 
 public class TabsFragment extends Fragment {
 
@@ -56,10 +55,8 @@ public class TabsFragment extends Fragment {
     private static boolean mShowArchive = true;
     private static boolean mShowAllArchiveVersions = true;
 
-    private static boolean mP2PFirstTab = false;  //TODO: expose or remove this flag
 
     private static int mTabmDNS;
-    private static int mTabP2P;
     private static int mTabArchive;
     private static int mTabCombined;
 
@@ -99,13 +96,7 @@ public class TabsFragment extends Fragment {
 
         if (mShowCombined) { mTabCombined = idx; idx++;} else { mTabCombined = -1;}
 
-        if (mP2PFirstTab){
-            if (mShowP2P) { mTabP2P = idx; idx++;} else { mTabP2P = -1;}
-            if (mShowmDNS) { mTabmDNS = idx; idx++;}  else {mTabmDNS = -1;}
-        } else {
-            if (mShowmDNS) { mTabmDNS = idx; idx++;}  else {mTabmDNS = -1;}
-            if (mShowP2P) { mTabP2P = idx; idx++;} else { mTabP2P = -1;}
-        }
+        if (mShowmDNS) { mTabmDNS = idx; idx++;}  else {mTabmDNS = -1;}
 
         if (mShowArchive) { mTabArchive = idx; idx++;}  else {mTabArchive = -1;}
 
@@ -151,9 +142,7 @@ public class TabsFragment extends Fragment {
                 if (position == mTabmDNS) {
                     tab.setText(R.string.wifi_tab);
                 } else {
-                    if (position == mTabP2P) {
-                        tab.setText(R.string.p2p_tab);
-                    } else {
+
                         if (position == mTabArchive) {
                             tab.setText(R.string.archived_tab);
                         } else {
@@ -161,7 +150,7 @@ public class TabsFragment extends Fragment {
                                 tab.setText(R.string.live_tab);
                             }
                         }
-                    }
+
                 }
 
 
@@ -188,10 +177,7 @@ public class TabsFragment extends Fragment {
                 Log.i(TAG, "createFragment:  Create mDNS tab");
                 return MdnsDiscoveryFragment.newInstance();
             } else {
-                if (position == mTabP2P) {
-                    Log.i(TAG, "createFragment:  Create P2P tab");
-                    return P2PDiscoveryFragment.newInstance();
-                } else {
+
                     if (position == mTabArchive) {
                         Log.i(TAG, "createFragment:  Create Archive tab");
                         Bundle args = new Bundle();
@@ -203,7 +189,7 @@ public class TabsFragment extends Fragment {
                             return DiscoveryFragment.newInstance();
                         }
                     }
-                }
+
             }
 
             return null;  //TODO: This function is defined as @NonNull - should we throw an exception instead?
@@ -213,7 +199,6 @@ public class TabsFragment extends Fragment {
         public int getItemCount() {
             int itemCount = 0;
             if (mShowmDNS) itemCount++;
-            if (mShowP2P) itemCount++;
             if (mShowArchive) itemCount++;
             if (mShowCombined) itemCount++;
 

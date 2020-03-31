@@ -57,7 +57,7 @@ public interface DiscoveryDataProvider {
      *
      * @param resolvedGroup
      */
-    void selectedDiscoveryResolveGroup(ResolvedGroup resolvedGroup);
+    void selectedDiscoveryResolveGroup(Context context, ResolvedGroup resolvedGroup);
 
     /**
      * Returns the {@link ServiceAdvertiser} for this Discovery Data Provider

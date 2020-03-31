@@ -25,6 +25,7 @@
 package io.mosaicnetworks.babble.discovery;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import java.io.IOException;
@@ -36,12 +37,12 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
-import io.mosaicnetworks.babble.node.BabbleConstants;
+import io.mosaicnetworks.babble.configure.OnBabbleConfigWritten;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.servicediscovery.JoinGroupConfirmation;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
@@ -51,13 +52,13 @@ import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.RandomString;
 import io.mosaicnetworks.babble.utils.Utils;
 
-public class DiscoveryDataController implements ServicesListListener {
+public class DiscoveryDataController  implements ServicesListListener {
 
     private final Lock providerLock = new ReentrantLock(true);
     private final Map<String, DiscoveryDataProvider> mDiscoveryDataProviders = new HashMap<>();
     private ResolvedGroupManager mResolvedGroupManager;
     private JoinGroupConfirmation mJoinGroupConfirmation;
-    private OnFragmentInteractionListener mOnFragmentInteractionListener;
+    private OnBabbleConfigWritten mOnBabbleConfigWritten;
     private boolean mIsDiscovering = false;
     private Context mContext;
 
@@ -119,21 +120,21 @@ public class DiscoveryDataController implements ServicesListListener {
 
 
     /**
-     * Registers a {@link OnFragmentInteractionListener} instance. This is used to find a
+     * Registers a {@link OnBabbleConfigWritten} instance. This is used to find a
      * Babble Service and call back when Babble is running.
      *
      *
-     * @param onFragmentInteractionListener
+     * @param OnBabbleConfigWritten
      */
-    public void registerOnFragmentInteractionListener(OnFragmentInteractionListener onFragmentInteractionListener) {
-        this.mOnFragmentInteractionListener = onFragmentInteractionListener;
+    public void registerOnBabbleConfigWritten(OnBabbleConfigWritten OnBabbleConfigWritten) {
+        this.mOnBabbleConfigWritten = OnBabbleConfigWritten;
     }
 
     /**
-     * Deregisters the {@link OnFragmentInteractionListener} instance
+     * Deregisters the {@link OnBabbleConfigWritten} instance
      */
-    public void deRegisterOnFragmentInteractionListener() {
-        this.mOnFragmentInteractionListener = null;
+    public void deRegisterOnBabbleConfigWritten() {
+        this.mOnBabbleConfigWritten = null;
     }
 
 
@@ -220,14 +221,14 @@ public class DiscoveryDataController implements ServicesListListener {
         resolvedGroup.setMoniker(mMoniker);
         String dataProviderId = resolvedGroup.getDataProviderId();
         DiscoveryDataProvider discoveryDataProvider = mDiscoveryDataProviders.get(dataProviderId);
-        discoveryDataProvider.selectedDiscoveryResolveGroup(resolvedGroup);
+        discoveryDataProvider.selectedDiscoveryResolveGroup(mContext, resolvedGroup);
 
 
         // Turn off Discovery for all DiscoveryDataProviders
         stopDiscovery();
 
         //TODO: This line will go as we use a service
-        BabbleService<?> babbleService = mOnFragmentInteractionListener.getBabbleService();
+     //   BabbleService<?> babbleService = mOnBabbleConfigWritten.getBabbleService();
 
 
         //TODO: Change this to use a Service
@@ -238,34 +239,27 @@ public class DiscoveryDataController implements ServicesListListener {
 
 
 
+
         try {
             String configDir = configManager.createConfigJoinGroup(resolvedService.getInitialPeers(),
-                    resolvedService.getCurrentPeers(), groupDescriptor,
-                    Utils.getIPAddr(mContext), discoveryDataProvider.getNetworkType()               // NB live pull of IP
-            );                                                                                      // InetAddress goes in peers file not here
-            babbleService.start(configDir, groupDescriptor);
+                resolvedService.getCurrentPeers(), groupDescriptor,
+                Utils.getIPAddr(mContext), discoveryDataProvider.getNetworkType() );// NB live pull of IP
+
+            mOnBabbleConfigWritten.startBabbleService(configDir, groupDescriptor, false, discoveryDataProvider.getAdvertiser());
+            //     public void startBabbleService(String configDir, GroupDescriptor groupDescriptor,
+            //                                   boolean isArchive, ServiceAdvertiser serviceAdvertiser) ;
+
         } catch (IllegalStateException | CannotStartBabbleNodeException | IOException ex ) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port or WiFi is turned off -
             // in which case we'll keep getting stuck here until the port is available or WiFi is
             // turned on!
- //           mLoadingDialog.dismiss();
             DialogUtils.displayOkAlertDialog(Objects.requireNonNull(mContext), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
-            return;
-        } catch (Exception ex) {
-            //TODO: Review this. The duplicate dialog function feels overkill.
- //           mLoadingDialog.dismiss();
-            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(mContext),
-                    R.string.babble_init_fail_title,
-                    "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
-            throw ex;
+            return ;
         }
 
- //       mLoadingDialog.dismiss();
 
-
-        mOnFragmentInteractionListener.baseOnJoined(mMoniker, groupDescriptor.getName());
 
     }
 
@@ -285,4 +279,6 @@ public class DiscoveryDataController implements ServicesListListener {
     public void onListEmptyStatusChange(boolean empty) {
         //TODO: Error handling
     }
+
+
 }

@@ -33,10 +33,12 @@ import java.io.IOException;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
+import io.mosaicnetworks.babble.discovery.PeersFactory;
 import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.utils.RandomString;
 
 public class MdnsAdvertiser2 implements ServiceAdvertiser {
@@ -51,8 +53,9 @@ public class MdnsAdvertiser2 implements ServiceAdvertiser {
     private String mCurrentPeers;
     private boolean mAdvertising = false;
 
-    public MdnsAdvertiser2(GroupDescriptor groupDescriptor, Context context, String currentPeers,
-                           String initPeers) {
+    public MdnsAdvertiser2(Context context, ResolvedGroup resolvedGroup) {
+        //    GroupDescriptor groupDescriptor, Context context, String currentPeers,
+          //                 String initPeers) {
         initializeRegistrationListener();
 
         mAppContext = context.getApplicationContext();
@@ -65,11 +68,11 @@ public class MdnsAdvertiser2 implements ServiceAdvertiser {
         // "package name" in their method names and parameter names, but this is actually your
         // application ID. For example, the Context.getPackageName() method
         // returns your application ID
-        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_LABEL, groupDescriptor.getName());
-        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_ID_LABEL, groupDescriptor.getUid());
+        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_LABEL, resolvedGroup.getGroupName());
+        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_GROUP_ID_LABEL, resolvedGroup.getGroupUid());
         mServiceInfo.setPort(sDiscoveryPort);
-        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_CURRENT_PEERS_LABEL, currentPeers);
-        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_INITIAL_PEERS_LABEL, initPeers);
+        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_CURRENT_PEERS_LABEL, PeersFactory.toJson(resolvedGroup.getRandomService().getCurrentPeers()));
+        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_INITIAL_PEERS_LABEL, PeersFactory.toJson(resolvedGroup.getRandomService().getInitialPeers()));
     }
 
     @Override

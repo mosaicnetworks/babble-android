@@ -24,6 +24,8 @@
 
 package io.mosaicnetworks.babble.configure;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -33,6 +35,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,10 +45,17 @@ import io.mosaicnetworks.babble.configure.p2p.P2PJoinGroupFragment;
 import io.mosaicnetworks.babble.discovery.DiscoveryDataController;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
+import io.mosaicnetworks.babble.node.ConfigManager;
+import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.service.BabbleService2;
+import io.mosaicnetworks.babble.service.BabbleServiceBinderActivity;
+import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.JoinGroupConfirmation;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListView;
+import io.mosaicnetworks.babble.utils.DialogUtils;
 
 /**
  * This activity complements the {@link BabbleService}. It consists of a set of fragments which
@@ -53,7 +63,7 @@ import io.mosaicnetworks.babble.servicediscovery.ServicesListView;
  * {@link BaseConfigActivity#getBabbleService()}, {@link BaseConfigActivity#onJoined(String)} and
  * {@link BaseConfigActivity#onStartedNew(String)} methods.
  */
-public abstract class BaseConfigActivity extends AppCompatActivity implements OnFragmentInteractionListener, JoinGroupConfirmation {
+public abstract class BaseConfigActivity extends BabbleServiceBinderActivity implements OnBabbleConfigWritten, OnFragmentInteractionListener, JoinGroupConfirmation {
 
     /**
      * Key for the bundle used to pass the visibility flag for the mDNS tab to the fragment
@@ -88,6 +98,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     private Boolean mFromGroup = false;
     private boolean mShowmDNS = true;
     private boolean mShowP2P = false;
+    private int mProtocol = BabbleConstants.NETWORK_GLOBAL;
 
 
     private boolean mShowCombined = true;
@@ -97,6 +108,14 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     private List<ResolvedGroup> mResolvedGroups;
     private ResolvedGroupManager mResolvedGroupManager;
     private DiscoveryDataController mDiscoveryDataController;
+    private ServiceAdvertiser mServiceAdvertiser;
+
+    private String mConfigDirectory;
+    private boolean mIsArchive = false;
+    private ProgressDialog mLoadingDialog;
+    private GroupDescriptor mGroupDescriptor;
+
+
 
     public static final String PREFERENCE_FILE_KEY = "babbleandroid";
     private static final String TAG = "BaseConfigActivity";
@@ -196,7 +215,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         Log.i(TAG,"  Register with DiscoveryTestActivity as JoinGroupConfirmation");
         mDiscoveryDataController.registerJoinGroupConfirmation(this);
         Log.i(TAG,"  Register with DiscoveryTestActivity as OnFragmentInteractionListener(");
-        mDiscoveryDataController.registerOnFragmentInteractionListener(this);
+        mDiscoveryDataController.registerOnBabbleConfigWritten(this);
 
         Log.i(TAG,"END setUpBabble()");
 // END general initialisation block
@@ -304,8 +323,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         }
     }
 
-    @Override
-    public abstract BabbleService getBabbleService();
+
 
     public abstract void onJoined(String moniker, String group);
 
@@ -313,6 +331,75 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
 
     @Override
     public abstract void onArchiveLoaded(String moniker, String group);
+
+
+    @Override
+    protected void onServiceDisconnected() {
+        //Do nothing
+    }
+
+
+
+
+
+    private void configAndStartBabble(String peersAddr, String babbleAddr)  {
+        ConfigManager configManager =
+                ConfigManager.getInstance(getApplicationContext());
+        try {
+            mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, peersAddr, babbleAddr, mProtocol);
+        } catch (CannotStartBabbleNodeException | IOException ex) {
+            //TODO: think about this error handling
+        }
+        startBabbleService();
+    }
+
+
+
+    @Override
+    public void startBabbleService(String configDir, GroupDescriptor groupDescriptor, boolean isArchive, ServiceAdvertiser serviceAdvertiser) {
+        // Needs
+        // mConfigDirectory, mGroupDescriptor, mServiceAdvertiser, mMoniker
+        mConfigDirectory = configDir;
+        mGroupDescriptor = groupDescriptor;
+        mIsArchive = isArchive;
+        mServiceAdvertiser = serviceAdvertiser;
+
+        startBabbleService();
+    }
+
+
+    public void startBabbleService() {
+        startService(new Intent(this, BabbleService2.class));
+        mLoadingDialog = DialogUtils.displayLoadingDialog(this);
+        mLoadingDialog.show();
+        doBindService();
+    }
+
+    /**
+     * This method launches the activity that actually uses babble
+     *
+     */
+    public abstract void startBabblingActivity();
+
+    @Override
+    protected void onServiceConnected() {
+        try {
+            mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
+            startBabblingActivity();
+        } catch (IllegalArgumentException ex) {
+            // we'll assume this is caused by the node taking a while to leave a previous group,
+            // though it could be that another application is using the port or WiFi is turned off -
+            // in which case we'll keep getting stuck here until the port is available or WiFi is
+            // turned on!
+            DialogUtils.displayOkAlertDialog(this, R.string.babble_init_fail_title, R.string.babble_init_fail_message);
+            mLoadingDialog.dismiss();
+            stopService(new Intent(this, BabbleService2.class));
+        }
+        doUnbindService();
+    }
+
+
+
 
 
     @Override

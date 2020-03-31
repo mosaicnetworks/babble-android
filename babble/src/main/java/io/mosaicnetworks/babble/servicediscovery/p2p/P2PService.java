@@ -52,16 +52,16 @@ import java.util.Map;
 import io.mosaicnetworks.babble.configure.OnNetworkInitialised;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.BabbleConstants;
+import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
-import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.utils.RandomString;
 
 /**
  * Service class to handle WiFi Direct (P2P)
  */
-public class P2PService implements ServiceAdvertiser{
+public class P2PService implements ServiceAdvertiser {
 
     private ServiceDiscoveryListener mServiceDiscoveryListener;
     private OnNetworkInitialised mNetworkInitListener;
@@ -576,10 +576,17 @@ public class P2PService implements ServiceAdvertiser{
         return ipAddrStr;
     }
 
+    /*
     @Override
     public void advertise() {
         // Do nothing. It is implicit in the starting a Wifi Direct node
         Log.i(TAG,"P2P advertise, does nothing");
+    }
+*/
+
+    @Override
+    public boolean advertise(String genesisPeers, String currentPeers) {
+        return true;
     }
 
     @Override
@@ -588,6 +595,14 @@ public class P2PService implements ServiceAdvertiser{
         mGroupCreated = false;
         Log.i(TAG,"P2P stop advertise, does nothing");
     }
+
+    @Override
+    public void onPeersChange(String newPeers) {
+
+    }
+
+
+    /*
 
     @Override
     public String getServiceName() {
@@ -600,4 +615,6 @@ public class P2PService implements ServiceAdvertiser{
 
         //TODO: potentially update the DNS TXT record with amended peers.
     }
+
+    */
 }

@@ -83,7 +83,7 @@ public abstract class BabbleServiceBinderActivity extends AppCompatActivity {
 
     protected abstract void onServiceDisconnected();
 
-    void doUnbindService() {
+    protected void doUnbindService() {
         if (mShouldUnbind) {
             // Release information about the service's state.
             unbindService(mConnection);

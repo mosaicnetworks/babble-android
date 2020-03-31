@@ -53,6 +53,9 @@ public class MdnsDataProvider implements DiscoveryDataProvider {
     private final Map<String, ResolvedService> mResolvedServices = new HashMap<>();
     private final List<ResolvedGroup> mResolvedGroupList = new ArrayList<>();
 
+    private MdnsAdvertiser2 mMdnsAdvertiser;
+
+
     private boolean mIsDiscovering = false;
 
 
@@ -100,13 +103,14 @@ public class MdnsDataProvider implements DiscoveryDataProvider {
     }
 
     @Override
-    public void selectedDiscoveryResolveGroup(ResolvedGroup resolvedGroup) {
+    public void selectedDiscoveryResolveGroup(Context context, ResolvedGroup resolvedGroup) {
+        mMdnsAdvertiser = new MdnsAdvertiser2(context, resolvedGroup);
         Log.i(TAG, "selectedDiscoveryResolveGroup: selected " + resolvedGroup.getGroupName());
     }
 
     @Override
     public ServiceAdvertiser getAdvertiser() {
-        return null;
+        return mMdnsAdvertiser;
     };
 
 

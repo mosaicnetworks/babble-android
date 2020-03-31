@@ -32,13 +32,6 @@ import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
  */
 public interface OnFragmentInteractionListener {
 
-    /**
-     * Your app will need an instance of the {@link BabbleService}. This method provides access to
-     * the service for the fragments in this activity.
-     *
-     * @return Your apps {@link BabbleService}.
-     */
-    BabbleService getBabbleService();
 
     /**
      * This method will be called when the {@link BabbleService} has successfully joined a group.

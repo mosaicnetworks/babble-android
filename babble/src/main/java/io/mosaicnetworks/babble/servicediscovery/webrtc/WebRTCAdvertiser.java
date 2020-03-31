@@ -43,7 +43,7 @@ import java.util.List;
 
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.BabbleConstants;
-import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
+import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 
 public class WebRTCAdvertiser implements ServiceAdvertiser {
 
@@ -65,9 +65,10 @@ public class WebRTCAdvertiser implements ServiceAdvertiser {
 
 
     @Override
-    public void advertise() {
+    public boolean advertise(String genesisPeers, String currentPeers){
         sendGroupToDisco(Request.Method.POST, "", mDisco);
         setIsAdvertising(true);
+        return true;
     }
 
     @Override
@@ -76,8 +77,13 @@ public class WebRTCAdvertiser implements ServiceAdvertiser {
         setIsAdvertising(false);
     }
 
-
     @Override
+    public void onPeersChange(String newPeers) {
+            //TODO
+    }
+
+
+//    @Override
     public void updateAdvertising(List<Peer> peers, int lastBlockIndex) {
         // Only need to update Current Peers as initial peers are unchanging
         mDisco.setPeers(peers);
@@ -85,11 +91,6 @@ public class WebRTCAdvertiser implements ServiceAdvertiser {
         sendGroupToDisco(Request.Method.PATCH, File.pathSeparator+mDisco.GroupUID, mDisco);
     }
 
-
-    @Override
-    public String getServiceName() {
-        return mServiceName;
-    }
 
     private void sendGroupToDisco(int sendMethod, String urlSuffix, Disco disco) {
         Log.i(TAG,"sendGroupToDisco");

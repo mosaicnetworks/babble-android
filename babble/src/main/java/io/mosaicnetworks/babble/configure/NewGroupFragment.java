@@ -49,9 +49,11 @@ import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService2;
-import io.mosaicnetworks.babble.service.BabbleServiceBinder;
+import io.mosaicnetworks.babble.service.BabbleServiceBinderFragment;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser2;
+import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedServiceMdnsFactory;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
@@ -62,7 +64,7 @@ import io.mosaicnetworks.babble.utils.Utils;
  * interface to handle interaction events. Use the {@link NewGroupFragment#newInstance} factory
  * method to create an instance of this fragment.
  */
-public class NewGroupFragment extends BabbleServiceBinder {
+public class NewGroupFragment extends BabbleServiceBinderFragment {
 
     private static boolean mShowmDNS = true;
     private static boolean mShowP2P = true;
@@ -193,11 +195,12 @@ public class NewGroupFragment extends BabbleServiceBinder {
             //TODO: finish this line: mServiceAdvertiser =
 
         } else {
+
             mNetworkType = BabbleConstants.NETWORK_WIFI;
-            mServiceAdvertiser = new MdnsAdvertiser2(mGroupDescriptor,
+            mServiceAdvertiser = new MdnsAdvertiser2(
                     getContext().getApplicationContext(),
-                    "", ""
-                    );  //TODO: JK20March
+                    null
+                    );  //TODO: JK27March  Add MDNS ResolvedService new group factory method
             String ip = Utils.getIPAddr(getContext());
             configAndStartBabble(ip, ip);
         }

@@ -25,6 +25,9 @@
 package io.mosaicnetworks.babble.service;
 
 
+import java.util.List;
+
+import io.mosaicnetworks.babble.discovery.Peer;
 
 public interface ServiceAdvertiser {
 
@@ -35,6 +38,7 @@ public interface ServiceAdvertiser {
 
     void stopAdvertising();
 
-    //void onPeersChange(List<Peer> newPeers);
+    //void onPeersChange(List<Peer> newPeers);  //TODO: need to reconcile these 2 different approaches. Need LBI for WebRTC
     void onPeersChange(String newPeers);
+ //    public void updateAdvertising(List<Peer> peers, int lastBlockIndex);
 }

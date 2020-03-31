@@ -30,7 +30,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,12 +49,11 @@ import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleConstants;
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService2;
-import io.mosaicnetworks.babble.service.BabbleServiceBinder;
+import io.mosaicnetworks.babble.service.BabbleServiceBinderFragment;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
@@ -64,7 +62,7 @@ import io.mosaicnetworks.babble.utils.Utils;
  * Use the {@link ArchivedGroupsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ArchivedGroupsFragment extends BabbleServiceBinder implements ArchivedGroupsAdapter.ItemClickListener {
+public class ArchivedGroupsFragment extends BabbleServiceBinderFragment implements ArchivedGroupsAdapter.ItemClickListener {
 
     public static boolean reloadArchive = false;
     private OnFragmentInteractionListener mListener;

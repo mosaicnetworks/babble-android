@@ -59,7 +59,7 @@ public class WebRTCDataProvider implements DiscoveryDataProvider {
     private List<ResolvedGroup> mResolvedGroups = new ArrayList<>();
     private Map<String, Disco> mDiscos = new HashMap<>();
 
-
+    private WebRTCAdvertiser mWebRTCAdvertiser;
 
     private String mDiscoverServerIP;
     private String mDiscoverServerEndpoint;
@@ -181,14 +181,15 @@ public class WebRTCDataProvider implements DiscoveryDataProvider {
     }
 
     @Override
-    public void selectedDiscoveryResolveGroup(ResolvedGroup resolvedGroup) {
+    public void selectedDiscoveryResolveGroup(Context context, ResolvedGroup resolvedGroup) {
+        mWebRTCAdvertiser = new WebRTCAdvertiser(context, mDiscos.get(resolvedGroup.getGroupUid()));
         Log.i(TAG, "selectedDiscoveryResolveGroup: selected " + resolvedGroup.getGroupName());
     }
 
 
     @Override
     public ServiceAdvertiser getAdvertiser() {
-        return null;
+        return mWebRTCAdvertiser;
     };
 
     private void pushListToResolvedGroupManager() {

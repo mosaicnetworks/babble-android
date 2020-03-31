@@ -24,6 +24,7 @@
 
 package io.mosaicnetworks.sample_custom_ui;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -39,19 +40,24 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
-import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
+import io.mosaicnetworks.babble.configure.OnBabbleConfigWritten;
 import io.mosaicnetworks.babble.discovery.DiscoveryDataController;
 import io.mosaicnetworks.babble.node.BabbleConstants;
-import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
+import io.mosaicnetworks.babble.node.ConfigManager;
+import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.service.BabbleServiceBinderActivity;
+import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.JoinGroupConfirmation;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
@@ -76,18 +82,24 @@ import io.mosaicnetworks.babble.utils.Utils;
  * it has been removed from the regular, new and join process.
  */
 public class MainActivity extends BabbleServiceBinderActivity implements JoinGroupConfirmation,
-        OnFragmentInteractionListener {
+        OnBabbleConfigWritten {
 
     private final String TAG = "MainActivity";
     private int mProtocol = BabbleConstants.NETWORK_GLOBAL;
     private String mMoniker = "";
+    private String mConfigDirectory;
+    private boolean mIsArchive = false;
+    private ProgressDialog mLoadingDialog;
+    private GroupDescriptor mGroupDescriptor;
 
-    public static final String PREFERENCE_FILE_KEY = "babbleandroidcustomui";
+
+   public static final String PREFERENCE_FILE_KEY = "babbleandroidcustomui";
 
 
     // Babble Section
     private DiscoveryDataController mDiscoveryDataController;
     private ResolvedGroupManager mResolvedGroupManager;
+    private ServiceAdvertiser mServiceAdvertiser;
 
     // This will become the ServicesListView List when we wire it up
     private List<ResolvedGroup> mResolvedGroups;
@@ -95,7 +107,6 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
     public SwipeRefreshLayout mSwipeRefreshServiceSearch;
     private SwipeRefreshLayout mSwipeRefreshDiscoveryFailed;
     private SwipeRefreshLayout mSwipeRefreshServicesDisplaying;
-
 
 
     @Override
@@ -169,7 +180,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         mDiscoveryDataController.registerJoinGroupConfirmation(this);
 
         Log.i(TAG, "  Register with DiscoveryTestActivity as OnFragmentInteractionListener(");
-        mDiscoveryDataController.registerOnFragmentInteractionListener(this);
+        mDiscoveryDataController.registerOnBabbleConfigWritten(this);
 
         mDiscoveryDataController.setMoniker(mMoniker);
 
@@ -419,72 +430,69 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         alertDialog.show();
     }
 
-    @Override
-    public BabbleService getBabbleService() {
-        return MessagingService.getInstance(this);
-    }
 
-
-
-
-    @Override
-    public void baseOnJoined(String moniker, String group) {
-        Intent intent = new Intent(this, ChatActivityAndroidService.class);
-        intent.putExtra("MONIKER", moniker);
-        intent.putExtra("ARCHIVE_MODE", false);
-        intent.putExtra("GROUP", group);
-        startActivity(intent);
-    }
-
-    @Override
-    public void baseOnStartedNew(String moniker, String group) {
-        Intent intent = new Intent(this, ChatActivityAndroidService.class);
-        intent.putExtra("MONIKER", moniker);
-        intent.putExtra("ARCHIVE_MODE", false);
-        intent.putExtra("GROUP", group);
-        startActivity(intent);
-    }
-
-    public void onArchiveLoaded(String moniker, String group) {
-        Intent intent = new Intent(this, ChatActivityAndroidService.class);
-        intent.putExtra("MONIKER", moniker);
-        intent.putExtra("ARCHIVE_MODE", true);
-        intent.putExtra("GROUP", group);
-        startActivity(intent);
-    }
-
-
-    @Override
-    public void onServiceSelected(ResolvedGroup resolvedGroup) {
-
-    }
-
-    @Override
-    protected void onServiceConnected() {
-
-        /*
-
-        try {
-            mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
-            mListener.baseOnStartedNew(mMoniker, mGroupDescriptor.getName());
-        } catch (IllegalArgumentException ex) {
-            // we'll assume this is caused by the node taking a while to leave a previous group,
-            // though it could be that another application is using the port or WiFi is turned off -
-            // in which case we'll keep getting stuck here until the port is available or WiFi is
-            // turned on!
-            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), io.mosaicnetworks.babble.R.string.babble_init_fail_title, io.mosaicnetworks.babble.R.string.babble_init_fail_message);
-            mLoadingDialog.dismiss();
-            getActivity().stopService(new Intent(getActivity(), BabbleService2.class));
-        }
-        doUnbindService();
-
-        */
-    }
 
     @Override
     protected void onServiceDisconnected() {
         //Do nothing
     }
+
+    private void configAndStartBabble(String peersAddr, String babbleAddr)  {
+        ConfigManager configManager =
+                ConfigManager.getInstance(getApplicationContext());
+        try {
+            mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, peersAddr, babbleAddr, mProtocol);
+        } catch (CannotStartBabbleNodeException | IOException ex) {
+            //TODO: think about this error handling
+        }
+        startBabbleService();
+    }
+
+    public void startBabbleService() {
+        startService(new Intent(this, BabbleService2.class));
+        mLoadingDialog = DialogUtils.displayLoadingDialog(this);
+        mLoadingDialog.show();
+        doBindService();
+    }
+
+    @Override
+    protected void onServiceConnected() {
+        try {
+            mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
+            startChatActivity();
+        } catch (IllegalArgumentException ex) {
+            // we'll assume this is caused by the node taking a while to leave a previous group,
+            // though it could be that another application is using the port or WiFi is turned off -
+            // in which case we'll keep getting stuck here until the port is available or WiFi is
+            // turned on!
+            DialogUtils.displayOkAlertDialog(this, R.string.babble_init_fail_title, R.string.babble_init_fail_message);
+            mLoadingDialog.dismiss();
+            stopService(new Intent(this, BabbleService2.class));
+        }
+        doUnbindService();
+    }
+
+
+    @Override
+    public void startBabbleService(String configDir, GroupDescriptor groupDescriptor, boolean isArchive, ServiceAdvertiser serviceAdvertiser) {
+        // Needs
+        // mConfigDirectory, mGroupDescriptor, mServiceAdvertiser, mMoniker
+        mConfigDirectory = configDir;
+        mGroupDescriptor = groupDescriptor;
+        mIsArchive = isArchive;
+        mServiceAdvertiser = serviceAdvertiser;
+
+        startBabbleService();
+    }
+
+    public void startChatActivity() {
+        Intent intent = new Intent(this, ChatActivityAndroidService.class);
+        intent.putExtra("MONIKER", mMoniker);
+        intent.putExtra("ARCHIVE_MODE", mIsArchive);
+        intent.putExtra("GROUP", mGroupDescriptor.getName());
+        startActivity(intent);
+    }
+
 
 
 }

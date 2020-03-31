@@ -30,11 +30,10 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
-public abstract class BabbleServiceBinder extends Fragment {
+public abstract class BabbleServiceBinderFragment extends Fragment {
     // Don't attempt to unbind from the service unless the client has received some
     // information about the service's state.
     private boolean mShouldUnbind;
@@ -51,7 +50,7 @@ public abstract class BabbleServiceBinder extends Fragment {
             // service that we know is running in our own process, we can
             // cast its IBinder to a concrete class and directly access it.
             mBoundService = ((BabbleService2.LocalBinder) service).getService();
-            BabbleServiceBinder.this.onServiceConnected();
+            BabbleServiceBinderFragment.this.onServiceConnected();
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -60,7 +59,7 @@ public abstract class BabbleServiceBinder extends Fragment {
             // Because it is running in our same process, we should never
             // see this happen.
             mBoundService = null;
-            BabbleServiceBinder.this.onServiceDisconnected();
+            BabbleServiceBinderFragment.this.onServiceDisconnected();
         }
     };
 

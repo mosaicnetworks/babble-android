@@ -32,6 +32,8 @@ import android.view.MenuItem;
 
 import io.mosaicnetworks.babble.configure.BaseConfigActivity;
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
@@ -71,10 +73,21 @@ public class MainActivity extends BaseConfigActivity {
 //        ConfigManager.setRootDir(getApplicationContext().getExternalFilesDir(null).toString());
     }
 
+
+    public void startBabbleService(String configDir, GroupDescriptor groupDescriptor,
+                                   boolean isArchive, ServiceAdvertiser serviceAdvertiser) {
+
+        //TODO: JK27Mar  Copy from sample_custom_ui version
+    }
+
+
     @Override
     public BabbleService getBabbleService() {
-        return MessagingService.getInstance(this);
+        return null;
     }
+
+
+
 
     @Override
     public void onJoined(String moniker, String group) {
