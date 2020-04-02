@@ -69,7 +69,8 @@ public abstract class ResolvedServiceP2PFactory {
                 (String) map.get(BabbleConstants.DNS_TXT_GROUP_LABEL),
                 (String) map.get(BabbleConstants.DNS_TXT_GROUP_ID_LABEL),
                 PeersFactory.toPeersList((String) map.get(BabbleConstants.DNS_TXT_INITIAL_PEERS_LABEL)),
-                PeersFactory.toPeersList((String) map.get(BabbleConstants.DNS_TXT_CURRENT_PEERS_LABEL))
+                PeersFactory.toPeersList((String) map.get(BabbleConstants.DNS_TXT_CURRENT_PEERS_LABEL)),
+                false
         );   //TODO: JK20Mar review this
     }
 

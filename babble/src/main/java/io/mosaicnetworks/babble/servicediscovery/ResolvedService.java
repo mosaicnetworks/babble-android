@@ -58,7 +58,7 @@ public final class ResolvedService {
 
     private final int mDiscoveryPort;
     private final int mBabblePort;
-
+    private final boolean mIsNew;
     private final String mAppIdentifier;
     private final String mGroupName;
     private final String mGroupUid;
@@ -76,7 +76,8 @@ public final class ResolvedService {
                            int babblePort, int discoveryPort, Map<String,
                            String> serviceAttributes, String appIdentifier, String groupName,
                            String groupUID, List<Peer> initialPeers,
-                           List<Peer> currentPeers ) {
+                           List<Peer> currentPeers,
+                           boolean isNew) {
         this.mInetAddress = inetAddress;
         this.mBabblePort = babblePort;
         this.mDiscoveryPort = discoveryPort;
@@ -87,6 +88,7 @@ public final class ResolvedService {
         this.mDataProviderId = dataProviderId;
         this.mInitialPeers = initialPeers;
         this.mCurrentPeers = currentPeers;
+        this.mIsNew = isNew;
 
         if (inetString.equals("")) {
             this.mInetString = mInetAddress;
@@ -111,6 +113,13 @@ public final class ResolvedService {
         return "";
     }
 
+    /**
+     * Set to true if this is a new group, false for joining a group
+     * @return
+     */
+    public boolean getIsNew() {
+        return mIsNew;
+    }
 
     /**
      * Get the group to which this instance has been assigned

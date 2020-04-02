@@ -32,7 +32,7 @@
         android:icon="@drawable/new_group"
         android:title="@string/new_group"
         app:showAsAction="always"
-        android:onClick="aboutDialog"
+        android:onClick="newGroup"
         />
     <item
         android:id="@+id/menuMenu"

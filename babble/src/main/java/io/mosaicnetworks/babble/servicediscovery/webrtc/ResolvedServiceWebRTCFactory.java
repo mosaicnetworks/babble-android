@@ -56,7 +56,8 @@ public abstract class ResolvedServiceWebRTCFactory {
                 disco.GroupName,
                 disco.GroupUID,
                 disco.InitialPeers,
-                disco.Peers
+                disco.Peers,
+              false
         );
     }
 
@@ -91,7 +92,8 @@ public abstract class ResolvedServiceWebRTCFactory {
                 groupName,
                 groupUid,
                 initialPeers,
-                currentPeers);
+                currentPeers,
+                true);
     }
 
 }

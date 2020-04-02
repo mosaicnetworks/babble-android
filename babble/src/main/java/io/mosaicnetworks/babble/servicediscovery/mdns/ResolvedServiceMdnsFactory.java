@@ -27,8 +27,8 @@ package io.mosaicnetworks.babble.servicediscovery.mdns;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
-import java.net.InetAddress;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,10 +50,17 @@ public abstract class ResolvedServiceMdnsFactory {
             int discoveryPort,
             String groupName,
             String groupUID,
-            List<Peer> initialPeers,
-            List<Peer> currentPeers,
+            String publicKey,
             String moniker
     ) {
+
+        List<Peer> initialPeers = new ArrayList<>();
+        initialPeers.add(new Peer(publicKey, inetAddress + ":" + babblePort, moniker));
+        List<Peer> currentPeers = new ArrayList<>();
+        currentPeers.add(new Peer(publicKey, inetAddress + ":" + babblePort, moniker));
+
+
+
         Map<String,String> dnsTxt =  new HashMap<>();
 
         dnsTxt.put(BabbleConstants.DNS_TXT_HOST_LABEL,inetString );
@@ -79,7 +86,8 @@ public abstract class ResolvedServiceMdnsFactory {
                 groupName,
                 groupUID,
                 initialPeers,
-                currentPeers
+                currentPeers,
+                true
         );
 
 
@@ -108,7 +116,8 @@ public abstract class ResolvedServiceMdnsFactory {
                 extractStringAttribute(serviceAttributes, BabbleConstants.DNS_TXT_APP_LABEL),
                 extractStringAttribute(serviceAttributes, BabbleConstants.DNS_TXT_GROUP_LABEL),
                 extractStringAttribute(serviceAttributes, BabbleConstants.DNS_TXT_GROUP_ID_LABEL),
-                null, null   //TODO: expand this
+                null, null ,  //TODO: expand this,
+                false
         );
     }
 

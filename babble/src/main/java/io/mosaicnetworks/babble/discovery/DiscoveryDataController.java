@@ -41,6 +41,7 @@ import io.mosaicnetworks.babble.configure.OnBabbleConfigWritten;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.node.KeyPair;
 import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.servicediscovery.JoinGroupConfirmation;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
@@ -66,6 +67,9 @@ public class DiscoveryDataController  implements ServicesListListener {
     }
 
     private String mMoniker;
+    private KeyPair mKeyPair;
+
+
 
     public DiscoveryDataController(Context context, ResolvedGroupManager mResolvedGroupManager) {
         this.mResolvedGroupManager = mResolvedGroupManager;
@@ -226,17 +230,9 @@ public class DiscoveryDataController  implements ServicesListListener {
         // Turn off Discovery for all DiscoveryDataProviders
         stopDiscovery();
 
-        //TODO: This line will go as we use a service
-     //   BabbleService<?> babbleService = mOnBabbleConfigWritten.getBabbleService();
-
-
-        //TODO: Change this to use a Service
-
-        ConfigManager configManager = ConfigManager.getInstance(mContext);
+        ConfigManager configManager = ConfigManager.getInstance(mContext, mKeyPair);
         GroupDescriptor groupDescriptor = new GroupDescriptor(resolvedGroup, mMoniker);
         ResolvedService resolvedService = resolvedGroup.getRandomService();
-
-
 
 
         try {
@@ -257,9 +253,6 @@ public class DiscoveryDataController  implements ServicesListListener {
             DialogUtils.displayOkAlertDialog(Objects.requireNonNull(mContext), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             return ;
         }
-
-
-
     }
 
 
@@ -303,10 +296,23 @@ public class DiscoveryDataController  implements ServicesListListener {
         if (mDiscoveryDataProviders.containsKey(dataProviderId)) {
                 mDiscoveryDataProviders.get(dataProviderId).addNewPseudoResolvedGroup(resolvedGroup);
 
+            // once added, we select it
+            onServiceSelectedSuccess(resolvedGroup);
         }  else {
             Log.e("DiscDataController", "onServiceSelectedSuccess: Unknown Discovery Data Provider" );
             //TODO: Error Handling
         }
+    }
+
+
+    /**
+     * Creates a key pair
+     * @return The public key of the created key pair
+     */
+    public String createKeyPair() {
+        mKeyPair = new KeyPair();
+
+        return mKeyPair.publicKey;
     }
 
 

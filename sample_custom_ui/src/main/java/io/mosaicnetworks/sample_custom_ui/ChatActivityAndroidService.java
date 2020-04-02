@@ -32,6 +32,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -277,6 +278,38 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
             DialogUtils.displayOkAlertDialogHTML(this, R.string.stats_title, html);
         }
     }
+
+
+
+
+    //TODO: JK29Mar Reimplement polling stats without the service.
+    //      This used to be in MessagingService which inherited from BabbleService. Time for Plan B.
+    public void pollStats(MenuItem menuItem) {
+    //    setPollStats(! mBoundService.getStatusPolling());
+    }
+
+
+    private void setPollStats(boolean enable) {
+
+   /*
+        LinearLayout linearLayoutStatusLine = findViewById(R.id.statusLine);
+
+        if (! enable) {
+            mBoundService.stopStatsPolling();
+            linearLayoutStatusLine.setVisibility(View.GONE);
+            mBoundService.removeStatsObserver();
+            Log.i("ChatActivity", "pollStats: stopping");
+        } else {
+            linearLayoutStatusLine.setVisibility(View.VISIBLE);
+            mBoundService.registerStatsObserver(this);
+            mBoundService.startStatsPolling();
+            Log.i("ChatActivity", "pollStats: starting");
+        }
+
+    */
+    }
+
+
 
 
 

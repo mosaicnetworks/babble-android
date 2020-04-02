@@ -40,15 +40,11 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.List;
-import java.util.Objects;
 
 import io.mosaicnetworks.babble.configure.OnBabbleConfigWritten;
 import io.mosaicnetworks.babble.discovery.DiscoveryDataController;
@@ -68,6 +64,7 @@ import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsDataProvider;
 import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedServiceMdnsFactory;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCDataProvider;
 import io.mosaicnetworks.babble.utils.DialogUtils;
+import io.mosaicnetworks.babble.utils.RandomString;
 import io.mosaicnetworks.babble.utils.Utils;
 
 /**
@@ -97,7 +94,8 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
 
 
    public static final String PREFERENCE_FILE_KEY = "babbleandroidcustomui";
-
+    private final String PREF_KEY_GROUP = "group";
+    private final String PREF_KEY_MONIKER = "moniker";
 
     // Babble Section
     private DiscoveryDataController mDiscoveryDataController;
@@ -215,8 +213,62 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
 
 
 
+
+
+
+
     public void newGroup(MenuItem menuItem) {
 
+        SharedPreferences sharedPref = getSharedPreferences(
+                PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+
+        String groupName = sharedPref.getString(PREF_KEY_GROUP, "Group");
+
+        final AlertDialog dialogBuilder = new AlertDialog.Builder(this).create();
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.edit_groupname, null);
+
+        dialogBuilder.setTitle(R.string.group_name);
+
+        final EditText editGroup = (EditText) dialogView.findViewById(R.id.edt_group);
+        editGroup.setText(groupName);
+        Button button1 = (Button) dialogView.findViewById(R.id.buttonSubmit);
+        Button button2 = (Button) dialogView.findViewById(R.id.buttonCancel);
+
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogBuilder.dismiss();
+            }
+        });
+        button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String groupName = editGroup.getText().toString();
+                Log.i(TAG, "onClick: "+ mMoniker);
+
+                SharedPreferences sharedPref = getSharedPreferences(
+                        PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString(PREF_KEY_GROUP, groupName);
+                editor.apply();
+
+                createNewGroup(groupName);
+
+                dialogBuilder.dismiss();
+            }
+
+
+        });
+
+        dialogBuilder.setView(dialogView);
+        dialogBuilder.show();
+
+
+
+    }
+
+    private void createNewGroup(String groupName) {
         ResolvedService resolvedService = null;
         String dataProviderId = mDiscoveryDataController.getDiscoveryDataProviderByProtocol(mProtocol);
 
@@ -227,20 +279,12 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
                 break;
 
             case BabbleConstants.NETWORK_WIFI:
-/*
-                String dataProviderId,
-                InetAddress inetAddress,
-                String inetString,
-                int babblePort,
-                int discoveryPort,
-                String groupName,
-                String groupUID,
-                List<Peer> initialPeers,
-                List<Peer> currentPeers,
-                String moniker
-                        */
 
                 String ip = Utils.getIPAddr(this);
+                String groupUID = new RandomString().nextString();
+                String publicKey = mDiscoveryDataController.createKeyPair();
+
+                Log.i(TAG, "createNewGroup: publicKey: " + publicKey);
 
                 resolvedService = ResolvedServiceMdnsFactory.NewNewResolvedService(
                         dataProviderId,
@@ -248,10 +292,9 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
                         ip,
                         BabbleConstants.BABBLE_PORT(),
                         BabbleConstants.DISCOVERY_PORT(),
-                        "",
-                        "",
-                        null,
-                        null,
+                        groupName,
+                        groupUID,
+                        publicKey,
                         mMoniker
                 );
                 break;
@@ -269,6 +312,8 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
 
         // And register it with a DiscoveryDataProvider
         mDiscoveryDataController.addNewPseudoResolvedGroup(dataProviderId, resolvedGroup);
+
+
     }
 
 
@@ -277,10 +322,19 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
     public void joinRequested(DiscoveryDataController discoveryDataController, final ResolvedGroup resolvedGroup) {
         // Add a simple confirmation dialog to demonstrate the addition of UX steps in the NewJoinResolvedService process
 
+        int posButton;
+
+        if (resolvedGroup.getRandomService().getIsNew() ) {
+            posButton = R.string.start;
+        } else {
+            posButton = R.string.join;
+        }
+
+
         final AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setTitle(R.string.join)
+                .setTitle(posButton)
                 .setMessage("NewJoinResolvedService group " + resolvedGroup.getGroupName() + "?")
-                .setPositiveButton(R.string.join, new DialogInterface.OnClickListener() {
+                .setPositiveButton(posButton, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mDiscoveryDataController.joinGroup(resolvedGroup);
@@ -410,7 +464,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         SharedPreferences sharedPref = getSharedPreferences(
                 PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
 
-        mMoniker = sharedPref.getString("moniker", "");
+        mMoniker = sharedPref.getString(PREF_KEY_MONIKER, "");
 
         setMonikerLabel();
     }
@@ -449,7 +503,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
                 SharedPreferences sharedPref = getSharedPreferences(
                         PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("moniker", mMoniker);
+                editor.putString(PREF_KEY_MONIKER, mMoniker);
                 editor.apply();
 
 

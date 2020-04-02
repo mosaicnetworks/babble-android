@@ -131,8 +131,10 @@ public final class ConfigManager {
 
         if ( keyPair == null) {
             mKeyPair = new KeyPair(); //TODO:  how should the key be handled??
+            Log.i("ConfigManager", "ConfigManager: New key pair");
         } else {
             mKeyPair = keyPair;
+            Log.i("ConfigManager", "ConfigManager: " + keyPair.publicKey);
         }
 
         Log.v("ConfigManager", "got Key Pair");
