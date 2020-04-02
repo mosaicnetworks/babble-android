@@ -60,7 +60,7 @@ public abstract class ResolvedServiceP2PFactory {
 
         return new ResolvedService(
                 dataProviderId,
-                InetAddresses.forString((String) map.get(BabbleConstants.DNS_TXT_HOST_LABEL)),
+                (String) map.get(BabbleConstants.DNS_TXT_HOST_LABEL),
                 "",
                 BabbleConstants.BABBLE_PORT(),
                 Integer.parseInt((String) map.get(BabbleConstants.DNS_TXT_PORT_LABEL)),

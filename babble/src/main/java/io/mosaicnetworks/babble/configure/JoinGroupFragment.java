@@ -152,7 +152,7 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         mResolvedService = (ResolvedService) resolvedServices.get(randomGenerator.nextInt(resolvedServices.size()));
 
 
-        final String peerIP = mResolvedService.getInetAddress().getHostAddress();
+        final String peerIP = mResolvedService.getInetAddress();
         final int peerPort = mResolvedService.getDiscoveryPort();
 
         // Store moniker and host entered

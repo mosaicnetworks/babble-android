@@ -240,12 +240,19 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
                 String moniker
                         */
 
-                InetAddress ip = Utils.getIPAddr(this);
+                String ip = Utils.getIPAddr(this);
 
                 resolvedService = ResolvedServiceMdnsFactory.NewNewResolvedService(
                         dataProviderId,
-                        Utils.getIPAddr(this),
-
+                        ip,
+                        ip,
+                        BabbleConstants.BABBLE_PORT(),
+                        BabbleConstants.DISCOVERY_PORT(),
+                        "",
+                        "",
+                        null,
+                        null,
+                        mMoniker
                 );
                 break;
 

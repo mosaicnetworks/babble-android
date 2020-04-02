@@ -53,7 +53,7 @@ public final class ResolvedService {
 
 
     private final String mDataProviderId;
-    private final InetAddress mInetAddress;
+    private final String mInetAddress;
     private final String mInetString;
 
     private final int mDiscoveryPort;
@@ -71,7 +71,7 @@ public final class ResolvedService {
 
     private boolean mAssignedGroup = false;
 
-    public ResolvedService(String dataProviderId, InetAddress inetAddress,
+    public ResolvedService(String dataProviderId, String inetAddress,
                            String inetString,
                            int babblePort, int discoveryPort, Map<String,
                            String> serviceAttributes, String appIdentifier, String groupName,
@@ -89,7 +89,7 @@ public final class ResolvedService {
         this.mCurrentPeers = currentPeers;
 
         if (inetString.equals("")) {
-            this.mInetString = mInetAddress.getHostAddress();
+            this.mInetString = mInetAddress;
         } else {
             this.mInetString = inetString;
         }
@@ -172,7 +172,7 @@ public final class ResolvedService {
      * Get the inet address
      * @return
      */
-    public InetAddress getInetAddress() {
+    public String getInetAddress() {
         return mInetAddress;
     }
 

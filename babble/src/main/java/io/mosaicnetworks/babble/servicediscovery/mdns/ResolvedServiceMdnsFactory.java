@@ -44,7 +44,7 @@ public abstract class ResolvedServiceMdnsFactory {
 
     public static ResolvedService NewNewResolvedService(
             String dataProviderId,
-            InetAddress inetAddress,
+            String inetAddress,
             String inetString,
             int babblePort,
             int discoveryPort,
@@ -100,7 +100,7 @@ public abstract class ResolvedServiceMdnsFactory {
         Log.i("ResolvedServiceMdnsFac", "NewJoinResolvedService: ");
 
         return new ResolvedService(dataProviderId,
-                nsdServiceInfo.getHost(),
+                nsdServiceInfo.getHost().getHostAddress(),
                 "",
                 BabbleConstants.BABBLE_PORT(),
                 nsdServiceInfo.getPort(),
