@@ -37,6 +37,8 @@ import java.util.Map;
 import io.mosaicnetworks.babble.node.BabbleState;
 import io.mosaicnetworks.babble.node.Block;
 import io.mosaicnetworks.babble.node.InternalTransactionReceipt;
+import io.mosaicnetworks.sample.chatkit.commons.models.IMessage;
+import io.mosaicnetworks.sample.notification.NotificationMessage;
 
 /**
  * The core state of the App. The state is passed to the service during service construction. Public
@@ -46,7 +48,7 @@ public class ChatState implements BabbleState {
 
     private byte[] mStateHash = new byte[0];
     @SuppressLint("UseSparseArrays")
-    private final Map<Integer, Message> mState = new HashMap<>();
+    private final Map<Integer, IMessage> mState = new HashMap<>();
     private Integer mNextIndex = 0;
 
     @Override
@@ -70,12 +72,12 @@ public class ChatState implements BabbleState {
         InternalTransactionReceipt[] itr = new InternalTransactionReceipt[block.body.internalTransactions.length];
         for(int i=0; i< block.body.internalTransactions.length; i++){
             itr[i] = block.body.internalTransactions[i].asAccepted();
-            Message msg;
+            IMessage msg;
 
             if (block.body.internalTransactions[i].body.type == 0 ) {
-                msg = new Message(block.body.internalTransactions[i].body.peer.moniker + " joined the group", Message.SYSTEM_MESSAGE_AUTHOR);
+                msg = new NotificationMessage(block.body.internalTransactions[i].body.peer.moniker + " joined the group");
             } else {
-                msg = new Message(block.body.internalTransactions[i].body.peer.moniker + " left the group", Message.SYSTEM_MESSAGE_AUTHOR);
+                msg = new NotificationMessage(block.body.internalTransactions[i].body.peer.moniker + " left the group");
             }
             mState.put(mNextIndex, msg);
             mNextIndex++;
@@ -100,7 +102,7 @@ public class ChatState implements BabbleState {
      * @param index the index from which all messages with a higher index should be returned
      * @return a list of messages
      */
-    public List<Message> getMessagesFromIndex(Integer index) {
+    public List<IMessage> getMessagesFromIndex(Integer index) {
 
         if (index<0) {
             throw new IllegalArgumentException("Index cannot be less than 0");
@@ -112,7 +114,7 @@ public class ChatState implements BabbleState {
 
         Integer numMessages = mNextIndex - index;
 
-        List<Message> messages = new ArrayList<>(numMessages);
+        List<IMessage> messages = new ArrayList<>(numMessages);
 
         for (int i = 0; i < numMessages; i++) {
             messages.add(mState.get(index + i));

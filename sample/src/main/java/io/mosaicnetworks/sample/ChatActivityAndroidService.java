@@ -51,9 +51,14 @@ import io.mosaicnetworks.babble.service.ServiceObserver2;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 import io.mosaicnetworks.sample.chatkit.commons.ImageLoader;
+import io.mosaicnetworks.sample.chatkit.commons.models.IMessage;
+import io.mosaicnetworks.sample.chatkit.messages.MessageHolders;
 import io.mosaicnetworks.sample.chatkit.messages.MessageInput;
 import io.mosaicnetworks.sample.chatkit.messages.MessagesList;
 import io.mosaicnetworks.sample.chatkit.messages.MessagesListAdapter;
+import io.mosaicnetworks.sample.notification.Checker;
+import io.mosaicnetworks.sample.notification.NotificationHolder;
+import io.mosaicnetworks.sample.notification.NotificationMessage;
 
 /**
  * This is the central UI component. It receives messages from the {@link MessagingService} and
@@ -61,7 +66,7 @@ import io.mosaicnetworks.sample.chatkit.messages.MessagesListAdapter;
  */
 public class ChatActivityAndroidService extends BabbleServiceBinderActivity implements ServiceObserver2 {
 
-    private MessagesListAdapter<Message> mAdapter;
+    private MessagesListAdapter mAdapter;
     private String mMoniker;
     private Integer mMessageIndex = 0;
     private boolean mArchiveMode;
@@ -119,7 +124,11 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
     private void initialiseAdapter() {
         MessagesList mMessagesList = findViewById(R.id.messagesList);
 
-        mAdapter = new MessagesListAdapter<>(mMoniker,   new ImageLoader() {
+        MessageHolders messageHolders = new MessageHolders();
+        messageHolders.registerContentType(new Integer(12).byteValue(), NotificationHolder.class,
+                R.layout.item_notification_message, R.layout.item_notification_message, new Checker());
+
+        mAdapter = new MessagesListAdapter<>(mMoniker, messageHolders, new ImageLoader() {
             @Override
             public void loadImage(ImageView imageView, String url, Object payload) {
                 // If string URL starts with R. it is a resource.
@@ -172,12 +181,12 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
             });
         }
 
-        final List<Message> newMessages = ((ChatState) mBoundService.getAppState()).getMessagesFromIndex(mMessageIndex);
+        final List<IMessage> newMessages = ((ChatState) mBoundService.getAppState()).getMessagesFromIndex(mMessageIndex);
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                for (Message message : newMessages ) {
+                for (IMessage message : newMessages ) {
                     mAdapter.addToStart(message, true);
                 }
             }
