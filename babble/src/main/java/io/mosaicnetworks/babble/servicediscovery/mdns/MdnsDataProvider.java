@@ -247,4 +247,12 @@ public class MdnsDataProvider implements DiscoveryDataProvider {
         return BabbleConstants.NETWORK_WIFI;
     }
 
+    @Override
+    public void addNewPseudoResolvedGroup(ResolvedGroup resolvedGroup) {
+        // We stop discovery to prevent overwriting our manually inserted group
+        stopDiscovery();
+
+        mResolvedServices.put(resolvedGroup.getGroupUid(), resolvedGroup.getRandomService());
+        mResolvedGroupList.add(resolvedGroup);
+    }
 }

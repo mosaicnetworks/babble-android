@@ -46,6 +46,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.List;
 import java.util.Objects;
 
@@ -61,8 +62,10 @@ import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.JoinGroupConfirmation;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListView;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsDataProvider;
+import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedServiceMdnsFactory;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCDataProvider;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
@@ -164,7 +167,6 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         }
 
         ServicesListView servicesListView = findViewById(R.id.servicesListView);
-
         mResolvedGroups =  servicesListView.getResolvedGroupList();
 
         Log.i(TAG, "  Create ResolvedGroupManager");
@@ -213,8 +215,145 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
 
 
 
-// About Menu
+    public void newGroup(MenuItem menuItem) {
 
+        ResolvedService resolvedService = null;
+        String dataProviderId = mDiscoveryDataController.getDiscoveryDataProviderByProtocol(mProtocol);
+
+
+        // First we create a resolved group
+        switch (mProtocol) {
+            case BabbleConstants.NETWORK_NONE:
+                break;
+
+            case BabbleConstants.NETWORK_WIFI:
+/*
+                String dataProviderId,
+                InetAddress inetAddress,
+                String inetString,
+                int babblePort,
+                int discoveryPort,
+                String groupName,
+                String groupUID,
+                List<Peer> initialPeers,
+                List<Peer> currentPeers,
+                String moniker
+                        */
+
+                InetAddress ip = Utils.getIPAddr(this);
+
+                resolvedService = ResolvedServiceMdnsFactory.NewNewResolvedService(
+                        dataProviderId,
+                        Utils.getIPAddr(this),
+
+                );
+                break;
+
+            case BabbleConstants.NETWORK_GLOBAL:
+                break;
+
+            case BabbleConstants.NETWORK_P2P:
+                break;
+
+        }
+
+        // Then we make an associated ResolvedGroup
+        ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService);
+
+        // And register it with a DiscoveryDataProvider
+        mDiscoveryDataController.addNewPseudoResolvedGroup(dataProviderId, resolvedGroup);
+    }
+
+
+
+    @Override
+    public void joinRequested(DiscoveryDataController discoveryDataController, final ResolvedGroup resolvedGroup) {
+        // Add a simple confirmation dialog to demonstrate the addition of UX steps in the NewJoinResolvedService process
+
+        final AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.join)
+                .setMessage("NewJoinResolvedService group " + resolvedGroup.getGroupName() + "?")
+                .setPositiveButton(R.string.join, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mDiscoveryDataController.joinGroup(resolvedGroup);
+                    }
+                })
+                .setNegativeButton(R.string.label_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
+                    }
+                })
+                .create();
+        alertDialog.show();
+    }
+
+
+
+    @Override
+    protected void onServiceDisconnected() {
+        //Do nothing
+    }
+
+    private void configAndStartBabble(String peersAddr, String babbleAddr)  {
+        ConfigManager configManager =
+                ConfigManager.getInstance(getApplicationContext());
+        try {
+            mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, peersAddr, babbleAddr, mProtocol);
+        } catch (CannotStartBabbleNodeException | IOException ex) {
+            //TODO: think about this error handling
+        }
+        startBabbleService();
+    }
+
+    public void startBabbleService() {
+        startService(new Intent(this, BabbleService2.class));
+        mLoadingDialog = DialogUtils.displayLoadingDialog(this);
+        mLoadingDialog.show();
+        doBindService();
+    }
+
+    @Override
+    protected void onServiceConnected() {
+        try {
+            mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
+            startChatActivity();
+        } catch (IllegalArgumentException ex) {
+            // we'll assume this is caused by the node taking a while to leave a previous group,
+            // though it could be that another application is using the port or WiFi is turned off -
+            // in which case we'll keep getting stuck here until the port is available or WiFi is
+            // turned on!
+            DialogUtils.displayOkAlertDialog(this, R.string.babble_init_fail_title, R.string.babble_init_fail_message);
+            mLoadingDialog.dismiss();
+            stopService(new Intent(this, BabbleService2.class));
+        }
+        doUnbindService();
+    }
+
+
+    @Override
+    public void startBabbleService(String configDir, GroupDescriptor groupDescriptor, boolean isArchive, ServiceAdvertiser serviceAdvertiser) {
+        // Needs
+        // mConfigDirectory, mGroupDescriptor, mServiceAdvertiser, mMoniker
+        mConfigDirectory = configDir;
+        mGroupDescriptor = groupDescriptor;
+        mIsArchive = isArchive;
+        mServiceAdvertiser = serviceAdvertiser;
+
+        startBabbleService();
+    }
+
+    public void startChatActivity() {
+        Intent intent = new Intent(this, ChatActivityAndroidService.class);
+        intent.putExtra("MONIKER", mMoniker);
+        intent.putExtra("ARCHIVE_MODE", mIsArchive);
+        intent.putExtra("GROUP", mGroupDescriptor.getName());
+        startActivity(intent);
+    }
+
+
+// About Menu
 
     public void aboutDialog(MenuItem menuItem) {
 
@@ -406,92 +545,6 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
        // BabbleConstants.getNetworkDescription(mProtocol);
     }
 
-
-    @Override
-    public void joinRequested(DiscoveryDataController discoveryDataController, final ResolvedGroup resolvedGroup) {
-        // Add a simple confirmation dialog to demonstrate the addition of UX steps in the NewJoinResolvedService process
-
-        final AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setTitle(R.string.join)
-                .setMessage("NewJoinResolvedService group " + resolvedGroup.getGroupName() + "?")
-                .setPositiveButton(R.string.join, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mDiscoveryDataController.joinGroup(resolvedGroup);
-                    }
-                })
-                .setNegativeButton(R.string.label_cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                })
-                .create();
-        alertDialog.show();
-    }
-
-
-
-    @Override
-    protected void onServiceDisconnected() {
-        //Do nothing
-    }
-
-    private void configAndStartBabble(String peersAddr, String babbleAddr)  {
-        ConfigManager configManager =
-                ConfigManager.getInstance(getApplicationContext());
-        try {
-            mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, peersAddr, babbleAddr, mProtocol);
-        } catch (CannotStartBabbleNodeException | IOException ex) {
-            //TODO: think about this error handling
-        }
-        startBabbleService();
-    }
-
-    public void startBabbleService() {
-        startService(new Intent(this, BabbleService2.class));
-        mLoadingDialog = DialogUtils.displayLoadingDialog(this);
-        mLoadingDialog.show();
-        doBindService();
-    }
-
-    @Override
-    protected void onServiceConnected() {
-        try {
-            mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
-            startChatActivity();
-        } catch (IllegalArgumentException ex) {
-            // we'll assume this is caused by the node taking a while to leave a previous group,
-            // though it could be that another application is using the port or WiFi is turned off -
-            // in which case we'll keep getting stuck here until the port is available or WiFi is
-            // turned on!
-            DialogUtils.displayOkAlertDialog(this, R.string.babble_init_fail_title, R.string.babble_init_fail_message);
-            mLoadingDialog.dismiss();
-            stopService(new Intent(this, BabbleService2.class));
-        }
-        doUnbindService();
-    }
-
-
-    @Override
-    public void startBabbleService(String configDir, GroupDescriptor groupDescriptor, boolean isArchive, ServiceAdvertiser serviceAdvertiser) {
-        // Needs
-        // mConfigDirectory, mGroupDescriptor, mServiceAdvertiser, mMoniker
-        mConfigDirectory = configDir;
-        mGroupDescriptor = groupDescriptor;
-        mIsArchive = isArchive;
-        mServiceAdvertiser = serviceAdvertiser;
-
-        startBabbleService();
-    }
-
-    public void startChatActivity() {
-        Intent intent = new Intent(this, ChatActivityAndroidService.class);
-        intent.putExtra("MONIKER", mMoniker);
-        intent.putExtra("ARCHIVE_MODE", mIsArchive);
-        intent.putExtra("GROUP", mGroupDescriptor.getName());
-        startActivity(intent);
-    }
 
 
 

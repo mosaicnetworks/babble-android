@@ -280,4 +280,34 @@ public class DiscoveryDataController  implements ServicesListListener {
     }
 
 
+
+    public String getDiscoveryDataProviderByProtocol(int protocol) {
+
+        Iterator iterator = mDiscoveryDataProviders.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry pair = (Map.Entry)iterator.next();
+            String key = (String) pair.getKey();
+            DiscoveryDataProvider ddp = (DiscoveryDataProvider) pair.getValue();
+            if ( ddp.getNetworkType() == protocol ) {
+                return key;
+            }
+        }
+        //TODO: should throw an error here to make the error condition explicit
+        return "";
+    }
+
+
+
+    public void addNewPseudoResolvedGroup(String dataProviderId, ResolvedGroup resolvedGroup) {
+
+        if (mDiscoveryDataProviders.containsKey(dataProviderId)) {
+                mDiscoveryDataProviders.get(dataProviderId).addNewPseudoResolvedGroup(resolvedGroup);
+
+        }  else {
+            Log.e("DiscDataController", "onServiceSelectedSuccess: Unknown Discovery Data Provider" );
+            //TODO: Error Handling
+        }
+    }
+
+
 }

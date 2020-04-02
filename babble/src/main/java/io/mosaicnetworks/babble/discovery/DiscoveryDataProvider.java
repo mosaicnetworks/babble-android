@@ -65,5 +65,14 @@ public interface DiscoveryDataProvider {
      */
     ServiceAdvertiser getAdvertiser();
 
+
+    /**
+     * When creating a new group, we pass a pseudo ResolvedGroup to the Discovery Data Provider
+     * so the that Babble creation and advertising code is common between new and joining groups
+     *
+     * @param resolvedGroup
+     */
+    void addNewPseudoResolvedGroup(ResolvedGroup resolvedGroup);
+
     int getNetworkType();
 }

@@ -27,17 +27,75 @@ package io.mosaicnetworks.babble.servicediscovery.mdns;
 import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
+import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import io.mosaicnetworks.babble.BuildConfig;
+import io.mosaicnetworks.babble.discovery.Peer;
+import io.mosaicnetworks.babble.discovery.PeersFactory;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 
 public abstract class ResolvedServiceMdnsFactory {
 
-    public static ResolvedService NewJoinResolvedService(String dataProviderId, NsdServiceInfo nsdServiceInfo) {
+
+    public static ResolvedService NewNewResolvedService(
+            String dataProviderId,
+            InetAddress inetAddress,
+            String inetString,
+            int babblePort,
+            int discoveryPort,
+            String groupName,
+            String groupUID,
+            List<Peer> initialPeers,
+            List<Peer> currentPeers,
+            String moniker
+    ) {
+        Map<String,String> dnsTxt =  new HashMap<>();
+
+        dnsTxt.put(BabbleConstants.DNS_TXT_HOST_LABEL,inetString );
+        dnsTxt.put(BabbleConstants.DNS_TXT_PORT_LABEL, Integer.toString(discoveryPort));
+        dnsTxt.put(BabbleConstants.DNS_TXT_MONIKER_LABEL, moniker);
+        dnsTxt.put(BabbleConstants.DNS_TXT_DNS_VERSION_LABEL, BabbleConstants.DNS_VERSION);
+        dnsTxt.put(BabbleConstants.DNS_TXT_BABBLE_VERSION_LABEL, BuildConfig.BabbleVersion);
+        dnsTxt.put(BabbleConstants.DNS_TXT_GROUP_ID_LABEL, groupUID);
+        dnsTxt.put(BabbleConstants.DNS_TXT_APP_LABEL, BabbleConstants.APP_ID());
+        dnsTxt.put(BabbleConstants.DNS_TXT_GROUP_LABEL, groupName);
+        dnsTxt.put(BabbleConstants.DNS_TXT_CURRENT_PEERS_LABEL, PeersFactory.toJson(currentPeers));
+        dnsTxt.put(BabbleConstants.DNS_TXT_INITIAL_PEERS_LABEL,  PeersFactory.toJson(initialPeers));
+
+
+        ResolvedService resolvedService = new ResolvedService(
+                dataProviderId,
+                inetAddress,
+                inetString,
+                babblePort,
+                discoveryPort,
+                dnsTxt,
+                BabbleConstants.APP_ID(),
+                groupName,
+                groupUID,
+                initialPeers,
+                currentPeers
+        );
+
+
+        return resolvedService;
+    }
+
+
+
+        public static ResolvedService NewJoinResolvedService(String dataProviderId, NsdServiceInfo nsdServiceInfo) {
         Map<String, byte[]> serviceAttributes = nsdServiceInfo.getAttributes();
+
+        Map<String, String> map = convertAttributeMap(serviceAttributes);
+        //TODO: JK29Mar remove this debugging code
+        for (Map.Entry<String,String> entry : map.entrySet()) {
+            Log.i("Resolved", entry.getKey()+": "+entry.getValue());
+        }
 
         Log.i("ResolvedServiceMdnsFac", "NewJoinResolvedService: ");
 
@@ -46,7 +104,7 @@ public abstract class ResolvedServiceMdnsFactory {
                 "",
                 BabbleConstants.BABBLE_PORT(),
                 nsdServiceInfo.getPort(),
-                convertAttributeMap(serviceAttributes),
+                map,
                 extractStringAttribute(serviceAttributes, BabbleConstants.DNS_TXT_APP_LABEL),
                 extractStringAttribute(serviceAttributes, BabbleConstants.DNS_TXT_GROUP_LABEL),
                 extractStringAttribute(serviceAttributes, BabbleConstants.DNS_TXT_GROUP_ID_LABEL),
@@ -57,6 +115,7 @@ public abstract class ResolvedServiceMdnsFactory {
 
     private static String extractStringAttribute(Map<String, byte[]> serviceAttributes, String key) {
         if (!serviceAttributes.containsKey(key)) {
+            Log.e("ResolvedServMdnsFac", "Map does not contain attribute: " + key );
             throw new IllegalArgumentException("Map does not contain attribute: " + key);
         }
         //TODO: "This method always replaces malformed-input and unmappable-character sequences with

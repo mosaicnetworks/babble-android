@@ -86,7 +86,6 @@ public class P2PService2 implements ServiceAdvertiser {
 
     public static boolean mGroupCreated = false;  //TODO: verify this is set to false on exit.
     final static private String TAG = "P2PService2";
-    private final static String DNS_VERSION = "0.0.1";
 
 
     private static String mMoniker = "Moniker";
@@ -186,7 +185,7 @@ public class P2PService2 implements ServiceAdvertiser {
 
     }
 
-
+//TODO: JK29Mar the calling parameters of this need to change. We are using ResolvedGroup now.
     public void startRegistration(String moniker, String groupName, String babbleVersion, boolean startDiscoverService) {
         //  Create a string map containing information about your service.
 
@@ -202,8 +201,13 @@ public class P2PService2 implements ServiceAdvertiser {
         record.put(BabbleConstants.DNS_TXT_PORT_LABEL, String.valueOf(BabbleConstants.DISCOVERY_PORT()));
         record.put(BabbleConstants.DNS_TXT_APP_LABEL, BabbleConstants.APP_ID());
         record.put(BabbleConstants.DNS_TXT_MONIKER_LABEL, moniker); // "John Doe" + (int) (Math.random() * 1000));
-        record.put(BabbleConstants.DNS_TXT_DNS_VERSION_LABEL, DNS_VERSION);
+        record.put(BabbleConstants.DNS_TXT_DNS_VERSION_LABEL, BabbleConstants.DNS_VERSION);
         record.put(BabbleConstants.DNS_TXT_BABBLE_VERSION_LABEL, babbleVersion);
+
+
+//        public final static String DNS_TXT_CURRENT_PEERS_LABEL = "peers";
+//        public final static String DNS_TXT_INITIAL_PEERS_LABEL = "initpeers";
+
 
         // Service information.  Pass it an instance name, service type
         // _protocol._transportlayer , and the map containing

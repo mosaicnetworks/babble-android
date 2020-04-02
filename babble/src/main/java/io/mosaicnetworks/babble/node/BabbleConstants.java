@@ -192,15 +192,16 @@ public class BabbleConstants {
     //           DNS TXT Constants
     /*----------------------------------------------------------------------------*/
 
+    public final static String DNS_VERSION = "0.2.0";
 
     public final static String DNS_TXT_HOST_LABEL = "host";
     public final static String DNS_TXT_PORT_LABEL = "port";
     public final static String DNS_TXT_MONIKER_LABEL = "moniker";
     public final static String DNS_TXT_DNS_VERSION_LABEL = "textvers";
     public final static String DNS_TXT_BABBLE_VERSION_LABEL = "babblevers";
-    public final static String DNS_TXT_GROUP_ID_LABEL = "groupid";
-    public final static String DNS_TXT_APP_LABEL = "app";
-    public final static String DNS_TXT_GROUP_LABEL = "group";
+    public final static String DNS_TXT_GROUP_ID_LABEL = "groupUid";        //TODO: JK29Mar - change this & 2 following to match disco
+    public final static String DNS_TXT_APP_LABEL = "appIdentifier";
+    public final static String DNS_TXT_GROUP_LABEL = "groupName";
     public final static String DNS_TXT_CURRENT_PEERS_LABEL = "peers";
     public final static String DNS_TXT_INITIAL_PEERS_LABEL = "initpeers";
 

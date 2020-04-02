@@ -28,6 +28,7 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
 
+import java.net.InetAddress;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -49,7 +50,12 @@ public final class Utils {
         return Formatter.formatIpAddress(Objects.requireNonNull(wm).getConnectionInfo().getIpAddress());
     }
 
+    public static InetAddress getInetAddr(Context context) {
+        WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
+        Objects.requireNonNull(wm).getConnectionInfo().getIpAddress();
 
+        return null;
+    }
 
 
 }

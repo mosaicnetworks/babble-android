@@ -52,7 +52,7 @@ import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.service.BabbleServiceBinderFragment;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser2;
-import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;
+import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService2;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
@@ -178,7 +178,7 @@ public class NewGroupFragment extends BabbleServiceBinderFragment {
             //TODO: P2P - Need change the workflow here. We are launching a new instance, but we rely
             //      on having started Wifi Direct up.
             mNetworkType = BabbleConstants.NETWORK_P2P;
-            P2PService p2PService = P2PService.getInstance(getContext());
+            P2PService2 p2PService = P2PService2.getInstance(getContext());
             p2PService.registerOnNetworkInitialised(new OnNetworkInitialised() {
                 @Override
                 public void onNetworkInitialised(String ip){

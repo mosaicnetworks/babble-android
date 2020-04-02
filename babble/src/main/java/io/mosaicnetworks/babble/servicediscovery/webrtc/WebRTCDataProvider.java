@@ -200,4 +200,12 @@ public class WebRTCDataProvider implements DiscoveryDataProvider {
     public int getNetworkType() {
         return BabbleConstants.NETWORK_GLOBAL;
     }
+
+
+    @Override
+    public void addNewPseudoResolvedGroup(ResolvedGroup resolvedGroup) {
+        //TODO: JK29Mar implement this
+    }
+
+
 }

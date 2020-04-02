@@ -32,6 +32,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.Objects;
 
+import io.mosaicnetworks.babble.BuildConfig;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
 import io.mosaicnetworks.babble.discovery.PeersFactory;
 import io.mosaicnetworks.babble.discovery.PeersProvider;
@@ -40,6 +41,7 @@ import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.utils.RandomString;
+import io.mosaicnetworks.babble.utils.Utils;
 
 public class MdnsAdvertiser2 implements ServiceAdvertiser {
 
@@ -73,6 +75,10 @@ public class MdnsAdvertiser2 implements ServiceAdvertiser {
         mServiceInfo.setPort(sDiscoveryPort);
         mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_CURRENT_PEERS_LABEL, PeersFactory.toJson(resolvedGroup.getRandomService().getCurrentPeers()));
         mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_INITIAL_PEERS_LABEL, PeersFactory.toJson(resolvedGroup.getRandomService().getInitialPeers()));
+        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_HOST_LABEL, Utils.getIPAddr(context));
+        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_MONIKER_LABEL, resolvedGroup.getMoniker());
+        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_DNS_VERSION_LABEL, BabbleConstants.DNS_VERSION);
+        mServiceInfo.setAttribute(BabbleConstants.DNS_TXT_BABBLE_VERSION_LABEL , BuildConfig.BabbleVersion);
     }
 
     @Override
