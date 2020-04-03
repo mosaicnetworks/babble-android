@@ -128,24 +128,7 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
         messageHolders.registerContentType(new Integer(12).byteValue(), NotificationHolder.class,
                 R.layout.item_notification_message, R.layout.item_notification_message, new Checker());
 
-        mAdapter = new MessagesListAdapter<>(mMoniker, messageHolders, new ImageLoader() {
-            @Override
-            public void loadImage(ImageView imageView, String url, Object payload) {
-                // If string URL starts with R. it is a resource.
-                if (url.startsWith("R.")) {
-                    String[] arrUrl = url.split("\\.", 3);
-                    int ResID = getResources().getIdentifier(arrUrl[2] , arrUrl[1], ChatActivityAndroidService.this.getPackageName());
-                    Log.i("ChatActivity", "loadImage: " +ResID + " "+ arrUrl[2] + " "+ arrUrl[1] + " "+ ChatActivityAndroidService.this.getPackageName());
-                    if (ResID == 0) {
-                        Picasso.get().load(R.drawable.error).into(imageView);
-                    } else {
-                        Picasso.get().load(ResID).into(imageView);  //TODO restore this line
-                    }
-                } else {
-                    Picasso.get().load(url).into(imageView);
-                }
-            }
-        });
+        mAdapter = new MessagesListAdapter<>(mMoniker, messageHolders, null);
 
         mMessagesList.setAdapter(mAdapter);
 

@@ -1049,6 +1049,7 @@ public class MessageHolders {
 
         protected TextView time;
         protected ImageView userAvatar;
+        protected TextView textAvatar;
 
         @Deprecated
         public BaseIncomingMessageViewHolder(View itemView) {
@@ -1075,6 +1076,15 @@ public class MessageHolders {
                 userAvatar.setVisibility(isAvatarExists ? View.VISIBLE : View.GONE);
                 if (isAvatarExists) {
                     imageLoader.loadImage(userAvatar, message.getUser().getAvatar(), null);
+                } else if (textAvatar != null) {
+                    textAvatar.setVisibility(View.VISIBLE);
+                    String firstLetter;
+                    if (message.getUser().getName().length() > 0) {
+                        firstLetter = message.getUser().getName().substring(0, 1);
+                    } else {
+                        firstLetter = "*";
+                    }
+                    textAvatar.setText(firstLetter);
                 }
             }
         }
@@ -1097,6 +1107,7 @@ public class MessageHolders {
         private void init(View itemView) {
             time = (TextView) itemView.findViewById(R.id.messageTime);
             userAvatar = (ImageView) itemView.findViewById(R.id.messageUserAvatar);
+            textAvatar = itemView.findViewById(R.id.messageUserAvatarText);
         }
     }
 

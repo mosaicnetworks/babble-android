@@ -97,19 +97,7 @@ public final class Message implements BabbleTx, IMessage {
 
         @Override
         public String getAvatar() {
-            if (mName.equals(SYSTEM_MESSAGE_AUTHOR)) {
-                return "R.drawable.system";
-            }
-
-            if (mName.length() < 1) { return "R.drawable.avatar_0"; }
-
-            char initLetter = Character.toLowerCase(mName.charAt(0));
-            if ( (initLetter >= 'a') && (initLetter <= 'z')) {
-                  return "R.drawable.avatar_" + initLetter;
-            }
-
-            return "R.drawable.avatar_0";
-//            return "https://i.imgur.com/kZypAmC.png";
+            return null;
         }
     }
 
