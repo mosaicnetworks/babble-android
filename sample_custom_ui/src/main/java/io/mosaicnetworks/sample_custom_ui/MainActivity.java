@@ -62,6 +62,7 @@ import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListView;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsDataProvider;
 import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedServiceMdnsFactory;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.ResolvedServiceWebRTCFactory;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCDataProvider;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.RandomString;
@@ -269,20 +270,21 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
     }
 
     private void createNewGroup(String groupName) {
+        String publicKey;
         ResolvedService resolvedService = null;
-        String dataProviderId = mDiscoveryDataController.getDiscoveryDataProviderByProtocol(mProtocol);
 
+        String dataProviderId = mDiscoveryDataController.getDiscoveryDataProviderByProtocol(mProtocol);
 
         // First we create a resolved group
         switch (mProtocol) {
             case BabbleConstants.NETWORK_NONE:
-                break;
-
+                //TODO: This is an error state that should not arise. Add some handling code here.
+                return;
             case BabbleConstants.NETWORK_WIFI:
 
                 String ip = Utils.getIPAddr(this);
                 String groupUID = new RandomString().nextString();
-                String publicKey = mDiscoveryDataController.createKeyPair();
+                publicKey = mDiscoveryDataController.createKeyPair();
 
                 Log.i(TAG, "createNewGroup: publicKey: " + publicKey);
 
@@ -300,6 +302,13 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
                 break;
 
             case BabbleConstants.NETWORK_GLOBAL:
+
+                publicKey = mDiscoveryDataController.createKeyPair();
+
+                resolvedService = ResolvedServiceWebRTCFactory.NewNewResolvedService(
+                    this, dataProviderId, mMoniker, publicKey, groupName
+                );
+
                 break;
 
             case BabbleConstants.NETWORK_P2P:
@@ -337,7 +346,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
                 .setPositiveButton(posButton, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mDiscoveryDataController.joinGroup(resolvedGroup);
+                        mDiscoveryDataController.startGroup(resolvedGroup);
                     }
                 })
                 .setNegativeButton(R.string.label_cancel, new DialogInterface.OnClickListener() {
@@ -357,18 +366,8 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         //Do nothing
     }
 
-    private void configAndStartBabble(String peersAddr, String babbleAddr)  {
-        ConfigManager configManager =
-                ConfigManager.getInstance(getApplicationContext());
-        try {
-            mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, peersAddr, babbleAddr, mProtocol);
-        } catch (CannotStartBabbleNodeException | IOException ex) {
-            //TODO: think about this error handling
-        }
-        startBabbleService();
-    }
 
-    public void startBabbleService() {
+    private void startBabbleAndroidService() {
         startService(new Intent(this, BabbleService2.class));
         mLoadingDialog = DialogUtils.displayLoadingDialog(this);
         mLoadingDialog.show();
@@ -402,7 +401,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         mIsArchive = isArchive;
         mServiceAdvertiser = serviceAdvertiser;
 
-        startBabbleService();
+        startBabbleAndroidService();
     }
 
     public void startChatActivity() {

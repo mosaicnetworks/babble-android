@@ -33,7 +33,7 @@ import io.mosaicnetworks.babble.discovery.DiscoveryDataController;
 public interface JoinGroupConfirmation {
     /**
      * Called when the user has selected a ResolvedGroup. If the user confirms they wish to join,
-     * {@link DiscoveryDataController#joinGroup(ResolvedGroup)} is called, which then effect the
+     * {@link DiscoveryDataController#startGroup(ResolvedGroup)} is called, which then effect the
      * NewJoinResolvedService instruction
      *
      * @param discoveryDataController The DiscoveryDataController to call back

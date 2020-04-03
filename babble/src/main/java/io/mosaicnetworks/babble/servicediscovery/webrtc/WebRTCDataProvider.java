@@ -204,7 +204,24 @@ public class WebRTCDataProvider implements DiscoveryDataProvider {
 
     @Override
     public void addNewPseudoResolvedGroup(ResolvedGroup resolvedGroup) {
-        //TODO: JK29Mar implement this
+        // We stop discovery to prevent overwriting our manually inserted group
+        stopDiscovery();
+
+
+        // We generate a disco record from the Resolved Group.
+        Disco disco = new Disco(
+                    resolvedGroup.getGroupUid(),
+                    resolvedGroup.getGroupName(),
+                    BabbleConstants.APP_ID(),
+                    resolvedGroup.getRandomService().getInetString(),
+                    0,
+                    -1,
+                    resolvedGroup.getRandomService().getInitialPeers(),
+                    resolvedGroup.getRandomService().getCurrentPeers()
+        );
+
+        mDiscos.put(resolvedGroup.getGroupUid(), disco);
+        mResolvedGroups.add(resolvedGroup);
     }
 
 

@@ -25,7 +25,6 @@
 package io.mosaicnetworks.babble.discovery;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import java.io.IOException;
@@ -42,7 +41,6 @@ import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.node.KeyPair;
-import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.servicediscovery.JoinGroupConfirmation;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
@@ -194,7 +192,7 @@ public class DiscoveryDataController  implements ServicesListListener {
             // If we have a JoinGroupConfirmation object registered, then call it. Otherwise
             // just join directly.
             if (mJoinGroupConfirmation == null) {
-                joinGroup(resolvedGroup);
+                startGroup(resolvedGroup);
             } else {
                 mJoinGroupConfirmation.joinRequested(this, resolvedGroup);
             }
@@ -212,18 +210,19 @@ public class DiscoveryDataController  implements ServicesListListener {
      * When the user selects a service, there is potentially some UI interaction. This could be
      * entering a new moniker, confirming that the user wants to actually join that group or
      * any other number of app specific requirements. Upon completion of those additional steps
-     * there is a callback to this function to actually effect the join.
+     * there is a callback to this function to actually effect starting the group.
      *
      *
      * @param resolvedGroup
      */
-    public void joinGroup(ResolvedGroup resolvedGroup) {
+    public void startGroup(ResolvedGroup resolvedGroup) {
 
-        Log.i("DiscDataController", "joinGroup: Joined " + resolvedGroup.getGroupName());
+        Log.i("DiscDataController", "startGroup: Joined " + resolvedGroup.getGroupName());
 
         resolvedGroup.setMoniker(mMoniker);
         String dataProviderId = resolvedGroup.getDataProviderId();
         DiscoveryDataProvider discoveryDataProvider = mDiscoveryDataProviders.get(dataProviderId);
+        // This call allows the DataProvider to configure their advertiser objects
         discoveryDataProvider.selectedDiscoveryResolveGroup(mContext, resolvedGroup);
 
 
@@ -240,7 +239,7 @@ public class DiscoveryDataController  implements ServicesListListener {
                 resolvedService.getCurrentPeers(), groupDescriptor,
                 Utils.getIPAddr(mContext), discoveryDataProvider.getNetworkType() );// NB live pull of IP
 
-            mOnBabbleConfigWritten.startBabbleService(configDir, groupDescriptor, false, discoveryDataProvider.getAdvertiser());
+            mOnBabbleConfigWritten.startBabbleService(configDir, groupDescriptor, false, discoveryDataProvider.getAdvertiser(resolvedGroup));
             //     public void startBabbleService(String configDir, GroupDescriptor groupDescriptor,
             //                                   boolean isArchive, ServiceAdvertiser serviceAdvertiser) ;
 
