@@ -40,6 +40,7 @@ import io.mosaicnetworks.sample.chatkit.commons.ImageLoader;
 import io.mosaicnetworks.sample.chatkit.commons.ViewHolder;
 import io.mosaicnetworks.sample.chatkit.commons.models.IMessage;
 import io.mosaicnetworks.sample.chatkit.utils.DateFormatter;
+import io.mosaicnetworks.sample.notification.NotificationMessage;
 
 /**
  * Adapter for {@link MessagesList}.
@@ -68,6 +69,7 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
     private MessagesListStyle messagesListStyle;
     private DateFormatter.Formatter dateHeadersFormatter;
     private SparseArray<OnMessageViewClickListener> viewClickListenersArray = new SparseArray<>();
+    private Date mPreviousDate = null;
 
     /**
      * For default list item layout and view holder.
@@ -149,8 +151,17 @@ public class MessagesListAdapter<MESSAGE extends IMessage>
      * @param scroll  {@code true} if need to scroll list to bottom when message added.
      */
     public void addToStart(MESSAGE message, boolean scroll) {
-        boolean isNewMessageToday = !isPreviousSameDate(0, message.getCreatedAt());
+        boolean isNewMessageToday;
+        if (message instanceof NotificationMessage) {
+            isNewMessageToday = false;
+        } else if (mPreviousDate==null) {
+            isNewMessageToday = true;
+        } else {
+            isNewMessageToday = !DateFormatter.isSameDay(message.getCreatedAt(), mPreviousDate);
+        }
+
         if (isNewMessageToday) {
+            mPreviousDate = message.getCreatedAt();
             items.add(0, new Wrapper<>(message.getCreatedAt()));
         }
         Wrapper<MESSAGE> element = new Wrapper<>(message);

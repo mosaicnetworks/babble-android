@@ -55,9 +55,11 @@ import io.mosaicnetworks.babble.node.ServiceObserver;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 import io.mosaicnetworks.sample.chatkit.commons.ImageLoader;
+import io.mosaicnetworks.sample.chatkit.commons.models.IMessage;
 import io.mosaicnetworks.sample.chatkit.messages.MessageInput;
 import io.mosaicnetworks.sample.chatkit.messages.MessagesList;
 import io.mosaicnetworks.sample.chatkit.messages.MessagesListAdapter;
+import io.mosaicnetworks.sample.notification.NotificationMessage;
 
 /**
  * This is the central UI component. It receives messages from the {@link MessagingService} and
@@ -65,7 +67,7 @@ import io.mosaicnetworks.sample.chatkit.messages.MessagesListAdapter;
  */
 public class ChatActivity extends AppCompatActivity implements ServiceObserver, StatsObserver  {
 
-    private MessagesListAdapter<Message> mAdapter;
+    private MessagesListAdapter<IMessage> mAdapter;
     private String mMoniker;
     private final MessagingService mMessagingService = MessagingService.getInstance(this);
     private Integer mMessageIndex = 0;
@@ -165,28 +167,12 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
             });
         }
 
-        List<Message> newMessagesTemp = new ArrayList<>();
-
-        for (Message m : mMessagingService.state.getMessagesFromIndex(mMessageIndex)) {
-
-            if (m.author.equals(mMoniker)) {
-                newMessagesTemp.add(m);
-            } else {
-                if (m.author.equals(Message.SYSTEM_MESSAGE_AUTHOR)) {
-                    newMessagesTemp.add(m);
-                } else {
-                    newMessagesTemp.add(new Message(m.author+ ":\n" + m.text, m.author, m.date));
-                }
-            }
-
-        }
-
-        final List<Message> newMessages = newMessagesTemp;
+        final List<IMessage> newMessages = mMessagingService.state.getMessagesFromIndex(mMessageIndex);
 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                for (Message message : newMessages ) {
+                for (IMessage message : newMessages ) {
                     mAdapter.addToStart(message, true);
                 }
             }

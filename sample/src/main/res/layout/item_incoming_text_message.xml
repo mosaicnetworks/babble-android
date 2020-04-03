@@ -8,42 +8,79 @@
     android:layout_marginRight="16dp"
     android:layout_marginTop="8dp">
 
+    <TextView
+        android:id="@+id/messageUserAvatarText"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:visibility="visible"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:background="@drawable/text_avatar_background" />
+
     <io.mosaicnetworks.sample.chatkit.utils.ShapeImageView
         android:id="@id/messageUserAvatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"/>
+        android:layout_marginRight="8dp"
+        android:layout_toEndOf="@id/messageUserAvatarText"
+        android:layout_toRightOf="@id/messageUserAvatarText"/>
 
-    <com.google.android.flexbox.FlexboxLayout
+    <LinearLayout
         android:id="@id/bubble"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_marginEnd="@dimen/message_incoming_bubble_margin_right"
         android:layout_marginRight="@dimen/message_incoming_bubble_margin_right"
         android:layout_toEndOf="@id/messageUserAvatar"
-        android:layout_toRightOf="@id/messageUserAvatar"
-        android:orientation="vertical"
-        app:alignContent="stretch"
-        app:alignItems="stretch"
-        app:flexWrap="wrap"
-        app:justifyContent="flex_end">
+        android:layout_toRightOf="@id/messageUserAvatar">
 
         <TextView
-            android:id="@id/messageText"
+            android:id="@id/messageFrom"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:text="Bob"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="6dp"
+            android:textStyle="bold"/>
 
-        <TextView
-            android:id="@id/messageTime"
+        <com.google.android.flexbox.FlexboxLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/messageText"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
-            app:layout_alignSelf="center"/>
+            android:orientation="vertical"
+            app:alignContent="stretch"
+            app:alignItems="stretch"
+            app:flexWrap="wrap"
+            app:justifyContent="flex_end">
 
-    </com.google.android.flexbox.FlexboxLayout>
+            <TextView
+                android:id="@id/messageText"
+                android:layout_width="wrap_content"
+                android:text="hi man, how are you?"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/messageFrom"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                app:layout_alignSelf="center"/>
+
+            <TextView
+                android:id="@id/messageTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/messageText"
+                android:layout_marginLeft="8dp"
+                android:text="17:23"
+                android:layout_marginStart="8dp"
+                app:layout_alignSelf="center"/>
+
+        </com.google.android.flexbox.FlexboxLayout>
+    </LinearLayout>
 
 </RelativeLayout>
