@@ -45,6 +45,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import io.mosaicnetworks.babble.discovery.Peer;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.Disco;
 
 /**
@@ -240,9 +241,9 @@ public final class ConfigManager {
      * Configure the service to create a new group using the default ports
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigNewGroup(GroupDescriptor groupDescriptor,  String peersInetAddress,
+    public String createConfigNewGroup(ResolvedGroup resolvedGroup,  String peersInetAddress,
                                        String babbleInetAddress, int networkType)  throws CannotStartBabbleNodeException, IOException {
-        return createConfigNewGroup(groupDescriptor,  peersInetAddress, babbleInetAddress, BabbleConstants.BABBLE_PORT(), networkType);
+        return createConfigNewGroup(resolvedGroup,  peersInetAddress, babbleInetAddress, BabbleConstants.BABBLE_PORT(), networkType);
     }
 
     /**
@@ -251,7 +252,7 @@ public final class ConfigManager {
      * //@param discoveryPort the port used by the HttpPeerDiscoveryServer //TODO: how to deal with this
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigNewGroup(GroupDescriptor groupDescriptor,  String peersInetAddress, String babbleInetAddress, int babblingPort, int networkType) throws CannotStartBabbleNodeException, IOException{
+    public String createConfigNewGroup(ResolvedGroup resolvedGroup,  String peersInetAddress, String babbleInetAddress, int babblingPort, int networkType) throws CannotStartBabbleNodeException, IOException{
 
         List<Peer> genesisPeers = new ArrayList<>();
 
@@ -259,11 +260,11 @@ public final class ConfigManager {
         String suffix = peersInetAddress.startsWith("0X") ? "" : ":" + babblingPort;
 
 
-        genesisPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress +suffix, groupDescriptor.getMoniker()));
+        genesisPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress +suffix, resolvedGroup.getMoniker()));
         List<Peer> currentPeers = new ArrayList<>();
-        currentPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress + suffix, groupDescriptor.getMoniker()));
+        currentPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress + suffix, resolvedGroup.getMoniker()));
 
-        return createConfig(genesisPeers, currentPeers, groupDescriptor,  babbleInetAddress, babblingPort, networkType);
+        return createConfig(genesisPeers, currentPeers, resolvedGroup,  babbleInetAddress, babblingPort, networkType);
     }
 
     /**
@@ -321,8 +322,8 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor,  String inetAddress, int networkType) throws CannotStartBabbleNodeException, IOException {
-        return createConfig(genesisPeers, currentPeers, groupDescriptor,  inetAddress, BabbleConstants.BABBLE_PORT(), networkType);
+    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, ResolvedGroup resolvedGroup,  String inetAddress, int networkType) throws CannotStartBabbleNodeException, IOException {
+        return createConfig(genesisPeers, currentPeers, resolvedGroup,  inetAddress, BabbleConstants.BABBLE_PORT(), networkType);
     }
 
     /**
@@ -334,23 +335,23 @@ public final class ConfigManager {
      * //@param discoveryPort the port used by the {HttpPeerDiscoveryServer} //TODO: deal with discovery
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor,  String inetAddress, int babblingPort, int networkType) throws CannotStartBabbleNodeException, IOException{
-        return createConfig(genesisPeers, currentPeers, groupDescriptor,  inetAddress, babblingPort, networkType); //TODO: group name
+    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, ResolvedGroup resolvedGroup,  String inetAddress, int babblingPort, int networkType) throws CannotStartBabbleNodeException, IOException{
+        return createConfig(genesisPeers, currentPeers, resolvedGroup,  inetAddress, babblingPort, networkType); //TODO: group name
     }
 
-    private String createConfig(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor,
+    private String createConfig(List<Peer> genesisPeers, List<Peer> currentPeers, ResolvedGroup resolvedGroup,
                                 String inetAddress, int babblingPort, int networkType) throws CannotStartBabbleNodeException, IOException {
 
         mNetworkType = networkType;
 
-        String compositeGroupName = getCompositeConfigDir(groupDescriptor);
+        String compositeGroupName = getCompositeConfigDir(resolvedGroup);
 
         NodeConfig nodeConfig = new NodeConfig.Builder()
                 .webrtc(networkType == BabbleConstants.NETWORK_GLOBAL)
                 .signalAddress(networkType == BabbleConstants.NETWORK_GLOBAL ? BabbleConstants.DISCO_RELAY_ADDRESS() : "")
                 .build();
 
-        mMoniker = groupDescriptor.getMoniker();
+        mMoniker = resolvedGroup.getMoniker();
         //TODO: is there a cleaner way of obtaining the path?
         // It is stored in mTomlDir which has getTomlDir and setTomlDir getter and setters
         String fullPath = writeBabbleTomlFiles(nodeConfig, compositeGroupName, inetAddress, babblingPort, mMoniker);
@@ -363,7 +364,7 @@ public final class ConfigManager {
         // If we are a WebRTC/Global type, build the disco object for use later.
         if (networkType == BabbleConstants.NETWORK_GLOBAL) {
             Log.i("ConfigManager", "createConfig: Network type global" );
-            mDisco = new Disco( groupDescriptor.getUid(), groupDescriptor.getName(),
+            mDisco = new Disco( resolvedGroup.getGroupUid(), resolvedGroup.getGroupName(),
                     BabbleConstants.APP_ID(), mKeyPair.publicKey, 0, -1,
                     currentPeers, genesisPeers  );
         } else {
@@ -613,12 +614,12 @@ public final class ConfigManager {
      * The 2nd part is a unique id as generated in getUniqueId. Currently this is 16 characters
      * The 3rd part is a narrative description field with spaces converted to minus signs and
      * input limit to spaces, letters and numbers only.
-     * @param groupDescriptor is the group information
+     * @param resolvedGroup is the resolved group information
      * @return a unique directory name
      */
-    private String getCompositeConfigDir(GroupDescriptor groupDescriptor) {
+    private String getCompositeConfigDir(ResolvedGroup resolvedGroup) {
 
-        String unique = groupDescriptor.getUid();
+        String unique = resolvedGroup.getGroupUid();
 
         //TODO: should this length be controlled in this class or in the group descriptor?
         String trimmedUnique = unique.length() >= sUniqueIdLength
@@ -629,7 +630,7 @@ public final class ConfigManager {
         //      We should consider the limitations imposed by MDNS (this should all be done in the
         //      GroupDescriptor)
         return BabbleConstants.APP_ID() + "_" + trimmedUnique + "_" +
-                ConfigDirectory.encodeDescription(groupDescriptor.getName()) + "_";
+                ConfigDirectory.encodeDescription(resolvedGroup.getGroupName()) + "_";
     }
 
     private boolean deleteDirectory(String subConfigDir) {

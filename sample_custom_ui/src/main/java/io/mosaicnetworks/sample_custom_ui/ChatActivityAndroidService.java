@@ -130,7 +130,7 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
                     if (ResID == 0) {
                         Picasso.get().load(R.drawable.error).into(imageView);
                     } else {
-                        Picasso.get().load(ResID).into(imageView);  //TODO restore this line
+                        Picasso.get().load(ResID).into(imageView);
                     }
                 } else {
                     Picasso.get().load(url).into(imageView);

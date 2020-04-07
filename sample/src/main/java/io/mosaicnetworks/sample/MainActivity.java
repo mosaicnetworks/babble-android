@@ -31,8 +31,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import io.mosaicnetworks.babble.configure.BaseConfigActivity;
-import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
@@ -73,7 +73,7 @@ public class MainActivity extends BaseConfigActivity {
     }
 
 
-    public void startBabbleService(String configDir, GroupDescriptor groupDescriptor,
+    public void startBabbleService(String configDir, ResolvedGroup resolvedGroup,
                                    boolean isArchive, ServiceAdvertiser serviceAdvertiser) {
 
         //TODO: JK27Mar  Copy from sample_custom_ui version

@@ -48,9 +48,9 @@ import io.mosaicnetworks.babble.node.BabbleState;
 import io.mosaicnetworks.babble.node.BabbleTx;
 import io.mosaicnetworks.babble.node.Block;
 import io.mosaicnetworks.babble.node.BlockConsumer;
-import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.node.LeaveResponseListener;
 import io.mosaicnetworks.babble.node.ServiceObserver;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 import static androidx.core.app.NotificationCompat.PRIORITY_LOW;
 
@@ -71,7 +71,7 @@ public class BabbleService2 extends Service {
 
     private BabbleNode mBabbleNode;
     private State mState = State.STOPPED;
-    private GroupDescriptor mGroupDescriptor;
+    private ResolvedGroup mResolvedGroup;
     private static BabbleState mAppState;
     private ServiceAdvertiser mServiceAdvertiser;
     private boolean mIsArchive = false;
@@ -80,17 +80,17 @@ public class BabbleService2 extends Service {
      * Start the service
      *
      * @param configDirectory The full path to the babble configuration directory
-     * @param groupDescriptor The group descriptor
+     * @param resolvedGroup The resolved Group
      * @throws IllegalStateException if the service is currently running
      */
-    public void start(String configDirectory, GroupDescriptor groupDescriptor,
+    public void start(String configDirectory, ResolvedGroup resolvedGroup,
                       ServiceAdvertiser serviceAdvertiser) {
         if (mState!= State.STOPPED) {
             throw new IllegalStateException("Cannot start service which isn't stopped");
         }
 
         mServiceAdvertiser = serviceAdvertiser;
-        mGroupDescriptor = groupDescriptor;
+        mResolvedGroup = resolvedGroup;
 
         mBabbleNode = BabbleNode.create(new BlockConsumer() {
             @Override
@@ -110,9 +110,9 @@ public class BabbleService2 extends Service {
     /**
      * This is an asynchronous call to start the service in archive mode
      * @param configDirectory
-     * @param groupDescriptor
+     * @param resolvedGroup
      */
-    public void startArchive(final String configDirectory, GroupDescriptor groupDescriptor,
+    public void startArchive(final String configDirectory, ResolvedGroup resolvedGroup,
                              final StartArchiveListener listener) {
         if (mState!=State.STOPPED) {
             throw new IllegalStateException("Cannot start archive service which isn't stopped");
@@ -148,7 +148,7 @@ public class BabbleService2 extends Service {
             }
         }).start();
 
-        mGroupDescriptor = groupDescriptor;
+        mResolvedGroup = resolvedGroup;
     }
 
     public static void setAppState(BabbleState appState) {
@@ -174,7 +174,7 @@ public class BabbleService2 extends Service {
         if (mBabbleNode==null) {
             //If an archive fails to load then the babble node can be null
             mState = State.STOPPED;
-            mGroupDescriptor = null;
+            mResolvedGroup = null;
             mAppState.reset();
             stopSelf();
 
@@ -189,7 +189,7 @@ public class BabbleService2 extends Service {
                 public void onComplete() {
                     mBabbleNode = null;
                     mState = State.STOPPED;
-                    mGroupDescriptor = null;
+                    mResolvedGroup = null;
                     mAppState.reset();
                     stopSelf();
 

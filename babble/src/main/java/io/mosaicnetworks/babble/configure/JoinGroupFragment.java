@@ -51,7 +51,6 @@ import io.mosaicnetworks.babble.discovery.ResponseListener;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
-import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
@@ -204,18 +203,14 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
         ConfigManager configManager;
             configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
 
-
-//        BabbleService<?> babbleService = mListener.getBabbleService();
-        GroupDescriptor groupDescriptor = new GroupDescriptor(mResolvedService.getGroupName(), mResolvedService.getGroupUid());
-
         int networkType = BabbleConstants.NETWORK_WIFI;  //TODO: Set this correctly.
 
 
         try {
-            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, Utils.getIPAddr(getContext()), networkType);
+            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, mResolvedGroup, Utils.getIPAddr(getContext()), networkType);
 
             mLoadingDialog.dismiss();
-            mListener.baseOnJoined(mMoniker, groupDescriptor.getName());
+            mListener.baseOnJoined(mMoniker, mResolvedGroup.getGroupName());
 
   //          babbleService.start(configDir, groupDescriptor);
         } catch (IllegalStateException | CannotStartBabbleNodeException| IOException ex ) {

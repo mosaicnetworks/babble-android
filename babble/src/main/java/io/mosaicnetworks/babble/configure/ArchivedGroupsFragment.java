@@ -51,9 +51,11 @@ import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
-import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.service.BabbleServiceBinderFragment;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
+import io.mosaicnetworks.babble.servicediscovery.archive.ResolvedServiceArchiveFactory;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
@@ -213,7 +215,13 @@ public class ArchivedGroupsFragment extends BabbleServiceBinderFragment implemen
     @Override
     protected void onServiceConnected() {
         try {
-            mBoundService.startArchive(mConfigManager.getTomlDir(), new GroupDescriptor("Archived Group"), null); //TODO: need to get a proper group descriptor
+
+
+            //TODO: JK29Mar THIS MUST BE CHANGED TO MAKE ARCHIVE WORK
+            ResolvedService resolvedService = ResolvedServiceArchiveFactory.NewJoinResolvedService("", null);
+            ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService);
+
+            mBoundService.startArchive(mConfigManager.getTomlDir(), resolvedGroup, null); //TODO: need to get a proper group descriptor
             mListener.onArchiveLoaded(mMoniker, "Archived Group");
         } catch (IllegalArgumentException ex) {
             DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);

@@ -39,7 +39,6 @@ import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.OnBabbleConfigWritten;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
-import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.node.KeyPair;
 import io.mosaicnetworks.babble.servicediscovery.JoinGroupConfirmation;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
@@ -230,17 +229,16 @@ public class DiscoveryDataController  implements ServicesListListener {
         stopDiscovery();
 
         ConfigManager configManager = ConfigManager.getInstance(mContext, mKeyPair);
-        GroupDescriptor groupDescriptor = new GroupDescriptor(resolvedGroup, mMoniker);
         ResolvedService resolvedService = resolvedGroup.getRandomService();
 
 
         try {
             String configDir = configManager.createConfigJoinGroup(resolvedService.getInitialPeers(),
-                resolvedService.getCurrentPeers(), groupDescriptor,
+                resolvedService.getCurrentPeers(), resolvedGroup,
                 Utils.getIPAddr(mContext), discoveryDataProvider.getNetworkType() );// NB live pull of IP
 
-            mOnBabbleConfigWritten.startBabbleService(configDir, groupDescriptor, false, discoveryDataProvider.getAdvertiser(resolvedGroup));
-            //     public void startBabbleService(String configDir, GroupDescriptor groupDescriptor,
+            mOnBabbleConfigWritten.startBabbleService(configDir, resolvedGroup, false, discoveryDataProvider.getAdvertiser());
+            //     public void startBabbleAndroidService(String configDir, GroupDescriptor groupDescriptor,
             //                                   boolean isArchive, ServiceAdvertiser serviceAdvertiser) ;
 
         } catch (IllegalStateException | CannotStartBabbleNodeException | IOException ex ) {

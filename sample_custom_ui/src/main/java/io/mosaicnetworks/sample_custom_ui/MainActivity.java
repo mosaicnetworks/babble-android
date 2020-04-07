@@ -51,7 +51,6 @@ import io.mosaicnetworks.babble.discovery.DiscoveryDataController;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
-import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.service.BabbleServiceBinderActivity;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
@@ -91,7 +90,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
     private String mConfigDirectory;
     private boolean mIsArchive = false;
     private ProgressDialog mLoadingDialog;
-    private GroupDescriptor mGroupDescriptor;
+    private ResolvedGroup mResolvedGroup;
 
 
    public static final String PREFERENCE_FILE_KEY = "babbleandroidcustomui";
@@ -143,7 +142,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
         mSwipeRefreshServicesDisplaying.setVisibility(View.VISIBLE);
 
-        //TODO: JK25Mar amend this to work properly - currently it is forcing the display of results.
+        //TODO: JK02Apr amend this to work properly - currently it is forcing the display of results.
 
 
     }
@@ -154,7 +153,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
      */
     private void setUpBabble() {
 
-        //TODO: split initialisation and screen rotation events
+        //TODO: JK02Apr split initialisation and screen rotation events
 
 
         // Initialise BabbleConstants
@@ -377,7 +376,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
     @Override
     protected void onServiceConnected() {
         try {
-            mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
+            mBoundService.start(mConfigDirectory, mResolvedGroup, mServiceAdvertiser);
             startChatActivity();
         } catch (IllegalArgumentException ex) {
             // we'll assume this is caused by the node taking a while to leave a previous group,
@@ -393,11 +392,11 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
 
 
     @Override
-    public void startBabbleService(String configDir, GroupDescriptor groupDescriptor, boolean isArchive, ServiceAdvertiser serviceAdvertiser) {
+    public void startBabbleService(String configDir, ResolvedGroup resolvedGroup, boolean isArchive, ServiceAdvertiser serviceAdvertiser) {
         // Needs
         // mConfigDirectory, mGroupDescriptor, mServiceAdvertiser, mMoniker
         mConfigDirectory = configDir;
-        mGroupDescriptor = groupDescriptor;
+        mResolvedGroup = resolvedGroup;
         mIsArchive = isArchive;
         mServiceAdvertiser = serviceAdvertiser;
 
@@ -408,7 +407,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         Intent intent = new Intent(this, ChatActivityAndroidService.class);
         intent.putExtra("MONIKER", mMoniker);
         intent.putExtra("ARCHIVE_MODE", mIsArchive);
-        intent.putExtra("GROUP", mGroupDescriptor.getName());
+        intent.putExtra("GROUP", mResolvedGroup.getGroupName());
         startActivity(intent);
     }
 

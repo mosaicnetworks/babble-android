@@ -37,7 +37,6 @@ import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
 import io.mosaicnetworks.babble.discovery.PeersFactory;
 import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.node.BabbleConstants;
-import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.utils.RandomString;

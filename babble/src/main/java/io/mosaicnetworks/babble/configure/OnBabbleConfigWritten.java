@@ -24,12 +24,11 @@
 
 package io.mosaicnetworks.babble.configure;
 
-import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 public interface OnBabbleConfigWritten {
-    public void startBabbleService(String configDir, GroupDescriptor groupDescriptor,
+    public void startBabbleService(String configDir, ResolvedGroup resolvedGroup,
                                    boolean isArchive, ServiceAdvertiser serviceAdvertiser) ;
 
     }

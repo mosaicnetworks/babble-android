@@ -45,12 +45,11 @@ import java.util.Objects;
 import io.mosaicnetworks.babble.BuildConfig;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleConstants;
-import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
-import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.service.BabbleServiceBinderFragment;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser2;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService2;
 import io.mosaicnetworks.babble.utils.DialogUtils;
@@ -68,7 +67,7 @@ public class NewGroupFragment extends BabbleServiceBinderFragment {
     private static boolean mShowP2P = true;
     private String mConfigDirectory;
     private ProgressDialog mLoadingDialog;
-    private GroupDescriptor mGroupDescriptor;
+    private ResolvedGroup mResolvedGroup;
     private String mMoniker;
     private OnFragmentInteractionListener mListener;
     private ServiceAdvertiser mServiceAdvertiser;
@@ -167,7 +166,9 @@ public class NewGroupFragment extends BabbleServiceBinderFragment {
             DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.no_group_name_alert_title, R.string.no_group_name_alert_message);
             return;
         }
-        mGroupDescriptor = new GroupDescriptor(groupName);
+
+
+  //      mGroupDescriptor = new GroupDescriptor(groupName);
 
         // Get network type
         Switch switchP2P =  view.findViewById(R.id.switch_p2p);
@@ -212,11 +213,15 @@ public class NewGroupFragment extends BabbleServiceBinderFragment {
     private void configAndStartBabble(String peersAddr, String babbleAddr)  {
         ConfigManager configManager =
                 ConfigManager.getInstance(getContext().getApplicationContext());
+        /*
        try {
-           mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, peersAddr, babbleAddr, mNetworkType);
+
+           //TODO: JK02Apr restore this line - will need to use ResolvedGroup
+                      mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, peersAddr, babbleAddr, mNetworkType);
        } catch (CannotStartBabbleNodeException|IOException ex) {
            //TODO: think about this error handling
        }
+       */
         startBabbleService();
     }
 
@@ -230,8 +235,8 @@ public class NewGroupFragment extends BabbleServiceBinderFragment {
     @Override
     protected void onServiceConnected() {
         try {
-            mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
-            mListener.baseOnStartedNew(mMoniker, mGroupDescriptor.getName());
+            mBoundService.start(mConfigDirectory, mResolvedGroup, mServiceAdvertiser);
+            mListener.baseOnStartedNew(mMoniker, mResolvedGroup.getGroupName());
         } catch (IllegalArgumentException ex) {
             // we'll assume this is caused by the node taking a while to leave a previous group,
             // though it could be that another application is using the port or WiFi is turned off -

@@ -43,7 +43,6 @@ import io.mosaicnetworks.babble.discovery.DiscoveryDataController;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
-import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.service.BabbleServiceBinderActivity;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
@@ -108,7 +107,7 @@ public abstract class BaseConfigActivity extends BabbleServiceBinderActivity imp
     private String mConfigDirectory;
     private boolean mIsArchive = false;
     private ProgressDialog mLoadingDialog;
-    private GroupDescriptor mGroupDescriptor;
+    private ResolvedGroup mResolvedGroup;
 
 
 
@@ -324,34 +323,33 @@ public abstract class BaseConfigActivity extends BabbleServiceBinderActivity imp
 
 
 
-
+/*
     private void configAndStartBabble(String peersAddr, String babbleAddr)  {
         ConfigManager configManager =
                 ConfigManager.getInstance(getApplicationContext());
         try {
-            mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, peersAddr, babbleAddr, mProtocol);
+            mConfigDirectory = configManager.createConfigNewGroup(mResolvedGroup, peersAddr, babbleAddr, mProtocol);
         } catch (CannotStartBabbleNodeException | IOException ex) {
             //TODO: think about this error handling
         }
-        startBabbleService();
+        startBabbleAndroidService();
     }
-
+*/
 
 
     @Override
-    public void startBabbleService(String configDir, GroupDescriptor groupDescriptor, boolean isArchive, ServiceAdvertiser serviceAdvertiser) {
-        // Needs
-        // mConfigDirectory, mGroupDescriptor, mServiceAdvertiser, mMoniker
+    public void startBabbleService(String configDir, ResolvedGroup resolvedGroup, boolean isArchive, ServiceAdvertiser serviceAdvertiser) {
+
         mConfigDirectory = configDir;
-        mGroupDescriptor = groupDescriptor;
+        mResolvedGroup = resolvedGroup;
         mIsArchive = isArchive;
         mServiceAdvertiser = serviceAdvertiser;
 
-        startBabbleService();
+        startBabbleAndroidService();
     }
 
 
-    public void startBabbleService() {
+    public void startBabbleAndroidService() {
         startService(new Intent(this, BabbleService2.class));
         mLoadingDialog = DialogUtils.displayLoadingDialog(this);
         mLoadingDialog.show();
@@ -367,7 +365,7 @@ public abstract class BaseConfigActivity extends BabbleServiceBinderActivity imp
     @Override
     protected void onServiceConnected() {
         try {
-            mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
+            mBoundService.start(mConfigDirectory, mResolvedGroup, mServiceAdvertiser);
             startBabblingActivity();
         } catch (IllegalArgumentException ex) {
             // we'll assume this is caused by the node taking a while to leave a previous group,
@@ -380,8 +378,6 @@ public abstract class BaseConfigActivity extends BabbleServiceBinderActivity imp
         }
         doUnbindService();
     }
-
-
 
 
 
