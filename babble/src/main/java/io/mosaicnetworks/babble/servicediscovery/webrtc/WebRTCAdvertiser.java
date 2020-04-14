@@ -57,15 +57,17 @@ public class WebRTCAdvertiser implements ServiceAdvertiser {
     private boolean mIsAdvertising = false;
 
     public WebRTCAdvertiser(Context context, Disco disco) {
-        mQueue = Volley.newRequestQueue(context.getApplicationContext());
+        Log.i(TAG, "WebRTCAdvertiser: Created");
         mDisco = disco;
         mServiceName = disco.GroupUID;
+        mQueue = Volley.newRequestQueue(context.getApplicationContext());
     }
 
 
 
     @Override
     public boolean advertise(String genesisPeers, String currentPeers){
+        Log.i(TAG, "advertise: WEBRTC START");
         sendGroupToDisco(Request.Method.POST, "", mDisco);
         setIsAdvertising(true);
         return true;
@@ -73,7 +75,7 @@ public class WebRTCAdvertiser implements ServiceAdvertiser {
 
     @Override
     public void stopAdvertising() {
-        sendGroupToDisco(Request.Method.DELETE, File.pathSeparator+mDisco.GroupUID, mDisco);
+        sendGroupToDisco(Request.Method.DELETE, File.separator+mDisco.GroupUID, mDisco);
         setIsAdvertising(false);
     }
 
@@ -88,17 +90,25 @@ public class WebRTCAdvertiser implements ServiceAdvertiser {
         // Only need to update Current Peers as initial peers are unchanging
         mDisco.setPeers(peers);
         mDisco.LastBlockIndex = lastBlockIndex;
-        sendGroupToDisco(Request.Method.PATCH, File.pathSeparator+mDisco.GroupUID, mDisco);
+        sendGroupToDisco(Request.Method.PATCH, File.separator+mDisco.GroupUID, mDisco);
     }
 
 
     private void sendGroupToDisco(int sendMethod, String urlSuffix, Disco disco) {
         Log.i(TAG,"sendGroupToDisco");
+        // Only creating a new group uses POST. So we can safely change the endpoint from
+        // groups to group if it uses post. 
+
+        String endPoint =   BabbleConstants.DISCO_DISCOVERY_ENDPOINT();
+
+        if (sendMethod == Request.Method.POST) {
+            endPoint =   BabbleConstants.DISCO_REGISTER_ENDPOINT();
+        }
 
         URL url;
         try {
-            url = new URL("http", BabbleConstants.DISCO_DISCOVERY_ADDRESS(),
-                    BabbleConstants.DISCO_DISCOVERY_PORT(), BabbleConstants.DISCO_DISCOVERY_ENDPOINT()+urlSuffix);
+            url = new URL("https", BabbleConstants.DISCO_DISCOVERY_ADDRESS(),
+                    BabbleConstants.DISCO_DISCOVERY_PORT(), endPoint+urlSuffix);
         } catch (MalformedURLException e) {
             Log.e(TAG, "sendGroupToDisco: Invalid Host" );
             throw new IllegalArgumentException("Invalid host");

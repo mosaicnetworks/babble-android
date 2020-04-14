@@ -52,13 +52,13 @@ public final class Disco {
         /**
          * Unique Group Identifier
          */
-        @SerializedName("GroupUID")
+        @SerializedName("ID")
         public final String GroupUID;
 
         /**
          * The Group Name
          */
-        @SerializedName("GroupName")
+        @SerializedName("Name")
         public final String GroupName;
 
         /**
@@ -93,7 +93,7 @@ public final class Disco {
         public final List<Peer> Peers;
 
 
-        @SerializedName("InitialPeers")
+        @SerializedName("GenesisPeers")
          public final List<Peer> InitialPeers;
 
         /**

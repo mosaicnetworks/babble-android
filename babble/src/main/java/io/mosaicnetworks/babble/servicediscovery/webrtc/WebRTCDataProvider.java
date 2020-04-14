@@ -126,13 +126,12 @@ public class WebRTCDataProvider implements DiscoveryDataProvider {
         URL url;
 
         try {
-            url = new URL("http", mDiscoverServerIP, mDiscoverServerPort, mDiscoverServerEndpoint);
+            url = new URL("https", mDiscoverServerIP, mDiscoverServerPort, mDiscoverServerEndpoint);
         } catch (MalformedURLException ex) {
             Log.e(TAG, "startDiscovery: Invalid Host ");
             throw new IllegalArgumentException("Invalid Host");
         }
 
-        Log.i(TAG, "startDiscovery: "+url.toString());
 
         Log.i(TAG, "getDiscovery: "+ url.toString());
         StringRequest request = new StringRequest(Request.Method.GET, url.toString(),

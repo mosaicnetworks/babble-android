@@ -99,6 +99,9 @@ public abstract class ResolvedServiceMdnsFactory {
         public static ResolvedService NewJoinResolvedService(String dataProviderId, NsdServiceInfo nsdServiceInfo) {
         Map<String, byte[]> serviceAttributes = nsdServiceInfo.getAttributes();
 
+
+            Log.i("NewJoinResolvedService", "NewJoinResolvedService: ");
+
         Map<String, String> map = convertAttributeMap(serviceAttributes);
         //TODO: JK29Mar remove this debugging code
         for (Map.Entry<String,String> entry : map.entrySet()) {
@@ -107,7 +110,28 @@ public abstract class ResolvedServiceMdnsFactory {
 
         Log.i("ResolvedServiceMdnsFac", "NewJoinResolvedService: ");
 
-        return new ResolvedService(dataProviderId,
+
+
+        //TODO: Add version checking / variable processing based upon the DNS_VERSION
+        //      This is not an issue yet as we only have the base version...
+
+//            dnsTxt.put(BabbleConstants.DNS_TXT_DNS_VERSION_LABEL, BabbleConstants.DNS_VERSION);
+//            dnsTxt.put(BabbleConstants.DNS_TXT_BABBLE_VERSION_LABEL, BuildConfig.BabbleVersion);
+
+
+
+            String initPeerString = extractStringAttribute(serviceAttributes, BabbleConstants.DNS_TXT_INITIAL_PEERS_LABEL);
+            String currPeerString = extractStringAttribute(serviceAttributes, BabbleConstants.DNS_TXT_CURRENT_PEERS_LABEL);
+
+            Log.i("NewJoinResolvedService", "initPeerString: "+initPeerString);
+            Log.i("NewJoinResolvedService", "currPeerString: "+currPeerString);
+
+            List<Peer> initialPeers = PeersFactory.toPeersList(initPeerString);
+            List<Peer> currentPeers = PeersFactory.toPeersList(currPeerString);
+
+            Log.i("NewJoinResolvedService", "Created Lists");
+
+            return new ResolvedService(dataProviderId,
                 nsdServiceInfo.getHost().getHostAddress(),
                 "",
                 BabbleConstants.BABBLE_PORT(),
@@ -116,7 +140,7 @@ public abstract class ResolvedServiceMdnsFactory {
                 extractStringAttribute(serviceAttributes, BabbleConstants.DNS_TXT_APP_LABEL),
                 extractStringAttribute(serviceAttributes, BabbleConstants.DNS_TXT_GROUP_LABEL),
                 extractStringAttribute(serviceAttributes, BabbleConstants.DNS_TXT_GROUP_ID_LABEL),
-                null, null ,  //TODO: expand this,
+                initialPeers, currentPeers,
                 false
         );
     }

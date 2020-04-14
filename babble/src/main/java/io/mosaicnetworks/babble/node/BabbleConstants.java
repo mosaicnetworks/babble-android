@@ -163,6 +163,17 @@ public class BabbleConstants {
     public static String DISCO_DISCOVERY_ENDPOINT() {return INSTANCE.DISCO_DISCOVERY_ENDPOINT;}
 
 
+    /**
+     * The address used by the disco WebRTC create group end point.
+     *
+     * Set in {@link io.mosaicnetworks.babble.R.string#babble_disco_register_endpoint}
+     *
+     * @return the WebRTC endpoint
+     */
+    public static String DISCO_REGISTER_ENDPOINT() {return INSTANCE.DISCO_REGISTER_ENDPOINT;}
+
+
+
     /*----------------------------------------------------------------------------*/
     //           Network Type
     /*----------------------------------------------------------------------------*/
@@ -226,6 +237,7 @@ public class BabbleConstants {
     public final String DISCO_DISCOVERY_ADDRESS;
     public final int DISCO_DISCOVERY_PORT;
     public final String DISCO_DISCOVERY_ENDPOINT;
+    public final String DISCO_REGISTER_ENDPOINT;
     public final int DISCO_DISCOVERY_POLLING_INTERVAL;
     public final String DISCO_RELAY_ADDRESS;
 
@@ -281,6 +293,7 @@ public class BabbleConstants {
         DISCO_DISCOVERY_ADDRESS = context.getResources().getString(R.string.babble_disco_discovery_address);
         DISCO_DISCOVERY_PORT = context.getResources().getInteger(R.integer.babble_disco_discovery_port);
         DISCO_DISCOVERY_ENDPOINT = context.getResources().getString(R.string.babble_disco_discovery_endpoint);
+        DISCO_REGISTER_ENDPOINT = context.getResources().getString(R.string.babble_disco_register_endpoint);
         DISCO_DISCOVERY_POLLING_INTERVAL = context.getResources().getInteger(R.integer.babble_disco_discovery_polling_interval);
         DISCO_RELAY_ADDRESS = context.getResources().getString(R.string.babble_disco_relay_address);
 
