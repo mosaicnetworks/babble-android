@@ -128,6 +128,7 @@ public class MdnsDataProvider implements DiscoveryDataProvider {
             }
             @Override
             public void onServiceFound(NsdServiceInfo discoveredServiceInfo) {
+                if ( ! mIsDiscovering) {return ;}
                 String serviceName = discoveredServiceInfo.getServiceName();
                 Log.i(TAG, "onServiceFound: "+serviceName);
                 //TODO: if statement commented out to help testing
