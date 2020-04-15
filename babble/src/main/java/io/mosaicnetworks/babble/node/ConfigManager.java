@@ -131,7 +131,7 @@ public final class ConfigManager {
         Log.v("ConfigManager", "got Package Name");
 
         if ( keyPair == null) {
-            mKeyPair = new KeyPair(); //TODO:  how should the key be handled??
+            mKeyPair = new KeyPair();
             Log.i("ConfigManager", "ConfigManager: New key pair");
         } else {
             mKeyPair = keyPair;

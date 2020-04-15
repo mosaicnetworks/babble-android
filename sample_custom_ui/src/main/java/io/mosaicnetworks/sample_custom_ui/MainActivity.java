@@ -31,25 +31,38 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import io.mosaicnetworks.babble.configure.ArchivedGroupsAdapter;
+import io.mosaicnetworks.babble.configure.ArchivedGroupsViewModel;
+import io.mosaicnetworks.babble.configure.ArchivedGroupsViewModelFactory;
 import io.mosaicnetworks.babble.configure.OnBabbleConfigWritten;
+import io.mosaicnetworks.babble.configure.SelectableData;
 import io.mosaicnetworks.babble.discovery.DiscoveryDataController;
 import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
+import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.service.BabbleServiceBinderActivity;
@@ -82,7 +95,7 @@ import io.mosaicnetworks.babble.utils.Utils;
  * it has been removed from the regular, new and join process.
  */
 public class MainActivity extends BabbleServiceBinderActivity implements JoinGroupConfirmation,
-        OnBabbleConfigWritten {
+        OnBabbleConfigWritten, ArchivedGroupsAdapter.ItemClickListener {
 
     private final String TAG = "MainActivity";
     private int mProtocol = BabbleConstants.NETWORK_GLOBAL;
@@ -91,7 +104,8 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
     private boolean mIsArchive = false;
     private ProgressDialog mLoadingDialog;
     private ResolvedGroup mResolvedGroup;
-
+    private ActionMode mActionMode;
+    private ActionMode.Callback mActionModeCallback;
 
    public static final String PREFERENCE_FILE_KEY = "babbleandroidcustomui";
     private final String PREF_KEY_GROUP = "group";
@@ -109,6 +123,15 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
     private SwipeRefreshLayout mSwipeRefreshDiscoveryFailed;
     private SwipeRefreshLayout mSwipeRefreshServicesDisplaying;
 
+    private ArchivedGroupsAdapter mArchivedGroupsAdapter;
+    private SelectableData<ConfigDirectory> mArchivedList = new SelectableData<>();
+    private ArchivedGroupsViewModel mViewModel;
+    private RecyclerView mRvArchivedGroups;
+    private LinearLayout mLinearLayoutNoArchives;
+
+
+    private ConfigManager mConfigManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +148,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
 
         setUpBabble();
 
-
+        setUpArchive();
 
 
         if (mMoniker.equals("")) {
@@ -145,6 +168,33 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         //TODO: JK02Apr amend this to work properly - currently it is forcing the display of results.
 
 
+    }
+
+
+    private void setUpArchive(){
+
+        mRvArchivedGroups = findViewById(io.mosaicnetworks.babble.R.id.rv_archived_groups);
+        mLinearLayoutNoArchives = findViewById(io.mosaicnetworks.babble.R.id.linearLayout_no_archives);
+
+
+        //TODO: Remove the need for an embedded ConfigManager here.
+        //      We could separate the Utils and the
+
+        mConfigManager = ConfigManager.getInstance(this.getApplicationContext());
+
+        initActionModeCallback();
+
+        mViewModel = ViewModelProviders.of(this, new ArchivedGroupsViewModelFactory(mConfigManager)).get(ArchivedGroupsViewModel.class);
+
+
+        // This was all in onResume
+        mArchivedList = mViewModel.getArchivedList().getValue();
+
+        mArchivedGroupsAdapter = new ArchivedGroupsAdapter(this, mArchivedList);
+        mArchivedGroupsAdapter.setClickListener(this);
+
+        mRvArchivedGroups.setLayoutManager(new LinearLayoutManager(this));
+        mRvArchivedGroups.setAdapter(mArchivedGroupsAdapter);
     }
 
 
@@ -604,6 +654,108 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
        // BabbleConstants.getNetworkDescription(mProtocol);
     }
 
+
+    @Override
+    public void onItemShortClick(View view, int position) {
+
+        if (mArchivedList.anySelected()) {
+
+            if (mArchivedList.isSelected(position)) {
+                mArchivedList.unSelect(position);
+                view.setSelected(false);
+                if  (!mArchivedList.anySelected()) {
+                    mActionMode.finish();
+                }
+            } else {
+                mArchivedList.select(position);
+                view.setSelected(true);
+            }
+        } else {
+
+            ConfigDirectory configDirectory = mArchivedList.get(position);
+
+            mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(this), BabbleConstants.BABBLE_PORT());
+            mMoniker = mConfigManager.getMoniker();
+            startService(new Intent(this, BabbleService2.class));
+            mLoadingDialog = DialogUtils.displayLoadingDialog(this);
+            mLoadingDialog.show();
+            doBindService();
+        }
+    }
+
+    @Override
+    public void onItemLongClick(View view, int position) {
+        if (mActionMode == null) {
+            mActionMode = startActionMode(mActionModeCallback);
+        }
+
+        List<Integer> selectedPositions = new ArrayList<>();
+        selectedPositions.addAll(mArchivedList.getAllSelected());
+
+        mArchivedList.unSelectAll();
+
+        for (Integer pos:selectedPositions) {
+            mArchivedGroupsAdapter.notifyItemChanged(pos);
+        }
+
+        mArchivedList.select(position);
+        view.setSelected(true);
+    }
+
+
+    private void initActionModeCallback() {
+        mActionModeCallback = new ActionMode.Callback() {
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(io.mosaicnetworks.babble.R.menu.archive_action, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false; // nothing is done so return false
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                int itemId = item.getItemId();
+
+                if (itemId == io.mosaicnetworks.babble.R.id.delete_contact) {
+
+                    for (int selectedPosition:mArchivedList.getAllSelected()) {
+                        ConfigDirectory configDirectory = mArchivedList.get(selectedPosition);
+                        mConfigManager.deleteDirectoryAndBackups(configDirectory.directoryName, false);
+                    }
+
+                    mArchivedList.removeAllSelected();
+
+                    if (mArchivedList.isEmpty()) {
+                        mLinearLayoutNoArchives.setVisibility(View.VISIBLE);
+                        mRvArchivedGroups.setVisibility(View.GONE);
+                    }
+
+                    mArchivedGroupsAdapter.notifyDataSetChanged();
+                    mode.finish();
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            // Called when the user exits the action mode
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+  //              if (isResumed()) {                           //TODO: Review this code from the Fragment
+                    mArchivedList.unSelectAll();
+                    mArchivedGroupsAdapter.notifyDataSetChanged();
+   //             }
+                mActionMode = null;
+            }
+        };
+    }
 
 
 

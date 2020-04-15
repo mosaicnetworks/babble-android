@@ -203,6 +203,13 @@ public class BabbleConstants {
     //           DNS TXT Constants
     /*----------------------------------------------------------------------------*/
 
+
+    // NB these are used for the DNS Text record. The field labels for the DISCO server are defined
+    // in the Disco object and DO NOT need to match these fields. Both sides of discovery should
+    // use theses constants so if you control the source for all users of your app, it is safe
+    // to change these. If you do, you must change the DNS_VERSION field to something other than
+    // 3 dot separated numbers. That format is reserved for babble android.
+
     public final static String DNS_VERSION = "0.2.0";
 
     public final static String DNS_TXT_HOST_LABEL = "host";
@@ -210,7 +217,7 @@ public class BabbleConstants {
     public final static String DNS_TXT_MONIKER_LABEL = "moniker";
     public final static String DNS_TXT_DNS_VERSION_LABEL = "textvers";
     public final static String DNS_TXT_BABBLE_VERSION_LABEL = "babblevers";
-    public final static String DNS_TXT_GROUP_ID_LABEL = "groupUid";        //TODO: JK29Mar - change this & 2 following to match disco
+    public final static String DNS_TXT_GROUP_ID_LABEL = "groupUid";
     public final static String DNS_TXT_APP_LABEL = "appIdentifier";
     public final static String DNS_TXT_GROUP_LABEL = "groupName";
     public final static String DNS_TXT_CURRENT_PEERS_LABEL = "peers";

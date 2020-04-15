@@ -223,7 +223,6 @@ public class JoinGroupFragment extends Fragment implements ResponseListener {
             DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             return;
         } catch (Exception ex) {
-            //TODO: Review this. The duplicate dialog function feels overkill.
             mLoadingDialog.dismiss();
             DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
             throw ex;
