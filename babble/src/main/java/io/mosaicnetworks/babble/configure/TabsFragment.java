@@ -42,6 +42,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.mdns.MdnsDiscoveryFragment;
 import io.mosaicnetworks.babble.configure.p2p.P2PDiscoveryFragment;
+import io.mosaicnetworks.babble.configure.webrtc.WebRTCDiscoveryFragment;
 
 public class TabsFragment extends Fragment {
 
@@ -50,6 +51,8 @@ public class TabsFragment extends Fragment {
 
     private static boolean mShowmDNS = true;
     private static boolean mShowP2P = false;
+    private static boolean mShowGlobal = true;
+
     private static boolean mShowArchive = true;
     private static boolean mShowAllArchiveVersions = true;
 
@@ -58,6 +61,8 @@ public class TabsFragment extends Fragment {
     private static int mTabmDNS;
     private static int mTabP2P;
     private static int mTabArchive;
+    private static int mTabGlobal;
+
 
     private static final String TAG="TabsFragment";
 
@@ -78,6 +83,7 @@ public class TabsFragment extends Fragment {
 
         mShowmDNS = args.getBoolean(BaseConfigActivity.SHOW_MDNS, true);
         mShowP2P = args.getBoolean(BaseConfigActivity.SHOW_P2P, true);
+        mShowGlobal = args.getBoolean(BaseConfigActivity.SHOW_GLOBAL, true);
         mShowArchive = args.getBoolean(BaseConfigActivity.SHOW_ARCHIVE, true);
         mShowAllArchiveVersions = args.getBoolean(BaseConfigActivity.SHOW_ALL_ARCHIVE, true);
         fragment.setArguments(args);
@@ -100,6 +106,7 @@ public class TabsFragment extends Fragment {
             if (mShowP2P) { mTabP2P = idx; idx++;} else { mTabP2P = -1;}
         }
 
+        if (mShowGlobal) { mTabGlobal = idx; idx++;}  else {mTabGlobal = -1;}
         if (mShowArchive) { mTabArchive = idx; idx++;}  else {mTabArchive = -1;}
 
 
@@ -149,6 +156,10 @@ public class TabsFragment extends Fragment {
                     } else {
                         if (position == mTabArchive) {
                             tab.setText(R.string.archived_tab);
+                        } else {
+                            if (position == mTabGlobal) {
+                                tab.setText(R.string.global_tab);
+                            }
                         }
                     }
                 }
@@ -186,6 +197,12 @@ public class TabsFragment extends Fragment {
                         Bundle args = new Bundle();
                         args.putBoolean(BaseConfigActivity.SHOW_ALL_ARCHIVE, mShowAllArchiveVersions);
                         return ArchivedGroupsFragment.newInstance(args);
+                    } else {
+                        if (position == mTabGlobal)
+                        {
+                            Log.i(TAG, "createFragment:  Create WebRTC tab");
+                            return WebRTCDiscoveryFragment.newInstance();
+                        }
                     }
                 }
             }
@@ -198,6 +215,7 @@ public class TabsFragment extends Fragment {
             int itemCount = 0;
             if (mShowmDNS) itemCount++;
             if (mShowP2P) itemCount++;
+            if (mShowGlobal) itemCount++;
             if (mShowArchive) itemCount++;
 
             return itemCount;

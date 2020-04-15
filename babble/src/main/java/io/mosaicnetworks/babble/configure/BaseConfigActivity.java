@@ -61,6 +61,11 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     public static final String SHOW_P2P ="SHOW_P2P";
 
     /**
+     * Key for the bundle used to pass the visibility flag for the Global tab to the fragment
+     */
+    public static final String SHOW_GLOBAL ="SHOW_GLOBAL";
+
+    /**
      * Key for the bundle used to pass the visibility flag for the Archive Tab to the fragment
      */
     public static final String SHOW_ARCHIVE ="SHOW_ARCHIVE";
@@ -75,6 +80,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     private Boolean mFromGroup = false;
     private boolean mShowmDNS = true;
     private boolean mShowP2P = true;
+    private boolean mShowGlobal = true;
     private boolean mShowArchive = true;
     private boolean mTooLateToChangeShowTabs = false;
     private boolean mShowAllArchiveVersions = true;
@@ -103,6 +109,18 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     protected void setShowP2P(boolean showP2P) throws IllegalStateException {
         if (mTooLateToChangeShowTabs) throw new IllegalStateException();
         mShowP2P = showP2P;
+    }
+
+    /**
+     * Controls whether to show the Global tab. Must be called before
+     * {@link BaseConfigActivity#onCreate(Bundle)} method is called as the parameters are used in
+     * {@link BaseConfigActivity#onCreate(Bundle)}.
+     * @param showGlobal true to show the global tab, false to hide
+     * @throws IllegalStateException if the OnCreate event handler has already been run
+     */
+    protected void setShowGlobal(boolean showGlobal) throws IllegalStateException {
+        if (mTooLateToChangeShowTabs) throw new IllegalStateException();
+        mShowGlobal = showGlobal;
     }
 
     /**
@@ -147,6 +165,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
             Bundle bundle = new Bundle();
             bundle.putBoolean(SHOW_MDNS, mShowmDNS);
             bundle.putBoolean(SHOW_P2P, mShowP2P);
+            bundle.putBoolean(SHOW_GLOBAL, mShowGlobal);
             bundle.putBoolean(SHOW_ARCHIVE, mShowArchive);
             bundle.putBoolean(SHOW_ALL_ARCHIVE, mShowAllArchiveVersions);
 
