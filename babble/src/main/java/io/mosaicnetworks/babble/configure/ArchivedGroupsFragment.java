@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
@@ -78,6 +77,7 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
     private LinearLayout mLinearLayoutNoArchives;
     private String mMoniker;
     private ProgressDialog mLoadingDialog;
+    private int mBabbleArchivePort = 6666;
 
     /**
      * Use this factory method to create a new instance of
@@ -129,7 +129,7 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
 
             ConfigDirectory configDirectory = mArchivedList.get(position);
 
-            mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), BabbleConstants.BABBLE_PORT());
+            mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), mBabbleArchivePort);
             mMoniker = mConfigManager.getMoniker();
             getActivity().startService(new Intent(getActivity(), BabbleService2.class));
             mLoadingDialog = DialogUtils.displayLoadingDialog(getContext());
