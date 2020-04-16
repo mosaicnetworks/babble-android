@@ -65,7 +65,7 @@
     <string name="p2p_tab">P2P</string>
     <string name="global_tab">Global</string>
     <string name="delete">delete</string>
-    <string name="network_type">Use P2P (Wifi Direct)</string>
+    <string name="network_type">Enable global</string>
     <string name="loading_archive">Loading archive</string>
     <string name="archive_load_fail_title">Unable to load archive</string>
     <string name="archive_load_fail_message">Please try again later!</string>

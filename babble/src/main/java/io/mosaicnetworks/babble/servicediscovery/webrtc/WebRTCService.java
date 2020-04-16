@@ -50,7 +50,7 @@ import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ConfigManager;
-import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
+import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 
 // import android.net.wifi.WifiManager;
@@ -58,7 +58,7 @@ import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 /**
  * Service class to handle WebRTC
  */
-public class WebRTCService implements ServiceAdvertiser{
+public class WebRTCService implements ServiceAdvertiser {
 
     public static String mDiscoverServerIP = "disco.babble.io";
     public static String mRelayServerAddress = "disco.babble.io:2443";
@@ -269,13 +269,7 @@ public class WebRTCService implements ServiceAdvertiser{
     }
 
     @Override
-    public void advertise() {
-
-    }
-
-    /*
-    @Override
-    public void advertise() {
+    public boolean advertise(String genesisPeers, String currentPeers) {
         Log.i(TAG,"WebRTC advertise");
 
         ConfigManager configManager = ConfigManager.getInstance(null);
@@ -285,10 +279,13 @@ public class WebRTCService implements ServiceAdvertiser{
 
         sendGroupToDisco(mRegisterEndPoint, disco);
         setIsAdvertising(true);
+        return true;
     }
 
-
-    public void updateAdvertise(List<Peer> peers) {
+    @Override
+    public void onPeersChange(String newPeers) {
+        //TODO: implement this
+        /*
         Log.i(TAG,"WebRTC advertise");
 
         ConfigManager configManager = ConfigManager.getInstance(null);
@@ -296,11 +293,8 @@ public class WebRTCService implements ServiceAdvertiser{
 
         disco.setPeers(peers);
         sendGroupToDisco(mUpdateEndPoint, disco);
+         */
     }
-
-     */
-
-
 
     private void sendGroupToDisco(String endPoint, Disco disco) {
         Log.i(TAG,"sendGroupToDisco");
@@ -354,12 +348,6 @@ public class WebRTCService implements ServiceAdvertiser{
         setIsAdvertising(false);
         Log.i(TAG,"WebRTC stop advertise, does nothing");
     }
-
-    @Override
-    public String getServiceName() {
-        return mServiceName;
-    }
-
 
 
 }

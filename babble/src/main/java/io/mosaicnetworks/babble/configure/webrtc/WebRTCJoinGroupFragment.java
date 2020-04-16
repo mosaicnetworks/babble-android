@@ -22,19 +22,13 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure.p2p;
+package io.mosaicnetworks.babble.configure.webrtc;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AlertDialog;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,14 +36,17 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.BaseConfigActivity;
-import io.mosaicnetworks.babble.configure.mdns.MdnsJoinGroupFragment;
 import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
@@ -60,36 +57,32 @@ import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
-import io.mosaicnetworks.babble.servicediscovery.p2p.P2PConnected;
-import io.mosaicnetworks.babble.servicediscovery.p2p.P2PResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.p2p.P2PResolvedService;
-import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCResolvedService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
-//TODO: This could be merged with MdnsJoinGroupFragment.java
 
 /**
  * This fragment enables the user to configure the {@link BabbleService} to join an existing group.
  * Activities that contain this fragment must implement the {@link OnFragmentInteractionListener}
- * interface to handle interaction events. Use the {@link MdnsJoinGroupFragment#newInstance} factory
+ * interface to handle interaction events. Use the {@link WebRTCJoinGroupFragment#newInstance} factory
  * method to create an instance of this fragment.
  */
-public class P2PJoinGroupFragment extends Fragment implements ResponseListener, P2PConnected {
+public class WebRTCJoinGroupFragment extends Fragment implements ResponseListener {
 
-
-    private static String TAG="P2PJoinFragment";
+    private static String TAG="WebRTCJoinFragment";
     private OnFragmentInteractionListener mListener;
     private ProgressDialog mLoadingDialog;
     private String mMoniker;
     private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
-    private P2PResolvedGroup mResolvedGroup;
-    private P2PResolvedService mResolvedService;
+    private WebRTCResolvedGroup mResolvedGroup;
+    private WebRTCResolvedService mResolvedService;
+    private static Random randomGenerator = new Random();
 
-    public P2PJoinGroupFragment() {
-
+    public WebRTCJoinGroupFragment() {
         // Required empty public constructor
     }
 
@@ -99,11 +92,11 @@ public class P2PJoinGroupFragment extends Fragment implements ResponseListener, 
      *
      * @return A new instance of fragment MdnsJoinGroupFragment.
      */
-    public static P2PJoinGroupFragment newInstance(ResolvedGroup resolvedGroup) {
+    public static WebRTCJoinGroupFragment newInstance(ResolvedGroup resolvedGroup) {
         Log.i(TAG, "newInstance: "+ resolvedGroup.getGroupName());
-        P2PJoinGroupFragment p2PJoinGroupFragment = new P2PJoinGroupFragment();
-        p2PJoinGroupFragment.mResolvedGroup = (P2PResolvedGroup) resolvedGroup;
-        return  p2PJoinGroupFragment;
+        WebRTCJoinGroupFragment webRTCJoinGroupFragment = new WebRTCJoinGroupFragment();
+        webRTCJoinGroupFragment.mResolvedGroup = (WebRTCResolvedGroup) resolvedGroup;
+        return webRTCJoinGroupFragment;
     }
 
     @Override
@@ -143,15 +136,13 @@ public class P2PJoinGroupFragment extends Fragment implements ResponseListener, 
     // called when the user presses the join button
     public void joinGroup(View view) {
         //get moniker
-
-        Log.i(TAG, "joinGroup: Button Pressed");
-
         EditText editText = view.findViewById(R.id.edit_moniker);
         mMoniker = editText.getText().toString();
         if (mMoniker.isEmpty()) {
             DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.no_moniker_alert_title, R.string.no_moniker_alert_message);
             return;
         }
+
 
         List<ResolvedService> resolvedServices = mResolvedGroup.getResolvedServices();
 
@@ -161,11 +152,13 @@ public class P2PJoinGroupFragment extends Fragment implements ResponseListener, 
         }
 
 
-        // For P2P only one node advertises.
-        mResolvedService = (P2PResolvedService) resolvedServices.get(0);
-        final String peerIP = mResolvedService.getInetAddress().getHostAddress();
-        final int peerPort = mResolvedService.getPort();
-        final String deviceAddress = mResolvedService.getGroupUid();
+        //We are choosing a random resolved service - if we try again we may get a different
+        //service.
+        mResolvedService = (WebRTCResolvedService) resolvedServices.get(randomGenerator.nextInt(resolvedServices.size()));
+
+
+        //     final String peerIP = mResolvedService.getInetAddress().getHostAddress();
+        //     final int peerPort = mResolvedService.getPort();
 
         // Store moniker and host entered
         SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
@@ -173,79 +166,42 @@ public class P2PJoinGroupFragment extends Fragment implements ResponseListener, 
 
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("moniker", mMoniker);
-        editor.putString("host", peerIP);
+        //      editor.putString("host", peerIP);
         editor.apply();
 
-        connectToPeer(deviceAddress, peerIP, peerPort);
-
-
-    }
-
-
-    private void connectToPeer(String deviceAddress, String peerIP, int peerPort) {
-
-        P2PService p2PService = P2PService.getInstance(getContext());
-        p2PService.registerP2PConnected(this);
-        p2PService.connectToPeer(deviceAddress, peerIP, peerPort);
-
-        // Calls back onConnected on Success.
-    }
-
-    @Override
-    public void onConnected(String peerIP, int peerPort) {
-        getPeers(peerIP, peerPort);
-    }
-
-    private void getPeers(final String peerIP, final int peerPort) {
-        try {
-
-
-            mHttpGenesisPeerDiscoveryRequest = HttpPeerDiscoveryRequest.createGenesisPeersRequest(peerIP,
-                    peerPort, new ResponseListener() {
-                        @Override
-                        public void onReceivePeers(List<Peer> genesisPeers) {
-                            mGenesisPeers = genesisPeers;
-
-                            mHttpCurrentPeerDiscoveryRequest =
-                                    HttpPeerDiscoveryRequest.createCurrentPeersRequest(
-                                            peerIP, peerPort,
-                                            P2PJoinGroupFragment.this, getContext());
-
-                            mHttpCurrentPeerDiscoveryRequest.send();
-                        }
-
-                        @Override
-                        public void onFailure(Error error) {
-                            P2PJoinGroupFragment.this.onFailure(error);
-                        }
-                    }, getContext());
-        } catch (IllegalArgumentException ex) {
-            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.invalid_hostname_alert_title, R.string.invalid_hostname_alert_message);
-            return;
-        }
-
-        mLoadingDialog.show();
-        mHttpGenesisPeerDiscoveryRequest.send();
+        mGenesisPeers = mResolvedService.getInitialPeers();
+        onReceivePeers(mResolvedService.getCurrentPeers());
     }
 
     @Override
     public void onReceivePeers(List<Peer> currentPeers) {
 
         ConfigManager configManager;
-            configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
-
-
+        //      try {
+        configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
+ /*
+        } catch (FileNotFoundException ex) {
+            //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
+            //This is probably a fatal error.
+            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
+            throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
+            // The app will terminate. But babble is unstartable from here.
+        }
+*/
         BabbleService<?> babbleService = mListener.getBabbleService();
         GroupDescriptor groupDescriptor = new GroupDescriptor(mResolvedService.getGroupName(), mResolvedService.getGroupUid());
 
         try {
-            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService.NETWORK_P2P);
+            String ip = Utils.getIPAddr(getContext());
+            Log.i(TAG, "onReceivePeers: "+ip);
+            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, mMoniker, ip, BabbleService.NETWORK_GLOBAL);
             babbleService.start(configDir, groupDescriptor);
         } catch (IllegalStateException | CannotStartBabbleNodeException| IOException ex ) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
-            //though it could be that another application is using the port - in which case
-            //we'll keep getting stuck here until the port is available!
+            //though it could be that another application is using the port or WiFi is turned off -
+            // in which case we'll keep getting stuck here until the port is available or WiFi is
+            // turned on!
             mLoadingDialog.dismiss();
             DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             return;
@@ -261,7 +217,7 @@ public class P2PJoinGroupFragment extends Fragment implements ResponseListener, 
     }
 
     @Override
-    public void onFailure(io.mosaicnetworks.babble.discovery.ResponseListener.Error error) {
+    public void onFailure(Error error) {
         mLoadingDialog.dismiss();
         int messageId;
         switch (error) {
