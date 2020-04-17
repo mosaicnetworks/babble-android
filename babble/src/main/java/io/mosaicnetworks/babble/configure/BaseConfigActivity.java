@@ -158,7 +158,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         //"When a config change occurs the old Fragment adds itself to the new Activity when it's
         //recreated". - https://stackoverflow.com/questions/8474104/android-fragment-lifecycle-over-orientation-changes
         //Check if fragment is already added to avoid attaching multiple instances of the fragment
-        TabsFragment fragment = (TabsFragment) mFragmentManager.findFragmentById(R.id.constraint_layout);
+        Fragment fragment = mFragmentManager.findFragmentById(R.id.constraint_layout);
         if (fragment == null) {
             mTooLateToChangeShowTabs = true;
             Bundle bundle = new Bundle();
