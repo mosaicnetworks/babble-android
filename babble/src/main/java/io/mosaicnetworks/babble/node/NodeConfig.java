@@ -57,7 +57,7 @@ public final class NodeConfig {
         private int mTcpTimeout = 10000;
         private int mMaxPool = 2;
         private int mCacheSize = 50000;
-        private int mSyncLimit = 1000;
+        private int mSyncLimit = 100;
         private boolean mEnableFastSync = false;
         private boolean mBootstrap = false;   //bootstrap
         private String mServiceListen = "";   //service-listen
