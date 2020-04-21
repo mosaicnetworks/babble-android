@@ -72,6 +72,8 @@ import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroupManager;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListView;
+import io.mosaicnetworks.babble.servicediscovery.archive.ArchiveDataProvider;
+import io.mosaicnetworks.babble.servicediscovery.archive.ResolvedServiceArchiveFactory;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsDataProvider;
 import io.mosaicnetworks.babble.servicediscovery.mdns.ResolvedServiceMdnsFactory;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.ResolvedServiceWebRTCFactory;
@@ -674,11 +676,25 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
 
             ConfigDirectory configDirectory = mArchivedList.get(position);
 
-            mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(this), BabbleConstants.BABBLE_PORT());
+            String dataProviderId = mDiscoveryDataController.getDiscoveryDataProviderByProtocol(BabbleConstants.NETWORK_NONE);
+            if (dataProviderId.equals("")){  // If Archive Data Provider does not exist create it
+                dataProviderId = mDiscoveryDataController.registerDiscoveryProvider(new ArchiveDataProvider(this));
+            }
+
+            mResolvedGroup = mConfigManager.setGroupConfigToArchive(configDirectory,
+                    Utils.getIPAddr(this), BabbleConstants.BABBLE_PORT(),
+                    dataProviderId);
             mMoniker = mConfigManager.getMoniker();
             startService(new Intent(this, BabbleService2.class));
             mLoadingDialog = DialogUtils.displayLoadingDialog(this);
             mLoadingDialog.show();
+
+            mIsArchive = true;
+            mServiceAdvertiser = null;  // no advertiser in Archive
+            mConfigDirectory = mConfigManager.getTomlDir();
+
+            mDiscoveryDataController.addNewPseudoResolvedGroup(dataProviderId, mResolvedGroup);
+
             doBindService();
         }
     }

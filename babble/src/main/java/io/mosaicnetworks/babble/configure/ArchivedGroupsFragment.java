@@ -218,7 +218,7 @@ public class ArchivedGroupsFragment extends BabbleServiceBinderFragment implemen
 
 
             //TODO: JK29Mar THIS MUST BE CHANGED TO MAKE ARCHIVE WORK
-            ResolvedService resolvedService = ResolvedServiceArchiveFactory.NewJoinResolvedService("", null);
+            ResolvedService resolvedService = null ; // ResolvedServiceArchiveFactory.NewNewResolvedService("", null);
             ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService);
 
             mBoundService.startArchive(mConfigManager.getTomlDir(), resolvedGroup, null); //TODO: need to get a proper group descriptor

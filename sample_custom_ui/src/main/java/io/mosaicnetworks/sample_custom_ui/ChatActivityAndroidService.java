@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.mosaicnetworks.babble.discovery.Peer;
+import io.mosaicnetworks.babble.node.BabbleConstants;
 import io.mosaicnetworks.babble.node.ServiceObserver;
 import io.mosaicnetworks.babble.service.BabbleServiceBinderActivity;
 import io.mosaicnetworks.babble.utils.DialogUtils;
@@ -70,6 +71,9 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        BabbleConstants.getInstance(this);
+
 
         Log.i("ChatActivity", "onCreate");
 

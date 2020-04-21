@@ -33,6 +33,7 @@ import com.moandjiezana.toml.Toml;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -46,6 +47,8 @@ import java.util.UUID;
 
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
+import io.mosaicnetworks.babble.servicediscovery.archive.ResolvedServiceArchiveFactory;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.Disco;
 
 /**
@@ -276,6 +279,63 @@ public final class ConfigManager {
         return setGroupToArchive(configDirectory, inetAddress, BabbleConstants.BABBLE_PORT());
     }
 
+
+
+    public ResolvedGroup setGroupConfigToArchive(ConfigDirectory configDirectory,
+                                                 String inetAddress, int babblingPort, String dataProviderId ) {
+        Log.i("setGroupToArchive", configDirectory.directoryName);
+        mNetworkType = BabbleConstants.NETWORK_NONE;
+        setTomlDir(configDirectory.directoryName);
+
+        Log.i("configArchive:tomlDir", mTomlDir);
+        Log.i("configArchive:IP", inetAddress);
+
+
+        // Build delta for config objects
+
+        Map<String, Object> configChanges = new HashMap<>();
+        configChanges.put("maintenance-mode", true);
+        configChanges.put("listen", inetAddress + ":" + babblingPort);
+        configChanges.put("advertise", inetAddress + ":" + babblingPort);
+
+
+        //TODO: possibly move these amendments into the backup config processing to avoid having to
+        //      set them here
+        configChanges.put("datadir", mTomlDir);
+        configChanges.put("db",  mTomlDir + File.separator+ BabbleConstants.DB_SUBDIR());
+
+        // Amend config files and retrieve a copy of the settings
+        Map<String, Object> configMap = amendTomlSettings(configChanges);
+
+
+
+        if (configMap.containsKey("moniker"))
+        {
+            mMoniker = Objects.requireNonNull(configMap.get("moniker")).toString();
+        }
+
+        String privKey = readPrivateKey(mTomlDir);
+        mKeyPair = new KeyPair(privKey);
+
+        // Build the ResolveService object from the config file
+        ResolvedService resolvedService = ResolvedServiceArchiveFactory.NewNewResolvedService(
+                dataProviderId,
+                inetAddress,
+                babblingPort,
+                0,
+                configDirectory.description,
+                configDirectory.uniqueId,
+                mKeyPair.publicKey,
+                mMoniker
+        );
+
+        ResolvedGroup resolvedGroup= new ResolvedGroup(resolvedService);
+
+        return resolvedGroup;
+    }
+
+
+
     /**
      *Configure the service to create an archive group, overriding the default ports
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
@@ -393,6 +453,37 @@ public final class ConfigManager {
             // Log.e("writePrivateKey", e.toString());
         }
     }
+
+
+
+    private String readPrivateKey(String targetDir) {
+        String privateKeyHex = "";
+        File file = new File(targetDir, BabbleConstants.PRIV_KEY());
+
+        long length = file.length();
+        if (length < 1 || length > Integer.MAX_VALUE) {
+            Log.w("ConfigManager", "Private key is empty or huge: " + file);
+        } else {
+            try (FileReader in = new FileReader(file)) {
+                char[] content = new char[(int)length];
+
+                int numRead = in.read(content);
+                if (numRead != length) {
+                    Log.e("ConfigManager", "Incomplete read of " + file + ". Read chars " + numRead + " of " + length);
+                }
+                privateKeyHex = new String(content, 0, numRead);
+            }
+            catch (Exception ex) {
+                Log.e("ConfigManager", "Failure reading " + file, ex);
+                privateKeyHex = "";
+            }
+        }
+
+        return privateKeyHex;
+    }
+
+
+
 
     /**
      * Write Both Peers JSON files
@@ -536,7 +627,7 @@ public final class ConfigManager {
      * Amends the Babble Config TOML file. This function relies on mTomlDir being set.
      * @param configHashMapChanges A HashMap object containing the changed config data to be written the Toml File.
      */
-    public void amendTomlSettings(Map<String, Object> configHashMapChanges) {
+    public Map<String, Object> amendTomlSettings(Map<String, Object> configHashMapChanges) {
         boolean hasChanged = false;
 
         Map<String, Object> configMap = readTomlFile();
@@ -569,7 +660,7 @@ public final class ConfigManager {
             Log.i("configArchive:moniker", mMoniker);
         }
 
-
+        return configMap;
     }
 
 

@@ -52,4 +52,13 @@ public final class KeyPair {
         publicKey = separated[0].trim();
         privateKey = separated[1].trim();
     }
+
+    /**
+     * Builds a key pair from a given private key.
+     * @param privateKey
+     */
+    public KeyPair(String privateKey) {
+        this.privateKey = privateKey;
+        this.publicKey = Mobile.getPublKey(privateKey);
+    }
 }

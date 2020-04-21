@@ -48,6 +48,9 @@ import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
  * its assignment in the constructor. The alternative version is commented out. All other calls
  * can remain the same.
  */
+
+//TODO: Remove this class if not used in final merge
+
 public class MdnsDiscovery {
     private static final String TAG = "MdnsDiscovery";
 
