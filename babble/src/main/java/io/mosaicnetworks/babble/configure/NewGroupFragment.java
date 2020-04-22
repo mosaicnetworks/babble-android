@@ -48,7 +48,7 @@ import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.service.BabbleServiceBinder;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser2;
-import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
@@ -61,7 +61,7 @@ import io.mosaicnetworks.babble.utils.Utils;
 public class NewGroupFragment extends BabbleServiceBinder {
 
     private static boolean mShowmDNS = true;
-    private static boolean mShowP2P = true;
+    private static boolean mShowGlobal = true;
     private String mConfigDirectory;
     private ProgressDialog mLoadingDialog;
     private GroupDescriptor mGroupDescriptor;
@@ -79,7 +79,7 @@ public class NewGroupFragment extends BabbleServiceBinder {
      */
     public static NewGroupFragment newInstance(Bundle args) {
         mShowmDNS = args.getBoolean(BaseConfigActivity.SHOW_MDNS, true);
-        mShowP2P = args.getBoolean(BaseConfigActivity.SHOW_P2P, true);
+        mShowGlobal = args.getBoolean(BaseConfigActivity.SHOW_GLOBAL, true);
         return new NewGroupFragment();
     }
 
@@ -111,20 +111,20 @@ public class NewGroupFragment extends BabbleServiceBinder {
 
         // If only one discovery tab is shown then set and then disable the toggle switch to only
         // allow a valid selection.
-        Switch switchP2P =  view.findViewById(R.id.switch_p2p);
+        Switch switchGlobal =  view.findViewById(R.id.switch_global);
         if (mShowmDNS) {
-            if (mShowP2P) {
-                switchP2P.setChecked(false);
-                switchP2P.setEnabled(true);
+            if (mShowGlobal) {
+                switchGlobal.setChecked(false);
+                switchGlobal.setEnabled(true);
             } else {
-                switchP2P.setChecked(false);
-                switchP2P.setEnabled(false);
-                switchP2P.setVisibility(View.GONE);
+                switchGlobal.setChecked(false);
+                switchGlobal.setEnabled(false);
+                switchGlobal.setVisibility(View.GONE);
             }
         } else {
-            if (mShowP2P) {
-                switchP2P.setChecked(true);
-                switchP2P.setEnabled(false);
+            if (mShowGlobal) {
+                switchGlobal.setChecked(true);
+                switchGlobal.setEnabled(false);
             }
         }
 
@@ -165,39 +165,32 @@ public class NewGroupFragment extends BabbleServiceBinder {
         mGroupDescriptor = new GroupDescriptor(groupName);
 
         // Get network type
-        Switch switchP2P =  view.findViewById(R.id.switch_p2p);
-        boolean isP2P = switchP2P.isChecked();
+        Switch switchGlobal =  view.findViewById(R.id.switch_global);
+        boolean isGlobal = switchGlobal.isChecked();
 
-        if (isP2P) {
+        if (isGlobal) {
+            WebRTCService webRTCService = WebRTCService.getInstance(getContext());
+            mServiceAdvertiser = webRTCService;
 
-            //TODO: P2P - Need change the workflow here. We are launching a new instance, but we rely
-            //      on having started Wifi Direct up.
+            String ip = Utils.getIPAddr(getContext());
 
-            P2PService p2PService = P2PService.getInstance(getContext());
-            p2PService.registerOnNetworkInitialised(new OnNetworkInitialised() {
-                @Override
-                public void onNetworkInitialised(String ip) {
-                    configAndStartBabble(ip);
-                }
-            });
+            ConfigManager configManager = ConfigManager.getInstance(getContext());
+            String peersAddr = configManager.getPublicKey();
 
-            // This will call back onNetworkInitialised
-            p2PService.startRegistration(mMoniker, groupName, BabbleService.BABBLE_VERSION, false);
-            //TODO: Turned off discovery for the lead peer, but may need to re-enable to trigger discovery.
-
-            //TODO: finish this line: mServiceAdvertiser =
+            configAndStartBabble(peersAddr, ip, BabbleService.NETWORK_GLOBAL);
 
         } else {
             mServiceAdvertiser = new MdnsAdvertiser2(mGroupDescriptor,
                     getContext().getApplicationContext());
-            configAndStartBabble(Utils.getIPAddr(getContext()));
+            String ipAddr = Utils.getIPAddr(getContext());
+            configAndStartBabble(ipAddr, ipAddr, BabbleService.NETWORK_WIFI);
         }
     }
 
-    private void configAndStartBabble(String ip) {
+    private void configAndStartBabble(String peersAddr, String babbleAddr, int serviceType) {
         ConfigManager configManager =
                 ConfigManager.getInstance(getContext().getApplicationContext());
-        mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, mMoniker, ip);
+        mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, mMoniker, peersAddr, babbleAddr, serviceType);
         startBabbleService();
     }
 

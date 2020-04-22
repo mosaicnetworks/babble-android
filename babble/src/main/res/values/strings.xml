@@ -50,7 +50,11 @@
     <string name="service_p2p_discovery_start_fail_title">Failed to start P2P discovery</string>
     <string name="service_discovery_start_fail_message">Please refresh to try again</string>
     <string name="searching_services">Searching for services</string>
+    <string name="service_webrtc_discovery_resolve_fail_title">Unable to resolve Web RTC service</string>
+    <string name="service_webrtc_discovery_start_fail_title">Failed to start Web RTC discovery</string>
+    <string name="webrtc_searching_services">Searching for Global services</string>
     <string name="discovery_start_failed">Failed to start mDNS\nPlease refresh to try again</string>
+    <string name="webrtc_discovery_start_failed">Failed to start mDNS\nPlease refresh to try again</string>
     <string name="p2p_discovery_start_failed">Failed to start P2P\nPlease refresh to try again</string>
     <string name="group_name">Group name</string>
     <string name="no_service_alert_title">No service</string>
@@ -59,8 +63,9 @@
     <string name="archived_tab">ARCHIVED</string>
     <string name="wifi_tab">WiFi</string>
     <string name="p2p_tab">P2P</string>
+    <string name="global_tab">Global</string>
     <string name="delete">delete</string>
-    <string name="network_type">Use P2P (Wifi Direct)</string>
+    <string name="network_type">Enable global</string>
     <string name="loading_archive">Loading archive</string>
     <string name="archive_load_fail_title">Unable to load archive</string>
     <string name="archive_load_fail_message">Please try again later!</string>

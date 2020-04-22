@@ -36,11 +36,12 @@ import android.view.View;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.mdns.MdnsJoinGroupFragment;
 import io.mosaicnetworks.babble.configure.p2p.P2PJoinGroupFragment;
-import io.mosaicnetworks.babble.node.BabbleConstants;
+import io.mosaicnetworks.babble.configure.webrtc.WebRTCJoinGroupFragment;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCResolvedGroup;
 
 /**
  * This activity complements the {@link BabbleService}. It consists of a set of fragments which
@@ -61,6 +62,11 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     public static final String SHOW_P2P ="SHOW_P2P";
 
     /**
+     * Key for the bundle used to pass the visibility flag for the Global tab to the fragment
+     */
+    public static final String SHOW_GLOBAL ="SHOW_GLOBAL";
+
+    /**
      * Key for the bundle used to pass the visibility flag for the Archive Tab to the fragment
      */
     public static final String SHOW_ARCHIVE ="SHOW_ARCHIVE";
@@ -75,6 +81,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     private Boolean mFromGroup = false;
     private boolean mShowmDNS = true;
     private boolean mShowP2P = true;
+    private boolean mShowGlobal = true;
     private boolean mShowArchive = true;
     private boolean mTooLateToChangeShowTabs = false;
     private boolean mShowAllArchiveVersions = true;
@@ -106,6 +113,18 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     }
 
     /**
+     * Controls whether to show the Global tab. Must be called before
+     * {@link BaseConfigActivity#onCreate(Bundle)} method is called as the parameters are used in
+     * {@link BaseConfigActivity#onCreate(Bundle)}.
+     * @param showGlobal true to show the global tab, false to hide
+     * @throws IllegalStateException if the OnCreate event handler has already been run
+     */
+    protected void setShowGlobal(boolean showGlobal) throws IllegalStateException {
+        if (mTooLateToChangeShowTabs) throw new IllegalStateException();
+        mShowGlobal = showGlobal;
+    }
+
+    /**
      * Controls whether to show the Archive tab. Must be called before
      * {@link BaseConfigActivity#onCreate(Bundle)} method is called as the parameters are used in
      * {@link BaseConfigActivity#onCreate(Bundle)}.
@@ -134,19 +153,18 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base_config);
 
-        BabbleConstants.initialise(this);
-
         mFragmentManager = getSupportFragmentManager();
 
         //"When a config change occurs the old Fragment adds itself to the new Activity when it's
         //recreated". - https://stackoverflow.com/questions/8474104/android-fragment-lifecycle-over-orientation-changes
         //Check if fragment is already added to avoid attaching multiple instances of the fragment
-        TabsFragment fragment = (TabsFragment) mFragmentManager.findFragmentById(R.id.constraint_layout);
+        Fragment fragment = mFragmentManager.findFragmentById(R.id.constraint_layout);
         if (fragment == null) {
             mTooLateToChangeShowTabs = true;
             Bundle bundle = new Bundle();
             bundle.putBoolean(SHOW_MDNS, mShowmDNS);
             bundle.putBoolean(SHOW_P2P, mShowP2P);
+            bundle.putBoolean(SHOW_GLOBAL, mShowGlobal);
             bundle.putBoolean(SHOW_ARCHIVE, mShowArchive);
             bundle.putBoolean(SHOW_ALL_ARCHIVE, mShowAllArchiveVersions);
 
@@ -191,13 +209,14 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
             Log.i(TAG, "onServiceSelected: MDNS item selected");
             MdnsJoinGroupFragment mJoinGroupMdnsFragment = MdnsJoinGroupFragment.newInstance(resolvedGroup);
             replaceFragment(mJoinGroupMdnsFragment, true);
-        } else {
-            if (resolvedGroup instanceof P2PResolvedGroup) {
-
-                Log.i(TAG, "onServiceSelected: P2P item selected");
-                P2PJoinGroupFragment mJoinGroupP2PFragment = P2PJoinGroupFragment.newInstance(resolvedGroup);
-                replaceFragment(mJoinGroupP2PFragment, true);
-            }
+        } else if (resolvedGroup instanceof P2PResolvedGroup) {
+            Log.i(TAG, "onServiceSelected: P2P item selected");
+            P2PJoinGroupFragment mJoinGroupP2PFragment = P2PJoinGroupFragment.newInstance(resolvedGroup);
+            replaceFragment(mJoinGroupP2PFragment, true);
+        } else if (resolvedGroup instanceof WebRTCResolvedGroup) {
+            Log.i(TAG, "onServiceSelected: WebRTC item selected");
+            WebRTCJoinGroupFragment mJoinGroupWebRTCFragment = WebRTCJoinGroupFragment.newInstance(resolvedGroup);
+            replaceFragment(mJoinGroupWebRTCFragment, true);
         }
     }
 

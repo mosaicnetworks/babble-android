@@ -54,10 +54,10 @@ public final class NodeConfig {
         private int mSlowHeartbeat = 200;
         private boolean mStore = true;
         private String mLogLevel = "info";
-        private int mTcpTimeout = 1000;
+        private int mTcpTimeout = 10000;
         private int mMaxPool = 2;
         private int mCacheSize = 50000;
-        private int mSyncLimit = 1000;
+        private int mSyncLimit = 100;
         private boolean mEnableFastSync = false;
         private boolean mBootstrap = false;   //bootstrap
         private String mServiceListen = "";   //service-listen
@@ -66,7 +66,8 @@ public final class NodeConfig {
         private int mSuspendLimit = 300;      //suspend-limit
         private boolean mLoadPeers = true;    //loadpeers
         private boolean mNoService = true;    //no-service
-
+        private boolean mWebRTC = false;  //webrtc
+        private String mSignalAddr = "";  //signal-addr
 
 
         /**
@@ -78,6 +79,29 @@ public final class NodeConfig {
             //db
             return this;
         }
+
+
+        /**
+         * Turn on webrtc
+         * @param webrtc use webrtc
+         * @return modified builder
+         */
+        public Builder webrtc(boolean webrtc) {
+            mWebRTC = webrtc;
+            return this;
+        }
+
+        /**
+         * signalAddress host in ip:port format
+         * @param signalAddress Signal Server Address
+         * @return modified builder
+         */
+        public Builder signalAddress(String signalAddress) {
+            mSignalAddr = signalAddress;
+            return this;
+        }
+
+
 
 
         /**
@@ -283,6 +307,13 @@ public final class NodeConfig {
         }
     }
 
+
+    //TODO: JavaDoc
+    public final String signalAddr; //signal Address
+    public final boolean webrtc; //use webrtc
+
+
+
     /**
      * Interval between node syncing in milliseconds when there is something to gossip about
      */
@@ -377,6 +408,8 @@ public final class NodeConfig {
         suspendLimit = builder.mSuspendLimit;
         loadPeers = builder.mLoadPeers;
         noService = builder.mNoService;
+        webrtc = builder.mWebRTC;
+        signalAddr = builder.mSignalAddr;
     }
 
 

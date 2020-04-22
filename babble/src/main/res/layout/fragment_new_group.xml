@@ -68,7 +68,7 @@
                 android:inputType="textPersonName"
                 android:importantForAutofill="no" />
             <Switch
-                android:id="@+id/switch_p2p"
+                android:id="@+id/switch_global"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"

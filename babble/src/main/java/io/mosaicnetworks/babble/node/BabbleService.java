@@ -63,10 +63,10 @@ public abstract class BabbleService<AppState extends BabbleState> {
         this.mNetworkType = mNetworkType;
     }
 
+    public final static int NETWORK_NONE = 0;
     public final static int NETWORK_WIFI = 1;
     public final static int NETWORK_P2P = 2;
-    public final static int NETWORK_NONE = 0;
-
+    public final static int NETWORK_GLOBAL = 3;
 
     protected int mNetworkType;
 
