@@ -93,6 +93,13 @@ public final class ConfigManager {
         if (INSTANCE==null) {
             Log.v("ConfigManager", "getInstance");
             INSTANCE = new ConfigManager(context.getApplicationContext(), keyPair);
+        } else  {
+            //TODO: This is a minor hack, but if the key changes, it creates a new ConfigManager
+            //      We need to tighten this logix
+            if ((keyPair!=null) &&(! INSTANCE.getPublicKey().equals(keyPair.publicKey))){
+                INSTANCE = new ConfigManager(context.getApplicationContext(), keyPair);
+            }
+
         }
 
         return INSTANCE;
@@ -401,6 +408,9 @@ public final class ConfigManager {
 
     private String createConfig(List<Peer> genesisPeers, List<Peer> currentPeers, ResolvedGroup resolvedGroup,
                                 String inetAddress, int babblingPort, int networkType) throws CannotStartBabbleNodeException, IOException {
+
+        Log.i("ConfigManager", "createConfig: " + mKeyPair.publicKey);
+        Log.i("ConfigManager", "createConfig: " + currentPeers.get(0).pubKeyHex);
 
         mNetworkType = networkType;
 

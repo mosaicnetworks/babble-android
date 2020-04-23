@@ -235,7 +235,7 @@ public class NewGroupFragment extends BabbleServiceBinderFragment {
     @Override
     protected void onServiceConnected() {
         try {
-            mBoundService.start(mConfigDirectory, mResolvedGroup, mServiceAdvertiser);
+            mBoundService.start(mConfigDirectory, mResolvedGroup, mServiceAdvertiser, false);
             mListener.baseOnStartedNew(mMoniker, mResolvedGroup.getGroupName());
         } catch (IllegalArgumentException ex) {
             // we'll assume this is caused by the node taking a while to leave a previous group,

@@ -75,4 +75,6 @@ public interface DiscoveryDataProvider {
     void addNewPseudoResolvedGroup(ResolvedGroup resolvedGroup);
 
     int getNetworkType();
+
+    boolean isArchive();
 }

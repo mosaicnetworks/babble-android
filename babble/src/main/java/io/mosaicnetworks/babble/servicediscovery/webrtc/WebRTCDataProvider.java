@@ -224,4 +224,9 @@ public class WebRTCDataProvider implements DiscoveryDataProvider {
     }
 
 
+    @Override
+    public boolean isArchive() {
+        return false;
+    }
+
 }

@@ -74,7 +74,6 @@ public class BabbleService2 extends Service {
     private ResolvedGroup mResolvedGroup;
     private static BabbleState mAppState;
     private ServiceAdvertiser mServiceAdvertiser;
-    private boolean mIsArchive = false;
 
     /**
      * Start the service
@@ -84,9 +83,13 @@ public class BabbleService2 extends Service {
      * @throws IllegalStateException if the service is currently running
      */
     public void start(String configDirectory, ResolvedGroup resolvedGroup,
-                      ServiceAdvertiser serviceAdvertiser) {
+                      ServiceAdvertiser serviceAdvertiser, boolean isArchive) {
         if (mState!= State.STOPPED) {
             throw new IllegalStateException("Cannot start service which isn't stopped");
+        }
+
+        if (isArchive) {
+            mState = State.ARCHIVE;
         }
 
         mServiceAdvertiser = serviceAdvertiser;
@@ -106,9 +109,15 @@ public class BabbleService2 extends Service {
         if (mServiceAdvertiser != null) {
             mServiceAdvertiser.advertise(mBabbleNode.getGenesisPeers(), mBabbleNode.getCurrentPeers());
         }
-        mState = State.RUNNING;
+        if (! isArchive) {
+            mState = State.RUNNING;
+        }
     }
 
+
+
+
+    //TODO: remove this
     /**
      * This is an asynchronous call to start the service in archive mode
      * @param configDirectory
@@ -121,7 +130,6 @@ public class BabbleService2 extends Service {
         }
 
         mState = State.ARCHIVE;
-        mIsArchive = true;
         new Thread(new Runnable() {
             public void run() {
                 try {

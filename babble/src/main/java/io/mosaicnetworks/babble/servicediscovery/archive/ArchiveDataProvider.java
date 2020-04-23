@@ -120,4 +120,9 @@ public class ArchiveDataProvider implements DiscoveryDataProvider {
 
         mResolvedGroup = resolvedGroup;
     }
+
+    @Override
+    public boolean isArchive() {
+        return true;
+    }
 }

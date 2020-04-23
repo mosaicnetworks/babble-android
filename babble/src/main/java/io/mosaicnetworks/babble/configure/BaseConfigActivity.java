@@ -365,7 +365,7 @@ public abstract class BaseConfigActivity extends BabbleServiceBinderActivity imp
     @Override
     protected void onServiceConnected() {
         try {
-            mBoundService.start(mConfigDirectory, mResolvedGroup, mServiceAdvertiser);
+            mBoundService.start(mConfigDirectory, mResolvedGroup, mServiceAdvertiser, false);
             startBabblingActivity();
         } catch (IllegalArgumentException ex) {
             // we'll assume this is caused by the node taking a while to leave a previous group,

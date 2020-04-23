@@ -256,4 +256,9 @@ public class MdnsDataProvider implements DiscoveryDataProvider {
         mResolvedServices.put(resolvedGroup.getGroupUid(), resolvedGroup.getRandomService());
         mResolvedGroupList.add(resolvedGroup);
     }
+
+    @Override
+    public boolean isArchive() {
+        return false;
+    }
 }

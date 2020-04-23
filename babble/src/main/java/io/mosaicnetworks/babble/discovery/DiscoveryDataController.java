@@ -217,7 +217,7 @@ public class DiscoveryDataController  implements ServicesListListener {
     public void startGroup(ResolvedGroup resolvedGroup) {
 
         Log.i("DiscDataController", "startGroup: Joined " + resolvedGroup.getGroupName());
-
+//        Log.i("DiscDataController", "startGroup: Joined " + mKeyPair.publicKey);
         resolvedGroup.setMoniker(mMoniker);
         String dataProviderId = resolvedGroup.getDataProviderId();
         DiscoveryDataProvider discoveryDataProvider = mDiscoveryDataProviders.get(dataProviderId);
@@ -232,12 +232,21 @@ public class DiscoveryDataController  implements ServicesListListener {
         ResolvedService resolvedService = resolvedGroup.getRandomService();
 
 
-        try {
-            String configDir = configManager.createConfigJoinGroup(resolvedService.getInitialPeers(),
-                resolvedService.getCurrentPeers(), resolvedGroup,
-                Utils.getIPAddr(mContext), discoveryDataProvider.getNetworkType() );// NB live pull of IP
 
-            mOnBabbleConfigWritten.startBabbleService(configDir, resolvedGroup, false, discoveryDataProvider.getAdvertiser());
+
+        try {
+            String configDir;
+
+            if (discoveryDataProvider.isArchive()) {
+                configDir = configManager.getTomlDir();
+            } else {
+                configDir = configManager.createConfigJoinGroup(resolvedService.getInitialPeers(),
+                        resolvedService.getCurrentPeers(), resolvedGroup,
+                        Utils.getIPAddr(mContext), discoveryDataProvider.getNetworkType());// NB live pull of IP
+            }
+
+
+            mOnBabbleConfigWritten.startBabbleService(configDir, resolvedGroup, discoveryDataProvider.isArchive(), discoveryDataProvider.getAdvertiser());
             //     public void startBabbleAndroidService(String configDir, GroupDescriptor groupDescriptor,
             //                                   boolean isArchive, ServiceAdvertiser serviceAdvertiser) ;
 
@@ -308,7 +317,7 @@ public class DiscoveryDataController  implements ServicesListListener {
      */
     public String createKeyPair() {
         mKeyPair = new KeyPair();
-
+        Log.i("DiscoverDataController", "createKeyPair: New " + mKeyPair.publicKey);
         return mKeyPair.publicKey;
     }
 

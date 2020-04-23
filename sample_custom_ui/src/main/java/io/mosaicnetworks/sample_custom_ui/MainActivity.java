@@ -97,7 +97,7 @@ import io.mosaicnetworks.babble.utils.Utils;
  * it has been removed from the regular, new and join process.
  */
 public class MainActivity extends BabbleServiceBinderActivity implements JoinGroupConfirmation,
-        OnBabbleConfigWritten, ArchivedGroupsAdapter.ItemClickListener {
+        OnBabbleConfigWritten, ArchivedGroupsAdapter.ItemClickListener, BabbleService2.StartArchiveListener {
 
     private final String TAG = "MainActivity";
     private int mProtocol = BabbleConstants.NETWORK_GLOBAL;
@@ -425,10 +425,16 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         doBindService();
     }
 
+
+// (final String configDirectory, ResolvedGroup resolvedGroup,
+//    final StartArchiveListener listener)
+
     @Override
     protected void onServiceConnected() {
         try {
-            mBoundService.start(mConfigDirectory, mResolvedGroup, mServiceAdvertiser);
+
+            mBoundService.start(mConfigDirectory, mResolvedGroup, mServiceAdvertiser, mIsArchive);
+
             startChatActivity();
         } catch (IllegalArgumentException ex) {
             // we'll assume this is caused by the node taking a while to leave a previous group,
@@ -439,6 +445,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
             mLoadingDialog.dismiss();
             stopService(new Intent(this, BabbleService2.class));
         }
+        mLoadingDialog.dismiss();
         doUnbindService();
     }
 
@@ -451,6 +458,8 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         mResolvedGroup = resolvedGroup;
         mIsArchive = isArchive;
         mServiceAdvertiser = serviceAdvertiser;
+
+        Log.i(TAG, "startBabbleService: IsArchive: "+ mIsArchive);
 
         startBabbleAndroidService();
     }
@@ -695,7 +704,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
 
             mDiscoveryDataController.addNewPseudoResolvedGroup(dataProviderId, mResolvedGroup);
 
-            doBindService();
+  //          doBindService();
         }
     }
 
@@ -773,6 +782,15 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         };
     }
 
+// StartArchiveListener implementation
 
+    @Override
+    public void onInitialised() {
 
+    }
+
+    @Override
+    public void onFailed() {
+
+    }
 }
