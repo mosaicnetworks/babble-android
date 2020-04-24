@@ -24,6 +24,8 @@
 
 package io.mosaicnetworks.babble.configure;
 
+import android.app.Application;
+
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -31,14 +33,16 @@ import io.mosaicnetworks.babble.node.ConfigManager;
 
 public class DiscoverGroupsViewModelFactory implements ViewModelProvider.Factory {
     private ConfigManager mConfigManager;
+    private Application mApplication;
 
-    public DiscoverGroupsViewModelFactory(ConfigManager configManager) {
+    public DiscoverGroupsViewModelFactory(Application application, ConfigManager configManager) {
         mConfigManager = configManager;
+        mApplication = application;
     }
 
     @Override
     @SuppressWarnings("unchecked")  //unchecked cast warning caused by the use of generics.
     public <T extends ViewModel> T create(Class<T> modelClass) {
-        return (T) new DiscoverGroupsViewModel(mConfigManager);
+        return (T) new DiscoverGroupsViewModel(mApplication, mConfigManager);
     }
 }

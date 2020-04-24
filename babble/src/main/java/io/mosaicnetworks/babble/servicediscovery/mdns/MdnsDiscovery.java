@@ -37,15 +37,7 @@ import java.util.Map;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 
 /**
- * This class encapsulates the MDNS discover process. There is a bug in released versions of
- * Android prior to 7.0 which means that the TXT records are not returned.
- *
- * There is a custom class CustomNsdManager that can be used in place of NsdManager that wraps
- * NsdManager substituting an alternative resolving mechanism as appropriate.
- *
- * To switch between CustomNdsManager and NdsManager change the declaration of mNsdManager and
- * its assignment in the constructor. The alternative version is commented out. All other calls
- * can remain the same.
+ * This class encapsulates the MDNS discover process.
  */
 public class MdnsDiscovery {
     private static final String TAG = "MdnsDiscovery";

@@ -76,7 +76,7 @@ public class DiscoverGroupsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mConfigManager = ConfigManager.getInstance(getContext().getApplicationContext());
-        mViewModel = new ViewModelProvider(this, new DiscoverGroupsViewModelFactory(mConfigManager)).get(DiscoverGroupsViewModel.class);
+        mViewModel = new ViewModelProvider(this, new DiscoverGroupsViewModelFactory(getActivity().getApplication(), mConfigManager)).get(DiscoverGroupsViewModel.class);
     }
 
     @Override
