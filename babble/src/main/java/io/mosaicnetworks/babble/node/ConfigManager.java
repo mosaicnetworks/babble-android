@@ -857,10 +857,18 @@ public final class ConfigManager {
     }
 
 
+    public void repopulateDirectories() {
+        File babbleDir = new File(sRootDir, BabbleConstants.BABBLE_ROOTDIR());
+        populateDirectories(babbleDir);
+    }
+
+
+
     private void populateDirectories(File babbleDir) {
         ArrayList<String> directories = new ArrayList<>();
 
-        mDirectories = new ArrayList<>();
+        // Clear rather than recreate archive list to preserve references
+        mDirectories.clear();
 
         Collections.addAll(directories,
                 Objects.requireNonNull(babbleDir.list(new FilenameFilter() {

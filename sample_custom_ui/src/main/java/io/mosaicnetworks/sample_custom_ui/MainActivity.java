@@ -149,15 +149,21 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         setUpUI();
 
         setUpBabble();
-
-        setUpArchive();
-
-
+        
         if (mMoniker.equals("")) {
             editMonikerClick(null);
         }
 
     }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.i(TAG, "onResume: resumeArchive");
+        resumeArchive();
+    }
+
+
 
     private void setUpUI() {
         mSwipeRefreshServiceSearch = findViewById(io.mosaicnetworks.babble.R.id.swipeRefresh_service_search);
@@ -173,20 +179,37 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
     }
 
 
-    private void setUpArchive(){
 
-        mRvArchivedGroups = findViewById(io.mosaicnetworks.babble.R.id.rv_archived_groups);
-        mLinearLayoutNoArchives = findViewById(io.mosaicnetworks.babble.R.id.linearLayout_no_archives);
+    private void resumeArchive() {
 
+        if (mRvArchivedGroups == null ) {
+            mRvArchivedGroups = findViewById(io.mosaicnetworks.babble.R.id.rv_archived_groups);
+        }
+
+        if (mLinearLayoutNoArchives == null) {
+            mLinearLayoutNoArchives = findViewById(io.mosaicnetworks.babble.R.id.linearLayout_no_archives);
+        }
 
         //TODO: Remove the need for an embedded ConfigManager here.
         //      We could separate the Utils and the
 
-        mConfigManager = ConfigManager.getInstance(this.getApplicationContext());
+        if (mConfigManager == null) {
+            mConfigManager = ConfigManager.getInstance(this.getApplicationContext());
+        } else {
+            mConfigManager.repopulateDirectories();
+        }
 
-        initActionModeCallback();
 
-        mViewModel = ViewModelProviders.of(this, new ArchivedGroupsViewModelFactory(mConfigManager)).get(ArchivedGroupsViewModel.class);
+        if (mActionModeCallback == null) {
+            initActionModeCallback();
+        }
+
+        if (mViewModel == null ) {
+            mViewModel = ViewModelProviders.of(this, new ArchivedGroupsViewModelFactory(mConfigManager)).get(ArchivedGroupsViewModel.class);
+        } else {
+            mViewModel.loadArchiveList();
+        }
+
 
 
         // This was all in onResume
