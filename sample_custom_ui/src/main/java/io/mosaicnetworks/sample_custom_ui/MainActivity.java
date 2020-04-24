@@ -143,26 +143,37 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.i(TAG, "onCreate: Started");
-        initMoniker();
 
-        setUpUI();
-
-        setUpBabble();
-        
-        if (mMoniker.equals("")) {
-            editMonikerClick(null);
-        }
 
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        Log.i(TAG, "onResume: resumeArchive");
+        Log.i(TAG, "onResume: Started");
+
+        initMoniker();
+
+        setUpUI();
+
+        setUpBabble();
+
+        if (mMoniker.equals("")) {
+            editMonikerClick(null);
+        }
+
         resumeArchive();
     }
 
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mDiscoveryDataController!=null) {
+            mDiscoveryDataController.stopDiscovery();
+        }
+    }
 
 
     private void setUpUI() {
@@ -240,38 +251,46 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
         }
 
         ServicesListView servicesListView = findViewById(R.id.servicesListView);
-        mResolvedGroups =  servicesListView.getResolvedGroupList();
 
-        Log.i(TAG, "  Create ResolvedGroupManager");
-        mResolvedGroupManager = new ResolvedGroupManager(this, mResolvedGroups);
+        if (mResolvedGroups == null) {
+            mResolvedGroups = servicesListView.getResolvedGroupList();
+        }
 
-        Log.i(TAG, "  Register ServicesListView for updates");
-        mResolvedGroupManager.registerServicesListUpdater(servicesListView);
+        if (mResolvedGroupManager == null) {
+            Log.i(TAG, "  Create ResolvedGroupManager");
+            mResolvedGroupManager = new ResolvedGroupManager(this, mResolvedGroups);
 
-        Log.i(TAG, "  Create DiscoveryDataController");
-        mDiscoveryDataController = new DiscoveryDataController(this, mResolvedGroupManager);
+            Log.i(TAG, "  Register ServicesListView for updates");
+            mResolvedGroupManager.registerServicesListUpdater(servicesListView);
+        }
 
-        Log.i(TAG, "  Register with DiscoveryTestActivity as JoinGroupConfirmation");
-        mDiscoveryDataController.registerJoinGroupConfirmation(this);
+        if (mDiscoveryDataController == null) {
+            Log.i(TAG, "  Create DiscoveryDataController");
+            mDiscoveryDataController = new DiscoveryDataController(this, mResolvedGroupManager);
 
-        Log.i(TAG, "  Register with DiscoveryTestActivity as OnFragmentInteractionListener(");
-        mDiscoveryDataController.registerOnBabbleConfigWritten(this);
+            Log.i(TAG, "  Register with DiscoveryTestActivity as JoinGroupConfirmation");
+            mDiscoveryDataController.registerJoinGroupConfirmation(this);
 
-        mDiscoveryDataController.setMoniker(mMoniker);
+            Log.i(TAG, "  Register with DiscoveryTestActivity as OnFragmentInteractionListener(");
+            mDiscoveryDataController.registerOnBabbleConfigWritten(this);
 
-        Log.i(TAG, "  Register DiscoveryDataController as ServicesListListener");
-        servicesListView.registerServicesListListener(mDiscoveryDataController);
+            mDiscoveryDataController.setMoniker(mMoniker);
+
+            Log.i(TAG, "  Register DiscoveryDataController as ServicesListListener");
+            servicesListView.registerServicesListListener(mDiscoveryDataController);
+
+            MdnsDataProvider mdnsDataProvider = new MdnsDataProvider(this);
+            String uidMdns = mDiscoveryDataController.registerDiscoveryProvider(mdnsDataProvider);
+
+            WebRTCDataProvider webRTCDataProvider = new WebRTCDataProvider(this,
+                    BabbleConstants.DISCO_DISCOVERY_ADDRESS(), BabbleConstants.DISCO_DISCOVERY_PORT(),
+                    BabbleConstants.DISCO_DISCOVERY_ENDPOINT(), BabbleConstants.DISCO_DISCOVERY_POLLING_INTERVAL());
 
 
-        MdnsDataProvider mdnsDataProvider = new MdnsDataProvider(this);
-        String uidMdns = mDiscoveryDataController.registerDiscoveryProvider(mdnsDataProvider);
+            String uidWebRTC = mDiscoveryDataController.registerDiscoveryProvider(webRTCDataProvider);
 
-        WebRTCDataProvider webRTCDataProvider = new WebRTCDataProvider(this,
-                BabbleConstants.DISCO_DISCOVERY_ADDRESS(), BabbleConstants.DISCO_DISCOVERY_PORT(),
-                BabbleConstants.DISCO_DISCOVERY_ENDPOINT(), BabbleConstants.DISCO_DISCOVERY_POLLING_INTERVAL());
+        }
 
-
-        String uidWebRTC = mDiscoveryDataController.registerDiscoveryProvider(webRTCDataProvider);
 
         mDiscoveryDataController.startDiscovery();
 
