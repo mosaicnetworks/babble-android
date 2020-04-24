@@ -40,7 +40,6 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.configure.mdns.MdnsDiscoveryFragment;
 import io.mosaicnetworks.babble.configure.p2p.P2PDiscoveryFragment;
 import io.mosaicnetworks.babble.configure.webrtc.WebRTCDiscoveryFragment;
 
@@ -186,7 +185,7 @@ public class TabsFragment extends Fragment {
 
             if (position == mTabmDNS) {
                 Log.i(TAG, "createFragment:  Create mDNS tab");
-                return MdnsDiscoveryFragment.newInstance();
+                return DiscoverGroupsFragment.newInstance();
             } else {
                 if (position == mTabP2P) {
                     Log.i(TAG, "createFragment:  Create P2P tab");
