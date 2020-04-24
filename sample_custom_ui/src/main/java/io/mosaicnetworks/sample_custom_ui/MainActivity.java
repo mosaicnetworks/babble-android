@@ -432,9 +432,7 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
     @Override
     protected void onServiceConnected() {
         try {
-
             mBoundService.start(mConfigDirectory, mResolvedGroup, mServiceAdvertiser, mIsArchive);
-
             startChatActivity();
         } catch (IllegalArgumentException ex) {
             // we'll assume this is caused by the node taking a while to leave a previous group,
@@ -695,8 +693,8 @@ public class MainActivity extends BabbleServiceBinderActivity implements JoinGro
                     dataProviderId);
             mMoniker = mConfigManager.getMoniker();
             startService(new Intent(this, BabbleService2.class));
-            mLoadingDialog = DialogUtils.displayLoadingDialog(this);
-            mLoadingDialog.show();
+//            mLoadingDialog = DialogUtils.displayLoadingDialog(this);
+//            mLoadingDialog.show();
 
             mIsArchive = true;
             mServiceAdvertiser = null;  // no advertiser in Archive
