@@ -26,7 +26,6 @@ package io.mosaicnetworks.babble.configure;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,27 +39,26 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import java.util.Objects;
+import java.util.List;
 
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
-import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsServicesListView;
-import io.mosaicnetworks.babble.utils.DialogUtils;
+import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsServicesListAdapter;
 
 public class DiscoverGroupsFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private RecyclerView mRvArchivedGroups;
+    private RecyclerView mRvDiscoveredGroups;
     private SwipeRefreshLayout mSwipeRefreshServiceSearch;
     private SwipeRefreshLayout mSwipeRefreshDiscoveryFailed;
     private SwipeRefreshLayout mSwipeRefreshServicesDisplaying;
     private ConfigManager mConfigManager;
     private DiscoverGroupsViewModel mViewModel;
-    private ArchivedGroupsAdapter mArchivedGroupsAdapter;
+    private MdnsServicesListAdapter mMdnsServicesListAdapter;
     private SelectableData<ConfigDirectory> mArchivedList = new SelectableData<>();
+    private List<MdnsResolvedGroup> mServiceInfoList;
 
     /**
      * Use this factory method to create a new instance of
@@ -84,7 +82,7 @@ public class DiscoverGroupsFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_mdns_discovery, container, false);
 
-        mRvArchivedGroups = view.findViewById(R.id.servicesListView);
+        mRvDiscoveredGroups = view.findViewById(R.id.servicesListView);
         mSwipeRefreshServiceSearch = view.findViewById(R.id.swipeRefresh_service_search);
         mSwipeRefreshDiscoveryFailed = view.findViewById(R.id.swiperefresh_discovery_failed);
         mSwipeRefreshServicesDisplaying = view.findViewById(R.id.swiperefresh_services_displaying);
@@ -200,24 +198,31 @@ public class DiscoverGroupsFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        mArchivedList = mViewModel.getArchivedList().getValue();
+        mServiceInfoList = mViewModel.getmServiceInfoList();
 
-        mArchivedGroupsAdapter = new ArchivedGroupsAdapter(getContext(), mArchivedList);
-        mArchivedGroupsAdapter.setClickListener(null);
+        mMdnsServicesListAdapter = new MdnsServicesListAdapter(getContext(), mServiceInfoList);
+        mRvDiscoveredGroups.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRvDiscoveredGroups.setAdapter(mMdnsServicesListAdapter);
 
-        mRvArchivedGroups.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRvArchivedGroups.setAdapter(mArchivedGroupsAdapter);
-
-        final Observer<SelectableData<ConfigDirectory>> nameObserver = new Observer<SelectableData<ConfigDirectory>>() {
+        final Observer<List<MdnsResolvedGroup>> servicesObserver = new Observer<List<MdnsResolvedGroup>>() {
             @Override
-            public void onChanged(@Nullable final SelectableData<ConfigDirectory> newName) {
-                mSwipeRefreshServiceSearch.setVisibility(View.GONE);
-                mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
-                mSwipeRefreshServicesDisplaying.setVisibility(View.VISIBLE);
+            public void onChanged(@Nullable final List<MdnsResolvedGroup> updatedList) {
+
+                if (mServiceInfoList.isEmpty()) {
+                    mSwipeRefreshServiceSearch.setVisibility(View.VISIBLE);
+                    mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
+                    mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
+                } else {
+                    mSwipeRefreshServiceSearch.setVisibility(View.GONE);
+                    mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
+                    mSwipeRefreshServicesDisplaying.setVisibility(View.VISIBLE);
+                }
+
+                mMdnsServicesListAdapter.notifyDataSetChanged();
             }
         };
 
-        mViewModel.getArchivedList().observe(this, nameObserver);
+        mViewModel.getServiceInfoList().observe(this, servicesObserver);
 
     }
 
@@ -229,7 +234,6 @@ public class DiscoverGroupsFragment extends Fragment {
         mSwipeRefreshServiceSearch.setVisibility(View.VISIBLE);
         mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
         mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
-
     }
 }
 

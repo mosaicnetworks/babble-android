@@ -26,11 +26,11 @@ package io.mosaicnetworks.babble.configure;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,46 +43,47 @@ import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedGroup;
 
 public class DiscoverGroupsViewModel extends AndroidViewModel {
     private MutableLiveData<SelectableData<ConfigDirectory>> mArchivedList;
-    private ConfigManager mConfigManager;
     private Context mAppContext;
     private List<MdnsResolvedGroup> mServiceInfoList = new ArrayList<>();
     private MdnsDiscovery mMdnsDiscovery;
+    private MutableLiveData<List<MdnsResolvedGroup>> mMutableServiceInfoList;
 
     public DiscoverGroupsViewModel(Application application, ConfigManager configManager) {
         super(application);
-        mConfigManager = configManager;
         mAppContext = application.getApplicationContext();
 
-        mArchivedList = new MutableLiveData<>();
-        loadArchiveList();
         initialise();
-
+        mMutableServiceInfoList = new MutableLiveData<>();
         mMdnsDiscovery.discoverServices();
     }
 
-    public void loadArchiveList() {
-        SelectableData<ConfigDirectory> data = new SelectableData<>();
-        data.addAll(mConfigManager.getDirectories());
-        mArchivedList.setValue(data);
-    }
-
-    public MutableLiveData<SelectableData<ConfigDirectory>> getArchivedList() {
-        return mArchivedList;
-    }
-
-    //###################
     private void initialise() {
         mMdnsDiscovery = new MdnsDiscovery(mAppContext, mServiceInfoList, new ServiceDiscoveryListener() {
             @Override
-            public void onServiceListUpdated ( boolean groupCountChange){
-                // let the adapter know
-                Log.d("MY-TAG", "Service list updated");
+            public void onServiceListUpdated (boolean groupCountChange){
+                Handler mainHandler = new Handler(mAppContext.getMainLooper());
+
+                Runnable myRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        mMutableServiceInfoList.setValue(mServiceInfoList);
+                    }
+                };
+                mainHandler.post(myRunnable);
             }
 
             @Override
             public void onStartDiscoveryFailed () {
-                Log.d("MY-TAG", "Start discovery failed");
+                //TODO: how should mdns discovery start failures be handled?
             }
         });
+    }
+
+    public MutableLiveData<List<MdnsResolvedGroup>> getServiceInfoList() {
+        return mMutableServiceInfoList;
+    }
+
+    public List<MdnsResolvedGroup> getmServiceInfoList() {
+        return mServiceInfoList;
     }
 }
