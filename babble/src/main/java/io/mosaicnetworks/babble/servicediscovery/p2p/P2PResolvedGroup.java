@@ -35,17 +35,17 @@ import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
  * group UID and group name can be added to the group as they're discovered. Services can be removed
  * from the group as and when they are lost.
  */
-public final class P2PResolvedGroup implements ResolvedGroup {
+public final class P2PResolvedGroup {
 
     private final String mGroupName;
     private final String mGroupUid;
-    private final List<ResolvedService> mResolvedServices = new ArrayList<>();
+    private final List<P2PResolvedService> mResolvedServices = new ArrayList<>();
 
     /**
      * Constructor, the group is initialised from a resolved service
      * @param resolvedService a resolved service used to initialise the group
      */
-    public P2PResolvedGroup(ResolvedService resolvedService) {
+    public P2PResolvedGroup(P2PResolvedService resolvedService) {
         mGroupName = resolvedService.getGroupName();
         mGroupUid = resolvedService.getGroupUid();
         mResolvedServices.add(resolvedService);
@@ -55,7 +55,7 @@ public final class P2PResolvedGroup implements ResolvedGroup {
      * Adds a resolved service to this group's list of resolved services
      * @param resolvedService
      */
-    public void addService(ResolvedService resolvedService) {
+    public void addService(P2PResolvedService resolvedService) {
         if (mResolvedServices.contains(resolvedService)) {
             throw new IllegalArgumentException("Cannot add service: Group already contains this service");
         }
@@ -91,7 +91,7 @@ public final class P2PResolvedGroup implements ResolvedGroup {
      * Get the list of resolved services associated with this group
      * @return a shallow copy of the list of services associated with this group
      */
-    public List<ResolvedService> getResolvedServices() {
+    public List<P2PResolvedService> getResolvedServices() {
         return new ArrayList<>(mResolvedServices);
     }
 

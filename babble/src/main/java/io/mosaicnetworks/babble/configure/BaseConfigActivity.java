@@ -39,15 +39,13 @@ import io.mosaicnetworks.babble.configure.p2p.P2PJoinGroupFragment;
 import io.mosaicnetworks.babble.configure.webrtc.WebRTCJoinGroupFragment;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCResolvedGroup;
 
 /**
  * This activity complements the {@link BabbleService}. It consists of a set of fragments which
  * allow the {@link BabbleService} to be configured. Extend class and override the
- * {@link BaseConfigActivity#getBabbleService()}, {@link BaseConfigActivity#onJoined(String)} and
- * {@link BaseConfigActivity#onStartedNew(String)} methods.
+ * {@link BaseConfigActivity#getBabbleService()}, {@link BaseConfigActivity#onJoined(String, String)} and
+ * {@link BaseConfigActivity#onStartedNew(String, String)} methods.
  */
 public abstract class BaseConfigActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 
@@ -205,15 +203,15 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     @Override
     public void onServiceSelected(ResolvedGroup resolvedGroup) {
 
-        if (resolvedGroup instanceof MdnsResolvedGroup) {
+        if (resolvedGroup instanceof ResolvedGroup) {
             Log.i(TAG, "onServiceSelected: MDNS item selected");
             MdnsJoinGroupFragment mJoinGroupMdnsFragment = MdnsJoinGroupFragment.newInstance(resolvedGroup);
             replaceFragment(mJoinGroupMdnsFragment, true);
-        } else if (resolvedGroup instanceof P2PResolvedGroup) {
+        } else if (resolvedGroup instanceof ResolvedGroup) {
             Log.i(TAG, "onServiceSelected: P2P item selected");
-            P2PJoinGroupFragment mJoinGroupP2PFragment = P2PJoinGroupFragment.newInstance(resolvedGroup);
-            replaceFragment(mJoinGroupP2PFragment, true);
-        } else if (resolvedGroup instanceof WebRTCResolvedGroup) {
+            //P2PJoinGroupFragment mJoinGroupP2PFragment = P2PJoinGroupFragment.newInstance(resolvedGroup);
+            //replaceFragment(mJoinGroupP2PFragment, true);
+        } else if (resolvedGroup instanceof ResolvedGroup) {
             Log.i(TAG, "onServiceSelected: WebRTC item selected");
             WebRTCJoinGroupFragment mJoinGroupWebRTCFragment = WebRTCJoinGroupFragment.newInstance(resolvedGroup);
             replaceFragment(mJoinGroupWebRTCFragment, true);

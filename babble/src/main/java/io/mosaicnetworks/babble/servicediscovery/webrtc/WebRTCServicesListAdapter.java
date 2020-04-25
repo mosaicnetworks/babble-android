@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 public class WebRTCServicesListAdapter extends RecyclerView.Adapter<WebRTCServicesListAdapter.ViewHolder> {
 
@@ -57,11 +58,11 @@ public class WebRTCServicesListAdapter extends RecyclerView.Adapter<WebRTCServic
         }
     }
 
-    private List<WebRTCResolvedGroup> mData;
+    private List<ResolvedGroup> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    public WebRTCServicesListAdapter(Context context, List<WebRTCResolvedGroup> data) {
+    public WebRTCServicesListAdapter(Context context, List<ResolvedGroup> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -77,7 +78,7 @@ public class WebRTCServicesListAdapter extends RecyclerView.Adapter<WebRTCServic
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        WebRTCResolvedGroup groupInfo = mData.get(position);
+        ResolvedGroup groupInfo = mData.get(position);
 
         holder.groupUidTextView.setText(groupInfo.getGroupUid());
         holder.serviceNameTextView.setText(groupInfo.getGroupName());
@@ -97,7 +98,7 @@ public class WebRTCServicesListAdapter extends RecyclerView.Adapter<WebRTCServic
     }
 
     // convenience method for getting data at click position
-    public WebRTCResolvedGroup getItem(int id) {
+    public ResolvedGroup getItem(int id) {
         return mData.get(id);
     }
 

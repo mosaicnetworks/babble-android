@@ -44,7 +44,7 @@ import java.util.List;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsServicesListAdapter;
 
 public class DiscoverGroupsFragment extends Fragment {
@@ -58,7 +58,7 @@ public class DiscoverGroupsFragment extends Fragment {
     private DiscoverGroupsViewModel mViewModel;
     private MdnsServicesListAdapter mMdnsServicesListAdapter;
     private SelectableData<ConfigDirectory> mArchivedList = new SelectableData<>();
-    private List<MdnsResolvedGroup> mServiceInfoList;
+    private List<ResolvedGroup> mServiceInfoList;
 
     /**
      * Use this factory method to create a new instance of
@@ -204,9 +204,9 @@ public class DiscoverGroupsFragment extends Fragment {
         mRvDiscoveredGroups.setLayoutManager(new LinearLayoutManager(getContext()));
         mRvDiscoveredGroups.setAdapter(mMdnsServicesListAdapter);
 
-        final Observer<List<MdnsResolvedGroup>> servicesObserver = new Observer<List<MdnsResolvedGroup>>() {
+        final Observer<List<ResolvedGroup>> servicesObserver = new Observer<List<ResolvedGroup>>() {
             @Override
-            public void onChanged(@Nullable final List<MdnsResolvedGroup> updatedList) {
+            public void onChanged(@Nullable final List<ResolvedGroup> updatedList) {
 
                 if (mServiceInfoList.isEmpty()) {
                     mSwipeRefreshServiceSearch.setVisibility(View.VISIBLE);

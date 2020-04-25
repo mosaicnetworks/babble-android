@@ -99,7 +99,7 @@ public class P2PJoinGroupFragment extends Fragment implements ResponseListener, 
      *
      * @return A new instance of fragment MdnsJoinGroupFragment.
      */
-    public static P2PJoinGroupFragment newInstance(ResolvedGroup resolvedGroup) {
+    public static P2PJoinGroupFragment newInstance(P2PResolvedGroup resolvedGroup) {
         Log.i(TAG, "newInstance: "+ resolvedGroup.getGroupName());
         P2PJoinGroupFragment p2PJoinGroupFragment = new P2PJoinGroupFragment();
         p2PJoinGroupFragment.mResolvedGroup = (P2PResolvedGroup) resolvedGroup;
@@ -153,7 +153,7 @@ public class P2PJoinGroupFragment extends Fragment implements ResponseListener, 
             return;
         }
 
-        List<ResolvedService> resolvedServices = mResolvedGroup.getResolvedServices();
+        List<P2PResolvedService> resolvedServices = mResolvedGroup.getResolvedServices();
 
         if (resolvedServices.size() < 1) {
             DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.no_service_alert_title, R.string.no_service_alert_message);

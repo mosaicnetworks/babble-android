@@ -73,7 +73,7 @@ public class P2PServicesListView extends RecyclerView {
         adapter.setClickListener(new P2PServicesListAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                mServicesListListener.onServiceSelectedSuccess(adapter.getItem(position));
+                //mServicesListListener.onServiceSelectedSuccess(adapter.getItem(position));
             }
         });
 

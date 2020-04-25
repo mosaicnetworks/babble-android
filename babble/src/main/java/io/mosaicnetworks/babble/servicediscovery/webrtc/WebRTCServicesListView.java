@@ -38,12 +38,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
 
 public class WebRTCServicesListView extends RecyclerView {
 
-    private List<WebRTCResolvedGroup> mServiceInfoList = new ArrayList<>();
+    private List<ResolvedGroup> mServiceInfoList = new ArrayList<>();
     private ServicesListListener mServicesListListener;
     private WebRTCService mWebRTCService;
     private boolean mPrevIsEmpty = true;

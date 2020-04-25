@@ -51,6 +51,8 @@ import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 
 // import android.net.wifi.WifiManager;
@@ -114,8 +116,8 @@ public class WebRTCService implements ServiceAdvertiser {
     private static WebRTCService INSTANCE;
     private Context mAppContext;
 
-    private final Map<String, WebRTCResolvedService> mResolvedServices = new HashMap<>();
-    private List<WebRTCResolvedGroup> mResolvedGroups;  //TODO: Look to make this final
+    private final Map<String, ResolvedService> mResolvedServices = new HashMap<>();
+    private List<ResolvedGroup> mResolvedGroups;  //TODO: Look to make this final
 //    final HashMap<String, Map> textRecords = new HashMap<>();
 
     private String mServiceName ;
@@ -158,7 +160,7 @@ public class WebRTCService implements ServiceAdvertiser {
     }
 
 
-    public void setResolvedGroups(List<WebRTCResolvedGroup> resolvedGroups) {
+    public void setResolvedGroups(List<ResolvedGroup> resolvedGroups) {
         this.mResolvedGroups = resolvedGroups;
     }
 
@@ -226,8 +228,8 @@ public class WebRTCService implements ServiceAdvertiser {
                                 Disco disco = entry.getValue();
 
                                 Log.i(TAG, "onResponse: disco: " + disco);
-                                WebRTCResolvedService webRTCResolvedService =
-                                        new WebRTCResolvedService(disco.GroupUID,
+                                ResolvedService webRTCResolvedService =
+                                        new ResolvedService(disco.GroupUID,
                                                 disco.GroupName,
                                                 disco.AppID,
                                                 disco.PubKey,
@@ -238,7 +240,7 @@ public class WebRTCService implements ServiceAdvertiser {
                                                 0
                                         );
 
-                                WebRTCResolvedGroup webRTCResolvedGroup = new WebRTCResolvedGroup(webRTCResolvedService);
+                                ResolvedGroup webRTCResolvedGroup = new ResolvedGroup(webRTCResolvedService);
                                 mResolvedGroups.add(webRTCResolvedGroup);
                                 webRTCResolvedService.setResolvedGroup(webRTCResolvedGroup);
                                 mResolvedServices.put(disco.GroupUID, webRTCResolvedService);

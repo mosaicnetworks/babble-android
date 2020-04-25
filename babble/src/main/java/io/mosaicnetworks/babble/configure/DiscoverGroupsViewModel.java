@@ -37,18 +37,18 @@ import java.util.List;
 
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsDiscovery;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
 
 public class DiscoverGroupsViewModel extends AndroidViewModel {
 
     private MutableLiveData<SelectableData<ConfigDirectory>> mArchivedList;
     private Context mAppContext;
-    private List<MdnsResolvedGroup> mServiceInfoList = new ArrayList<>();
+    private List<ResolvedGroup> mServiceInfoList = new ArrayList<>();
     private MdnsDiscovery mMdnsDiscovery;
-    private MutableLiveData<List<MdnsResolvedGroup>> mMutableServiceInfoList;
+    private MutableLiveData<List<ResolvedGroup>> mMutableServiceInfoList;
     private WebRTCService mWebRTCService;
 
     public DiscoverGroupsViewModel(Application application, ConfigManager configManager) {
@@ -100,11 +100,11 @@ public class DiscoverGroupsViewModel extends AndroidViewModel {
         });
     }
 
-    public MutableLiveData<List<MdnsResolvedGroup>> getServiceInfoList() {
+    public MutableLiveData<List<ResolvedGroup>> getServiceInfoList() {
         return mMutableServiceInfoList;
     }
 
-    public List<MdnsResolvedGroup> getmServiceInfoList() {
+    public List<ResolvedGroup> getmServiceInfoList() {
         return mServiceInfoList;
     }
 }

@@ -49,7 +49,7 @@ import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.GROU
  * {@link P2PResolvedService} that represent the same group. In this sense a {@link P2PResolvedService} is
  * assigned to a group. This assignment can be set by calling the
  */
-public final class P2PResolvedService implements ResolvedService {
+public final class P2PResolvedService {
 
     private final InetAddress mInetAddress ;
     private final int mPort;
@@ -92,7 +92,7 @@ public final class P2PResolvedService implements ResolvedService {
      * Get the group to which this instance has been assigned
      * @return the reoslved group
      */
-    public ResolvedGroup getResolvedGroup() {
+    public P2PResolvedGroup getResolvedGroup() {
         return mResolvedGroup;
     }
 
@@ -101,7 +101,7 @@ public final class P2PResolvedService implements ResolvedService {
      * in an {@link IllegalStateException}.
      * @param resolvedGroup the group to which the service should be assigned
      */
-    public void setResolvedGroup(ResolvedGroup resolvedGroup) {
+    public void setResolvedGroup(P2PResolvedGroup resolvedGroup) {
 
         if (mAssignedGroup) {
             throw new IllegalStateException("This service has already been assigned to a group");

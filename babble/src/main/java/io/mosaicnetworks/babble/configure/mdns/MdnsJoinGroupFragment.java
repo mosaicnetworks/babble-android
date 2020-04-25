@@ -60,8 +60,6 @@ import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
@@ -81,8 +79,8 @@ public class MdnsJoinGroupFragment extends Fragment implements ResponseListener 
     private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
-    private MdnsResolvedGroup mResolvedGroup;
-    private MdnsResolvedService mResolvedService;
+    private ResolvedGroup mResolvedGroup;
+    private ResolvedService mResolvedService;
     private static Random randomGenerator = new Random();
 
     public MdnsJoinGroupFragment() {
@@ -98,7 +96,7 @@ public class MdnsJoinGroupFragment extends Fragment implements ResponseListener 
     public static MdnsJoinGroupFragment newInstance(ResolvedGroup resolvedGroup) {
         Log.i(TAG, "newInstance: "+ resolvedGroup.getGroupName());
         MdnsJoinGroupFragment mdnsJoinGroupFragment = new MdnsJoinGroupFragment();
-        mdnsJoinGroupFragment.mResolvedGroup = (MdnsResolvedGroup) resolvedGroup;
+        mdnsJoinGroupFragment.mResolvedGroup = resolvedGroup;
         return  mdnsJoinGroupFragment;
     }
 
@@ -157,7 +155,7 @@ public class MdnsJoinGroupFragment extends Fragment implements ResponseListener 
 
         //We are choosing a random resolved service - if we try again we may get a different
         //service.
-        mResolvedService = (MdnsResolvedService) resolvedServices.get(randomGenerator.nextInt(resolvedServices.size()));
+        mResolvedService = resolvedServices.get(randomGenerator.nextInt(resolvedServices.size()));
 
 
         final String peerIP = mResolvedService.getInetAddress().getHostAddress();
