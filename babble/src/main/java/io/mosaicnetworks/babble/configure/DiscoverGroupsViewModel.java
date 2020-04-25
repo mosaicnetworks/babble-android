@@ -40,13 +40,16 @@ import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsDiscovery;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
 
 public class DiscoverGroupsViewModel extends AndroidViewModel {
+
     private MutableLiveData<SelectableData<ConfigDirectory>> mArchivedList;
     private Context mAppContext;
     private List<MdnsResolvedGroup> mServiceInfoList = new ArrayList<>();
     private MdnsDiscovery mMdnsDiscovery;
     private MutableLiveData<List<MdnsResolvedGroup>> mMutableServiceInfoList;
+    private WebRTCService mWebRTCService;
 
     public DiscoverGroupsViewModel(Application application, ConfigManager configManager) {
         super(application);
@@ -75,6 +78,24 @@ public class DiscoverGroupsViewModel extends AndroidViewModel {
             @Override
             public void onStartDiscoveryFailed () {
                 //TODO: how should mdns discovery start failures be handled?
+            }
+        });
+    }
+
+    private void initialiseWebRtcDiscovery() {
+        mWebRTCService = WebRTCService.getInstance(mAppContext);
+
+        mWebRTCService.setResolvedGroups(null);
+
+        mWebRTCService.registerServiceDiscoveryListener(new ServiceDiscoveryListener() {
+            @Override
+            public void onServiceListUpdated(boolean groupCountChange) {
+
+            }
+
+            @Override
+            public void onStartDiscoveryFailed() {
+
             }
         });
     }
