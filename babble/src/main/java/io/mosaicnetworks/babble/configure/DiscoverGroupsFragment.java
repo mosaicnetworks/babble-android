@@ -204,6 +204,13 @@ public class DiscoverGroupsFragment extends Fragment {
         mRvDiscoveredGroups.setLayoutManager(new LinearLayoutManager(getContext()));
         mRvDiscoveredGroups.setAdapter(mMdnsServicesListAdapter);
 
+        mMdnsServicesListAdapter.setClickListener(new MdnsServicesListAdapter.ItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                mListener.onServiceSelected(mMdnsServicesListAdapter.getItem(position));
+            }
+        });
+
         final Observer<List<ResolvedGroup>> servicesObserver = new Observer<List<ResolvedGroup>>() {
             @Override
             public void onChanged(@Nullable final List<ResolvedGroup> updatedList) {

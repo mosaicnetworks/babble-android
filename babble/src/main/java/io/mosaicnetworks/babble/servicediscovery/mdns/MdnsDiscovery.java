@@ -178,7 +178,7 @@ public class MdnsDiscovery {
                 }
 
                 //no matching group - create a new group
-                ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService);
+                ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService, ResolvedGroup.Source.MDNS);
                 mResolvedGroups.add(resolvedGroup);
                 resolvedService.setResolvedGroup(resolvedGroup);
                 mServiceDiscoveryListener.onServiceListUpdated(false);

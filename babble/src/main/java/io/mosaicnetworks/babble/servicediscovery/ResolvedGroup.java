@@ -33,18 +33,26 @@ import java.util.List;
  * from the group as and when they are lost.
  */
 public class ResolvedGroup {
+
+    public enum Source {
+        MDNS,
+        WEBRTC
+    }
+
     private final String mGroupName;
     private final String mGroupUid;
     private final List<ResolvedService> mResolvedServices = new ArrayList<>();
+    private final Source mSource;
 
     /**
      * Constructor, the group is initialised from a resolved service
      * @param resolvedService a resolved service used to initialise the group
      */
-    public ResolvedGroup(ResolvedService resolvedService) {
+    public ResolvedGroup(ResolvedService resolvedService, Source source) {
         mGroupName = resolvedService.getGroupName();
         mGroupUid = resolvedService.getGroupUid();
         mResolvedServices.add(resolvedService);
+        mSource = source;
     }
 
     /**
@@ -105,5 +113,13 @@ public class ResolvedGroup {
      */
     public String getGroupUid() {
         return mGroupUid;
+    }
+
+    /**
+     * Get the source of this group descriptor
+     * @return the source type
+     */
+    public Source getSource() {
+        return mSource;
     }
 }

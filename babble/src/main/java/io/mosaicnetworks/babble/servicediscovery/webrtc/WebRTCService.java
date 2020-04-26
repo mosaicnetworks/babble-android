@@ -249,7 +249,7 @@ public class WebRTCService implements ServiceAdvertiser {
                                     }
                                 }
 
-                                ResolvedGroup webRTCResolvedGroup = new ResolvedGroup(webRTCResolvedService);
+                                ResolvedGroup webRTCResolvedGroup = new ResolvedGroup(webRTCResolvedService, ResolvedGroup.Source.WEBRTC);
                                 mResolvedGroups.add(webRTCResolvedGroup);
                                 webRTCResolvedService.setResolvedGroup(webRTCResolvedGroup);
                                 mResolvedServices.put(disco.GroupUID, webRTCResolvedService);

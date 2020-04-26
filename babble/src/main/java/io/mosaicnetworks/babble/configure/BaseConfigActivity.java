@@ -203,7 +203,19 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     @Override
     public void onServiceSelected(ResolvedGroup resolvedGroup) {
 
-        if (resolvedGroup instanceof ResolvedGroup) {
+        switch (resolvedGroup.getSource()) {
+            case MDNS:
+                MdnsJoinGroupFragment mJoinGroupMdnsFragment = MdnsJoinGroupFragment.newInstance(resolvedGroup);
+                replaceFragment(mJoinGroupMdnsFragment, true);
+                break;
+            case WEBRTC:
+                WebRTCJoinGroupFragment mJoinGroupWebRTCFragment = WebRTCJoinGroupFragment.newInstance(resolvedGroup);
+                replaceFragment(mJoinGroupWebRTCFragment, true);
+                break;
+        }
+
+        /*
+        if (resolvedGroup.getSource()) {
             Log.i(TAG, "onServiceSelected: MDNS item selected");
             MdnsJoinGroupFragment mJoinGroupMdnsFragment = MdnsJoinGroupFragment.newInstance(resolvedGroup);
             replaceFragment(mJoinGroupMdnsFragment, true);
@@ -216,6 +228,8 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
             WebRTCJoinGroupFragment mJoinGroupWebRTCFragment = WebRTCJoinGroupFragment.newInstance(resolvedGroup);
             replaceFragment(mJoinGroupWebRTCFragment, true);
         }
+
+         */
     }
 
     @Override
