@@ -110,7 +110,7 @@ public class DiscoverGroupsFragment extends Fragment {
                     @Override
                     public void onRefresh() {
 
-                        //do nothing ;)
+                        mViewModel.refreshDiscovery();
 
                         if (mSwipeRefreshServicesDisplaying.isRefreshing()) {
                             mSwipeRefreshServicesDisplaying.setRefreshing(false);
@@ -124,7 +124,7 @@ public class DiscoverGroupsFragment extends Fragment {
                     @Override
                     public void onRefresh() {
 
-                        //do nothing ;)
+                        mViewModel.refreshDiscovery();
 
                         if (mSwipeRefreshServiceSearch.isRefreshing()) {
                             mSwipeRefreshServiceSearch.setRefreshing(false);
@@ -223,6 +223,8 @@ public class DiscoverGroupsFragment extends Fragment {
         };
 
         mViewModel.getServiceInfoList().observe(this, servicesObserver);
+
+        mViewModel.refreshDiscovery();
 
     }
 

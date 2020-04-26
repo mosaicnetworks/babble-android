@@ -27,7 +27,6 @@ package io.mosaicnetworks.babble.configure;
 import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
@@ -56,8 +55,14 @@ public class DiscoverGroupsViewModel extends AndroidViewModel {
         mAppContext = application.getApplicationContext();
 
         initialise();
+        initialiseWebRtcDiscovery();
         mMutableServiceInfoList = new MutableLiveData<>();
         mMdnsDiscovery.discoverServices();
+        mWebRTCService.discoverService();
+    }
+
+    public void refreshDiscovery() {
+        mWebRTCService.discoverService();
     }
 
     private void initialise() {
@@ -85,11 +90,20 @@ public class DiscoverGroupsViewModel extends AndroidViewModel {
     private void initialiseWebRtcDiscovery() {
         mWebRTCService = WebRTCService.getInstance(mAppContext);
 
-        mWebRTCService.setResolvedGroups(null);
+        mWebRTCService.setResolvedGroups(mServiceInfoList);
 
         mWebRTCService.registerServiceDiscoveryListener(new ServiceDiscoveryListener() {
             @Override
             public void onServiceListUpdated(boolean groupCountChange) {
+                Handler mainHandler = new Handler(mAppContext.getMainLooper());
+
+                Runnable myRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        mMutableServiceInfoList.setValue(mServiceInfoList);
+                    }
+                };
+                mainHandler.post(myRunnable);
 
             }
 

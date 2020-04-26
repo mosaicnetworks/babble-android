@@ -218,7 +218,7 @@ public class WebRTCService implements ServiceAdvertiser {
 
                         Log.i(TAG, "onResponse: Disco unpacked" );
 
-                        mResolvedGroups.clear();
+                        //mResolvedGroups.clear();
 
                         Iterator<Map.Entry<String, Disco>> itr = discos.entrySet().iterator();
 
@@ -239,6 +239,15 @@ public class WebRTCService implements ServiceAdvertiser {
                                                 null,
                                                 0
                                         );
+
+                                //check if seen before
+                                for (ResolvedGroup group:mResolvedGroups) {
+                                    if (group.getGroupUid().equals(webRTCResolvedService.getGroupUid())) {
+                                        //already seen - remove the previous version
+                                        mResolvedGroups.remove(group);
+                                        break;
+                                    }
+                                }
 
                                 ResolvedGroup webRTCResolvedGroup = new ResolvedGroup(webRTCResolvedService);
                                 mResolvedGroups.add(webRTCResolvedGroup);

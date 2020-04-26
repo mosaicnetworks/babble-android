@@ -79,7 +79,7 @@ public abstract class BaseConfigActivity extends AppCompatActivity implements On
     private Boolean mFromGroup = false;
     private boolean mShowmDNS = true;
     private boolean mShowP2P = true;
-    private boolean mShowGlobal = true;
+    private boolean mShowGlobal = false;
     private boolean mShowArchive = true;
     private boolean mTooLateToChangeShowTabs = false;
     private boolean mShowAllArchiveVersions = true;
