@@ -204,7 +204,7 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
         String peerList = this.getResources().getString(R.string.monikers_preamble);
 
         for (int i=0; i< peers.length; i++ ) {
-            peerList = peerList + join + peers[i].moniker;
+            peerList = peerList + join + peers[i].moniker + ", " + peers[i].pubKeyHex;
             join = ",\n";
         }
 
