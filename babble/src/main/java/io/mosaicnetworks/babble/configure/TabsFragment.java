@@ -148,7 +148,7 @@ public class TabsFragment extends Fragment {
 
                 // These are not compile time constants so we cannot use a switch
                 if (position == mTabmDNS) {
-                    tab.setText(R.string.wifi_tab);
+                    tab.setText(R.string.live_tab);
                 } else {
                     if (position == mTabP2P) {
                         tab.setText(R.string.p2p_tab);
