@@ -91,6 +91,8 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
         mMessagingService.registerObserver(this);
 
         setPollStats(mMessagingService.getStatusPolling());
+        
+        stateUpdated();
 
 
         Log.i("ChatActivity", "registerObserver");

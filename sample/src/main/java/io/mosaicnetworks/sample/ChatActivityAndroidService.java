@@ -85,13 +85,15 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
         initialiseAdapter();
         doBindService();
 
-
     }
 
     @Override
     protected void onServiceConnected() {
 
         mBoundService.registerObserver(this);
+
+        //we need to call stateUpdate() to ensure messages are pulled on configuration changes
+        stateUpdated();
 
         Log.i("ChatActivity", "registerObserver");
 
