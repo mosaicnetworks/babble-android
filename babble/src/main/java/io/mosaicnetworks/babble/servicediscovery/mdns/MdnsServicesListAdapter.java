@@ -36,6 +36,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.configure.mdns.MdnsJoinGroupFragment;
+import io.mosaicnetworks.babble.configure.webrtc.WebRTCJoinGroupFragment;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 public class MdnsServicesListAdapter extends RecyclerView.Adapter<MdnsServicesListAdapter.ViewHolder> {
@@ -61,10 +63,12 @@ public class MdnsServicesListAdapter extends RecyclerView.Adapter<MdnsServicesLi
     private List<ResolvedGroup> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+    private Context mContext;
 
     public MdnsServicesListAdapter(Context context, List<ResolvedGroup> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        mContext = context.getApplicationContext();
     }
 
     // inflates the row layout from xml when needed
@@ -79,6 +83,22 @@ public class MdnsServicesListAdapter extends RecyclerView.Adapter<MdnsServicesLi
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         ResolvedGroup groupInfo = mData.get(position);
+
+        int colourGroupName;
+        int colourGroupUid;
+        switch (groupInfo.getSource()) {
+            case MDNS:
+                colourGroupName = R.color.colorArchivedGroup;
+                colourGroupUid = R.color.colorArchivedGroup;
+                break;
+            default:
+                colourGroupName = android.R.color.primary_text_light;
+                colourGroupUid = android.R.color.secondary_text_light;
+                break;
+        }
+
+        holder.serviceNameTextView.setTextColor(mContext.getResources().getColor(colourGroupName));
+        holder.groupUidTextView.setTextColor(mContext.getResources().getColor(colourGroupUid));
 
         holder.groupUidTextView.setText(groupInfo.getGroupUid());
         holder.serviceNameTextView.setText(groupInfo.getGroupName());
