@@ -81,6 +81,9 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
         Intent intent = getIntent();
         mMoniker = intent.getStringExtra("MONIKER");
         mArchiveMode = intent.getBooleanExtra("ARCHIVE_MODE", false);
+        String group = intent.getStringExtra("GROUP");
+
+        setTitle(group);
 
         initialiseAdapter();
         doBindService();
