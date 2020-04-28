@@ -73,21 +73,11 @@ public class MdnsAdvertiser2 implements ServiceAdvertiser {
     }
 
     @Override
-    public boolean advertise(final String genesisPeers, final String currentPeers) {
+    public boolean advertise(final String genesisPeers, final String currentPeers, PeersProvider peersProvider) {
 
         mCurrentPeers = currentPeers;
 
-        mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(sDiscoveryPort, new PeersProvider() {
-            @Override
-            public String getGenesisPeers() {
-                return genesisPeers;
-            }
-
-            @Override
-            public String getCurrentPeers() {
-                return mCurrentPeers;
-            }
-        });
+        mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(sDiscoveryPort, peersProvider);
 
         try {
             mHttpPeerDiscoveryServer.start();

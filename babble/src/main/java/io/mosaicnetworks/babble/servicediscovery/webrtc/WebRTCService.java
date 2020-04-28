@@ -280,7 +280,7 @@ public class WebRTCService implements ServiceAdvertiser {
     }
 
     @Override
-    public boolean advertise(String genesisPeers, String currentPeers) {
+    public boolean advertise(String genesisPeers, String currentPeers, PeersProvider peersProvider) {
         Log.i(TAG,"WebRTC advertise");
 
         ConfigManager configManager = ConfigManager.getInstance(null);

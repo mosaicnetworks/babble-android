@@ -25,13 +25,14 @@
 package io.mosaicnetworks.babble.service;
 
 
+import io.mosaicnetworks.babble.discovery.PeersProvider;
 
 public interface ServiceAdvertiser {
 
     //TODO: swap out the "string methods" with the "list methods"
 
     //boolean advertise(List<Peer> genesisPeers, List<Peer> currentPeers);
-    boolean advertise(String genesisPeers, String currentPeers);
+    boolean advertise(String genesisPeers, String currentPeers, PeersProvider peersProvider);
 
     void stopAdvertising();
 

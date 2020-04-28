@@ -241,7 +241,7 @@ public class P2PJoinGroupFragment extends Fragment implements ResponseListener, 
         try {
             String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService.NETWORK_P2P);
             babbleService.start(configDir, groupDescriptor);
-        } catch (IllegalStateException | CannotStartBabbleNodeException| IOException ex ) {
+        } catch (IllegalStateException ex ) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port - in which case

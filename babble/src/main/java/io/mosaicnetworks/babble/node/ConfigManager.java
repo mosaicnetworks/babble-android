@@ -306,7 +306,7 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor, String moniker, String inetAddress, int networkType) throws CannotStartBabbleNodeException, IOException {
+    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor, String moniker, String inetAddress, int networkType) {
         return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, inetAddress, mDefaultBabblePort, networkType);
     }
 

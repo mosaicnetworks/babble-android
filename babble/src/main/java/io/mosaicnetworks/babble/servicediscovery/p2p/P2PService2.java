@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.mosaicnetworks.babble.configure.OnNetworkInitialised;
+import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.utils.RandomString;
@@ -588,7 +589,7 @@ public class P2PService2 implements ServiceAdvertiser {
     }
 
     @Override
-    public boolean advertise(String genesisPeers, String currentPeers) {
+    public boolean advertise(String genesisPeers, String currentPeers, PeersProvider peersProvider) {
         // Do nothing. It is implicit in the starting a Wifi Direct node
         Log.i(TAG,"P2P advertise, does nothing");
         return true;

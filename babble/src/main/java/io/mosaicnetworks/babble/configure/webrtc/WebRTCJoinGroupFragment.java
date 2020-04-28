@@ -194,7 +194,7 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
             Log.i(TAG, "onReceivePeers: "+ip);
             String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, mMoniker, ip, BabbleService.NETWORK_GLOBAL);
             babbleService.start(configDir, groupDescriptor);
-        } catch (IllegalStateException | CannotStartBabbleNodeException| IOException ex ) {
+        } catch (IllegalStateException ex) {
             //TODO: just catch IOException - this will mean the port is in use
             //we'll assume this is caused by the node taking a while to leave a previous group,
             //though it could be that another application is using the port or WiFi is turned off -

@@ -103,7 +103,7 @@ public class BabbleService2 extends Service {
         });
 
         mBabbleNode.run();
-        mServiceAdvertiser.advertise(mBabbleNode.getGenesisPeers(), mBabbleNode.getCurrentPeers());
+        mServiceAdvertiser.advertise(mBabbleNode.getGenesisPeers(), mBabbleNode.getCurrentPeers(), mBabbleNode);
         mState = State.RUNNING;
     }
 
