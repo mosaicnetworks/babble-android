@@ -212,42 +212,6 @@ public class MdnsJoinGroupFragment extends BabbleServiceBinder implements Respon
         mHttpGenesisPeerDiscoveryRequest.send();
     }
 
-    /*
-    @Override
-    public void onReceivePeers(List<Peer> currentPeers) {
-
-        ConfigManager configManager;
-            configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
-
-
-        BabbleService<?> babbleService = mListener.getBabbleService();
-        GroupDescriptor groupDescriptor = new GroupDescriptor(mResolvedService.getGroupName(), mResolvedService.getGroupUid());
-
-        try {
-            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService.NETWORK_WIFI);
-            babbleService.start(configDir, groupDescriptor);
-        } catch (IllegalStateException | CannotStartBabbleNodeException| IOException ex ) {
-            //TODO: just catch IOException - this will mean the port is in use
-            //we'll assume this is caused by the node taking a while to leave a previous group,
-            //though it could be that another application is using the port or WiFi is turned off -
-            // in which case we'll keep getting stuck here until the port is available or WiFi is
-            // turned on!
-            mLoadingDialog.dismiss();
-            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
-            return;
-        } catch (Exception ex) {
-            //TODO: Review this. The duplicate dialog function feels overkill.
-            mLoadingDialog.dismiss();
-            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
-            throw ex;
-        }
-
-        mLoadingDialog.dismiss();
-        mListener.baseOnJoined(mMoniker, groupDescriptor.getName());
-    }
-
-     */
-
     @Override
     public void onFailure(io.mosaicnetworks.babble.discovery.ResponseListener.Error error) {
         mLoadingDialog.dismiss();
