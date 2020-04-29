@@ -32,6 +32,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -48,6 +50,7 @@ import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.BabbleNode;
 import io.mosaicnetworks.babble.service.BabbleServiceBinderActivity;
 import io.mosaicnetworks.babble.service.ServiceObserver2;
+import io.mosaicnetworks.babble.service.StatsObserver;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 import io.mosaicnetworks.sample.chatkit.commons.ImageLoader;
@@ -64,7 +67,7 @@ import io.mosaicnetworks.sample.notification.NotificationMessage;
  * This is the central UI component. It receives messages from the {@link MessagingService} and
  * displays them as a list.
  */
-public class ChatActivityAndroidService extends BabbleServiceBinderActivity implements ServiceObserver2 {
+public class ChatActivityAndroidService extends BabbleServiceBinderActivity implements ServiceObserver2, StatsObserver {
 
     private MessagesListAdapter mAdapter;
     private String mMoniker;
@@ -196,7 +199,7 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_chat2, menu);
+        getMenuInflater().inflate(R.menu.menu_chat, menu);
         return true;
     }
 
@@ -242,31 +245,29 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
             map.put("time", dateString);
         }
 
+        String preBlock = "<table style=\"border-collapse:collapse;border-spacing:0;\">";
+        String postBlock = "</table>\n";
+        String predata = "<td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;\">";
+        String prelabel = "<tr><td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;\">";
+        String postlabel = "</td>";
+        String postdata = "</td></tr>\n";
+        String databreak = "<tr><td colspan=\"2\" style=\"border-style:none;\">&nbsp;</td></tr>";
 
 
-        boolean plainText = false;
-        if (plainText) {
-            String rawStats = gson.toJson(map);
 
-            String stats = rawStats.replace('{', '\0')
-                    .replace('}', '\0')
-                    .replace('"', '\0')
-                    .replace(',', '\0');
 
-            DialogUtils.displayOkAlertDialogText(this, R.string.stats_title, stats);
-        } else {
             Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
-            String html = "<table>\n";
+            String html = preBlock;
 
             while(itr.hasNext()) {
                 Map.Entry<String, String> entry = itr.next();
-                html = html + "<tr><td><font color=\"#0000ff\">" + entry.getKey() + "</font></td><td><font color=\"#ff0000\"> " + entry.getValue() + "</font></td></tr>\n";
+                html = html + prelabel + entry.getKey() + postlabel+predata + entry.getValue() + postdata;
             }
 
-            html = html + "</table>\n";
+            html = html + postBlock;
 
             DialogUtils.displayOkAlertDialogHTML(this, R.string.stats_title, html);
-        }
+
     }
 
     /**
@@ -281,8 +282,47 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
 
     @Override
     public void onDestroy() {
+        mBoundService.removeStatsObserver();
         mBoundService.removeObserver(this);
-
         super.onDestroy();
     }
+
+
+    public void pollStats(MenuItem menuItem) {
+        setPollStats(! mBoundService.getStatusPolling());
+    }
+
+
+    private void setPollStats(boolean enable) {
+        LinearLayout linearLayoutStatusLine = findViewById(R.id.statusLine);
+
+        if (! enable) {
+            mBoundService.stopStatsPolling();
+            linearLayoutStatusLine.setVisibility(View.GONE);
+            mBoundService.removeStatsObserver();
+            Log.i("ChatActivity", "pollStats: stopping");
+        } else {
+            linearLayoutStatusLine.setVisibility(View.VISIBLE);
+            mBoundService.registerStatsObserver(this);
+            mBoundService.startStatsPolling();
+            Log.i("ChatActivity", "pollStats: starting");
+        }
+    }
+
+
+
+
+
+    @Override
+    public void statsUpdated(Map map) {
+        Log.i("ChatActivity", "statsUpdated");
+        Log.i("ChatActivity", (String) map.get("time"));
+        ((TextView) findViewById(R.id.babbleStatus)).setText((String) map.get("state"));
+        ((TextView) findViewById(R.id.babbleEvents)).setText((String) map.get("consensus_events"));
+        ((TextView) findViewById(R.id.babbleTransactions)).setText((String) map.get("consensus_transactions"));
+        ((TextView) findViewById(R.id.babbleUndetermined)).setText((String) map.get("undetermined_events"));
+
+    }
+
+
 }

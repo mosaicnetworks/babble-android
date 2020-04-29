@@ -37,6 +37,7 @@ import java.util.Map;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
 
 import io.mosaicnetworks.babble.node.BabbleService;
+import io.mosaicnetworks.babble.service.StatsObserver;
 import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.p2p.P2PService;

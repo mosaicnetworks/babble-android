@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.sample;
+package io.mosaicnetworks.babble.service;
 
 import java.util.Map;
 

@@ -34,14 +34,19 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.mosaicnetworks.babble.node.BabbleNode;
 import io.mosaicnetworks.babble.node.BabbleService;
@@ -70,6 +75,13 @@ public class BabbleService2 extends Service {
     private ServiceAdvertiser mServiceAdvertiser;
     private boolean mIsArchive = false;
     private BabbleNode.State mNodeState;
+
+    private StatsObserver mStatsObserver;
+    private boolean mIsStatsPolling = false;
+    public int mPollingInterval = 5000;
+    private Gson gson;
+
+
 
     /**
      * Start the service
@@ -351,5 +363,52 @@ public class BabbleService2 extends Service {
     }
 
     //##############################################################################################
+
+    //Stats
+
+    public void registerStatsObserver(StatsObserver statsObserver) {
+        mStatsObserver = statsObserver;
+    }
+
+    public void removeStatsObserver() {
+        mStatsObserver = null;
+    }
+
+
+    public void setPollingInterval(int pollingIntervalMilliSeconds) {
+        mPollingInterval = pollingIntervalMilliSeconds;
+    }
+
+    public boolean getStatusPolling() { return mIsStatsPolling; }
+    public void stopStatsPolling(){
+        mIsStatsPolling = false;
+    }
+
+    public void startStatsPolling(){
+        final android.os.Handler handler = new Handler();
+
+        if (gson == null) { gson = new GsonBuilder().create();}
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!mIsStatsPolling) { return ; }
+                if (mStatsObserver == null) { mIsStatsPolling = false; return ;}
+                if (mBabbleNode == null) {
+                    mIsStatsPolling = false; return ;}
+
+                mBabbleNode.getStats();
+                Map map = gson.fromJson(mBabbleNode.getStats(), Map.class);
+
+                mStatsObserver.statsUpdated(map);
+                handler.postDelayed(this, mPollingInterval);
+            }
+        };
+
+        mIsStatsPolling = true;
+        handler.postDelayed(runnable, 0);
+    }
+
+
 
 }

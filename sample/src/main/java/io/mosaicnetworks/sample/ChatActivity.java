@@ -27,7 +27,6 @@ package io.mosaicnetworks.sample;
 import android.content.Context;
 import android.content.Intent;
 
-import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,7 +43,6 @@ import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -52,6 +50,7 @@ import java.util.Map;
 
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.ServiceObserver;
+import io.mosaicnetworks.babble.service.StatsObserver;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 import io.mosaicnetworks.sample.chatkit.commons.ImageLoader;
@@ -59,13 +58,12 @@ import io.mosaicnetworks.sample.chatkit.commons.models.IMessage;
 import io.mosaicnetworks.sample.chatkit.messages.MessageInput;
 import io.mosaicnetworks.sample.chatkit.messages.MessagesList;
 import io.mosaicnetworks.sample.chatkit.messages.MessagesListAdapter;
-import io.mosaicnetworks.sample.notification.NotificationMessage;
 
 /**
  * This is the central UI component. It receives messages from the {@link MessagingService} and
  * displays them as a list.
  */
-public class ChatActivity extends AppCompatActivity implements ServiceObserver, StatsObserver  {
+public class ChatActivity extends AppCompatActivity implements ServiceObserver, StatsObserver {
 
     private MessagesListAdapter<IMessage> mAdapter;
     private String mMoniker;
