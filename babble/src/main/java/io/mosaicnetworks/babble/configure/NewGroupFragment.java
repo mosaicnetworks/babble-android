@@ -206,7 +206,7 @@ public class NewGroupFragment extends BabbleServiceBinder {
         try {
             mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
             mListener.baseOnStartedNew(mMoniker, mGroupDescriptor.getName());
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalStateException ex) {
             // we'll assume this is caused by the node taking a while to leave a previous group,
             // though it could be that another application is using the port or WiFi is turned off -
             // in which case we'll keep getting stuck here until the port is available or WiFi is
