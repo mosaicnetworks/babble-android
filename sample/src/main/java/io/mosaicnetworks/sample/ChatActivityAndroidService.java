@@ -208,16 +208,23 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
         Gson gson = new Gson();
         Peer[] peers = gson.fromJson(mBoundService.getMonikerList(), Peer[].class);
 
-        String join = "";
-        String peerList = this.getResources().getString(R.string.monikers_preamble);
+        String preBlock = "<table style=\"border-collapse:collapse;border-spacing:0;\">";
+        String postBlock = "</table>\n";
+        String predata = "<td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;font-size: 50%;\">";
+        String prelabel = "<tr><td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;\">";
+        String postlabel = "</td>";
+        String postdata = "</td></tr>\n";
+        String databreak = "<tr><td colspan=\"2\" style=\"border-style:none;\">&nbsp;</td></tr>";
+
+       // String html = "<h4>"+this.getResources().getString(R.string.monikers_preamble)+"</h4>\n"+preBlock;
+        String html = preBlock;
 
         for (int i=0; i< peers.length; i++ ) {
-            peerList = peerList + join + peers[i].moniker + ", " + peers[i].pubKeyHex;
-            join = ",\n";
+            html = html + prelabel + peers[i].moniker + postlabel+predata + peers[i].pubKeyHex + postdata;
         }
 
-        DialogUtils.displayOkAlertDialogText(this,R.string.monikers_title,peerList) ;
-
+        html = html + postBlock;
+        DialogUtils.displayOkAlertDialogHTML(this,R.string.monikers_preamble,html) ;
     }
 
 
@@ -227,6 +234,7 @@ public class ChatActivityAndroidService extends BabbleServiceBinderActivity impl
         String ip = "Your IP is: "+ Utils.getIPAddr(context);
 
         DialogUtils.displayOkAlertDialogText(this,R.string.ip_title,ip) ;
+
 
     }
 
