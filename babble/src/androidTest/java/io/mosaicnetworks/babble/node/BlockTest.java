@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNotNull;
 public class BlockTest {
 
     @Test
-    public void BlocksTest() throws InterruptedException {
+    public void BlocksTest() {
 
         String blockJson = "{\"Body\":{\"Index\":1,\"RoundReceived\":6,\"StateHash\":\"\",\"FrameHash\":\"mVKthxLv6woSfAZjZRp9nXsxIBunM7Poszm4q26EzqQ=\",\"PeersHash\":\"rbeyzzZrJI3VQFyS2f9gteGLPWZ1HM24VA5ET/fKbAc=\",\"Transactions\":[\"eyJmcm9tIjoiZmZmYyIsImltYWdlcyI6W10sInRleHQiOiJnaHZjIiwidHlwZSI6InRleHQifQ==\"],\"InternalTransactions\":[],\"InternalTransactionReceipts\":null},\"Signatures\":{}}";
 

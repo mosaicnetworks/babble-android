@@ -31,7 +31,7 @@ public interface ServiceAdvertiser {
 
     //TODO: swap out the "string methods" with the "list methods"
 
-    //boolean advertise(List<Peer> genesisPeers, List<Peer> currentPeers);
+    //boolean advertise(List<Peer> genesisPeers, List<Peer> currentPeers, PeersProvider peersProvider);
     boolean advertise(String genesisPeers, String currentPeers, PeersProvider peersProvider);
 
     void stopAdvertising();

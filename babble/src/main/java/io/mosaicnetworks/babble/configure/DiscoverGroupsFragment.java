@@ -136,47 +136,6 @@ public class DiscoverGroupsFragment extends Fragment {
         return view;
     }
 
-    /*
-    private void startDiscovery() {
-        mServiceListView.startDiscovery(new ServicesListListener() {
-
-            @Override
-            public void onServiceSelectedSuccess(ResolvedGroup resolvedGroup) {
-                mListener.onServiceSelected(resolvedGroup);
-            }
-
-            @Override
-            public void onServiceSelectedFailure() {
-                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_discovery_resolve_fail_title, R.string.service_discovery_resolve_fail_message);
-            }
-
-            @Override
-            public void onDiscoveryStartFailure() {
-                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
-
-                mSwipeRefreshServiceSearch.setVisibility(View.GONE);
-                mSwipeRefreshDiscoveryFailed.setVisibility(View.VISIBLE);
-                mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onListEmptyStatusChange(boolean empty) {
-                if (empty) {
-                    mSwipeRefreshServiceSearch.setVisibility(View.VISIBLE);
-                    mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
-                    mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
-                } else {
-                    mSwipeRefreshServiceSearch.setVisibility(View.GONE);
-                    mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
-                    mSwipeRefreshServicesDisplaying.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-    }
-
-     */
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);

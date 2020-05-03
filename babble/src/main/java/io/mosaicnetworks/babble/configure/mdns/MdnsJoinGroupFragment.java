@@ -32,9 +32,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AlertDialog;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,8 +40,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -55,9 +50,6 @@ import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
-import io.mosaicnetworks.babble.node.BabbleService;
-import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
-import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService2;
@@ -65,13 +57,12 @@ import io.mosaicnetworks.babble.service.BabbleServiceBinder;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser2;
+import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
-
 /**
- * This fragment enables the user to configure the {@link BabbleService} to join an existing group.
+ * This fragment enables the user to configure the BabbleService to join an existing group.
  * Activities that contain this fragment must implement the {@link OnFragmentInteractionListener}
  * interface to handle interaction events. Use the {@link MdnsJoinGroupFragment#newInstance} factory
  * method to create an instance of this fragment.
@@ -139,7 +130,6 @@ public class MdnsJoinGroupFragment extends BabbleServiceBinder implements Respon
         Objects.requireNonNull(imgr).toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
 
         return view;
-
     }
 
     // called when the user presses the join button
@@ -152,7 +142,6 @@ public class MdnsJoinGroupFragment extends BabbleServiceBinder implements Respon
             return;
         }
 
-
         List<ResolvedService> resolvedServices = mResolvedGroup.getResolvedServices();
 
         if (resolvedServices.size() < 1) {
@@ -160,11 +149,9 @@ public class MdnsJoinGroupFragment extends BabbleServiceBinder implements Respon
             return;
         }
 
-
         //We are choosing a random resolved service - if we try again we may get a different
         //service.
         mResolvedService = resolvedServices.get(randomGenerator.nextInt(resolvedServices.size()));
-
 
         final String peerIP = mResolvedService.getInetAddress().getHostAddress();
         final int peerPort = mResolvedService.getPort();
@@ -177,7 +164,6 @@ public class MdnsJoinGroupFragment extends BabbleServiceBinder implements Respon
         editor.putString("moniker", mMoniker);
         editor.putString("host", peerIP);
         editor.apply();
-
 
         getPeers(peerIP, peerPort);
     }
@@ -240,7 +226,7 @@ public class MdnsJoinGroupFragment extends BabbleServiceBinder implements Respon
         ConfigManager configManager =
                 ConfigManager.getInstance(getContext().getApplicationContext());
 
-        mConfigDirectory = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, mGroupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService.NETWORK_WIFI);
+        mConfigDirectory = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, mGroupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService2.NETWORK_WIFI);
 
         startBabbleService();
     }
@@ -253,7 +239,7 @@ public class MdnsJoinGroupFragment extends BabbleServiceBinder implements Respon
     @Override
     protected void onServiceConnected() {
 
-        ServiceAdvertiser serviceAdvertiser = new MdnsAdvertiser2(mGroupDescriptor,
+        ServiceAdvertiser serviceAdvertiser = new MdnsAdvertiser(mGroupDescriptor,
                 getContext().getApplicationContext());
 
         try {
@@ -291,7 +277,6 @@ public class MdnsJoinGroupFragment extends BabbleServiceBinder implements Respon
                 cancelRequests();
             }});
     }
-
 
     private void cancelRequests() {
         if (mHttpCurrentPeerDiscoveryRequest!=null) {

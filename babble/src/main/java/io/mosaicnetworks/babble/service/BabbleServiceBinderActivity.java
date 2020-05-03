@@ -74,7 +74,7 @@ public abstract class BabbleServiceBinderActivity extends AppCompatActivity {
         if (bindService(new Intent(this, BabbleService2.class), mConnection, Context.BIND_AUTO_CREATE)) {
             mShouldUnbind = true;
         } else {
-            Log.e("MY_APP_TAG", "Error: The requested service doesn't " +
+            Log.e("ERROR", "Error: The requested service doesn't " +
                     "exist, or this client isn't allowed access to it.");
         }
     }

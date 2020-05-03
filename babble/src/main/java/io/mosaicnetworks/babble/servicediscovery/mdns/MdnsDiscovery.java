@@ -42,7 +42,6 @@ import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
  * This class encapsulates the MDNS discover process.
  */
 public class MdnsDiscovery {
-    private static final String TAG = "MdnsDiscovery";
 
     private final Map<String, ResolvedService> mResolvedServices = new HashMap<>();
     private final List<ResolvedGroup> mResolvedGroups;
@@ -52,10 +51,6 @@ public class MdnsDiscovery {
     private ServiceDiscoveryListener mServiceDiscoveryListener;
 
     private final String mPackageName;
-
-
-
-
     public MdnsDiscovery(Context context, List<ResolvedGroup> resolvedGroups,
                          ServiceDiscoveryListener serviceDiscoveryListener) {
         Context appContext = context.getApplicationContext();
@@ -66,13 +61,11 @@ public class MdnsDiscovery {
         mPackageName =  appContext.getPackageName() ;
 
         initializeDiscoveryListener(serviceDiscoveryListener);
-
     }
 
     public void discoverServices() {
         mNsdManager.discoverServices(
                 MdnsAdvertiser.SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
-
     }
 
     public void stopDiscovery() {
@@ -133,9 +126,7 @@ public class MdnsDiscovery {
         };
     }
 
-
     private void resolveService(final NsdServiceInfo serviceInfo) {
-
         mNsdManager.resolveService(serviceInfo, new NsdManager.ResolveListener() {
             @Override
             public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {

@@ -38,10 +38,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -53,8 +50,6 @@ import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
-import io.mosaicnetworks.babble.node.BabbleService;
-import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService2;
@@ -62,13 +57,11 @@ import io.mosaicnetworks.babble.service.BabbleServiceBinder;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser2;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
-
 /**
- * This fragment enables the user to configure the {@link BabbleService} to join an existing group.
+ * This fragment enables the user to configure the BabbleService to join an existing group.
  * Activities that contain this fragment must implement the {@link OnFragmentInteractionListener}
  * interface to handle interaction events. Use the {@link WebRTCJoinGroupFragment#newInstance} factory
  * method to create an instance of this fragment.
@@ -87,10 +80,6 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
     private static Random randomGenerator = new Random();
     private GroupDescriptor mGroupDescriptor;
     private String mConfigDirectory;
-
-    public WebRTCJoinGroupFragment() {
-        // Required empty public constructor
-    }
 
     /**
      * Use this factory method to create a new instance of
@@ -136,7 +125,6 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
         Objects.requireNonNull(imgr).toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
 
         return view;
-
     }
 
     // called when the user presses the join button
@@ -149,7 +137,6 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
             return;
         }
 
-
         List<ResolvedService> resolvedServices = mResolvedGroup.getResolvedServices();
 
         if (resolvedServices.size() < 1) {
@@ -157,14 +144,9 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
             return;
         }
 
-
         //We are choosing a random resolved service - if we try again we may get a different
         //service.
         mResolvedService = resolvedServices.get(randomGenerator.nextInt(resolvedServices.size()));
-
-
-        //     final String peerIP = mResolvedService.getInetAddress().getHostAddress();
-        //     final int peerPort = mResolvedService.getPort();
 
         // Store moniker and host entered
         SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
@@ -172,7 +154,6 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
 
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("moniker", mMoniker);
-        //      editor.putString("host", peerIP);
         editor.apply();
 
         mGenesisPeers = mResolvedService.getInitialPeers();
@@ -207,7 +188,7 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
         ConfigManager configManager =
                 ConfigManager.getInstance(getContext().getApplicationContext());
 
-        mConfigDirectory = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, mGroupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService.NETWORK_GLOBAL);
+        mConfigDirectory = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, mGroupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService2.NETWORK_GLOBAL);
 
         startBabbleService();
     }
@@ -229,12 +210,12 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
 
                 @Override
                 public void stopAdvertising() {
-
+                    //do nothing
                 }
 
                 @Override
                 public void onPeersChange(String newPeers) {
-
+                    //do nothing
                 }
             });
             mLoadingDialog.dismiss();
@@ -270,7 +251,6 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
                 cancelRequests();
             }});
     }
-
 
     private void cancelRequests() {
         if (mHttpCurrentPeerDiscoveryRequest!=null) {

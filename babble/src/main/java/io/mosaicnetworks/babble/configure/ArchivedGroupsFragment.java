@@ -80,10 +80,9 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
     /**
      * Use this factory method to create a new instance of
      * this fragment.
-     * @param args Bundle of invocation params
      * @return A new instance of fragment ArchivedGroupsFragment.
      */
-    public static ArchivedGroupsFragment newInstance(Bundle args) {
+    public static ArchivedGroupsFragment newInstance() {
         return new ArchivedGroupsFragment();
     }
 

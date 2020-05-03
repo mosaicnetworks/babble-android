@@ -25,7 +25,7 @@
 package io.mosaicnetworks.babble.node;
 
 /**
- * A transaction to be submitted to the {@link BabbleService} must implement this interface
+ * A transaction to be submitted to the BabbleService must implement this interface
  */
 public interface BabbleTx {
 

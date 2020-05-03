@@ -2,26 +2,34 @@
 
 **NOTE**:
 This is alpha software. Breaking changes are likely to be made as the
-interfaces are refined.
+interfaces are refined. Also there are a few areas which need some
+attention:
+
+* Documentation - only parts of the API have been documented.
+* Code quality - some parts of the code need tidying up.
+* Test coverage - we need to work towards much higher test coverage.
 
 babble-android allows developers to easily integrate the
 [Babble](https://github.com/mosaicnetworks/babble) consensus engine
 into their Android apps.
 
-A complete API reference can be found [here](https://javadoc.io/doc/io.mosaicnetworks/babble/latest/index.html)
-
-A tutorial can be found [here](https://android.babble.io)
+A partial API reference can be found [here](https://javadoc.io/doc/io.mosaicnetworks/babble/latest/index.html)
 
 ## Quickstart
 
-The best place to start is [this](https://github.com/mosaicnetworks/babble-android/tree/master/docs/first_app) comprehensive tutorial,
-which guides you through building the [sample app](https://github.com/mosaicnetworks/babble-android/tree/master/sample).
+The best place to start is the [sample app](https://github.com/mosaicnetworks/babble-android/tree/master/sample). This is a demo app which shows how the
+components in the library can be used to build a simple chat app.
 
 For the impatient, add the following to your app's `build.gradle` file:
 
 ```implementation 'io.mosaicnetworks:babble:0.4.3'```
 
 and start coding!
+
+For the very impatient we've added the sample app to the google play store. Install
+it to get a quick feel for what babble can be used for.
+
+<a href='https://play.google.com/store/apps/details?id=io.mosaicnetworks.sample&hl=en_GB'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='80px'/></a>
 
 ## Library structure
 
@@ -31,20 +39,13 @@ However we don't recommend you use this class
 directly (not initially anyway). We've included a number of ancillary
 classes in the library, which can be used as scaffolding so that you can
 focus on building your app logic. These components can easily be swapped
-out with your own custom implementations later on.
-
-The scaffolding architecture is shown below.
-
-![alt text](https://github.com/mosaicnetworks/babble-android/blob/master/pics/android-architecture.svg "Scaffold app architecture")
-
-There are five classes which you will need to
-implement, these will either extend classes or implement interfaces from
-the library. For a comprehensive tutorial on writing these classes see
-[here](https://github.com/mosaicnetworks/babble-android/tree/master/docs/first_app).
+out with your own custom implementations later on. Take a look at the
+[sample app](https://github.com/mosaicnetworks/babble-android/tree/master/sample)
+to see how to use these classes.
 
 ## Library Development
 
-Building the library requires the Android SDK. This can be installed
+If you want to build the library you'll need the Android SDK. This can be installed
 as part of an [Android Studio](https://developer.android.com/studio)
 install, or alternatively you can download and install the
 [command line tools](https://developer.android.com/studio/index.html#command-tools)

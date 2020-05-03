@@ -93,7 +93,6 @@ public final class ConfigDirectory {
         return tempArray[0]+"_"+tempArray[1]+"_"+tempArray[2]+"_";
     }
 
-
     /**
      * Encodes the description to make it filename safe. Spaces become minus signs, all other
      * non-alphanumeric characters are striped

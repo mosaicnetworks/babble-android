@@ -262,8 +262,6 @@ public final class NodeConfig {
             return this;
         }
 
-
-
         /**
          * Specified whether babble loads peers from a file. This should always be true
          * @param loadPeers open peers from a file
@@ -274,7 +272,6 @@ public final class NodeConfig {
             return this;
         }
 
-
         /**
          * Disables the babble service. This should always be true
          * @param noService disable babble service
@@ -284,11 +281,6 @@ public final class NodeConfig {
             mNoService = noService;
             return this;
         }
-
-
-
-
-
 
         /*
         //temporarily disable method

@@ -82,9 +82,6 @@ public class WebRTCServicesListAdapter extends RecyclerView.Adapter<WebRTCServic
 
         holder.groupUidTextView.setText(groupInfo.getGroupUid());
         holder.serviceNameTextView.setText(groupInfo.getGroupName());
-
-
-
     }
 
     // total number of rows

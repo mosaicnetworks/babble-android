@@ -42,8 +42,6 @@ import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
 
 public class MdnsServicesListView extends RecyclerView {
-
-
     private List<ResolvedGroup> mServiceInfoList = new ArrayList<>();
     private ServicesListListener mServicesListListener;
     private MdnsDiscovery mMdnsDiscovery;

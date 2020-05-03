@@ -27,7 +27,6 @@ package io.mosaicnetworks.babble.servicediscovery;
 import android.net.nsd.NsdServiceInfo;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +46,6 @@ public class ResolvedService {
     private ResolvedGroup mResolvedGroup;
     private final Map<String, byte[]> mServiceAttributes;
     private boolean mAssignedGroup = false;
-    private final String mPubKey;
     private final List<Peer> mInitialPeers;
     private final List<Peer> mCurrentPeers;
     public final int mLastUpdated;
@@ -55,13 +53,12 @@ public class ResolvedService {
     /**
      * Initialise from components
      */
-    public ResolvedService(String groupUid, String groupName, String appIdentifier, String pubKey, int lastUpdated, List<Peer> initialPeers, List<Peer> currentPeers, InetAddress inetAddress, int port) throws UnknownHostException {
+    public ResolvedService(String groupUid, String groupName, String appIdentifier, int lastUpdated, List<Peer> initialPeers, List<Peer> currentPeers, InetAddress inetAddress, int port) {
         mCurrentPeers = currentPeers;
         mInitialPeers = initialPeers;
         mAppIdentifier = appIdentifier;
         mGroupName = groupName;
         mGroupUid = groupUid;
-        mPubKey = pubKey;
         mLastUpdated = lastUpdated;
         mInetAddress = inetAddress;
         mPort = port;
@@ -81,7 +78,6 @@ public class ResolvedService {
         mGroupName = extractStringAttribute(GROUP_NAME);
         mGroupUid = extractStringAttribute(GROUP_UID);
 
-        mPubKey = null;
         mInitialPeers = null;
         mCurrentPeers = null;
         mLastUpdated = 0;
@@ -94,10 +90,6 @@ public class ResolvedService {
             throw new IllegalArgumentException("Map does not contain attribute: " + key);
         }
 
-        //TODO: "This method always replaces malformed-input and unmappable-character sequences with
-        // this charset's default replacement string" - is this ok?
-        // The impact would be a fallback default value for these fields in the event that they could
-        // not be retrieved. But in those circumstances another error has probably already been thrown.
         return new String(mServiceAttributes.get(key), Charset.forName("UTF-8"));
     }
 
@@ -165,14 +157,8 @@ public class ResolvedService {
         return mPort;
     }
 
-
     public List<Peer> getCurrentPeers() {
         return mCurrentPeers;
-    }
-
-
-    public String getPubKey() {
-        return mPubKey;
     }
 
     public List<Peer> getInitialPeers() {

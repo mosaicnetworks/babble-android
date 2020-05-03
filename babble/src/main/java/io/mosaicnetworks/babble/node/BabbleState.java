@@ -25,7 +25,7 @@
 package io.mosaicnetworks.babble.node;
 
 /**
- * The App state which is passed to the {@link BabbleService} constructor must implement this
+ * The App state which is passed to the BabbleService constructor must implement this
  * interface
  */
 public interface BabbleState {

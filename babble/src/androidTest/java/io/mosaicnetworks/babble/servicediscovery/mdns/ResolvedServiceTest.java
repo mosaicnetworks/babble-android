@@ -34,6 +34,9 @@ import org.junit.runner.RunWith;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(AndroidJUnit4.class)
@@ -59,7 +62,7 @@ public class ResolvedServiceTest {
         nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_NAME, groupName);
         nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_UID, groupUid);
 
-        MdnsResolvedService resolvedService = new MdnsResolvedService(nsdServiceInfo);
+        ResolvedService resolvedService = new ResolvedService(nsdServiceInfo);
 
         assertEquals(inetAddress, resolvedService.getInetAddress());
         assertEquals(port, resolvedService.getPort());
@@ -88,9 +91,9 @@ public class ResolvedServiceTest {
         nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_NAME, groupName);
         nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_UID, groupUid);
 
-        MdnsResolvedService resolvedService = new MdnsResolvedService(nsdServiceInfo);
+        ResolvedService resolvedService = new ResolvedService(nsdServiceInfo);
 
-        MdnsResolvedGroup resolvedGroup = new MdnsResolvedGroup(resolvedService);
+        ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService, ResolvedGroup.Source.WEBRTC);
 
         resolvedService.setResolvedGroup(resolvedGroup);
 
@@ -118,9 +121,9 @@ public class ResolvedServiceTest {
         nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_NAME, groupName);
         nsdServiceInfo.setAttribute(MdnsAdvertiser.GROUP_UID, groupUid);
 
-        MdnsResolvedService resolvedService = new MdnsResolvedService(nsdServiceInfo);
+        ResolvedService resolvedService = new ResolvedService(nsdServiceInfo);
 
-        MdnsResolvedGroup resolvedGroup = new MdnsResolvedGroup(resolvedService);
+        ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService, ResolvedGroup.Source.WEBRTC);
 
         resolvedService.setResolvedGroup(resolvedGroup);
         resolvedService.setResolvedGroup(resolvedGroup); //should throw an IllegalStateException

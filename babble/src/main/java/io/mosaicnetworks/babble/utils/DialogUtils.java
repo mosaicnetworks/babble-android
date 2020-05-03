@@ -64,10 +64,6 @@ public class DialogUtils {
                 .setNeutralButton(R.string.ok_button, null)
                 .create();
 
-        String fullhtml = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
-                "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"></head><body>\n" +
-                html + "\n</body>\n</html>";
-
         WebView view = new WebView(context);
         view.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
         view.setPadding(10, 10, 10, 10);

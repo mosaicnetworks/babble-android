@@ -24,61 +24,28 @@
 
 package io.mosaicnetworks.sample;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import io.mosaicnetworks.babble.configure.BaseConfigActivity;
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
 import io.mosaicnetworks.babble.service.BabbleService2;
 
-
 public class MainActivity extends BaseConfigActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Control which tabs are shown.
-        setShowArchive(true);
-        setShowmDNS(true);
-        setShowP2P(false);
-
-        // Show all versions of each group in the archive tab
-        setShowAllArchiveVersions(true);
-
         BabbleService2.setAppState(new ChatState());
-
         super.onCreate(savedInstanceState);
-
-// If you wish to change the Babble Configuration Backup Policy uncomment the code below:
-
-//        ConfigManager.setConfigDirectoryBackupPolicy(
-//                [ConfigManager.ConfigDirectoryBackupPolicy.ABORT|SINGLE_BACKUP|DELETE|COMPLETE_BACKUP]
-//        );
-
-// If you want to change the length of the unique ID component of the configuration dir name,
-// uncomment the line below
-
-//        ConfigManager.setUniqueIdLength(8);
-
-// If you want to change the storage location used for babble-go configuration and database files
-// uncomment the line below.
-
-//        ConfigManager.setRootDir(getApplicationContext().getExternalFilesDir(null).toString());
-    }
-
-    @Override
-    public BabbleService getBabbleService() {
-        return MessagingService.getInstance(this);
     }
 
     @Override
     public void onJoined(String moniker, String group) {
-        Intent intent = new Intent(this, ChatActivityAndroidService.class);
+        Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("MONIKER", moniker);
         intent.putExtra("ARCHIVE_MODE", false);
         intent.putExtra("GROUP", group);
@@ -87,7 +54,7 @@ public class MainActivity extends BaseConfigActivity {
 
     @Override
     public void onStartedNew(String moniker, String group) {
-        Intent intent = new Intent(this, ChatActivityAndroidService.class);
+        Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("MONIKER", moniker);
         intent.putExtra("ARCHIVE_MODE", false);
         intent.putExtra("GROUP", group);
@@ -95,7 +62,7 @@ public class MainActivity extends BaseConfigActivity {
     }
 
     public void onArchiveLoaded(String moniker, String group) {
-        Intent intent = new Intent(this, ChatActivityAndroidService.class);
+        Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("MONIKER", moniker);
         intent.putExtra("ARCHIVE_MODE", true);
         intent.putExtra("GROUP", group);
@@ -109,10 +76,7 @@ public class MainActivity extends BaseConfigActivity {
         return true;
     }
 
-
     public void aboutDialog(MenuItem menuItem) {
-
-
         String preBlock = "<table style=\"border-collapse:collapse;border-spacing:0;\">";
         String postBlock = "</table>\n";
         String predata = "<td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;\">";

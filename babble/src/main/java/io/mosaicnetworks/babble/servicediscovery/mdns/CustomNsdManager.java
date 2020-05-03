@@ -41,7 +41,6 @@ public class CustomNsdManager {
     private NsdManager mNsdManager;
     private boolean AttemptStockResolveFirst = true;
     private static final int RESOLVE_TIMEOUT = 12000;
-    // private static final int RESOLVE_TIMEOUT = 0;
 
     public CustomNsdManager(Context context) {
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
@@ -57,13 +56,11 @@ public class CustomNsdManager {
 
     public void resolveService(final NsdServiceInfo serviceInfo, final NsdManager.ResolveListener listener) {
 
-
         // If using alternative method by preference
         if (! AttemptStockResolveFirst) {
             resolveServiceAlternative(serviceInfo, listener);
             return;
         }
-
 
         // Standard use stock, failover to alternative
         mNsdManager.resolveService(serviceInfo,new NsdManager.ResolveListener() {

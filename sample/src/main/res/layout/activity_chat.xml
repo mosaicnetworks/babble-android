@@ -121,7 +121,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
-        tools:context=".ChatActivityAndroidService">
+        tools:context=".ChatActivity">
 
         <io.mosaicnetworks.sample.chatkit.messages.MessagesList
             android:id="@+id/messagesList"
