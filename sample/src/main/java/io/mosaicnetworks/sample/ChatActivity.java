@@ -179,7 +179,7 @@ public class ChatActivity extends BabbleServiceBinderActivity implements Service
         Peer[] peers = gson.fromJson(mBoundService.getMonikerList(), Peer[].class);
 
         String preBlock = "<table style=\"border-collapse:collapse;border-spacing:0;\">";
-        String postBlock = "</table>\n";
+        String postBlock = "</table><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>&nbsp;\n";
         String predata = "<td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;font-size: 50%;\">";
         String prelabel = "<tr><td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;\">";
         String postlabel = "</td>";
