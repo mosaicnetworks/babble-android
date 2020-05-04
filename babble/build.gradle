@@ -30,13 +30,13 @@ apply plugin: io.mosaicnetworks.getbabblecore.GetBabbleCorePlugin
 //##################################################################################################
 // babble core configuration
 
-// def babbleCoreVersion = "0.7.0"
-// def repository = "https://github.com/mosaicnetworks/babble/releases/download"
-// def method = "https"
+def babbleCoreVersion = "0.8.0"
+def repository = "https://github.com/mosaicnetworks/babble/releases/download"
+def method = "https"
 
-def babbleCoreVersion = "develop_c149a5051ac7769d927c0374157b3169e8751c10"
-def repository = (System.getenv('GOPATH') == null ? System.properties['user.home'] + "/go" : System.getenv('GOPATH'))  + "/src/github.com/mosaicnetworks/babble/build/distmobile"
-def method = "file"
+// def babbleCoreVersion = "develop_c149a5051ac7769d927c0374157b3169e8751c10"
+// def repository = (System.getenv('GOPATH') == null ? System.properties['user.home'] + "/go" : System.getenv('GOPATH'))  + "/src/github.com/mosaicnetworks/babble/build/distmobile"
+// def method = "file"
 
 //##################################################################################################
 
@@ -102,7 +102,7 @@ android {
         }
     }
 
-    getBabbleCore {
+     getBabbleCore {
         version = babbleCoreVersion
         remoteRepo = repository
         localRepo = "babble/libs/babble-core"
