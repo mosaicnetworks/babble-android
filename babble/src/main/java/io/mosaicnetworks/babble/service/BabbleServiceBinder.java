@@ -38,6 +38,7 @@ public abstract class BabbleServiceBinder extends Fragment {
     // Don't attempt to unbind from the service unless the client has received some
     // information about the service's state.
     private boolean mShouldUnbind;
+    private static final String TAG = BabbleServiceBinder.class.getName();
 
     // To invoke the bound service, first make sure that this value
     // is not null.
@@ -73,7 +74,7 @@ public abstract class BabbleServiceBinder extends Fragment {
         if (getActivity().bindService(new Intent(getActivity(), BabbleService2.class), mConnection, Context.BIND_AUTO_CREATE)) {
             mShouldUnbind = true;
         } else {
-            Log.e("ERROR", "Error: The requested service doesn't " +
+            Log.e(TAG, "Error: The requested service doesn't " +
                     "exist, or this client isn't allowed access to it.");
         }
     }
