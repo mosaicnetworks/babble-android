@@ -31,17 +31,38 @@ it to get a quick feel for what babble can be used for.
 
 <a href='https://play.google.com/store/apps/details?id=io.mosaicnetworks.sample&hl=en_GB'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height='80px'/></a>
 
-## Library structure
+## Library Components
 
 At the core of the library is the BabbleNode class. This is a
 wrapper around our [golang implementation of Babble](https://github.com/mosaicnetworks/babble).
-However we don't recommend you use this class
-directly (not initially anyway). We've included a number of ancillary
-classes in the library, which can be used as scaffolding so that you can
-focus on building your app logic. These components can easily be swapped
-out with your own custom implementations later on. Take a look at the
+This class can be used directly or alternatively the BabbleService class can be used which essentially
+wraps the BabbleNode class inside an Android Service.
+
+Where devices have a publicly accessible IP address they can be configured to use these addresses
+to communicate directly. However when this is not the case, in particular when devices are behind
+a NAT and do not have publicly accessible IP addresses, the nodes can be configured to use WebRTC
+In this case the BabbleNode instance is provided with the public keys of the peer nodes and the
+address of a signaling server.
+
+Whether using WebRTC or public IP addresses, the devices which make up a network will need to be passed to
+the BabbleNode instance.
+Unless you intend to hard code this information into your app (which works fine for a fixed set of static groups),
+the app will need to discover groups and retrieve this information. We've included an MdnsDiscovery
+class to enable devices on the same local network to discover
+each other. MDNS is not suitable in use cases where WebRTC would be used, in this case we have a
+WebRTCService class which uses a discovery server to discover groups.
+
+Once the discovery procedure has retrieved the peer information this needs to be written to
+configuration files on the device. A ConfigManager class has been included which takes care
+of writing the necessary configuration files.
+
+We've also included some pre-baked UI components that essentially wrap up the two
+discovery mechanisms allowing you to focus on building your specific app logic.
+
+Take a look at the
 [sample app](https://github.com/mosaicnetworks/babble-android/tree/master/sample)
-to see how to use these classes.
+to see one way the various components can be used to build a real app.
+
 
 ## Library Development
 
