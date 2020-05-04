@@ -178,13 +178,23 @@ public class ChatActivity extends BabbleServiceBinderActivity implements Service
         Gson gson = new Gson();
         Peer[] peers = gson.fromJson(mBoundService.getMonikerList(), Peer[].class);
 
-        String join = "";
-        String peerList = "";
+        String preBlock = "<table style=\"border-collapse:collapse;border-spacing:0;\">";
+        String postBlock = "</table>\n";
+        String predata = "<td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;font-size: 50%;\">";
+        String prelabel = "<tr><td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;\">";
+        String postlabel = "</td>";
+        String postdata = "</td></tr>\n";
+        String databreak = "<tr><td colspan=\"2\" style=\"border-style:none;\">&nbsp;</td></tr>";
+
+        // String html = "<h4>"+this.getResources().getString(R.string.monikers_preamble)+"</h4>\n"+preBlock;
+        String html = preBlock;
+
         for (int i=0; i< peers.length; i++ ) {
-            peerList = peerList + join + peers[i].moniker;
-            join = "\n";
+            html = html + prelabel + peers[i].moniker + postlabel+predata + peers[i].pubKeyHex + postdata;
         }
-        DialogUtils.displayOkAlertDialogText(this,R.string.monikers_title,peerList) ;
+
+        html = html + postBlock;
+        DialogUtils.displayOkAlertDialogHTML(this,R.string.monikers_title,html) ;
     }
 
     public void showIP(MenuItem menuItem) {
@@ -194,11 +204,12 @@ public class ChatActivity extends BabbleServiceBinderActivity implements Service
     }
 
     public void showStats(MenuItem menuItem) {
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Map map = gson.fromJson(mBoundService.getStats(), Map.class);
 
-        if (map.containsKey("time")) {
-            // Convert Unix nano seconds to a real date time
+        if (map.containsKey("time"))  // Convert Unix nano seconds to a real date time
+        {
             String timeStr = (String) map.get("time");
             Date currentTime = new Date(Long.parseLong(timeStr)  / 1000000L);
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -206,29 +217,29 @@ public class ChatActivity extends BabbleServiceBinderActivity implements Service
             map.put("time", dateString);
         }
 
-        boolean plainText = false;
-        if (plainText) {
-            String rawStats = gson.toJson(map);
+        String preBlock = "<table style=\"border-collapse:collapse;border-spacing:0;\">";
+        String postBlock = "</table>\n";
+        String predata = "<td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;\">";
+        String prelabel = "<tr><td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;\">";
+        String postlabel = "</td>";
+        String postdata = "</td></tr>\n";
+        String databreak = "<tr><td colspan=\"2\" style=\"border-style:none;\">&nbsp;</td></tr>";
 
-            String stats = rawStats.replace('{', '\0')
-                    .replace('}', '\0')
-                    .replace('"', '\0')
-                    .replace(',', '\0');
 
-            DialogUtils.displayOkAlertDialogText(this, R.string.stats_title, stats);
-        } else {
-            Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
-            String html = "<table>\n";
 
-            while(itr.hasNext()) {
-                Map.Entry<String, String> entry = itr.next();
-                html = html + "<tr><td><font color=\"#0000ff\">" + entry.getKey() + "</font></td><td><font color=\"#ff0000\"> " + entry.getValue() + "</font></td></tr>\n";
-            }
 
-            html = html + "</table>\n";
+        Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
+        String html = preBlock;
 
-            DialogUtils.displayOkAlertDialogHTML(this, R.string.stats_title, html);
+        while(itr.hasNext()) {
+            Map.Entry<String, String> entry = itr.next();
+            html = html + prelabel + entry.getKey() + postlabel+predata + entry.getValue() + postdata;
         }
+
+        html = html + postBlock;
+
+        DialogUtils.displayOkAlertDialogHTML(this, R.string.stats_title, html);
+
     }
 
     /**
