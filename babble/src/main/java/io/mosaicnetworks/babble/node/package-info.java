@@ -23,6 +23,8 @@
  */
 
 /**
- * io.mosaicnetworks.babble.node contains
+ * io.mosaicnetworks.babble.node contains the classes which directly interact with the Babble
+ * node, the Crypto Keys class, the data classes for information returned from the Node, and,
+ * the classes for configuring the Node.
  */
 package io.mosaicnetworks.babble.node;

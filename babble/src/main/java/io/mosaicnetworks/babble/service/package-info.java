@@ -23,6 +23,6 @@
  */
 
 /**
- * io.mosaicnetworks.babble.utils contains utility classes used in the library
+ * io.mosaicnetworks.babble.service contains the classes for the Babble Android Service
  */
-package io.mosaicnetworks.babble.utils;
+package io.mosaicnetworks.babble.service;

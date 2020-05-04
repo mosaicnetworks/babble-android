@@ -23,6 +23,7 @@
  */
 
 /**
- * io.mosaicnetworks.babble.utils contains utility classes used in the library
+ * io.mosaicnetworks.babble.servicediscovery.webrtc is the implementation of WebRTC for service
+ * discovery.
  */
-package io.mosaicnetworks.babble.utils;
+package io.mosaicnetworks.babble.servicediscovery.webrtc;

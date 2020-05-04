@@ -23,6 +23,6 @@
  */
 
 /**
- * io.mosaicnetworks.babble.utils contains utility classes used in the library
+ * io.mosaicnetworks.babble.servicediscovery contains the classes which implement Service Discovery
  */
-package io.mosaicnetworks.babble.utils;
+package io.mosaicnetworks.babble.servicediscovery;
