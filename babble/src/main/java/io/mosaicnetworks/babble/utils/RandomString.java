@@ -33,10 +33,7 @@ import java.util.Random;
 
 public class RandomString {
 
-    private static final String sUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private static final String sLower = sUpper.toLowerCase(Locale.ROOT);
-    private static final String sDigits = "0123456789";
-    private static final String sAlphanum = sUpper + sLower + sDigits;
+    private static final String sAlphanum = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
     private final Random random;
     private final char[] symbols;
     private final char[] buf;
