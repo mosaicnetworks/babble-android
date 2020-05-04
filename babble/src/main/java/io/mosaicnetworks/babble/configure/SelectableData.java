@@ -83,7 +83,7 @@ public final class SelectableData<T> {
 
     /**
      * Returns a list of the positions of all the selected items
-     * @return {@link List<Integer>} of the positions of all selected items
+     * @return {@link List} of the positions of all selected items
      */
     public List<Integer> getAllSelected() {
         return new ArrayList<>(mAllSelected); //return a copy so the list cannot be interfered with

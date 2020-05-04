@@ -23,6 +23,7 @@
  */
 
 /**
- * io.mosaicnetworks.babble.utils contains utility classes used in the library
+ * io.mosaicnetworks.babble.servicediscovery.mdns is the implementation of mDNS for service
+ * discovery. Only nodes on the same subnet will be discoverable
  */
-package io.mosaicnetworks.babble.utils;
+package io.mosaicnetworks.babble.servicediscovery.mdns;

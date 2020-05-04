@@ -23,6 +23,7 @@
  */
 
 /**
- * io.mosaicnetworks.babble.configure contains
+ * io.mosaicnetworks.babble.configure contains UI components to display discovered babble instances and
+ * fragments to join / create new groups
  */
 package io.mosaicnetworks.babble.configure;

@@ -23,6 +23,8 @@
  */
 
 /**
- * io.mosaicnetworks.babble.discovery contains
+ * io.mosaicnetworks.babble.discovery contains some discovery support classes. The
+ * HttpPeerDiscovery classes implement a server for publishing information about a node. The
+ * Peers classes define Peers records required to start a Babble instance.
  */
 package io.mosaicnetworks.babble.discovery;

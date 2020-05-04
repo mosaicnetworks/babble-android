@@ -55,14 +55,32 @@ import io.mosaicnetworks.babble.node.NodeStateChangeHandler;
 
 import static androidx.core.app.NotificationCompat.PRIORITY_LOW;
 
+/**
+ * The Android Service that manages the Babble Node
+ */
 public class BabbleService extends Service {
 
+    /**
+     * The state of the Babble Service
+     */
     public enum State {
+        /**
+         * Babble has stopped
+         */
         STOPPED,
+        /**
+         * Babble is running
+         */
         RUNNING,
+        /**
+         * Babble is in non-gossipping archive mode
+         */
         ARCHIVE,
     }
 
+    /**
+     * Interface to expose methods for starting a Group in archive mode.
+     */
     public interface StartArchiveListener {
 
         void onInitialised();
@@ -70,8 +88,17 @@ public class BabbleService extends Service {
         void onFailed();
     }
 
+    /**
+     * Network type of no Discovery. I.e. an Archive
+     */
     public final static int NETWORK_NONE = 0;
+    /**
+     * Network type of WiFi i.e. mDNS
+     */
     public final static int NETWORK_WIFI = 1;
+    /**
+     * Network type of Global i.e. WebRTC
+     */
     public final static int NETWORK_GLOBAL = 3;
 
     private BabbleNode mBabbleNode;
@@ -169,10 +196,18 @@ public class BabbleService extends Service {
         mGroupDescriptor = groupDescriptor;
     }
 
+    /**
+     * Set the {@link BabbleState} for the service
+     * @param appState
+     */
     public static void setAppState(BabbleState appState) {
         mAppState = appState;
     }
 
+    /**
+     * Get the {@link BabbleState} for the service
+     * @return
+     */
     public BabbleState getAppState() {
         return mAppState;
     }
@@ -233,14 +268,26 @@ public class BabbleService extends Service {
         mBabbleNode.submitTx(tx.toBytes());
     }
 
+    /**
+     * Gets the state from the Babble Node
+     * @return
+     */
     public BabbleNode.State getNodeState() {
         return mNodeState;
     }
 
+    /**
+     * Gets the current peers set from the Babble Node
+     * @return
+     */
     public String getMonikerList() {
         return mBabbleNode.getCurrentPeers();
     }
 
+    /**
+     * Retrieves a JSON formatted list of stats from the Babble Node
+     * @return
+     */
     public String getStats() {
         return mBabbleNode.getStats();
     }
@@ -261,6 +308,7 @@ public class BabbleService extends Service {
             return BabbleService.this;
         }
     }
+
 
     @Override
     public IBinder onBind(Intent intent) {
