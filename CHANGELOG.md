@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## UNRELEASED
+## v0.5.0 (May 4, 2020)
 
 SECURITY:
 
@@ -10,10 +10,11 @@ FEATURES:
 
 IMPROVEMENTS:
 
+- Consolidated discovery to a single tab
+
 BUG FIXES:
 
 - Eliminated various bugs releated to restarting activities
-
 
 ## v0.4.3 (March 23, 2020)
 
