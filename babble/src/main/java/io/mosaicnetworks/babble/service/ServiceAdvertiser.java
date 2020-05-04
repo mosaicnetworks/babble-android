@@ -27,6 +27,11 @@ package io.mosaicnetworks.babble.service;
 
 import io.mosaicnetworks.babble.discovery.PeersProvider;
 
+/**
+ * This interface defines the methods that an Advertiser passed to {@link BabbleService} would
+ * need to implement. {@link io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser} and
+ * {@link io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService} implement this interface.
+ */
 public interface ServiceAdvertiser {
 
     //TODO: swap out the "string methods" with the "list methods"

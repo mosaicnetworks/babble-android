@@ -26,6 +26,9 @@ package io.mosaicnetworks.babble.node;
 
 import io.mosaicnetworks.babble.utils.RandomString;
 
+/**
+ * This class contains details of a new Group to be passed to {@link ConfigManager}
+ */
 public final class GroupDescriptor {
 
     private final String mName;

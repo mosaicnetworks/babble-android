@@ -38,6 +38,10 @@ import java.lang.reflect.Type;
 
 import io.mosaicnetworks.babble.discovery.Peer;
 
+/**
+ * This data class is used to hold instances of Internal Transactions as specified in a {@link Block}.
+ * Internal Transaction are usually used for joining and leaving a group.
+ */
 public final class InternalTransaction {
     private final static Gson mCustomGson;
 
@@ -50,6 +54,9 @@ public final class InternalTransaction {
                 }).create();
     }
 
+    /**
+     * The body of an {@link InternalTransaction}
+     */
     public static final class InternalTransactionBody {
         @SerializedName("Type")
         public int type = 0;

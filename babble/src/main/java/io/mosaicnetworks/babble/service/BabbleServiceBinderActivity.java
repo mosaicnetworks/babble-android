@@ -32,7 +32,9 @@ import android.os.IBinder;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
-
+/**
+ * This abstract Actvity implements binding to {@link BabbleService}
+ */
 public abstract class BabbleServiceBinderActivity extends AppCompatActivity {
     // Don't attempt to unbind from the service unless the client has received some
     // information about the service's state.

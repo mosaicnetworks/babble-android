@@ -33,6 +33,9 @@ import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 
+/**
+ * This abstract Fragment implements binding to {@link BabbleService}
+ */
 public abstract class BabbleServiceBinder extends Fragment {
     // Don't attempt to unbind from the service unless the client has received some
     // information about the service's state.

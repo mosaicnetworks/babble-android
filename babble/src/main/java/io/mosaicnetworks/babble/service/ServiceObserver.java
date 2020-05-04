@@ -26,6 +26,10 @@ package io.mosaicnetworks.babble.service;
 
 import io.mosaicnetworks.babble.node.BabbleNode;
 
+/**
+ * This interface provides methods for callbacks when blocks are received. A ServiceObserver
+ * can be registered with the Service.
+ */
 public interface ServiceObserver {
 
     /**

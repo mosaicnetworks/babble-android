@@ -36,6 +36,11 @@ import com.google.gson.annotations.SerializedName;
 
 import java.lang.reflect.Type;
 
+
+/**
+ * This data class holds an instance of the Receipt when the Babble Node applies an
+ * {@link InternalTransaction}
+ */
 public final class InternalTransactionReceipt {
     private final static Gson mCustomGson;
 
