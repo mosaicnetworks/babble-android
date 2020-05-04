@@ -31,8 +31,6 @@ import android.webkit.WebView;
 
 import androidx.annotation.StringRes;
 
-import java.util.Objects;
-
 import io.mosaicnetworks.babble.R;
 
 public class DialogUtils {

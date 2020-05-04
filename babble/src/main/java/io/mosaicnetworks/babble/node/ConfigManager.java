@@ -105,7 +105,6 @@ public final class ConfigManager {
     /**
      * Create an object to manage multiple Babble Configs
      * @param appContext the application context
-     * @throws FileNotFoundException when the babble root dir cannot be created
      */
     private ConfigManager(Context appContext) {
 
@@ -446,9 +445,8 @@ public final class ConfigManager {
     protected Map<String, Object> readTomlFile(){
         File tomlFile =  new File(mTomlDir, mBabbleTomlFile);
         Toml toml = new Toml().read(tomlFile);
-        Map<String, Object> configMap = toml.toMap();
 
-        return configMap;
+        return toml.toMap();
     }
 
     /**

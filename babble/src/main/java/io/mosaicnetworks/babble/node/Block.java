@@ -37,6 +37,9 @@ import com.google.gson.annotations.SerializedName;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+/**
+ * Block is a class to handle the JSON format blocks produced by the Golang Babble Node.
+ */
 public final class Block {
 
     private final static Gson mCustomGson;
@@ -50,38 +53,75 @@ public final class Block {
                 }).create();
     }
 
+    /**
+     * A class containing the block of the {@link Block}
+     */
     public static final class BlockBody {
+
+        /**
+         * The block index
+         */
         @SerializedName("Index")
         public final int index = 0;
 
+        /**
+         * Round received parameter
+         */
         @SerializedName("RoundReceived")
         public final int roundReceived = 0;
 
+        /**
+         * The State Hash of the block
+         */
         @SerializedName("StateHash")
         public byte[] stateHash = new byte[]{};
 
+        /**
+         * An array of transactions in byte format
+         */
         @SerializedName("Transactions")
         public byte[][] transactions = new byte[][]{};
 
+        /**
+         * An Array of {@link InternalTransaction} instances
+         */
         @SerializedName("InternalTransactions")
         public InternalTransaction[] internalTransactions = new InternalTransaction[]{};
 
+        /**
+         * An Array of {@link InternalTransactionReceipt} instances
+         */
         @SerializedName("InternalTransactionReceipts")
         public InternalTransactionReceipt[] internalTransactionReceipts = new InternalTransactionReceipt[]{};
 
     }
 
+    /**
+     * The Body of the Block in an {@link BlockBody} instance
+     */
     @SerializedName("Body")
     public final BlockBody body = new BlockBody();
 
+    /**
+     * A map containing the Signatures on the block
+     */
     @SerializedName("Signatures")
     public final Map<String, String> signatures = null;
 
+    /**
+     * Static method to take a JSON string block and return an instance of {@link Block}
+     * @param blockJson a Block in JSON format
+     * @return
+     */
     public static Block fromJson(String blockJson) {
         //TODO: implement checks for correct types and missing and extra JSON attributes using GSON
         return mCustomGson.fromJson(blockJson, Block.class);
     }
 
+    /**
+     * Exports the block to JSON format.
+     * @return
+     */
     public String toJson() {
         return mCustomGson.toJson(this);
     }

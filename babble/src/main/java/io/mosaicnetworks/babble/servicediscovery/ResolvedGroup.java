@@ -78,7 +78,7 @@ public class ResolvedGroup {
     /**
      * Removes a resolved service from this group's list of resolved services
      * @param resolvedService the service to be removed
-     * @return
+     * @return  <tt>true</tt> if this list contained the specified ResolvedServer
      */
     public boolean removeService(ResolvedService resolvedService) {
 

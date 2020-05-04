@@ -118,10 +118,12 @@ public class BabbleService extends Service {
         mState = State.RUNNING;
     }
 
+
     /**
      * This is an asynchronous call to start the service in archive mode
      * @param configDirectory
      * @param groupDescriptor
+     * @param listener
      */
     public void startArchive(final String configDirectory, GroupDescriptor groupDescriptor,
                              final StartArchiveListener listener) {
@@ -291,7 +293,7 @@ public class BabbleService extends Service {
     //##############################################################################################
     // Observer components
 
-    private List<ServiceObserver> mObservers = new ArrayList<>();;
+    private List<ServiceObserver> mObservers = new ArrayList<>();
 
     /**
      * Register an observer
@@ -330,12 +332,11 @@ public class BabbleService extends Service {
             channel = "";
         }
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, channel).setSmallIcon(android.R.drawable.ic_menu_mylocation).setContentTitle(getResources().getString(R.string.babble_service_running));
-        Notification notification = mBuilder
+
+        return mBuilder
                 .setPriority(PRIORITY_LOW)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
-
-        return notification;
     }
 
     @NonNull

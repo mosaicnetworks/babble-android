@@ -26,7 +26,6 @@ package io.mosaicnetworks.babble.servicediscovery.webrtc;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.mosaicnetworks.babble.discovery.Peer;

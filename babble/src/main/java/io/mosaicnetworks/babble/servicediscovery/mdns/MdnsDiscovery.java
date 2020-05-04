@@ -27,9 +27,7 @@ package io.mosaicnetworks.babble.servicediscovery.mdns;
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
-import android.util.Log;
 
-import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +85,7 @@ public class MdnsDiscovery {
                     if (mResolvedServices.containsKey(discoveredServiceInfo.getServiceName())) {
                         //we already have this service
                         return;
-                    };
+                    }
 
                     resolveService(discoveredServiceInfo);
                 }
@@ -140,7 +138,7 @@ public class MdnsDiscovery {
                 if (mResolvedServices.containsKey(nsdServiceInfo.getServiceName())) {
                     //we already have this service
                     return;
-                };
+                }
 
                 ResolvedService resolvedService;
                 try {

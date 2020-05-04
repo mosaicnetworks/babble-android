@@ -57,7 +57,7 @@ class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.V
             mView = itemView;
         }
 
-        public void setSelected(Boolean selected) {
+        void setSelected(Boolean selected) {
             mView.setSelected(selected);
         }
 
