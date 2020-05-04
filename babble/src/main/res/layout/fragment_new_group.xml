@@ -73,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:text="@string/network_type"
-                android:checked="true"
+                android:checked="false"
                 android:layout_marginLeft="2dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginRight="2dp"

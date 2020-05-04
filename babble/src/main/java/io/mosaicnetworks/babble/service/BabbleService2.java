@@ -43,8 +43,8 @@ import androidx.core.app.NotificationCompat;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleNode;
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.BabbleState;
 import io.mosaicnetworks.babble.node.BabbleTx;
 import io.mosaicnetworks.babble.node.Block;
@@ -62,6 +62,17 @@ public class BabbleService2 extends Service {
         RUNNING,
         ARCHIVE,
     }
+
+    public interface StartArchiveListener {
+
+        void onInitialised();
+
+        void onFailed();
+    }
+
+    public final static int NETWORK_NONE = 0;
+    public final static int NETWORK_WIFI = 1;
+    public final static int NETWORK_GLOBAL = 3;
 
     private BabbleNode mBabbleNode;
     private State mState = State.STOPPED;
@@ -103,7 +114,7 @@ public class BabbleService2 extends Service {
         });
 
         mBabbleNode.run();
-        mServiceAdvertiser.advertise(mBabbleNode.getGenesisPeers(), mBabbleNode.getCurrentPeers());
+        mServiceAdvertiser.advertise(mBabbleNode.getGenesisPeers(), mBabbleNode.getCurrentPeers(), mBabbleNode);
         mState = State.RUNNING;
     }
 
@@ -113,7 +124,7 @@ public class BabbleService2 extends Service {
      * @param groupDescriptor
      */
     public void startArchive(final String configDirectory, GroupDescriptor groupDescriptor,
-                             final BabbleService.StartArchiveListener listener) {
+                             final StartArchiveListener listener) {
         if (mState!=State.STOPPED) {
             throw new IllegalStateException("Cannot start archive service which isn't stopped");
         }
@@ -233,8 +244,8 @@ public class BabbleService2 extends Service {
     }
 
 
-    //###########
-    // service specific stuff
+    //##############################################################################################
+    // Service specific section
 
     private static final int NOTIF_ID = 1;
 
@@ -277,8 +288,8 @@ public class BabbleService2 extends Service {
         }
     }
 
-    //#############
-    // observer stuff
+    //##############################################################################################
+    // Observer components
 
     private List<ServiceObserver2> mObservers = new ArrayList<>();;
 
@@ -318,12 +329,11 @@ public class BabbleService2 extends Service {
         else {
             channel = "";
         }
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, channel).setSmallIcon(android.R.drawable.ic_menu_mylocation).setContentTitle("Babble service is running");
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, channel).setSmallIcon(android.R.drawable.ic_menu_mylocation).setContentTitle(getResources().getString(R.string.babble_service_running));
         Notification notification = mBuilder
                 .setPriority(PRIORITY_LOW)
                 .setCategory(Notification.CATEGORY_SERVICE)
                 .build();
-
 
         return notification;
     }
@@ -333,10 +343,10 @@ public class BabbleService2 extends Service {
     private synchronized String createChannel() {
         NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        String name = "snap map fake location ";
+        String name = "babble service running";
         int importance = NotificationManager.IMPORTANCE_LOW;
 
-        NotificationChannel mChannel = new NotificationChannel("snap map channel", name, importance);
+        NotificationChannel mChannel = new NotificationChannel("babble service channel", name, importance);
 
         mChannel.enableLights(true);
         mChannel.setLightColor(Color.BLUE);
@@ -346,10 +356,8 @@ public class BabbleService2 extends Service {
             stopSelf();
         }
 
-        return "snap map channel";
+        return "babble service channel";
 
     }
-
-    //##############################################################################################
 
 }

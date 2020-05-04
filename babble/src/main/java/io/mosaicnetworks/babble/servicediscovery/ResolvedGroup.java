@@ -24,12 +24,102 @@
 
 package io.mosaicnetworks.babble.servicediscovery;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public interface ResolvedGroup {
-    void addService(ResolvedService resolvedService);
-    boolean removeService(ResolvedService resolvedService);
-    List<ResolvedService> getResolvedServices();
-    String getGroupName();
-    String getGroupUid();
+/**
+ * This represents a group of resolved services with the same group UID. Services with a matching
+ * group UID and group name can be added to the group as they're discovered. Services can be removed
+ * from the group as and when they are lost.
+ */
+public class ResolvedGroup {
+
+    public enum Source {
+        MDNS,
+        WEBRTC
+    }
+
+    private final String mGroupName;
+    private final String mGroupUid;
+    private final List<ResolvedService> mResolvedServices = new ArrayList<>();
+    private final Source mSource;
+
+    /**
+     * Constructor, the group is initialised from a resolved service
+     * @param resolvedService a resolved service used to initialise the group
+     */
+    public ResolvedGroup(ResolvedService resolvedService, Source source) {
+        mGroupName = resolvedService.getGroupName();
+        mGroupUid = resolvedService.getGroupUid();
+        mResolvedServices.add(resolvedService);
+        mSource = source;
+    }
+
+    /**
+     * Adds a resolved service to this group's list of resolved services
+     * @param resolvedService
+     */
+    public void addService(ResolvedService resolvedService) {
+        if (mResolvedServices.contains(resolvedService)) {
+            throw new IllegalArgumentException("Cannot add service: Group already contains this service");
+        }
+
+        if (!resolvedService.getGroupUid().equals(mGroupUid)) {
+            throw new IllegalArgumentException("Cannot add service: Service group UID does not match this group's UID");
+        }
+
+        if (!resolvedService.getGroupName().equals(mGroupName)) {
+            throw new IllegalArgumentException("Cannot add service: Service group name does not match this group's name");
+        }
+
+        mResolvedServices.add(resolvedService);
+    }
+
+    /**
+     * Removes a resolved service from this group's list of resolved services
+     * @param resolvedService the service to be removed
+     * @return
+     */
+    public boolean removeService(ResolvedService resolvedService) {
+
+        if (!mResolvedServices.contains(resolvedService)) {
+            throw new IllegalArgumentException("Cannot remove service: Group does not contain this service");
+        }
+
+        mResolvedServices.remove(resolvedService);
+
+        return mResolvedServices.isEmpty();
+    }
+
+    /**
+     * Get the list of resolved services associated with this group
+     * @return a shallow copy of the list of services associated with this group
+     */
+    public List<ResolvedService> getResolvedServices() {
+        return new ArrayList<>(mResolvedServices);
+    }
+
+    /**
+     * Get the group name
+     * @return the group name
+     */
+    public String getGroupName() {
+        return mGroupName;
+    }
+
+    /**
+     * Get the group UID
+     * @return the group UID
+     */
+    public String getGroupUid() {
+        return mGroupUid;
+    }
+
+    /**
+     * Get the source of this group descriptor
+     * @return the source type
+     */
+    public Source getSource() {
+        return mSource;
+    }
 }

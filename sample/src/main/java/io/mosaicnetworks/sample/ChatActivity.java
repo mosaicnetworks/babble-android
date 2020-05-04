@@ -26,50 +26,42 @@ package io.mosaicnetworks.sample;
 
 import android.content.Context;
 import android.content.Intent;
-
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import io.mosaicnetworks.babble.discovery.Peer;
-import io.mosaicnetworks.babble.node.ServiceObserver;
+import io.mosaicnetworks.babble.node.BabbleNode;
+import io.mosaicnetworks.babble.service.BabbleServiceBinderActivity;
+import io.mosaicnetworks.babble.service.ServiceObserver2;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
-import io.mosaicnetworks.sample.chatkit.commons.ImageLoader;
 import io.mosaicnetworks.sample.chatkit.commons.models.IMessage;
+import io.mosaicnetworks.sample.chatkit.messages.MessageHolders;
 import io.mosaicnetworks.sample.chatkit.messages.MessageInput;
 import io.mosaicnetworks.sample.chatkit.messages.MessagesList;
 import io.mosaicnetworks.sample.chatkit.messages.MessagesListAdapter;
-import io.mosaicnetworks.sample.notification.NotificationMessage;
+import io.mosaicnetworks.sample.notification.Checker;
+import io.mosaicnetworks.sample.notification.NotificationHolder;
 
 /**
- * This is the central UI component. It receives messages from the {@link MessagingService} and
+ * This is the central UI component. It receives messages from the BabbleService} and
  * displays them as a list.
  */
-public class ChatActivity extends AppCompatActivity implements ServiceObserver, StatsObserver  {
+public class ChatActivity extends BabbleServiceBinderActivity implements ServiceObserver2 {
 
-    private MessagesListAdapter<IMessage> mAdapter;
+    private MessagesListAdapter mAdapter;
     private String mMoniker;
-    private final MessagingService mMessagingService = MessagingService.getInstance(this);
     private Integer mMessageIndex = 0;
     private boolean mArchiveMode;
 
@@ -77,61 +69,45 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
-        Log.i("ChatActivity", "onCreate");
-
         Intent intent = getIntent();
         mMoniker = intent.getStringExtra("MONIKER");
         mArchiveMode = intent.getBooleanExtra("ARCHIVE_MODE", false);
         String group = intent.getStringExtra("GROUP");
 
-        setTitle(group + " (" + mMoniker + ")");
-
+        setTitle(group);
         initialiseAdapter();
-        mMessagingService.registerObserver(this);
+        doBindService();
+    }
 
-        setPollStats(mMessagingService.getStatusPolling());
+    @Override
+    protected void onServiceConnected() {
+        mBoundService.registerObserver(this);
 
-
-        Log.i("ChatActivity", "registerObserver");
-
+        //we need to call stateUpdate() to ensure messages are pulled on configuration changes
+        stateUpdated();
 
         if (mArchiveMode) {
             stateUpdated();
-
             if (mMessageIndex==0) {
                 findViewById(R.id.relativeLayout_messages).setVisibility(View.GONE);
                 findViewById(R.id.linearLayout_empty_archive).setVisibility(View.VISIBLE);
             }
-
-        } else {
-            if ((!mMessagingService.isAdvertising()) && (!mArchiveMode )) {
-                Toast.makeText(this, "Unable to advertise peers", Toast.LENGTH_LONG).show();
-            }
         }
+    }
+
+    @Override
+    protected void onServiceDisconnected() {
+        //do nothing
     }
 
     private void initialiseAdapter() {
         MessagesList mMessagesList = findViewById(R.id.messagesList);
 
-        mAdapter = new MessagesListAdapter<>(mMoniker,   new ImageLoader() {
-            @Override
-            public void loadImage(ImageView imageView, String url, Object payload) {
-                // If string URL starts with R. it is a resource.
-                if (url.startsWith("R.")) {
-                    String[] arrUrl = url.split("\\.", 3);
-                    int ResID = getResources().getIdentifier(arrUrl[2] , arrUrl[1], ChatActivity.this.getPackageName());
-                    Log.i("ChatActivity", "loadImage: " +ResID + " "+ arrUrl[2] + " "+ arrUrl[1] + " "+ ChatActivity.this.getPackageName());
-                    if (ResID == 0) {
-                        Picasso.get().load(R.drawable.error).into(imageView);
-                    } else {
-                        Picasso.get().load(ResID).into(imageView);  //TODO restore this line
-                    }
-                } else {
-                    Picasso.get().load(url).into(imageView);
-                }
-            }
-        });
+        MessageHolders messageHolders = new MessageHolders();
+        messageHolders.registerContentType(new Integer(12).byteValue(), NotificationHolder.class,
+                R.layout.item_notification_message, R.layout.item_notification_message, new Checker());
+
+        mAdapter = new MessagesListAdapter<>(mMoniker, messageHolders, null);
 
         mMessagesList.setAdapter(mAdapter);
 
@@ -142,7 +118,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
             input.setInputListener(new MessageInput.InputListener() {
                 @Override
                 public boolean onSubmit(CharSequence input) {
-                    mMessagingService.submitTx(new Message(input.toString(), mMoniker));
+                    mBoundService.submitTx(new Message(input.toString(), mMoniker));
                     return true;
                 }
             });
@@ -150,7 +126,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
     }
 
     /**
-     * Called after the {@link MessagingService} state is updated. This happens after transactions
+     * Called after the BabbleService state is updated. This happens after transactions
      * received from the babble node are applied to the state. At this point the
      * {@link ChatActivity} retrieves all messages with index greater than it's current index.
      */
@@ -167,7 +143,7 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
             });
         }
 
-        final List<IMessage> newMessages = mMessagingService.state.getMessagesFromIndex(mMessageIndex);
+        final List<IMessage> newMessages = ((ChatState) mBoundService.getAppState()).getMessagesFromIndex(mMessageIndex);
 
         runOnUiThread(new Runnable() {
             @Override
@@ -181,46 +157,56 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
         mMessageIndex = mMessageIndex + newMessages.size();
     }
 
+    @Override
+    public void onNodeStateChanged(BabbleNode.State state) {
+
+        if (state== BabbleNode.State.Suspended) {
+            DialogUtils.displayOkAlertDialog(this, R.string.node_suspended_title, R.string.node_suspended_message);
+            MessageInput input = findViewById(R.id.input);
+            input.setVisibility(View.GONE);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_chat, menu);
+        getMenuInflater().inflate(R.menu.menu_chat2, menu);
         return true;
     }
 
-
     public void showChatters(MenuItem menuItem) {
         Gson gson = new Gson();
-        Peer[] peers = gson.fromJson(mMessagingService.getMonikerList(), Peer[].class);
+        Peer[] peers = gson.fromJson(mBoundService.getMonikerList(), Peer[].class);
 
-        String join = "";
-        String peerList = this.getResources().getString(R.string.monikers_preamble);
+        String preBlock = "<table style=\"border-collapse:collapse;border-spacing:0;\">";
+        String postBlock = "</table><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>&nbsp;\n";
+        String predata = "<td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;font-size: 50%;\">";
+        String prelabel = "<tr><td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;\">";
+        String postlabel = "</td>";
+        String postdata = "</td></tr>\n";
+        String databreak = "<tr><td colspan=\"2\" style=\"border-style:none;\">&nbsp;</td></tr>";
+
+        // String html = "<h4>"+this.getResources().getString(R.string.monikers_preamble)+"</h4>\n"+preBlock;
+        String html = preBlock;
 
         for (int i=0; i< peers.length; i++ ) {
-            peerList = peerList + join + peers[i].moniker;
-            join = ",\n";
+            html = html + prelabel + peers[i].moniker + postlabel+predata + peers[i].pubKeyHex + postdata;
         }
 
-        DialogUtils.displayOkAlertDialogText(this,R.string.monikers_title,peerList) ;
-
+        html = html + postBlock;
+        DialogUtils.displayOkAlertDialogHTML(this,R.string.monikers_title,html) ;
     }
-
-
 
     public void showIP(MenuItem menuItem) {
         Context context = getApplicationContext();
-        String ip = "Your IP is: "+ Utils.getIPAddr(context);
-
+        String ip = Utils.getIPAddr(context);
         DialogUtils.displayOkAlertDialogText(this,R.string.ip_title,ip) ;
-
     }
-
 
     public void showStats(MenuItem menuItem) {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Map map = gson.fromJson(mMessagingService.getStats(), Map.class);
+        Map map = gson.fromJson(mBoundService.getStats(), Map.class);
 
         if (map.containsKey("time"))  // Convert Unix nano seconds to a real date time
         {
@@ -231,35 +217,30 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
             map.put("time", dateString);
         }
 
+        String preBlock = "<table style=\"border-collapse:collapse;border-spacing:0;\">";
+        String postBlock = "</table>\n";
+        String predata = "<td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;\">";
+        String prelabel = "<tr><td style=\"padding:10px 5px;border-style:solid;border-width:1px;border-color:black;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;\">";
+        String postlabel = "</td>";
+        String postdata = "</td></tr>\n";
+        String databreak = "<tr><td colspan=\"2\" style=\"border-style:none;\">&nbsp;</td></tr>";
 
 
-        boolean plainText = false;
-        if (plainText) {
-            String rawStats = gson.toJson(map);
 
-            String stats = rawStats.replace('{', '\0')
-                    .replace('}', '\0')
-                    .replace('"', '\0')
-                    .replace(',', '\0');
 
-            DialogUtils.displayOkAlertDialogText(this, R.string.stats_title, stats);
-        } else {
-            Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
-            String html = "<table>\n";
+        Iterator<Map.Entry<String, String>> itr = map.entrySet().iterator();
+        String html = preBlock;
 
-            while(itr.hasNext()) {
-                Map.Entry<String, String> entry = itr.next();
-                html = html + "<tr><td><font color=\"#0000ff\">" + entry.getKey() + "</font></td><td><font color=\"#ff0000\"> " + entry.getValue() + "</font></td></tr>\n";
-            }
-
-            html = html + "</table>\n";
-
-            DialogUtils.displayOkAlertDialogHTML(this, R.string.stats_title, html);
+        while(itr.hasNext()) {
+            Map.Entry<String, String> entry = itr.next();
+            html = html + prelabel + entry.getKey() + postlabel+predata + entry.getValue() + postdata;
         }
+
+        html = html + postBlock;
+
+        DialogUtils.displayOkAlertDialogHTML(this, R.string.stats_title, html);
+
     }
-
-
-
 
     /**
      * When back is pressed we should leave the group. The {@link #onDestroy()} method will handle
@@ -267,51 +248,13 @@ public class ChatActivity extends AppCompatActivity implements ServiceObserver, 
      */
     @Override
     public void onBackPressed() {
-        mMessagingService.leave(null);
+        mBoundService.leave(null);
         super.onBackPressed();
     }
 
     @Override
-    protected void onDestroy() {
-        mMessagingService.removeObserver(this);
-        mMessagingService.removeStatsObserver();
+    public void onDestroy() {
+        mBoundService.removeObserver(this);
         super.onDestroy();
-    }
-
-
-    public void pollStats(MenuItem menuItem) {
-        setPollStats(! mMessagingService.getStatusPolling());
-    }
-
-
-    private void setPollStats(boolean enable) {
-        LinearLayout linearLayoutStatusLine = findViewById(R.id.statusLine);
-
-        if (! enable) {
-            mMessagingService.stopStatsPolling();
-            linearLayoutStatusLine.setVisibility(View.GONE);
-            mMessagingService.removeStatsObserver();
-            Log.i("ChatActivity", "pollStats: stopping");
-        } else {
-            linearLayoutStatusLine.setVisibility(View.VISIBLE);
-            mMessagingService.registerStatsObserver(this);
-            mMessagingService.startStatsPolling();
-            Log.i("ChatActivity", "pollStats: starting");
-        }
-    }
-
-
-
-
-
-    @Override
-    public void statsUpdated(Map map) {
-        Log.i("ChatActivity", "statsUpdated");
-        Log.i("ChatActivity", (String) map.get("time"));
-        ((TextView) findViewById(R.id.babbleStatus)).setText((String) map.get("state"));
-        ((TextView) findViewById(R.id.babbleEvents)).setText((String) map.get("consensus_events"));
-        ((TextView) findViewById(R.id.babbleTransactions)).setText((String) map.get("consensus_transactions"));
-        ((TextView) findViewById(R.id.babbleUndetermined)).setText((String) map.get("undetermined_events"));
-
     }
 }

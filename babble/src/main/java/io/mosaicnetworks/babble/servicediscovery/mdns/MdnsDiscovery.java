@@ -34,35 +34,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 
 /**
- * This class encapsulates the MDNS discover process. There is a bug in released versions of
- * Android prior to 7.0 which means that the TXT records are not returned.
- *
- * There is a custom class CustomNsdManager that can be used in place of NsdManager that wraps
- * NsdManager substituting an alternative resolving mechanism as appropriate.
- *
- * To switch between CustomNdsManager and NdsManager change the declaration of mNsdManager and
- * its assignment in the constructor. The alternative version is commented out. All other calls
- * can remain the same.
+ * This class encapsulates the MDNS discover process.
  */
 public class MdnsDiscovery {
-    private static final String TAG = "MdnsDiscovery";
 
-    private final Map<String, MdnsResolvedService> mResolvedServices = new HashMap<>();
-    private final List<MdnsResolvedGroup> mResolvedGroups;
+    private final Map<String, ResolvedService> mResolvedServices = new HashMap<>();
+    private final List<ResolvedGroup> mResolvedGroups;
     private CustomNsdManager mNsdManager;
     private NsdManager.DiscoveryListener mDiscoveryListener;
     private boolean mDiscoveryActive = false;
     private ServiceDiscoveryListener mServiceDiscoveryListener;
 
     private final String mPackageName;
-
-
-
-
-    public MdnsDiscovery(Context context, List<MdnsResolvedGroup> resolvedGroups,
+    public MdnsDiscovery(Context context, List<ResolvedGroup> resolvedGroups,
                          ServiceDiscoveryListener serviceDiscoveryListener) {
         Context appContext = context.getApplicationContext();
         mNsdManager = new CustomNsdManager(context);
@@ -72,13 +61,11 @@ public class MdnsDiscovery {
         mPackageName =  appContext.getPackageName() ;
 
         initializeDiscoveryListener(serviceDiscoveryListener);
-
     }
 
     public void discoverServices() {
         mNsdManager.discoverServices(
                 MdnsAdvertiser.SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
-
     }
 
     public void stopDiscovery() {
@@ -109,7 +96,7 @@ public class MdnsDiscovery {
             public void onServiceLost(NsdServiceInfo serviceInfo) {
 
                 if (mResolvedServices.containsKey(serviceInfo.getServiceName())) {
-                    MdnsResolvedService lostService = mResolvedServices.get(serviceInfo.getServiceName());
+                    ResolvedService lostService = mResolvedServices.get(serviceInfo.getServiceName());
                     boolean empty = lostService.getResolvedGroup().removeService(lostService);
                     mResolvedServices.remove(serviceInfo.getServiceName());
 
@@ -139,9 +126,7 @@ public class MdnsDiscovery {
         };
     }
 
-
     private void resolveService(final NsdServiceInfo serviceInfo) {
-
         mNsdManager.resolveService(serviceInfo, new NsdManager.ResolveListener() {
             @Override
             public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
@@ -157,9 +142,9 @@ public class MdnsDiscovery {
                     return;
                 };
 
-                MdnsResolvedService resolvedService;
+                ResolvedService resolvedService;
                 try {
-                    resolvedService = new MdnsResolvedService(nsdServiceInfo);
+                    resolvedService = new ResolvedService(nsdServiceInfo);
                 } catch (IllegalArgumentException ex) {
                     //The txt record doesn't even have the attributes we need, so we'll try the alternate method
                     onResolveFailed(serviceInfo, 97);
@@ -173,7 +158,7 @@ public class MdnsDiscovery {
 
                 mResolvedServices.put(nsdServiceInfo.getServiceName(), resolvedService);
 
-                for (MdnsResolvedGroup group:mResolvedGroups) {
+                for (ResolvedGroup group:mResolvedGroups) {
                     if (group.getGroupUid().equals(resolvedService.getGroupUid())) {
                         resolvedService.setResolvedGroup(group);
                         group.addService(resolvedService);
@@ -184,7 +169,7 @@ public class MdnsDiscovery {
                 }
 
                 //no matching group - create a new group
-                MdnsResolvedGroup resolvedGroup = new MdnsResolvedGroup(resolvedService);
+                ResolvedGroup resolvedGroup = new ResolvedGroup(resolvedService, ResolvedGroup.Source.MDNS);
                 mResolvedGroups.add(resolvedGroup);
                 resolvedService.setResolvedGroup(resolvedGroup);
                 mServiceDiscoveryListener.onServiceListUpdated(false);

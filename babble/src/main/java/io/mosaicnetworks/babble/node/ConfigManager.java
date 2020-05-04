@@ -45,6 +45,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import io.mosaicnetworks.babble.discovery.Peer;
+import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.Disco;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
 
@@ -62,15 +63,16 @@ public final class ConfigManager {
      * COMPLETE_BACKUP - saves all archive copies
      * ABORT - If there is any pre-existing archive for this groups, throw an exception and abort
      */
-    public enum ConfigDirectoryBackupPolicy  {DELETE, SINGLE_BACKUP, COMPLETE_BACKUP, ABORT}
+    public enum ConfigDirectoryBackupPolicy  {
+        DELETE,
+        SINGLE_BACKUP,
+        COMPLETE_BACKUP,
+        ABORT
+    }
 
-// These variables are static to allow them to be set in the initialisation of any app.
-// As ConfigManager is invoked from within BabbleService, it would otherwise not be possible to
-// amend these app wide values without passing them into BabbleService.
-    private static int sUniqueIdLength = 12;
     private static ConfigManager INSTANCE;
-    private static String sRootDir = "";
-
+    private int mUniqueIdLength = 12;
+    private String mRootDir = "";
     private String mTomlDir = "";
     private String mMoniker = "";
     private final String mAppId;
@@ -86,7 +88,6 @@ public final class ConfigManager {
     private String mPeersGenesisJsonFile = "peers.genesis.json";
     private String mBabbleTomlFile = "babble.toml";
 
-
     /**
      * Provides an instance of the static ConfigManager class, reusing one if available, calling the
      * constructor if not.
@@ -95,7 +96,6 @@ public final class ConfigManager {
      */
     public static ConfigManager getInstance(Context context) {
         if (INSTANCE==null) {
-            Log.v("ConfigManager", "getInstance");
             INSTANCE = new ConfigManager(context.getApplicationContext());
         }
 
@@ -109,23 +109,13 @@ public final class ConfigManager {
      */
     private ConfigManager(Context appContext) {
 
-        Log.v("ConfigManager", "constructor");
-
-        if (sRootDir.equals("")) {
-            sRootDir = appContext.getFilesDir().toString();
+        if (mRootDir.equals("")) {
+            mRootDir = appContext.getFilesDir().toString();
         }
 
-        Log.v("ConfigManager", "got FilesDir");
-
         mAppId = appContext.getPackageName();
-
-        Log.v("ConfigManager", "got Package Name");
-
         mKeyPair = new KeyPair(); //TODO:  how should the key be handled??
-
-        Log.v("ConfigManager", "got Key Pair");
-
-        File babbleDir = new File(sRootDir, mBabbleRootDir);
+        File babbleDir = new File(mRootDir, mBabbleRootDir);
 
         if (babbleDir.exists()) {
             populateDirectories(babbleDir);
@@ -135,8 +125,7 @@ public final class ConfigManager {
             }
         }
     }
-
-
+    
     /**
      * ConfigDirectoryBackupPolicy getter takes an enumerated type ConfigDirectoryBackupPolicy
      * which can take the following types:
@@ -146,7 +135,7 @@ public final class ConfigManager {
      * ABORT - If there is any pre-existing archive for this groups, throw an exception and abort
      * @return ConfigDirectoryBackupPolicy
      */
-    public static ConfigDirectoryBackupPolicy getConfigDirectoryBackupPolicy() {
+    public ConfigDirectoryBackupPolicy getConfigDirectoryBackupPolicy() {
         return sConfigDirectoryBackupPolicy;
     }
 
@@ -159,10 +148,9 @@ public final class ConfigManager {
      * ABORT - If there is any pre-existing archive for this groups, throw an exception and abort
      * @param mConfigDirectoryBackupPolicy the policy to use
      */
-    public static void setConfigDirectoryBackupPolicy(ConfigDirectoryBackupPolicy mConfigDirectoryBackupPolicy) {
+    public void setConfigDirectoryBackupPolicy(ConfigDirectoryBackupPolicy mConfigDirectoryBackupPolicy) {
         ConfigManager.sConfigDirectoryBackupPolicy = mConfigDirectoryBackupPolicy;
     }
-
 
     /**
      * Getter method for Unique ID Length
@@ -172,10 +160,9 @@ public final class ConfigManager {
      * long the unique hex string is. The default length is 12.
      * @return the unique ID length
      */
-    public static int getUniqueIdLength() {
-        return sUniqueIdLength;
+    public int getUniqueIdLength() {
+        return mUniqueIdLength;
     }
-
 
     /**
      * Setter method for Unique ID Length
@@ -183,10 +170,10 @@ public final class ConfigManager {
      * Each configuration has a unique identifier that is formed by concatenating an appId with
      * a unique ID and the group description using underscores. The Unique ID length controls how
      * long the unique hex string is. The default length is 12.
-     * @param sUniqueIdLength the unique ID length
+     * @param uniqueIdLength the unique ID length
      */
-    public static void setUniqueIdLength(int sUniqueIdLength) {
-        ConfigManager.sUniqueIdLength = sUniqueIdLength;
+    public void setUniqueIdLength(int uniqueIdLength) {
+        mUniqueIdLength = uniqueIdLength;
     }
 
     /**
@@ -198,25 +185,13 @@ public final class ConfigManager {
         return mMoniker;
     }
 
-
-    //TODO: is this the best way to get the root directory?
-
     /**
      * Returns the root directory of the App-specific storage. It defaults to
      * appContext.getFilesDir().
      * @return the Root Dir
      */
-    public static String getRootDir() {
-        return sRootDir;
-    }
-
-    /**
-     * Setter for root directory of the App-specific storage. It defaults to
-     * appContext.getFilesDir(). This needs to be set before the first call to ConfigManager.getInstance()
-     * @param sRootDir the root directory to create the babble config directories hierarchy
-     */
-    public static void setRootDir(String sRootDir) {
-        ConfigManager.sRootDir = sRootDir;
+    public String getRootDir() {
+        return mRootDir;
     }
 
     /**
@@ -255,7 +230,7 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String setGroupToArchive(ConfigDirectory configDirectory, String inetAddress)  throws  IOException {
+    public String setGroupToArchive(ConfigDirectory configDirectory, String inetAddress) throws IOException {
         return setGroupToArchive(configDirectory, inetAddress, mDefaultBabblePort);
     }
 
@@ -265,37 +240,19 @@ public final class ConfigManager {
      * @param babblingPort the port used for Babble consensus
      */
     public String setGroupToArchive(ConfigDirectory configDirectory, String inetAddress, int babblingPort) {
-
-        Log.i("setGroupToArchive", configDirectory.directoryName);
-
         setTomlDir(configDirectory.directoryName);
-
-        Log.i("configArchive:tomlDir", mTomlDir);
-        Log.i("configArchive:IP", inetAddress);
-
-
         Map<String, Object> configChanges = new HashMap<>();
         configChanges.put("maintenance-mode", true);
         configChanges.put("listen", inetAddress + ":" + babblingPort);
         configChanges.put("advertise", inetAddress + ":" + babblingPort);
 
-
         //TODO: possibly move these amendments into the backup config processing to avoid having to
         //      set them here
         configChanges.put("datadir", mTomlDir);
         configChanges.put("db",  mTomlDir + File.separator+ mDbSubDir);
-
-
         amendTomlSettings(configChanges);
 
         return mTomlDir;
-
-//        List<Peer> genesisPeers = new ArrayList<>();
-//        genesisPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
-//        List<Peer> currentPeers = new ArrayList<>();
-//        currentPeers.add(new Peer(mKeyPair.publicKey, inetAddress + ":" + babblingPort, moniker));
-
-//        return createConfig(genesisPeers, currentPeers, "TODO-GROUP-NAME", moniker, inetAddress, babblingPort, true); //TODO: group name
     }
 
     /**
@@ -306,7 +263,7 @@ public final class ConfigManager {
      * @param inetAddress the IPv4 address of the interface to which the Babble node will bind
      * @throws IllegalStateException if the service is currently running
      */
-    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor, String moniker, String inetAddress, int networkType) throws CannotStartBabbleNodeException, IOException {
+    public String createConfigJoinGroup(List<Peer> genesisPeers, List<Peer> currentPeers, GroupDescriptor groupDescriptor, String moniker, String inetAddress, int networkType) {
         return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, inetAddress, mDefaultBabblePort, networkType);
     }
 
@@ -330,35 +287,26 @@ public final class ConfigManager {
         String compositeGroupName = getCompositeConfigDir(groupDescriptor);
 
         NodeConfig nodeConfig = new NodeConfig.Builder()
-                .webrtc(networkType == BabbleService.NETWORK_GLOBAL)
-                .signalAddress(networkType == BabbleService.NETWORK_GLOBAL ? WebRTCService.mRelayServerAddress : "")
+                .webrtc(networkType == BabbleService2.NETWORK_GLOBAL)
+                .signalAddress(networkType == BabbleService2.NETWORK_GLOBAL ? WebRTCService.RELAY_SEVER_ADDRESS : "")
                 .build();
         mMoniker = moniker;
-        //TODO: is there a cleaner way of obtaining the path?
-        // It is stored in mTomlDir which has getTomlDir and setTomlDir getter and setters
-        String fullPath = writeBabbleTomlFiles(nodeConfig, compositeGroupName, inetAddress, babblingPort, moniker);
-        Log.v("Config.createConfig", "Full Path:" + fullPath);
 
+        String fullPath = writeBabbleTomlFiles(nodeConfig, compositeGroupName, inetAddress, babblingPort, moniker);
         writePeersJsonFiles(fullPath, genesisPeers, currentPeers);
 
         // private key -- does not overwrite
         writePrivateKey(fullPath, mKeyPair.privateKey);
 
         // If we are a WebRTC/Global type, build the disco object for use later.
-        if (networkType == BabbleService.NETWORK_GLOBAL) {
-            Log.i("ConfigManager", "createConfig: Network type global" );
+        if (networkType == BabbleService2.NETWORK_GLOBAL) {
             mDisco = new Disco( groupDescriptor.getUid(), groupDescriptor.getName(), mAppId, mKeyPair.publicKey, 0, -1, currentPeers, genesisPeers  );
         } else {
-            Log.i("ConfigManager", "createConfig: Network type not global" );
             mDisco = null;
         }
 
         return fullPath;
     }
-
-    //#######################################################
-
-
 
     /**
      * Write private key
@@ -384,25 +332,21 @@ public final class ConfigManager {
     public void writePeersJsonFiles(String targetDir, List<Peer> genesisPeers, List<Peer> currentPeers) {
         Gson gson = new Gson();
         try {
-
-            Log.i("writePeersJsonFiles", "JSON " + gson.toJson(currentPeers));
-
             FileWriter fileWriter = new FileWriter(new File(targetDir, mPeersJsonFile));
             gson.toJson(currentPeers, fileWriter);
             fileWriter.close();
-        } catch (Exception e) {
-            Log.e("writePeersJsonFiles", e.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
         }
 
         try {
             FileWriter fileWriter = new FileWriter(new File(targetDir, mPeersGenesisJsonFile));
             gson.toJson(genesisPeers, fileWriter);
             fileWriter.close();
-        } catch (Exception e) {
-            Log.e("writePeersJsonFiles", e.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
-
 
     /**
      * Getter to get  the tomlDir to the full path to the folder containing the babble toml
@@ -417,11 +361,9 @@ public final class ConfigManager {
       * @param compositeName the directory name for the config folder. NB this must be the composite version, not the human readable one.
      */
     public void setTomlDir(String compositeName) {
-        mTomlDir = sRootDir + File.separator + mBabbleRootDir + File.separator + compositeName;
+        mTomlDir = mRootDir + File.separator + mBabbleRootDir + File.separator + compositeName;
         this.mTomlDir = mTomlDir;
     }
-
-
 
     /**
      * Write Babble Config to disk ready for Babble to use
@@ -433,7 +375,6 @@ public final class ConfigManager {
 
         //TODO: add inetAddress, port and moniker to nodeConfig??
         Map<String, Object> babble = new HashMap<>();
-
 
         setTomlDir(compositeGroupName);
 
@@ -491,8 +432,6 @@ public final class ConfigManager {
 
         writeTomlFile(babble);
 
-        Log.i("writeTomlFile", "Wrote toml file successfully");
-
         if (isNotExistingConfigDirectory(compositeGroupName)) {
             addConfigDirectoryToList(compositeGroupName);
         }
@@ -500,21 +439,14 @@ public final class ConfigManager {
         return mTomlDir;
     }
 
-
     /**
      * Loads the Babble Config TOML file. This function relies on mTomlDir being set.
      * @return A HashMap object containing the data from the Toml File.
      */
-
     protected Map<String, Object> readTomlFile(){
         File tomlFile =  new File(mTomlDir, mBabbleTomlFile);
-
         Toml toml = new Toml().read(tomlFile);
-
         Map<String, Object> configMap = toml.toMap();
-
-
-        Log.i("readTomlFile", "Read toml file successfully");
 
         return configMap;
     }
@@ -524,13 +456,10 @@ public final class ConfigManager {
      * @param configHashMap A HashMap object containing the config data to be written the Toml File.
      */
     protected void writeTomlFile(Map<String, Object> configHashMap) {
-        Log.i("writeTomlFile", mTomlDir);
 
         try {
             TomlWriter tomlWriter = new TomlWriter();
             tomlWriter.write(configHashMap, new File(mTomlDir, mBabbleTomlFile));
-
-            Log.i("writeTomlFile", "Wrote toml file");
         } catch (IOException e) {
             // Log and rethrow
             Log.e("writeTomlFile", e.toString());
@@ -538,7 +467,6 @@ public final class ConfigManager {
         }
 
     }
-
 
     /**
      * Amends the Babble Config TOML file. This function relies on mTomlDir being set.
@@ -550,39 +478,24 @@ public final class ConfigManager {
         Map<String, Object> configMap = readTomlFile();
 
         for (Map.Entry<String,Object> entry : configHashMapChanges.entrySet()) {
-
-            Log.i("amendTomlSettings", entry.getKey() + " = " + entry.getValue().toString()) ;
-
             if (
                 ( configMap.containsKey(entry.getKey())) &&
                         (Objects.requireNonNull(configMap.get(entry.getKey())).equals(entry.getValue()))
             ) { continue ; }    // If key exists and value matches, there is nothing to do
             hasChanged = true;
-
-            Log.i("amendTomlSettings:SET", entry.getKey() + " = " + entry.getValue().toString());
             configMap.put(entry.getKey(), entry.getValue());
         }
 
         if (hasChanged) {
                 writeTomlFile(configMap);
-                Log.i("amendTomlSettings", configMap.toString());
-
-            Log.i("amendTomlSettings", "No changes, no write");
         }
 
 
         if (configMap.containsKey("moniker"))
         {
             mMoniker = Objects.requireNonNull(configMap.get("moniker")).toString();
-            Log.i("configArchive:moniker", mMoniker);
         }
-
-
     }
-
-
-
-
 
     /**
      * Gets a list of the configuration directories available to this app
@@ -630,8 +543,8 @@ public final class ConfigManager {
         String unique = groupDescriptor.getUid();
 
         //TODO: should this length be controlled in this class or in the group descriptor?
-        String trimmedUnique = unique.length() >= sUniqueIdLength
-                ? unique.substring(unique.length() - sUniqueIdLength)
+        String trimmedUnique = unique.length() >= mUniqueIdLength
+                ? unique.substring(unique.length() - mUniqueIdLength)
                 : unique;
 
         //TODO: the encodeDescription method is lossy e.g. "My-Group" and "MyGroup" will be mapped to "MyGroup"
@@ -641,14 +554,13 @@ public final class ConfigManager {
     }
 
     private boolean deleteDirectory(String subConfigDir) {
-        Log.d("deleteDirectory", subConfigDir);
 
         if (isNotExistingConfigDirectory(subConfigDir)) { // Doesn't exist
-            Log.e("deleteDirectory !Exists", subConfigDir);
+            Log.w("deleteDirectory !Exists", subConfigDir);
             return false;
         }
 
-        File dir = new File(sRootDir + File.separator + mBabbleRootDir +
+        File dir = new File(mRootDir + File.separator + mBabbleRootDir +
                 File.separator + subConfigDir);
 
         return deleteDir(dir);
@@ -678,16 +590,13 @@ public final class ConfigManager {
     }
     
     private void renameConfigDirectory(String oldSubConfigDir, int newSuffix) {
-        File oldFile = new File(sRootDir + File.separator + mBabbleRootDir +
+        File oldFile = new File(mRootDir + File.separator + mBabbleRootDir +
                 File.separator + oldSubConfigDir);
-        File newFile = new File(sRootDir + File.separator + mBabbleRootDir +
+        File newFile = new File(mRootDir + File.separator + mBabbleRootDir +
                 File.separator + oldSubConfigDir + newSuffix);
         
-        Log.d("Rename ", oldFile.getAbsolutePath());
-        Log.d("Rename ", newFile.getAbsolutePath());
-        
         if (!(oldFile.renameTo(newFile))) {
-            Log.d("Rename ","Fails");
+            Log.e("Rename ","Fails");
             throw new RuntimeException("Cannot backup the old configuration directory");
         }
     }
@@ -696,7 +605,6 @@ public final class ConfigManager {
         
         if (sConfigDirectoryBackupPolicy == ConfigDirectoryBackupPolicy.SINGLE_BACKUP) {
 
-            Log.d("backupOldConfigs SINGLE", compositeName);
             for (ConfigDirectory d : mDirectories) {
                 if ((d.isBackup) && (d.directoryName.startsWith(compositeName))) {
                     deleteDirectory(d.directoryName);
@@ -708,7 +616,6 @@ public final class ConfigManager {
         } else { 
             // MULTIPLE_BACKUP
             int newestInt = 0;
-            Log.d("backupOldConfigs MULT", compositeName);
             for (ConfigDirectory d : mDirectories) {
                 if ((d.isBackup) && (d.directoryName.startsWith(compositeName))) {
                     if (newestInt < d.BackUpVersion) {
@@ -720,8 +627,7 @@ public final class ConfigManager {
             renameConfigDirectory(compositeName,newestInt + 1);
         }
 
-        Log.d("backupOldConfigs POP", compositeName);
-        populateDirectories(new File(sRootDir, mBabbleRootDir));
+        populateDirectories(new File(mRootDir, mBabbleRootDir));
     }
 
 
@@ -734,10 +640,6 @@ public final class ConfigManager {
      */
 
     public void deleteDirectoryAndBackups(String compositeName, boolean onlyDeleteBackups) {
-
-        // Call ConfigDirectory.rootDirectoryName on composite name to de-backup the name
-
-
         for (ConfigDirectory d : mDirectories) {
             if ((d.isBackup || (!onlyDeleteBackups)) && (d.directoryName.startsWith(compositeName))) {
                 deleteDirectory(d.directoryName);
@@ -745,7 +647,7 @@ public final class ConfigManager {
         }
 
         // Rebuild directory list after pruning backups
-        populateDirectories(new File(sRootDir, mBabbleRootDir));
+        populateDirectories(new File(mRootDir, mBabbleRootDir));
     }
 
     public String getPublicKey() throws IllegalAccessError {

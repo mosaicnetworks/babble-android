@@ -24,8 +24,6 @@
 
 package io.mosaicnetworks.sample;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
@@ -39,7 +37,6 @@ import java.util.Date;
 import io.mosaicnetworks.babble.node.BabbleTx;
 import io.mosaicnetworks.sample.chatkit.commons.models.IMessage;
 import io.mosaicnetworks.sample.chatkit.commons.models.IUser;
-
 
 class UnixEraDateTypeAdapter extends TypeAdapter<Date> {
     @Override
@@ -59,7 +56,6 @@ class UnixEraDateTypeAdapter extends TypeAdapter<Date> {
     }
 }
 
-
 /**
  * A chat message class that implements the {@link IMessage} interface, which is required to display
  * messages in the adapter from the same library, and BabbleTx which is required to serialize
@@ -67,11 +63,7 @@ class UnixEraDateTypeAdapter extends TypeAdapter<Date> {
  */
 public final class Message implements BabbleTx, IMessage {
 
-    public final static String SYSTEM_MESSAGE_AUTHOR = "SYSTEM-MESSAGE";
-
     private final static Gson gson = new GsonBuilder().registerTypeAdapter(Date.class,new UnixEraDateTypeAdapter()).create();
-
-  //  private final static Gson gson =  new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
     /**
      * This class implements the {@link IUser} interface which is required by the message adapter
@@ -121,7 +113,6 @@ public final class Message implements BabbleTx, IMessage {
         this.date = new Date();
     }
 
-
     /**
      * Constructor
      * @param text the message text
@@ -133,8 +124,6 @@ public final class Message implements BabbleTx, IMessage {
         this.author = author;
         this.date = date;
     }
-
-
 
     /**
      * Factory for constructing a {@link Message} from JSON
@@ -173,10 +162,6 @@ public final class Message implements BabbleTx, IMessage {
      */
     @Override
     public byte[] toBytes() {
-
-        Log.i("Message", "toBytes: " + gson.toJson(this));
-
         return gson.toJson(this).getBytes();
     }
-
 }

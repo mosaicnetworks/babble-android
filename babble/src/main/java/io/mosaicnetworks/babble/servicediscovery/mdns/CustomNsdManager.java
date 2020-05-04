@@ -34,12 +34,13 @@ import java.net.InetAddress;
 import java.util.Iterator;
 import java.util.Map;
 
+import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
+
 public class CustomNsdManager {
     private static final String TAG = "CustomNsdManager";
     private NsdManager mNsdManager;
     private boolean AttemptStockResolveFirst = true;
     private static final int RESOLVE_TIMEOUT = 12000;
-    // private static final int RESOLVE_TIMEOUT = 0;
 
     public CustomNsdManager(Context context) {
         mNsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
@@ -55,13 +56,11 @@ public class CustomNsdManager {
 
     public void resolveService(final NsdServiceInfo serviceInfo, final NsdManager.ResolveListener listener) {
 
-
         // If using alternative method by preference
         if (! AttemptStockResolveFirst) {
             resolveServiceAlternative(serviceInfo, listener);
             return;
         }
-
 
         // Standard use stock, failover to alternative
         mNsdManager.resolveService(serviceInfo,new NsdManager.ResolveListener() {
@@ -72,9 +71,9 @@ public class CustomNsdManager {
 
                     @Override
                     public void onServiceResolved(NsdServiceInfo nsdServiceInfo) {
-                        MdnsResolvedService resolvedService;
+                        ResolvedService resolvedService;
                         try {
-                            resolvedService = new MdnsResolvedService(nsdServiceInfo);
+                            resolvedService = new ResolvedService(nsdServiceInfo);
                             // No error so we make stock return
                             listener.onServiceResolved(nsdServiceInfo);
                         } catch (IllegalArgumentException ex) {

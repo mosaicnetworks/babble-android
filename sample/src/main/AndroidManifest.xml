@@ -42,7 +42,6 @@
             android:stopWithTask="true"
             android:exported="false" />
 
-        <activity android:name=".ChatActivityAndroidService" />
         <activity android:name=".ChatActivity" />
         <activity android:name=".MainActivity"
             android:windowSoftInputMode="adjustResize">

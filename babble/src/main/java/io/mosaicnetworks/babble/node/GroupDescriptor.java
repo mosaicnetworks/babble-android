@@ -24,8 +24,6 @@
 
 package io.mosaicnetworks.babble.node;
 
-import java.util.UUID;
-
 import io.mosaicnetworks.babble.utils.RandomString;
 
 public final class GroupDescriptor {

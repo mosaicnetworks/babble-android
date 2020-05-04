@@ -4,9 +4,8 @@ import org.junit.Test;
 
 import java.util.List;
 
-import io.mosaicnetworks.babble.node.BabbleTx;
 import io.mosaicnetworks.babble.node.Block;
-import io.mosaicnetworks.babble.node.InternalTransaction;
+import io.mosaicnetworks.sample.chatkit.commons.models.IMessage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,7 +17,7 @@ public class ChatStateTest {
 
         ChatState chatState = new ChatState();
 
-        List<Message> messageList = chatState.getMessagesFromIndex(0);
+        List<IMessage> messageList = chatState.getMessagesFromIndex(0);
 
         assertTrue(messageList.isEmpty());
     }
@@ -29,7 +28,7 @@ public class ChatStateTest {
         ChatState appState = new ChatState();
 
         try {
-            List<Message> messageList = appState.getMessagesFromIndex(-5);
+            List<IMessage> messageList = appState.getMessagesFromIndex(-5);
         } catch (IllegalArgumentException ex) {
             return;
         }
@@ -50,7 +49,7 @@ public class ChatStateTest {
         block.body.transactions = txs;
         chatState.processBlock(block);
 
-        List<Message> messages = chatState.getMessagesFromIndex(0);
+        List<IMessage> messages = chatState.getMessagesFromIndex(0);
 
         assertEquals(1, messages.size());
         assertEquals("alice", messages.get(0).getUser().getName());
@@ -76,7 +75,7 @@ public class ChatStateTest {
         block2.body.transactions = txs2;
         chatState.processBlock(block2);
 
-        List<Message> messages = chatState.getMessagesFromIndex(0);
+        List<IMessage> messages = chatState.getMessagesFromIndex(0);
 
         assertEquals(2, messages.size());
         assertEquals("alice", messages.get(0).getUser().getName());
@@ -91,7 +90,6 @@ public class ChatStateTest {
 
         ChatState chatState = new ChatState();
 
-
         byte[][] txs = {
                 new Message("hello camille, we need to talk!", "alice" ).toBytes()
         };
@@ -101,7 +99,7 @@ public class ChatStateTest {
 
         chatState.reset();
 
-        List<Message> messages = chatState.getMessagesFromIndex(0);
+        List<IMessage> messages = chatState.getMessagesFromIndex(0);
 
         assertEquals(0, messages.size());
     }

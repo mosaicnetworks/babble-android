@@ -28,25 +28,32 @@ import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 
+import java.io.IOException;
 import java.util.Objects;
 
+import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
+import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
-import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
+import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.utils.RandomString;
 
-public class MdnsAdvertiser implements ServiceAdvertiser  {
+public class MdnsAdvertiser implements ServiceAdvertiser {
 
     public static final String SERVICE_TYPE = "_babble._tcp.";
     public static final String APP_IDENTIFIER = "appIdentifier";
     public static final String GROUP_NAME = "groupName";
     public static final String GROUP_UID = "groupUid";
+    private static int sDiscoveryPort = 8988;
     private NsdManager mNsdManager;
     private NsdManager.RegistrationListener mRegistrationListener;
     private String mServiceName;
     private NsdServiceInfo mServiceInfo = new NsdServiceInfo();
     private Context mAppContext;
+    private HttpPeerDiscoveryServer mHttpPeerDiscoveryServer;
+    private String mCurrentPeers;
+    private boolean mAdvertising = false;
 
-    public MdnsAdvertiser(GroupDescriptor groupDescriptor, int port, Context context) {
+    public MdnsAdvertiser(GroupDescriptor groupDescriptor, Context context) {
         initializeRegistrationListener();
 
         mAppContext = context.getApplicationContext();
@@ -61,17 +68,47 @@ public class MdnsAdvertiser implements ServiceAdvertiser  {
         // returns your application ID
         mServiceInfo.setAttribute(GROUP_NAME, groupDescriptor.getName());
         mServiceInfo.setAttribute(GROUP_UID, groupDescriptor.getUid());
-        mServiceInfo.setPort(port);
+        mServiceInfo.setPort(sDiscoveryPort);
     }
 
-    public void advertise() {
+    @Override
+    public boolean advertise(final String genesisPeers, final String currentPeers, PeersProvider peersProvider) {
+
+        mCurrentPeers = currentPeers;
+
+        mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(sDiscoveryPort, peersProvider);
+
+        try {
+            mHttpPeerDiscoveryServer.start();
+        } catch (IOException ex) {
+            //Probably the port is in use, we'll continue without the discovery service
+            return false;
+        }
 
         mNsdManager = (NsdManager) mAppContext.getSystemService(Context.NSD_SERVICE);
         Objects.requireNonNull(mNsdManager).registerService(mServiceInfo, NsdManager.PROTOCOL_DNS_SD, mRegistrationListener);
+
+        mAdvertising = true;
+
+        //TODO: is it worth this using the success/fail callback of the NSD manager service registration?
+        return true;
     }
 
+    @Override
+    public void onPeersChange(String newPeers) {
+        mCurrentPeers = newPeers;
+    }
+
+    @Override
     public void stopAdvertising() {
-        mNsdManager.unregisterService(mRegistrationListener);
+
+        if (mAdvertising) {
+            mNsdManager.unregisterService(mRegistrationListener);
+
+            mHttpPeerDiscoveryServer.stop();
+            mHttpPeerDiscoveryServer = null;
+            mAdvertising = false;
+        }
     }
 
     private void initializeRegistrationListener() {
@@ -97,10 +134,6 @@ public class MdnsAdvertiser implements ServiceAdvertiser  {
             @Override
             public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {}
         };
-    }
-
-    public String getServiceName() {
-        return mServiceName;
     }
 }
 

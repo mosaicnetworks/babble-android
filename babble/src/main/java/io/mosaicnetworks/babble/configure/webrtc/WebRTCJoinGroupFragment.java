@@ -27,6 +27,7 @@ package io.mosaicnetworks.babble.configure.webrtc;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,10 +38,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -50,26 +48,25 @@ import io.mosaicnetworks.babble.configure.BaseConfigActivity;
 import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
+import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
-import io.mosaicnetworks.babble.node.BabbleService;
-import io.mosaicnetworks.babble.node.CannotStartBabbleNodeException;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
+import io.mosaicnetworks.babble.service.BabbleService2;
+import io.mosaicnetworks.babble.service.BabbleServiceBinder;
+import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
-import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCResolvedService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
-
 /**
- * This fragment enables the user to configure the {@link BabbleService} to join an existing group.
+ * This fragment enables the user to configure the BabbleService to join an existing group.
  * Activities that contain this fragment must implement the {@link OnFragmentInteractionListener}
  * interface to handle interaction events. Use the {@link WebRTCJoinGroupFragment#newInstance} factory
  * method to create an instance of this fragment.
  */
-public class WebRTCJoinGroupFragment extends Fragment implements ResponseListener {
+public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements ResponseListener {
 
     private static String TAG="WebRTCJoinFragment";
     private OnFragmentInteractionListener mListener;
@@ -78,13 +75,11 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
     private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
-    private WebRTCResolvedGroup mResolvedGroup;
-    private WebRTCResolvedService mResolvedService;
+    private ResolvedGroup mResolvedGroup;
+    private ResolvedService mResolvedService;
     private static Random randomGenerator = new Random();
-
-    public WebRTCJoinGroupFragment() {
-        // Required empty public constructor
-    }
+    private GroupDescriptor mGroupDescriptor;
+    private String mConfigDirectory;
 
     /**
      * Use this factory method to create a new instance of
@@ -95,7 +90,7 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
     public static WebRTCJoinGroupFragment newInstance(ResolvedGroup resolvedGroup) {
         Log.i(TAG, "newInstance: "+ resolvedGroup.getGroupName());
         WebRTCJoinGroupFragment webRTCJoinGroupFragment = new WebRTCJoinGroupFragment();
-        webRTCJoinGroupFragment.mResolvedGroup = (WebRTCResolvedGroup) resolvedGroup;
+        webRTCJoinGroupFragment.mResolvedGroup = resolvedGroup;
         return webRTCJoinGroupFragment;
     }
 
@@ -130,7 +125,6 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
         Objects.requireNonNull(imgr).toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);
 
         return view;
-
     }
 
     // called when the user presses the join button
@@ -143,7 +137,6 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
             return;
         }
 
-
         List<ResolvedService> resolvedServices = mResolvedGroup.getResolvedServices();
 
         if (resolvedServices.size() < 1) {
@@ -151,14 +144,9 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
             return;
         }
 
-
         //We are choosing a random resolved service - if we try again we may get a different
         //service.
-        mResolvedService = (WebRTCResolvedService) resolvedServices.get(randomGenerator.nextInt(resolvedServices.size()));
-
-
-        //     final String peerIP = mResolvedService.getInetAddress().getHostAddress();
-        //     final int peerPort = mResolvedService.getPort();
+        mResolvedService = resolvedServices.get(randomGenerator.nextInt(resolvedServices.size()));
 
         // Store moniker and host entered
         SharedPreferences sharedPref = Objects.requireNonNull(getActivity()).getSharedPreferences(
@@ -166,54 +154,10 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
 
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("moniker", mMoniker);
-        //      editor.putString("host", peerIP);
         editor.apply();
 
         mGenesisPeers = mResolvedService.getInitialPeers();
         onReceivePeers(mResolvedService.getCurrentPeers());
-    }
-
-    @Override
-    public void onReceivePeers(List<Peer> currentPeers) {
-
-        ConfigManager configManager;
-        //      try {
-        configManager = ConfigManager.getInstance(Objects.requireNonNull(getContext()).getApplicationContext());
- /*
-        } catch (FileNotFoundException ex) {
-            //This error is thrown by ConfigManager when it fails to read / create a babble root dir.
-            //This is probably a fatal error.
-            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot write configuration. Aborting.");
-            throw new IllegalStateException();  // Throws a runtime exception that is deliberately not caught
-            // The app will terminate. But babble is unstartable from here.
-        }
-*/
-        BabbleService<?> babbleService = mListener.getBabbleService();
-        GroupDescriptor groupDescriptor = new GroupDescriptor(mResolvedService.getGroupName(), mResolvedService.getGroupUid());
-
-        try {
-            String ip = Utils.getIPAddr(getContext());
-            Log.i(TAG, "onReceivePeers: "+ip);
-            String configDir = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, groupDescriptor, mMoniker, ip, BabbleService.NETWORK_GLOBAL);
-            babbleService.start(configDir, groupDescriptor);
-        } catch (IllegalStateException | CannotStartBabbleNodeException| IOException ex ) {
-            //TODO: just catch IOException - this will mean the port is in use
-            //we'll assume this is caused by the node taking a while to leave a previous group,
-            //though it could be that another application is using the port or WiFi is turned off -
-            // in which case we'll keep getting stuck here until the port is available or WiFi is
-            // turned on!
-            mLoadingDialog.dismiss();
-            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
-            return;
-        } catch (Exception ex) {
-            //TODO: Review this. The duplicate dialog function feels overkill.
-            mLoadingDialog.dismiss();
-            DialogUtils.displayOkAlertDialogText(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, "Cannot start babble: "+ ex.getClass().getCanonicalName()+": "+ ex.getMessage() );
-            throw ex;
-        }
-
-        mLoadingDialog.dismiss();
-        mListener.baseOnJoined(mMoniker, groupDescriptor.getName());
     }
 
     @Override
@@ -236,6 +180,63 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
         DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.peers_error_alert_title, messageId);
     }
 
+    @Override
+    public void onReceivePeers(List<Peer> currentPeers) {
+
+        mGroupDescriptor = new GroupDescriptor(mResolvedService.getGroupName(), mResolvedService.getGroupUid());
+
+        ConfigManager configManager =
+                ConfigManager.getInstance(getContext().getApplicationContext());
+
+        mConfigDirectory = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, mGroupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService2.NETWORK_GLOBAL);
+
+        startBabbleService();
+    }
+
+    public void startBabbleService() {
+        getActivity().startService(new Intent(getActivity(), BabbleService2.class));
+        doBindService();
+    }
+
+    @Override
+    protected void onServiceConnected() {
+
+        try {
+            mBoundService.start(mConfigDirectory, mGroupDescriptor, new ServiceAdvertiser() {
+                @Override
+                public boolean advertise(String genesisPeers, String currentPeers, PeersProvider peersProvider) {
+                    return false;
+                }
+
+                @Override
+                public void stopAdvertising() {
+                    //do nothing
+                }
+
+                @Override
+                public void onPeersChange(String newPeers) {
+                    //do nothing
+                }
+            });
+            mLoadingDialog.dismiss();
+            mListener.baseOnJoined(mMoniker, mGroupDescriptor.getName());
+        } catch (IllegalStateException ex) {
+            // we'll assume this is caused by the node taking a while to leave a previous group,
+            // though it could be that another application is using the port or WiFi is turned off -
+            // in which case we'll keep getting stuck here until the port is available or WiFi is
+            // turned on!
+            DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
+            mLoadingDialog.dismiss();
+            getActivity().stopService(new Intent(getActivity(), BabbleService2.class));
+        }
+        doUnbindService();
+    }
+
+    @Override
+    protected void onServiceDisconnected() {
+        //Do nothing
+    }
+
     private void initLoadingDialog() {
         mLoadingDialog = new ProgressDialog(getContext());
         mLoadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -250,7 +251,6 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
                 cancelRequests();
             }});
     }
-
 
     private void cancelRequests() {
         if (mHttpCurrentPeerDiscoveryRequest!=null) {
@@ -283,6 +283,12 @@ public class WebRTCJoinGroupFragment extends Fragment implements ResponseListene
     public void onPause() {
         super.onPause();
         cancelRequests();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        doUnbindService();
     }
 
 }

@@ -41,27 +41,24 @@ import androidx.annotation.NonNull;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService2;
 import io.mosaicnetworks.babble.service.BabbleServiceBinder;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser2;
+import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
 /**
- * This fragment enables the user to configure the {@link BabbleService} to create a new group.
+ * This fragment enables the user to configure the BabbleService to create a new group.
  * Activities that contain this fragment must implement the {@link OnFragmentInteractionListener}
  * interface to handle interaction events. Use the {@link NewGroupFragment#newInstance} factory
  * method to create an instance of this fragment.
  */
 public class NewGroupFragment extends BabbleServiceBinder {
 
-    private static boolean mShowmDNS = true;
-    private static boolean mShowGlobal = true;
     private String mConfigDirectory;
     private ProgressDialog mLoadingDialog;
     private GroupDescriptor mGroupDescriptor;
@@ -77,9 +74,7 @@ public class NewGroupFragment extends BabbleServiceBinder {
      *
      * @return A new instance of fragment NewGroupServiceFragment.
      */
-    public static NewGroupFragment newInstance(Bundle args) {
-        mShowmDNS = args.getBoolean(BaseConfigActivity.SHOW_MDNS, true);
-        mShowGlobal = args.getBoolean(BaseConfigActivity.SHOW_GLOBAL, true);
+    public static NewGroupFragment newInstance() {
         return new NewGroupFragment();
     }
 
@@ -108,25 +103,6 @@ public class NewGroupFragment extends BabbleServiceBinder {
 
         EditText edit = view.findViewById(R.id.edit_moniker);
         edit.setText(sharedPref.getString("moniker", "Me"));
-
-        // If only one discovery tab is shown then set and then disable the toggle switch to only
-        // allow a valid selection.
-        Switch switchGlobal =  view.findViewById(R.id.switch_global);
-        if (mShowmDNS) {
-            if (mShowGlobal) {
-                switchGlobal.setChecked(false);
-                switchGlobal.setEnabled(true);
-            } else {
-                switchGlobal.setChecked(false);
-                switchGlobal.setEnabled(false);
-                switchGlobal.setVisibility(View.GONE);
-            }
-        } else {
-            if (mShowGlobal) {
-                switchGlobal.setChecked(true);
-                switchGlobal.setEnabled(false);
-            }
-        }
 
         EditText editGroup = view.findViewById(R.id.edit_group_name);
         editGroup.requestFocus();
@@ -177,13 +153,13 @@ public class NewGroupFragment extends BabbleServiceBinder {
             ConfigManager configManager = ConfigManager.getInstance(getContext());
             String peersAddr = configManager.getPublicKey();
 
-            configAndStartBabble(peersAddr, ip, BabbleService.NETWORK_GLOBAL);
+            configAndStartBabble(peersAddr, ip, BabbleService2.NETWORK_GLOBAL);
 
         } else {
-            mServiceAdvertiser = new MdnsAdvertiser2(mGroupDescriptor,
+            mServiceAdvertiser = new MdnsAdvertiser(mGroupDescriptor,
                     getContext().getApplicationContext());
             String ipAddr = Utils.getIPAddr(getContext());
-            configAndStartBabble(ipAddr, ipAddr, BabbleService.NETWORK_WIFI);
+            configAndStartBabble(ipAddr, ipAddr, BabbleService2.NETWORK_WIFI);
         }
     }
 
@@ -206,7 +182,7 @@ public class NewGroupFragment extends BabbleServiceBinder {
         try {
             mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
             mListener.baseOnStartedNew(mMoniker, mGroupDescriptor.getName());
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalStateException ex) {
             // we'll assume this is caused by the node taking a while to leave a previous group,
             // though it could be that another application is using the port or WiFi is turned off -
             // in which case we'll keep getting stuck here until the port is available or WiFi is

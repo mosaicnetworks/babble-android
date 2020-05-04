@@ -107,7 +107,7 @@ public class HttpPeerDiscoveryRequestTest {
         lock.await(testTimeout, TimeUnit.MILLISECONDS);
 
         assertNotNull(mError);
-        assertEquals(ResponseListener.Error.TIMEOUT, mError);
+        assertEquals(ResponseListener.Error.CONNECTION_ERROR, mError);
 
     }
 }

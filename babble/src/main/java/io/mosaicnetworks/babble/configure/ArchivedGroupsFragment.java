@@ -30,8 +30,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -49,7 +48,6 @@ import java.util.List;
 import java.util.Objects;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.node.BabbleService;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
@@ -82,10 +80,9 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
     /**
      * Use this factory method to create a new instance of
      * this fragment.
-     * @param args Bundle of invocation params
      * @return A new instance of fragment ArchivedGroupsFragment.
      */
-    public static ArchivedGroupsFragment newInstance(Bundle args) {
+    public static ArchivedGroupsFragment newInstance() {
         return new ArchivedGroupsFragment();
     }
 
@@ -93,10 +90,9 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mConfigManager = ConfigManager.getInstance(getContext().getApplicationContext());
-
         initActionModeCallback();
 
-        mViewModel = ViewModelProviders.of(this, new ArchivedGroupsViewModelFactory(mConfigManager)).get(ArchivedGroupsViewModel.class);
+        mViewModel = new ViewModelProvider(this, new ArchivedGroupsViewModelFactory(mConfigManager)).get(ArchivedGroupsViewModel.class);
     }
 
     @Override

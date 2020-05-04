@@ -22,55 +22,59 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure.mdns;
+package io.mosaicnetworks.babble.configure;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import java.util.Objects;
+import java.util.List;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
+import io.mosaicnetworks.babble.node.ConfigDirectory;
+import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsServicesListView;
-import io.mosaicnetworks.babble.utils.DialogUtils;
+import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsServicesListAdapter;
 
-public class MdnsDiscoveryFragment extends Fragment {
+public class DiscoverGroupsFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
-    private MdnsServicesListView mServiceListView;
-    public SwipeRefreshLayout mSwipeRefreshServiceSearch;
+    private RecyclerView mRvDiscoveredGroups;
+    private SwipeRefreshLayout mSwipeRefreshServiceSearch;
     private SwipeRefreshLayout mSwipeRefreshDiscoveryFailed;
     private SwipeRefreshLayout mSwipeRefreshServicesDisplaying;
-
-    public MdnsDiscoveryFragment() {
-        // Required empty public constructor
-    }
+    private ConfigManager mConfigManager;
+    private DiscoverGroupsViewModel mViewModel;
+    private MdnsServicesListAdapter mMdnsServicesListAdapter;
+    private SelectableData<ConfigDirectory> mArchivedList = new SelectableData<>();
+    private List<ResolvedGroup> mServiceInfoList;
 
     /**
      * Use this factory method to create a new instance of
      * this fragment.
-     *
-     * @return A new instance of fragment MdnsDiscoveryFragment.
+     * @return A new instance of fragment DiscoverGroupsFragment.
      */
-    public static MdnsDiscoveryFragment newInstance() {
-        return new MdnsDiscoveryFragment();
+    public static DiscoverGroupsFragment newInstance() {
+        return new DiscoverGroupsFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mConfigManager = ConfigManager.getInstance(getContext().getApplicationContext());
+        mViewModel = new ViewModelProvider(this, new DiscoverGroupsViewModelFactory(getActivity().getApplication(), mConfigManager)).get(DiscoverGroupsViewModel.class);
     }
 
     @Override
@@ -78,7 +82,7 @@ public class MdnsDiscoveryFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_mdns_discovery, container, false);
 
-        mServiceListView = view.findViewById(R.id.servicesListView);
+        mRvDiscoveredGroups = view.findViewById(R.id.servicesListView);
         mSwipeRefreshServiceSearch = view.findViewById(R.id.swipeRefresh_service_search);
         mSwipeRefreshDiscoveryFailed = view.findViewById(R.id.swiperefresh_discovery_failed);
         mSwipeRefreshServicesDisplaying = view.findViewById(R.id.swiperefresh_services_displaying);
@@ -92,7 +96,7 @@ public class MdnsDiscoveryFragment extends Fragment {
                         mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
                         mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
 
-                        startDiscovery();
+                        //startDiscovery(); TODO: do something when refresh after discovery start failure!
 
                         if (mSwipeRefreshDiscoveryFailed.isRefreshing()) {
                             mSwipeRefreshDiscoveryFailed.setRefreshing(false);
@@ -106,7 +110,7 @@ public class MdnsDiscoveryFragment extends Fragment {
                     @Override
                     public void onRefresh() {
 
-                        //do nothing ;)
+                        mViewModel.refreshDiscovery();
 
                         if (mSwipeRefreshServicesDisplaying.isRefreshing()) {
                             mSwipeRefreshServicesDisplaying.setRefreshing(false);
@@ -120,7 +124,7 @@ public class MdnsDiscoveryFragment extends Fragment {
                     @Override
                     public void onRefresh() {
 
-                        //do nothing ;)
+                        mViewModel.refreshDiscovery();
 
                         if (mSwipeRefreshServiceSearch.isRefreshing()) {
                             mSwipeRefreshServiceSearch.setRefreshing(false);
@@ -149,31 +153,28 @@ public class MdnsDiscoveryFragment extends Fragment {
         mListener = null;
     }
 
-    private void startDiscovery() {
-        mServiceListView.startDiscovery(new ServicesListListener() {
+    @Override
+    public void onResume() {
+        super.onResume();
 
+        mServiceInfoList = mViewModel.getmServiceInfoList();
+
+        mMdnsServicesListAdapter = new MdnsServicesListAdapter(getContext(), mServiceInfoList);
+        mRvDiscoveredGroups.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRvDiscoveredGroups.setAdapter(mMdnsServicesListAdapter);
+
+        mMdnsServicesListAdapter.setClickListener(new MdnsServicesListAdapter.ItemClickListener() {
             @Override
-            public void onServiceSelectedSuccess(ResolvedGroup resolvedGroup) {
-                mListener.onServiceSelected(resolvedGroup);
+            public void onItemClick(View view, int position) {
+                mListener.onServiceSelected(mMdnsServicesListAdapter.getItem(position));
             }
+        });
 
+        final Observer<List<ResolvedGroup>> servicesObserver = new Observer<List<ResolvedGroup>>() {
             @Override
-            public void onServiceSelectedFailure() {
-                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_discovery_resolve_fail_title, R.string.service_discovery_resolve_fail_message);
-            }
+            public void onChanged(@Nullable final List<ResolvedGroup> updatedList) {
 
-            @Override
-            public void onDiscoveryStartFailure() {
-                DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.service_discovery_start_fail_title, R.string.service_discovery_start_fail_message);
-
-                mSwipeRefreshServiceSearch.setVisibility(View.GONE);
-                mSwipeRefreshDiscoveryFailed.setVisibility(View.VISIBLE);
-                mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onListEmptyStatusChange(boolean empty) {
-                if (empty) {
+                if (mServiceInfoList.isEmpty()) {
                     mSwipeRefreshServiceSearch.setVisibility(View.VISIBLE);
                     mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
                     mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
@@ -182,17 +183,15 @@ public class MdnsDiscoveryFragment extends Fragment {
                     mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
                     mSwipeRefreshServicesDisplaying.setVisibility(View.VISIBLE);
                 }
+
+                mMdnsServicesListAdapter.notifyDataSetChanged();
             }
-        });
+        };
 
-    }
+        mViewModel.getServiceInfoList().observe(this, servicesObserver);
 
+        mViewModel.refreshDiscovery();
 
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        startDiscovery();
     }
 
     @Override
@@ -203,8 +202,6 @@ public class MdnsDiscoveryFragment extends Fragment {
         mSwipeRefreshServiceSearch.setVisibility(View.VISIBLE);
         mSwipeRefreshDiscoveryFailed.setVisibility(View.GONE);
         mSwipeRefreshServicesDisplaying.setVisibility(View.GONE);
-
-        mServiceListView.stopDiscovery();
     }
-
 }
+

@@ -23,33 +23,22 @@ import static org.junit.Assert.assertEquals;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 
-
 @RunWith(AndroidJUnit4.class)
 @LargeTest
-public class SoloSessionTest {
+public class MainActivityTest {
 
     @Rule
     public ActivityTestRule<MainActivity> activityRule =
             new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void checkForNewButton() {
-        onView(withText("New")).check(matches(isDisplayed()));
+    public void checkForLiveTab() {
+        onView(withText("LIVE")).check(matches(isDisplayed()));
     }
 
     @Test
-    public void checkForJoinButton() {
-        onView(withText("Join")).check(matches(isDisplayed()));
+    public void checkForArchivedTab() {
+        onView(withText("ARCHIVED")).check(matches(isDisplayed()));
     }
-
-/*
-
-// Deliberately failing test for testing
-    @Test
-    public void checkForFishpaste() {
-        onView(withText("FishPaste")).check(matches(isDisplayed()));
-    }
-    */
-
 }
 

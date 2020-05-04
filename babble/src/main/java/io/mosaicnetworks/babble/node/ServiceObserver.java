@@ -25,7 +25,7 @@
 package io.mosaicnetworks.babble.node;
 
 /**
- * Observers of the {@link BabbleService} are required to implement this interface
+ * Observers of the BabbleService are required to implement this interface
  */
 public interface ServiceObserver {
 
