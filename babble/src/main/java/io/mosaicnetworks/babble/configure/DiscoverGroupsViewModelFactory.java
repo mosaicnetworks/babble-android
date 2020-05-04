@@ -31,6 +31,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import io.mosaicnetworks.babble.node.ConfigManager;
 
+/**
+ * This factory class produces {@link DiscoverGroupsViewModel}
+ */
 public class DiscoverGroupsViewModelFactory implements ViewModelProvider.Factory {
     private ConfigManager mConfigManager;
     private Application mApplication;

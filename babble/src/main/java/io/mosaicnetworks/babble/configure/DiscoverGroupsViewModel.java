@@ -41,6 +41,9 @@ import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsDiscovery;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
 
+/**
+ * This class implements a ViewModel for the {@link DiscoverGroupsFragment}
+ */
 public class DiscoverGroupsViewModel extends AndroidViewModel {
 
     private MutableLiveData<SelectableData<ConfigDirectory>> mArchivedList;

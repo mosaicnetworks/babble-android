@@ -40,6 +40,9 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import io.mosaicnetworks.babble.R;
 
+/**
+ * This Fragment implements a multi-tabbed UX allowing the display of multiple Discovery Fragments
+ */
 public class TabsFragment extends Fragment {
 
     GroupCollectionAdapter groupCollectionAdapter;
@@ -97,6 +100,9 @@ public class TabsFragment extends Fragment {
             }}).attach();
     }
 
+    /**
+     * A {@link FragmentStateAdapter} implementation for {@link TabsFragment}
+     */
     public static class GroupCollectionAdapter extends FragmentStateAdapter {
 
         public GroupCollectionAdapter(Fragment fragment) {

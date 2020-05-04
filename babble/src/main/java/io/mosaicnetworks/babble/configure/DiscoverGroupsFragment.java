@@ -47,6 +47,10 @@ import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsServicesListAdapter;
 
+/**
+ * This fragment implements a visual component to allow selection of a discovered group. It includes
+ * swipe refresh and a nothing found message
+ */
 public class DiscoverGroupsFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
