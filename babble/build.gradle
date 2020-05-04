@@ -78,8 +78,8 @@ android {
     defaultConfig {
         minSdkVersion 21       // nsdServiceInfo.getAttributes requires API 21
         targetSdkVersion 29
-        versionCode 14
-        versionName "0.4.3"
+        versionCode 15
+        versionName "0.5.0"
         buildConfigField "String", "GitHash", "\"${getGitHash()}\""
         buildConfigField "String", "GitHashShort", "\"${getGitHashShort()}\""
         buildConfigField "String", "GitBranch", "\"${getGitBranch()}\""
@@ -154,7 +154,7 @@ artifacts {
     archives sourcesJar
 }
 
-version '0.4.3'
+version '0.5.0'
 
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())

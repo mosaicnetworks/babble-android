@@ -22,7 +22,7 @@ components in the library can be used to build a simple chat app.
 
 For the impatient, add the following to your app's `build.gradle` file:
 
-```implementation 'io.mosaicnetworks:babble:0.4.3'```
+```implementation 'io.mosaicnetworks:babble:0.5.0'```
 
 and start coding!
 
