@@ -43,7 +43,6 @@
             android:exported="false" />
 
         <activity android:name=".ChatActivity" />
-        <activity android:name=".ChatActivity" />
         <activity android:name=".MainActivity"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
