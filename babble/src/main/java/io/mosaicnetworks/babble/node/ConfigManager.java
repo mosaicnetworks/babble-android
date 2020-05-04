@@ -45,7 +45,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import io.mosaicnetworks.babble.discovery.Peer;
-import io.mosaicnetworks.babble.service.BabbleService2;
+import io.mosaicnetworks.babble.service.BabbleService;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.Disco;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
 
@@ -287,8 +287,8 @@ public final class ConfigManager {
         String compositeGroupName = getCompositeConfigDir(groupDescriptor);
 
         NodeConfig nodeConfig = new NodeConfig.Builder()
-                .webrtc(networkType == BabbleService2.NETWORK_GLOBAL)
-                .signalAddress(networkType == BabbleService2.NETWORK_GLOBAL ? WebRTCService.RELAY_SEVER_ADDRESS : "")
+                .webrtc(networkType == BabbleService.NETWORK_GLOBAL)
+                .signalAddress(networkType == BabbleService.NETWORK_GLOBAL ? WebRTCService.RELAY_SEVER_ADDRESS : "")
                 .build();
         mMoniker = moniker;
 
@@ -299,7 +299,7 @@ public final class ConfigManager {
         writePrivateKey(fullPath, mKeyPair.privateKey);
 
         // If we are a WebRTC/Global type, build the disco object for use later.
-        if (networkType == BabbleService2.NETWORK_GLOBAL) {
+        if (networkType == BabbleService.NETWORK_GLOBAL) {
             mDisco = new Disco( groupDescriptor.getUid(), groupDescriptor.getName(), mAppId, mKeyPair.publicKey, 0, -1, currentPeers, genesisPeers  );
         } else {
             mDisco = null;

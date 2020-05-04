@@ -43,7 +43,7 @@ import java.util.Map;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.node.BabbleNode;
 import io.mosaicnetworks.babble.service.BabbleServiceBinderActivity;
-import io.mosaicnetworks.babble.service.ServiceObserver2;
+import io.mosaicnetworks.babble.service.ServiceObserver;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 import io.mosaicnetworks.sample.chatkit.commons.models.IMessage;
@@ -58,7 +58,7 @@ import io.mosaicnetworks.sample.notification.NotificationHolder;
  * This is the central UI component. It receives messages from the BabbleService} and
  * displays them as a list.
  */
-public class ChatActivity extends BabbleServiceBinderActivity implements ServiceObserver2 {
+public class ChatActivity extends BabbleServiceBinderActivity implements ServiceObserver {
 
     private MessagesListAdapter mAdapter;
     private String mMoniker;

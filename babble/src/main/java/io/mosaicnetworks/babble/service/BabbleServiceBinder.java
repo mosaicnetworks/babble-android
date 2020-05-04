@@ -30,7 +30,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -42,7 +41,7 @@ public abstract class BabbleServiceBinder extends Fragment {
 
     // To invoke the bound service, first make sure that this value
     // is not null.
-    protected BabbleService2 mBoundService;
+    protected BabbleService mBoundService;
 
     private ServiceConnection mConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -51,7 +50,7 @@ public abstract class BabbleServiceBinder extends Fragment {
             // interact with the service.  Because we have bound to a explicit
             // service that we know is running in our own process, we can
             // cast its IBinder to a concrete class and directly access it.
-            mBoundService = ((BabbleService2.LocalBinder) service).getService();
+            mBoundService = ((BabbleService.LocalBinder) service).getService();
             BabbleServiceBinder.this.onServiceConnected();
         }
 
@@ -71,7 +70,7 @@ public abstract class BabbleServiceBinder extends Fragment {
         // implementation that we know will be running in our own process
         // (and thus won't be supporting component replacement by other
         // applications).
-        if (getActivity().bindService(new Intent(getActivity(), BabbleService2.class), mConnection, Context.BIND_AUTO_CREATE)) {
+        if (getActivity().bindService(new Intent(getActivity(), BabbleService.class), mConnection, Context.BIND_AUTO_CREATE)) {
             mShouldUnbind = true;
         } else {
             Log.e(TAG, "Error: The requested service doesn't " +

@@ -51,7 +51,7 @@ import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
-import io.mosaicnetworks.babble.service.BabbleService2;
+import io.mosaicnetworks.babble.service.BabbleService;
 import io.mosaicnetworks.babble.service.BabbleServiceBinder;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
@@ -127,7 +127,7 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
 
             mConfigManager.setGroupToArchive(configDirectory, Utils.getIPAddr(Objects.requireNonNull(getContext())), mBabbleArchivePort);
             mMoniker = mConfigManager.getMoniker();
-            getActivity().startService(new Intent(getActivity(), BabbleService2.class));
+            getActivity().startService(new Intent(getActivity(), BabbleService.class));
             mLoadingDialog = DialogUtils.displayLoadingDialog(getContext());
             mLoadingDialog.show();
             doBindService();
@@ -215,7 +215,7 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
             mListener.onArchiveLoaded(mMoniker, "Archived Group");
         } catch (IllegalArgumentException ex) {
             DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
-            getActivity().stopService(new Intent(getActivity(), BabbleService2.class));
+            getActivity().stopService(new Intent(getActivity(), BabbleService.class));
         }
 
         doUnbindService();

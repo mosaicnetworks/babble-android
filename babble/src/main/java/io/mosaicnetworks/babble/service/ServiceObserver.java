@@ -26,7 +26,7 @@ package io.mosaicnetworks.babble.service;
 
 import io.mosaicnetworks.babble.node.BabbleNode;
 
-public interface ServiceObserver2 {
+public interface ServiceObserver {
 
     /**
      * Called when transactions are received and the app state is updated

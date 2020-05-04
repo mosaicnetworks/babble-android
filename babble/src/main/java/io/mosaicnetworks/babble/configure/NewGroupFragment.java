@@ -43,7 +43,7 @@ import java.util.Objects;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
-import io.mosaicnetworks.babble.service.BabbleService2;
+import io.mosaicnetworks.babble.service.BabbleService;
 import io.mosaicnetworks.babble.service.BabbleServiceBinder;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser;
@@ -153,13 +153,13 @@ public class NewGroupFragment extends BabbleServiceBinder {
             ConfigManager configManager = ConfigManager.getInstance(getContext());
             String peersAddr = configManager.getPublicKey();
 
-            configAndStartBabble(peersAddr, ip, BabbleService2.NETWORK_GLOBAL);
+            configAndStartBabble(peersAddr, ip, BabbleService.NETWORK_GLOBAL);
 
         } else {
             mServiceAdvertiser = new MdnsAdvertiser(mGroupDescriptor,
                     getContext().getApplicationContext());
             String ipAddr = Utils.getIPAddr(getContext());
-            configAndStartBabble(ipAddr, ipAddr, BabbleService2.NETWORK_WIFI);
+            configAndStartBabble(ipAddr, ipAddr, BabbleService.NETWORK_WIFI);
         }
     }
 
@@ -171,7 +171,7 @@ public class NewGroupFragment extends BabbleServiceBinder {
     }
 
     public void startBabbleService() {
-        getActivity().startService(new Intent(getActivity(), BabbleService2.class));
+        getActivity().startService(new Intent(getActivity(), BabbleService.class));
         mLoadingDialog = DialogUtils.displayLoadingDialog(getContext());
         mLoadingDialog.show();
         doBindService();
@@ -189,7 +189,7 @@ public class NewGroupFragment extends BabbleServiceBinder {
             // turned on!
             DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             mLoadingDialog.dismiss();
-            getActivity().stopService(new Intent(getActivity(), BabbleService2.class));
+            getActivity().stopService(new Intent(getActivity(), BabbleService.class));
         }
         doUnbindService();
     }

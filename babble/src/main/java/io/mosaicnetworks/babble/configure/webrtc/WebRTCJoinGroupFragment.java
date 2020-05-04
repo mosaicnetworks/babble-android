@@ -52,7 +52,7 @@ import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
-import io.mosaicnetworks.babble.service.BabbleService2;
+import io.mosaicnetworks.babble.service.BabbleService;
 import io.mosaicnetworks.babble.service.BabbleServiceBinder;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
@@ -188,13 +188,13 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
         ConfigManager configManager =
                 ConfigManager.getInstance(getContext().getApplicationContext());
 
-        mConfigDirectory = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, mGroupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService2.NETWORK_GLOBAL);
+        mConfigDirectory = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, mGroupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService.NETWORK_GLOBAL);
 
         startBabbleService();
     }
 
     public void startBabbleService() {
-        getActivity().startService(new Intent(getActivity(), BabbleService2.class));
+        getActivity().startService(new Intent(getActivity(), BabbleService.class));
         doBindService();
     }
 
@@ -227,7 +227,7 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
             // turned on!
             DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
             mLoadingDialog.dismiss();
-            getActivity().stopService(new Intent(getActivity(), BabbleService2.class));
+            getActivity().stopService(new Intent(getActivity(), BabbleService.class));
         }
         doUnbindService();
     }

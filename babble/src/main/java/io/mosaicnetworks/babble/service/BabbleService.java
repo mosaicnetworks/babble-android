@@ -55,7 +55,7 @@ import io.mosaicnetworks.babble.node.NodeStateChangeHandler;
 
 import static androidx.core.app.NotificationCompat.PRIORITY_LOW;
 
-public class BabbleService2 extends Service {
+public class BabbleService extends Service {
 
     public enum State {
         STOPPED,
@@ -255,8 +255,8 @@ public class BabbleService2 extends Service {
      * IPC.
      */
     public class LocalBinder extends Binder {
-        BabbleService2 getService() {
-            return BabbleService2.this;
+        BabbleService getService() {
+            return BabbleService.this;
         }
     }
 
@@ -291,14 +291,14 @@ public class BabbleService2 extends Service {
     //##############################################################################################
     // Observer components
 
-    private List<ServiceObserver2> mObservers = new ArrayList<>();;
+    private List<ServiceObserver> mObservers = new ArrayList<>();;
 
     /**
      * Register an observer
      * @param serviceObserver the observer to be registered, the observer must implement the
-     * {@link ServiceObserver2} interface
+     * {@link ServiceObserver} interface
      */
-    public void registerObserver(ServiceObserver2 serviceObserver) {
+    public void registerObserver(ServiceObserver serviceObserver) {
         if (!mObservers.contains(serviceObserver)) {
             mObservers.add(serviceObserver);
         }
@@ -307,14 +307,14 @@ public class BabbleService2 extends Service {
     /**
      * Remove an observer
      * @param messageObserver the observer to be removed, the observer must implement the
-     *                        {@link ServiceObserver2} interface
+     *                        {@link ServiceObserver} interface
      */
-    public void removeObserver(ServiceObserver2 messageObserver) {
+    public void removeObserver(ServiceObserver messageObserver) {
         mObservers.remove(messageObserver);
     }
 
     private void notifyObservers() {
-        for (ServiceObserver2 observer: mObservers) {
+        for (ServiceObserver observer: mObservers) {
             observer.stateUpdated();
         }
     }

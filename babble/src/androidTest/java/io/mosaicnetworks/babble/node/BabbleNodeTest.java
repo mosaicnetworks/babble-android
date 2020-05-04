@@ -3,7 +3,7 @@ package io.mosaicnetworks.babble.node;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import android.content.Context;
-import android.util.Log;
+
 import androidx.test.rule.GrantPermissionRule;
 import androidx.test.platform.app.InstrumentationRegistry;
 
@@ -17,8 +17,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import io.mosaicnetworks.babble.discovery.Peer;
-import io.mosaicnetworks.babble.service.BabbleService2;
-import io.mosaicnetworks.babble.utils.Utils;
+import io.mosaicnetworks.babble.service.BabbleService;
 
 import static org.junit.Assert.*;
 
@@ -65,7 +64,7 @@ public class BabbleNodeTest {
         };
 
         ConfigManager configManager = ConfigManager.getInstance(context);
-        String configDirectory = configManager.createConfigNewGroup(groupDescriptor, moniker, "localhost", "localhost", BabbleService2.NETWORK_WIFI);
+        String configDirectory = configManager.createConfigNewGroup(groupDescriptor, moniker, "localhost", "localhost", BabbleService.NETWORK_WIFI);
 
         BabbleNode babbleNode = BabbleNode.create(blockConsumer, configDirectory, null);
 

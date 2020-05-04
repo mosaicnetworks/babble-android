@@ -33,13 +33,13 @@ import io.mosaicnetworks.babble.configure.BaseConfigActivity;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
-import io.mosaicnetworks.babble.service.BabbleService2;
+import io.mosaicnetworks.babble.service.BabbleService;
 
 public class MainActivity extends BaseConfigActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        BabbleService2.setAppState(new ChatState());
+        BabbleService.setAppState(new ChatState());
         super.onCreate(savedInstanceState);
     }
 
