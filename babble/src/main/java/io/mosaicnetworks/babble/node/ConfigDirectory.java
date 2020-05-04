@@ -24,13 +24,38 @@
 
 package io.mosaicnetworks.babble.node;
 
+/**
+ * A class that wraps the details of Babble Configuration Directory
+ */
 public final class ConfigDirectory {
 
+    /**
+     * The full directory path
+     */
     public final String directoryName;
+
+    /**
+     * The unique identifier for the app. It may be the Fully Qualified Domain Name, but does not have to be
+     */
     public final String appId;
+
+    /**
+     * A generated random ID to render the name unique
+     */
     public final String uniqueId;
+    /**
+     * The text description of this group as displayed to the user
+     */
     public final String description;
+
+    /**
+     * Set to true if this is not the last saved version of this group.
+     */
     public final boolean isBackup;
+
+    /**
+     * An incrementing version count. It is incremented until an unused version number is found
+     */
     public final int BackUpVersion;
 
     /**

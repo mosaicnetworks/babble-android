@@ -28,6 +28,7 @@ import android.net.nsd.NsdServiceInfo;
 
 import java.net.InetAddress;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -90,7 +91,7 @@ public class ResolvedService {
             throw new IllegalArgumentException("Map does not contain attribute: " + key);
         }
 
-        return new String(mServiceAttributes.get(key), Charset.forName("UTF-8"));
+        return new String(mServiceAttributes.get(key), StandardCharsets.UTF_8);
     }
 
     /**
@@ -143,7 +144,7 @@ public class ResolvedService {
 
     /**
      * Get the inet address
-     * @return
+     * @return the Inet Address
      */
     public InetAddress getInetAddress() {
         return mInetAddress;

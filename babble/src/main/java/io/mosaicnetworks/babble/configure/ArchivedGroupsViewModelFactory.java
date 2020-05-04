@@ -29,12 +29,20 @@ import androidx.lifecycle.ViewModelProvider;
 
 import io.mosaicnetworks.babble.node.ConfigManager;
 
+/**
+ * Factory class to create {@link ArchivedGroupsViewModel} instance
+ */
 public class ArchivedGroupsViewModelFactory implements ViewModelProvider.Factory {
     private ConfigManager mConfigManager;
 
+    /**
+     * Constructor. Needs {@link ConfigManager} instance to pass to {@link ArchivedGroupsViewModel}
+     * @param configManager
+     */
     public ArchivedGroupsViewModelFactory(ConfigManager configManager) {
         mConfigManager = configManager;
     }
+
 
     @Override
     @SuppressWarnings("unchecked")  //unchecked cast warning caused by the use of generics.

@@ -29,7 +29,6 @@ import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
 
 import java.util.Objects;
-import java.util.UUID;
 
 import static android.content.Context.WIFI_SERVICE;
 

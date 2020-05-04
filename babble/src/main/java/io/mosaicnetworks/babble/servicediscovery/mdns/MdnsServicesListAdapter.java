@@ -36,8 +36,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.configure.mdns.MdnsJoinGroupFragment;
-import io.mosaicnetworks.babble.configure.webrtc.WebRTCJoinGroupFragment;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 public class MdnsServicesListAdapter extends RecyclerView.Adapter<MdnsServicesListAdapter.ViewHolder> {

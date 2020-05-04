@@ -29,14 +29,14 @@ import android.util.Log;
 import com.google.gson.JsonSyntaxException;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import io.mosaicnetworks.babble.discovery.PeersProvider;
 import mobile.Mobile;
 import mobile.Node;
-import mobile.StateChangeHandler;
 
 /**
- * This is the core Babble node. It can be used directly or alternatively the {@link BabbleService}
+ * This is the core Babble node. It can be used directly or alternatively the {@link io.mosaicnetworks.babble.service.BabbleService}
  * class can be used to offer the same functionality wrapped up as a service. After creating the
  * node, call {@link BabbleNode#run()} to start it.
  */
@@ -66,7 +66,7 @@ public final class BabbleNode implements PeersProvider {
 
         private int value;
 
-        private State(int value) {
+        State(int value) {
             this.value = value;
         }
 
@@ -95,7 +95,7 @@ public final class BabbleNode implements PeersProvider {
                 new mobile.CommitHandler() {
                     @Override
                     public byte[] onCommit(final byte[] blockBytes) {
-                        String strJson = new String(blockBytes, Charset.forName("UTF-8"));
+                        String strJson = new String(blockBytes, StandardCharsets.UTF_8);
                         try {
                             Block incomingBlock = Block.fromJson(strJson);
 
