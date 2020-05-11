@@ -124,7 +124,7 @@ public final class ConfigManager {
             }
         }
     }
-    
+
     /**
      * ConfigDirectoryBackupPolicy getter takes an enumerated type ConfigDirectoryBackupPolicy
      * which can take the following types:

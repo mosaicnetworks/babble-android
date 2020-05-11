@@ -108,6 +108,7 @@ public class BabbleService extends Service {
     private ServiceAdvertiser mServiceAdvertiser;
     private boolean mIsArchive = false;
     private BabbleNode.State mNodeState;
+    private String mPubKeyHex;
 
     /**
      * Start the service
@@ -408,5 +409,16 @@ public class BabbleService extends Service {
         return "babble service channel";
 
     }
+
+
+    public void setPublicKey(String pubKeyHex) {
+        mPubKeyHex = pubKeyHex;
+    }
+
+    public String getPublicKey() {
+        return mPubKeyHex;
+    }
+
+
 
 }

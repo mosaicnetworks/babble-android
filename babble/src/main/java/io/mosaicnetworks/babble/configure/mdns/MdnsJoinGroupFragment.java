@@ -73,6 +73,7 @@ public class MdnsJoinGroupFragment extends BabbleServiceBinder implements Respon
     private OnFragmentInteractionListener mListener;
     private ProgressDialog mLoadingDialog;
     private String mMoniker;
+    private String mPubKeyHex;
     private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
@@ -227,7 +228,7 @@ public class MdnsJoinGroupFragment extends BabbleServiceBinder implements Respon
                 ConfigManager.getInstance(getContext().getApplicationContext());
 
         mConfigDirectory = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, mGroupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService.NETWORK_WIFI);
-
+        mPubKeyHex = configManager.getPublicKey();
         startBabbleService();
     }
 
@@ -243,6 +244,7 @@ public class MdnsJoinGroupFragment extends BabbleServiceBinder implements Respon
                 getContext().getApplicationContext());
 
         try {
+            mBoundService.setPublicKey(mPubKeyHex);
             mBoundService.start(mConfigDirectory, mGroupDescriptor, serviceAdvertiser);
             mLoadingDialog.dismiss();
             mListener.baseOnJoined(mMoniker, mGroupDescriptor.getName());

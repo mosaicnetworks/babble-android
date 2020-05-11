@@ -189,8 +189,14 @@ public class ChatActivity extends BabbleServiceBinderActivity implements Service
         // String html = "<h4>"+this.getResources().getString(R.string.monikers_preamble)+"</h4>\n"+preBlock;
         String html = preBlock;
 
+        String pubKey = mBoundService.getPublicKey();
+
         for (int i=0; i< peers.length; i++ ) {
-            html = html + prelabel + peers[i].moniker + postlabel+predata + peers[i].pubKeyHex + postdata;
+            if (pubKey.equals(peers[i].pubKeyHex)) {
+                html = html + prelabel + "<span style=\"color:red;font-weight:bold\">"+peers[i].moniker +"</span>"+ postlabel+predata + peers[i].pubKeyHex + postdata;
+            } else {
+                html = html + prelabel + peers[i].moniker + postlabel+predata + peers[i].pubKeyHex + postdata;
+            }
         }
 
         html = html + postBlock;

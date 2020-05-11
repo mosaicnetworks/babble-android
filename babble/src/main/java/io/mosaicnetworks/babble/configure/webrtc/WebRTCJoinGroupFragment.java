@@ -72,6 +72,7 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
     private OnFragmentInteractionListener mListener;
     private ProgressDialog mLoadingDialog;
     private String mMoniker;
+    private String mPubKeyHex;
     private HttpPeerDiscoveryRequest mHttpGenesisPeerDiscoveryRequest;
     private HttpPeerDiscoveryRequest mHttpCurrentPeerDiscoveryRequest;
     private List<Peer> mGenesisPeers;
@@ -189,7 +190,7 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
                 ConfigManager.getInstance(getContext().getApplicationContext());
 
         mConfigDirectory = configManager.createConfigJoinGroup(mGenesisPeers, currentPeers, mGroupDescriptor, mMoniker, Utils.getIPAddr(getContext()), BabbleService.NETWORK_GLOBAL);
-
+        mPubKeyHex = configManager.getPublicKey();
         startBabbleService();
     }
 
@@ -202,6 +203,7 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
     protected void onServiceConnected() {
 
         try {
+            mBoundService.setPublicKey(mPubKeyHex);
             mBoundService.start(mConfigDirectory, mGroupDescriptor, new ServiceAdvertiser() {
                 @Override
                 public boolean advertise(String genesisPeers, String currentPeers, PeersProvider peersProvider) {
@@ -218,6 +220,8 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
                     //do nothing
                 }
             });
+
+
             mLoadingDialog.dismiss();
             mListener.baseOnJoined(mMoniker, mGroupDescriptor.getName());
         } catch (IllegalStateException ex) {

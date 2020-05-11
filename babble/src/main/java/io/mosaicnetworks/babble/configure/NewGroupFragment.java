@@ -63,6 +63,7 @@ public class NewGroupFragment extends BabbleServiceBinder {
     private ProgressDialog mLoadingDialog;
     private GroupDescriptor mGroupDescriptor;
     private String mMoniker;
+    private String mPubKeyHex;
     private OnFragmentInteractionListener mListener;
     private ServiceAdvertiser mServiceAdvertiser;
 
@@ -167,6 +168,7 @@ public class NewGroupFragment extends BabbleServiceBinder {
         ConfigManager configManager =
                 ConfigManager.getInstance(getContext().getApplicationContext());
         mConfigDirectory = configManager.createConfigNewGroup(mGroupDescriptor, mMoniker, peersAddr, babbleAddr, serviceType);
+        mPubKeyHex = configManager.getPublicKey();
         startBabbleService();
     }
 
@@ -180,6 +182,7 @@ public class NewGroupFragment extends BabbleServiceBinder {
     @Override
     protected void onServiceConnected() {
         try {
+            mBoundService.setPublicKey(mPubKeyHex);
             mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
             mListener.baseOnStartedNew(mMoniker, mGroupDescriptor.getName());
         } catch (IllegalStateException ex) {
