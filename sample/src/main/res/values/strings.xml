@@ -37,4 +37,5 @@
     <string name="about_title">About</string>
     <string name="node_suspended_title">Chat Suspended</string>
     <string name="node_suspended_message">The number of active participants is too low to achieve consensus.</string>
+    <string name="loading_group">Loading chat</string>
 </resources>
