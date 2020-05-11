@@ -71,9 +71,10 @@ public class DialogUtils {
 
     public static ProgressDialog displayLoadingDialog(Context context) {
         ProgressDialog loadingDialog = new ProgressDialog(context);
+
         loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        loadingDialog.setTitle("Loading chat");
-        loadingDialog.setMessage("Loading. Please wait...");
+        loadingDialog.setTitle(R.string.loading_group);
+        loadingDialog.setMessage(context.getString(R.string.loading_please_wait));
         loadingDialog.setIndeterminate(true);
         loadingDialog.setCanceledOnTouchOutside(false);
 

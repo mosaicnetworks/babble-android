@@ -71,5 +71,6 @@
     <string name="archive_load_fail_message">Please try again later!</string>
     <string name="no_archives_found">There are no archives to view</string>
     <string name="babble_service_running">Babble service is running</string>
-
+    <string name="loading_group">Loading group</string>
+    <string name="loading_please_wait">Loading. Please wait...</string>
 </resources>
