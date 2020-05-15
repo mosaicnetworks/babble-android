@@ -142,7 +142,9 @@ public class BabbleService extends Service {
         });
 
         mBabbleNode.run();
-        mServiceAdvertiser.advertise(mBabbleNode.getGenesisPeers(), mBabbleNode.getCurrentPeers(), mBabbleNode);
+        if (mServiceAdvertiser!=null) {
+            mServiceAdvertiser.advertise(mBabbleNode.getGenesisPeers(), mBabbleNode.getCurrentPeers(), mBabbleNode);
+        }
         mState = State.RUNNING;
     }
 
@@ -305,7 +307,7 @@ public class BabbleService extends Service {
      * IPC.
      */
     public class LocalBinder extends Binder {
-        BabbleService getService() {
+        public BabbleService getService() {
             return BabbleService.this;
         }
     }
