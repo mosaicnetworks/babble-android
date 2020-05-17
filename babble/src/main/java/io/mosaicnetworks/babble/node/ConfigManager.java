@@ -193,6 +193,12 @@ public final class ConfigManager {
     }
 
     /**
+     * Returns the ID of the package that uses this class (ex: io.mosaicnetworks.sample)
+     * @return the AppID
+     */
+    public String getAppID() { return mAppId; }
+
+    /**
      * Configure the service to create a new group using the default ports
      * @param moniker node moniker
      * @throws IllegalStateException if the service is currently running

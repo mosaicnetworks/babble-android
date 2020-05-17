@@ -106,16 +106,22 @@ public class WebRTCService implements ServiceAdvertiser {
     }
 
     public void discoverService() {
-        URL url;
+        ConfigManager configManager = ConfigManager.getInstance(null);
 
-        try {
-            url = new URL("https", DISCOVER_SERVER_HOST, DISCOVER_SERVER_PORT, DISCOVER_END_POINT);
-        } catch (MalformedURLException e) {
-            //We should never arrive here!
-            throw new RuntimeException("Unexpected Invalid host exception");
-        }
+        // Query the /groups endpoint with the app-id parameter to include only groups pertaining
+        // to the current app.
+        // XXX there is no need to construct this url on every call, it should be initialised in the
+        // constructor.
+        String url = String.format("https://%s:%d/%s?app-id=%s",
+                    DISCOVER_SERVER_HOST,
+                    DISCOVER_SERVER_PORT,
+                    DISCOVER_END_POINT,
+                    configManager.getAppID()
+                );
 
-        StringRequest request = new StringRequest(Request.Method.GET, url.toString(),
+        Log.d("WebRTCService", url);
+
+        StringRequest request = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
