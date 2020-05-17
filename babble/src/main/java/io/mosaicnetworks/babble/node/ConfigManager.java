@@ -28,19 +28,18 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.moandjiezana.toml.TomlWriter;
 import com.moandjiezana.toml.Toml;
+import com.moandjiezana.toml.TomlWriter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -288,6 +287,7 @@ public final class ConfigManager {
         NodeConfig nodeConfig = new NodeConfig.Builder()
                 .webrtc(networkType == BabbleService.NETWORK_GLOBAL)
                 .signalAddress(networkType == BabbleService.NETWORK_GLOBAL ? WebRTCService.RELAY_SEVER_ADDRESS : "")
+                .skipVerify(true) // XXX this should not be hardcoded here
                 .build();
         mMoniker = moniker;
 
@@ -427,7 +427,7 @@ public final class ConfigManager {
         babble.put("maintenance-mode", nodeConfig.maintenanceMode);
         babble.put("suspend-limit", nodeConfig.suspendLimit);
         babble.put("moniker", moniker);
-        babble.put("loadpeers", nodeConfig.loadPeers);
+        babble.put("signal-skip-verify", nodeConfig.skipVerify);
 
         writeTomlFile(babble);
 

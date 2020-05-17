@@ -42,7 +42,6 @@ public class NodeConfigTest {
         assertEquals("20s", nodeConfig.joinTimeout);
         assertEquals(false, nodeConfig.maintenanceMode);
         assertEquals(300, nodeConfig.suspendLimit);
-        assertEquals(true, nodeConfig.loadPeers);
         assertEquals(true, nodeConfig.noService);
     }
 
@@ -64,7 +63,6 @@ public class NodeConfigTest {
                 .joinTimeout("10s")
                 .maintenanceMode(true)
                 .suspendLimit(200)
-                .loadPeers(false)
                 .noService(false)
                 .build();
 
@@ -83,7 +81,6 @@ public class NodeConfigTest {
         assertEquals("10s", nodeConfig.joinTimeout);
         assertEquals(true, nodeConfig.maintenanceMode);
         assertEquals(200, nodeConfig.suspendLimit);
-        assertEquals(false, nodeConfig.loadPeers);
         assertEquals(false, nodeConfig.noService);
     }
 

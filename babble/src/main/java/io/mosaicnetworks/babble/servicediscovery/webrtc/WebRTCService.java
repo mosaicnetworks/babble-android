@@ -25,6 +25,7 @@
 package io.mosaicnetworks.babble.servicediscovery.webrtc;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -48,15 +49,21 @@ import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
+import io.mosaicnetworks.babble.utils.HttpsTrustManager;
+
 
 /**
  * Service class to handle WebRTC
  */
 public class WebRTCService implements ServiceAdvertiser {
 
-    public static final String DISCOVER_SERVER_HOST = "disco.babble.io";
-    public static final String RELAY_SEVER_ADDRESS = "disco.babble.io:2443";
+    // XXX localhost values
+    public static final String DISCOVER_SERVER_HOST = "192.168.0.13";
     public static final int DISCOVER_SERVER_PORT = 1443;
+    public static final String RELAY_SEVER_ADDRESS = "192.168.0.13:2443";
+
+    // XXX skip verify UNSAFE
+    public static final boolean SKIP_VERIFY = true;
 
     private static final String DISCOVER_END_POINT = "groups";
     private static final String REGISTER_END_POINT = "group";
@@ -76,6 +83,10 @@ public class WebRTCService implements ServiceAdvertiser {
         if (INSTANCE == null) {
             INSTANCE = new WebRTCService();
             sQueue = Volley.newRequestQueue(context.getApplicationContext());
+            // XXX
+            if (SKIP_VERIFY) {
+                HttpsTrustManager.allowAllSSL();
+            }
         }
         return INSTANCE;
     }
@@ -144,15 +155,16 @@ public class WebRTCService implements ServiceAdvertiser {
                         }
                         mServiceDiscoveryListener.onServiceListUpdated(true);
                     }
-                }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //TODO: error handling
-                //             sQueue.stop();
-                //            responseListener.onFailure(ResponseListener.Error.CONNECTION_ERROR);
-            }
-        })      ;
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //TODO: error handling
+                        // sQueue.stop();
+                        // responseListener.onFailure(ResponseListener.Error.CONNECTION_ERROR);
+                        Log.e("WebRTCService", "CONNECTION_ERROR", error);
+                    }
+        });
 
         sQueue.add(request);
     }
@@ -191,11 +203,12 @@ public class WebRTCService implements ServiceAdvertiser {
                     @Override
                     public void onResponse(String response) {
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //TODO: error handling
-            }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                    //TODO: go.error handling
+                }
         })  {
             @Override
             public byte[] getBody() throws AuthFailureError {
