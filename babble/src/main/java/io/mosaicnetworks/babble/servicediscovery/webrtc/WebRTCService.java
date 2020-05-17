@@ -58,15 +58,19 @@ import io.mosaicnetworks.babble.utils.HttpsTrustManager;
 public class WebRTCService implements ServiceAdvertiser {
 
     // XXX localhost values
+    // TODO these should not be hardcoded
     public static final String DISCOVER_SERVER_HOST = "192.168.0.13";
     public static final int DISCOVER_SERVER_PORT = 1443;
     public static final String RELAY_SEVER_ADDRESS = "192.168.0.13:2443";
 
-    // XXX skip verify UNSAFE
-    public static final boolean SKIP_VERIFY = true;
-
     private static final String DISCOVER_END_POINT = "groups";
     private static final String REGISTER_END_POINT = "group";
+
+    private static String mGroupsURL;
+
+    // XXX Unsafe.
+    // TODO this should not be hardcoded
+    private static final boolean SKIP_VERIFY = true;
 
     private static RequestQueue sQueue;
     private ServiceDiscoveryListener mServiceDiscoveryListener;
@@ -81,17 +85,29 @@ public class WebRTCService implements ServiceAdvertiser {
      */
     public static WebRTCService getInstance(Context context) {
         if (INSTANCE == null) {
-            INSTANCE = new WebRTCService();
-            sQueue = Volley.newRequestQueue(context.getApplicationContext());
-            // XXX
-            if (SKIP_VERIFY) {
-                HttpsTrustManager.allowAllSSL();
-            }
+            INSTANCE = new WebRTCService(context);
         }
         return INSTANCE;
     }
 
-    private WebRTCService() {}
+    private WebRTCService(Context context) {
+
+        sQueue = Volley.newRequestQueue(context.getApplicationContext());
+
+        // calculate groups URI once and for all
+        mGroupsURL = String.format(
+                "https://%s:%d/%s?app-id=%s",
+                DISCOVER_SERVER_HOST,
+                DISCOVER_SERVER_PORT,
+                DISCOVER_END_POINT,
+                context.getApplicationContext().getPackageName()
+        );
+
+        // disable TLS verification if skip-verify is set
+        if (SKIP_VERIFY) {
+            HttpsTrustManager.allowAllSSL();
+        }
+    }
 
     public void registerServiceDiscoveryListener(ServiceDiscoveryListener listener){
         mServiceDiscoveryListener = listener;
@@ -106,22 +122,9 @@ public class WebRTCService implements ServiceAdvertiser {
     }
 
     public void discoverService() {
-        ConfigManager configManager = ConfigManager.getInstance(null);
+        Log.d("WebRTCService", mGroupsURL);
 
-        // Query the /groups endpoint with the app-id parameter to include only groups pertaining
-        // to the current app.
-        // XXX there is no need to construct this url on every call, it should be initialised in the
-        // constructor.
-        String url = String.format("https://%s:%d/%s?app-id=%s",
-                    DISCOVER_SERVER_HOST,
-                    DISCOVER_SERVER_PORT,
-                    DISCOVER_END_POINT,
-                    configManager.getAppID()
-                );
-
-        Log.d("WebRTCService", url);
-
-        StringRequest request = new StringRequest(Request.Method.GET, url,
+        StringRequest request = new StringRequest(Request.Method.GET, mGroupsURL,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {

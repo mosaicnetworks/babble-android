@@ -86,6 +86,7 @@ public final class ConfigManager {
     private String mPeersJsonFile = "peers.json";
     private String mPeersGenesisJsonFile = "peers.genesis.json";
     private String mBabbleTomlFile = "babble.toml";
+    private boolean mSkipVerify = true; // XXX Unsafe This should be read from context or config file
 
     /**
      * Provides an instance of the static ConfigManager class, reusing one if available, calling the
@@ -106,7 +107,6 @@ public final class ConfigManager {
      * @param appContext the application context
      */
     private ConfigManager(Context appContext) {
-
         if (mRootDir.equals("")) {
             mRootDir = appContext.getFilesDir().toString();
         }
@@ -197,6 +197,13 @@ public final class ConfigManager {
      * @return the AppID
      */
     public String getAppID() { return mAppId; }
+
+    /**
+     * Returns the value of mSkipVerify which decides whether to check TLS certificates in https
+     * requests.
+     * @return value of skip-verify option
+     */
+    public boolean getSkipVerify() { return mSkipVerify; }
 
     /**
      * Configure the service to create a new group using the default ports
@@ -293,7 +300,7 @@ public final class ConfigManager {
         NodeConfig nodeConfig = new NodeConfig.Builder()
                 .webrtc(networkType == BabbleService.NETWORK_GLOBAL)
                 .signalAddress(networkType == BabbleService.NETWORK_GLOBAL ? WebRTCService.RELAY_SEVER_ADDRESS : "")
-                .skipVerify(true) // XXX this should not be hardcoded here
+                .skipVerify(mSkipVerify)
                 .build();
         mMoniker = moniker;
 
@@ -305,7 +312,14 @@ public final class ConfigManager {
 
         // If we are a WebRTC/Global type, build the disco object for use later.
         if (networkType == BabbleService.NETWORK_GLOBAL) {
-            mDisco = new Disco( groupDescriptor.getUid(), groupDescriptor.getName(), mAppId, mKeyPair.publicKey, 0, -1, currentPeers, genesisPeers  );
+            mDisco = new Disco( groupDescriptor.getUid(),
+                    groupDescriptor.getName(),
+                    mAppId,
+                    mKeyPair.publicKey,
+                    0,
+                    -1,
+                    currentPeers,
+                    genesisPeers  );
         } else {
             mDisco = null;
         }
