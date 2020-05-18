@@ -230,6 +230,35 @@ public class WebRTCService implements ServiceAdvertiser {
 
     @Override
     public void stopAdvertising() {
-        //do nothing
+        URL url;
+        try {
+            url = new URL(
+                    "https",
+                    DISCOVER_SERVER_HOST,
+                    DISCOVER_SERVER_PORT,
+                    String.format("groups/%s", ConfigManager.getInstance(null).getDisco().GroupUID)
+            );
+        } catch (MalformedURLException e) {
+            //We should never arrive here!
+            throw new RuntimeException("Unexpected Invalid host exception");
+        }
+
+        Log.d("WebRTCService", "URL: " + url.toString());
+
+        StringRequest request = new StringRequest(Request.Method.DELETE, url.toString(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("WebRTCService", "Error removing group from disco", error);
+                    }
+                }
+         )  {} ;
+
+        sQueue.add(request);
     }
 }
