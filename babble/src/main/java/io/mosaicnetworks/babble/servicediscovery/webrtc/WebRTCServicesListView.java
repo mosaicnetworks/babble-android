@@ -30,14 +30,13 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
@@ -77,6 +76,8 @@ public class WebRTCServicesListView extends RecyclerView {
         });
 
         setAdapter(adapter);
+
+        // XXX Why are we doing this here? It is also done in ViewModel
 
         mWebRTCService = WebRTCService.getInstance(context);
 

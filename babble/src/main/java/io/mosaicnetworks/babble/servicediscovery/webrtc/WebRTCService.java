@@ -57,6 +57,7 @@ import io.mosaicnetworks.babble.utils.HttpsTrustManager;
  */
 public class WebRTCService implements ServiceAdvertiser {
 
+    private static final String TAG = "WebRTCService";
     // XXX localhost values
     // TODO these should not be hardcoded
     public static final String DISCOVER_SERVER_HOST = "192.168.0.13";
@@ -76,6 +77,7 @@ public class WebRTCService implements ServiceAdvertiser {
     private ServiceDiscoveryListener mServiceDiscoveryListener;
 
     private static WebRTCService INSTANCE;
+
     private List<ResolvedGroup> mResolvedGroups;
 
     /**
@@ -133,10 +135,24 @@ public class WebRTCService implements ServiceAdvertiser {
                         Map<String,Disco> discos = gson.fromJson(response, new TypeToken<Map<String, Disco>>(){}.getType());
                         Iterator<Map.Entry<String, Disco>> itr = discos.entrySet().iterator();
 
-                        while(itr.hasNext())  {
+                        while(itr.hasNext()) {
 
                             Map.Entry<String, Disco> entry = itr.next();
                             Disco disco = entry.getValue();
+
+                            // XXX find better way of checking existence
+                            boolean isNewGroup = true;
+
+                            for (ResolvedGroup g: mResolvedGroups) {
+                                if (g.getGroupUid().equals(entry.getKey())) {
+                                    isNewGroup = false;
+                                    break;
+                                }
+                            }
+
+                            if (!isNewGroup) {
+                                continue;
+                            }
 
                             ResolvedService webRTCResolvedService =
                                     new ResolvedService(disco.GroupUID,
@@ -149,19 +165,25 @@ public class WebRTCService implements ServiceAdvertiser {
                                             0
                                     );
 
-                            //check if seen before
-                            for (ResolvedGroup group:mResolvedGroups) {
-                                if (group.getGroupUid().equals(webRTCResolvedService.getGroupUid())) {
-                                    //already seen - remove the previous version
-                                    mResolvedGroups.remove(group);
-                                    break;
-                                }
-                            }
+                            ResolvedGroup webRTCResolvedGroup = new ResolvedGroup(
+                                    webRTCResolvedService,
+                                    ResolvedGroup.Source.WEBRTC
+                            );
 
-                            ResolvedGroup webRTCResolvedGroup = new ResolvedGroup(webRTCResolvedService, ResolvedGroup.Source.WEBRTC);
-                            mResolvedGroups.add(webRTCResolvedGroup);
+                            // XXX whats this
                             webRTCResolvedService.setResolvedGroup(webRTCResolvedGroup);
+
+                            mResolvedGroups.add(webRTCResolvedGroup);
+
                         }
+
+                        // XXX remove deleted groups
+                        for (ResolvedGroup g: mResolvedGroups) {
+                            if (!discos.containsKey(g.getGroupUid())) {
+                                mResolvedGroups.remove(g);
+                            }
+                        }
+
                         mServiceDiscoveryListener.onServiceListUpdated(true);
                     }
                 },
@@ -171,7 +193,7 @@ public class WebRTCService implements ServiceAdvertiser {
                         //TODO: error handling
                         // sQueue.stop();
                         // responseListener.onFailure(ResponseListener.Error.CONNECTION_ERROR);
-                        Log.e("WebRTCService", "CONNECTION_ERROR", error);
+                        Log.e(TAG, "CONNECTION_ERROR", error);
                     }
         });
 
@@ -243,7 +265,7 @@ public class WebRTCService implements ServiceAdvertiser {
             throw new RuntimeException("Unexpected Invalid host exception");
         }
 
-        Log.d("WebRTCService", "URL: " + url.toString());
+        Log.d(TAG, "URL: " + url.toString());
 
         StringRequest request = new StringRequest(Request.Method.DELETE, url.toString(),
                 new Response.Listener<String>() {
@@ -254,7 +276,7 @@ public class WebRTCService implements ServiceAdvertiser {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e("WebRTCService", "Error removing group from disco", error);
+                        Log.e(TAG, "Error removing group from disco", error);
                     }
                 }
          )  {} ;
