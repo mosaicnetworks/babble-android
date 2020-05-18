@@ -229,6 +229,8 @@ public class WebRTCService implements ServiceAdvertiser {
         Gson gson = new Gson();
         PostBody = gson.toJson(disco);
 
+        Log.d(TAG, String.format("XXX sending group %s", PostBody));
+
         StringRequest request = new StringRequest(Request.Method.POST, url.toString(),
                 new Response.Listener<String>() {
                     @Override
@@ -252,13 +254,22 @@ public class WebRTCService implements ServiceAdvertiser {
 
     @Override
     public void stopAdvertising() {
+        Disco group = ConfigManager.getInstance(null).getDisco();
+
+        // XXX this is a temporary hack to prevent anyone other than the group creator to delete the
+        // group from disco. The functionality should be propertly implemented server side.
+        if (!group.PubKey.equals(ConfigManager.getInstance(null).getPublicKey())) {
+            Log.d(TAG, "Not group creator => not deleting from disco");
+            return;
+        }
+
         URL url;
         try {
             url = new URL(
                     "https",
                     DISCOVER_SERVER_HOST,
                     DISCOVER_SERVER_PORT,
-                    String.format("groups/%s", ConfigManager.getInstance(null).getDisco().GroupUID)
+                    String.format("groups/%s", group.GroupUID)
             );
         } catch (MalformedURLException e) {
             //We should never arrive here!
