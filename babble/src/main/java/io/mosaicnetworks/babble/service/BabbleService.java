@@ -37,12 +37,11 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.BabbleNode;
 import io.mosaicnetworks.babble.node.BabbleState;
@@ -125,20 +124,24 @@ public class BabbleService extends Service {
         mServiceAdvertiser = serviceAdvertiser;
         mGroupDescriptor = groupDescriptor;
 
-        mBabbleNode = BabbleNode.create(new BlockConsumer() {
-            @Override
-            public Block onReceiveBlock(Block block) {
-                Log.i("ProcessBlock", "Process block");
-                Block processedBlock = mAppState.processBlock(block);
-                notifyObservers();
-                return processedBlock;
-            }
-        }, configDirectory, new NodeStateChangeHandler() {
+        mBabbleNode = BabbleNode.create(
+                new BlockConsumer() {
+                    @Override
+                    public Block onReceiveBlock(Block block) {
+                        Log.i("ProcessBlock", "Process block");
+                        Block processedBlock = mAppState.processBlock(block);
+                        notifyObservers();
+                        return processedBlock;
+                    }
+                },
+                configDirectory,
+                new NodeStateChangeHandler() {
             @Override
             public void onStateChanged(BabbleNode.State state) {
                 mNodeState = state;
             }
-        });
+        }
+        );
 
         mBabbleNode.run();
         mServiceAdvertiser.advertise(mBabbleNode.getGenesisPeers(), mBabbleNode.getCurrentPeers(), mBabbleNode);
@@ -163,21 +166,24 @@ public class BabbleService extends Service {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    mBabbleNode = BabbleNode.create(new BlockConsumer() {
-                        @Override
-                        public Block onReceiveBlock(Block block) {
-                            Log.i("ProcessBlock", "Process block");
-                            Block processedBlock = mAppState.processBlock(block);
-                            notifyObservers();
-                            return processedBlock;
-                        }
-                    }, configDirectory, new NodeStateChangeHandler() {
+                    mBabbleNode = BabbleNode.create(
+                            new BlockConsumer() {
+                                    @Override
+                                    public Block onReceiveBlock(Block block) {
+                                        Log.i("ProcessBlock", "Process block");
+                                        Block processedBlock = mAppState.processBlock(block);
+                                        notifyObservers();
+                                        return processedBlock;
+                                    }
+                            },
+                            configDirectory,
+                            new NodeStateChangeHandler() {
                         @Override
                         public void onStateChanged(BabbleNode.State state) {
                             mNodeState = state;
                         }
-                    });
-
+                    }
+                    );
                 } catch (IllegalArgumentException ex) {
                     //TODO: need more refined Babble exceptions
                     if (listener!=null) {

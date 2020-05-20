@@ -24,8 +24,6 @@
 
 package io.mosaicnetworks.babble.utils;
 
-import android.util.Log;
-
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -41,8 +39,6 @@ import javax.net.ssl.X509TrustManager;
 public class HttpsTrustManager {
 
     public static void allowAllSSL() {
-        Log.d("HttpsTrustManager","XXX allowSSL");
-
         SSLContext context = null;
 
         TrustManager[] trustManagers = new TrustManager[]{
@@ -74,7 +70,6 @@ public class HttpsTrustManager {
         HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
             @Override
             public boolean verify(String arg0, SSLSession arg1) {
-                Log.d("HttpsTrustManager","XXX verify certificate");
                 return true;
             }
         });

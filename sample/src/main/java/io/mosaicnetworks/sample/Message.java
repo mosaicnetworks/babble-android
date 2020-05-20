@@ -38,6 +38,10 @@ import io.mosaicnetworks.babble.node.BabbleTx;
 import io.mosaicnetworks.sample.chatkit.commons.models.IMessage;
 import io.mosaicnetworks.sample.chatkit.commons.models.IUser;
 
+/*
+    UnixEraDateTypeAdapter converts dates to and from ints using number of seconds since
+    January 1, 1970, 00:00:00 GTM.
+ */
 class UnixEraDateTypeAdapter extends TypeAdapter<Date> {
     @Override
     public void write(JsonWriter out, Date value) throws IOException {
@@ -162,6 +166,7 @@ public final class Message implements BabbleTx, IMessage {
      */
     @Override
     public byte[] toBytes() {
-        return gson.toJson(this).getBytes();
+        String json = gson.toJson(this);
+        return json.getBytes();
     }
 }

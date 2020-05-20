@@ -57,6 +57,7 @@ public class ChatState implements BabbleState {
         for (byte[] rawTx:block.body.transactions) {
             String tx = new String(rawTx, StandardCharsets.UTF_8);
             Message msg;
+
             try {
                 msg = Message.fromJson(tx);
             } catch (JsonSyntaxException ex) {

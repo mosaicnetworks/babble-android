@@ -229,8 +229,6 @@ public class WebRTCService implements ServiceAdvertiser {
         Gson gson = new Gson();
         PostBody = gson.toJson(disco);
 
-        Log.d(TAG, String.format("XXX sending group %s", PostBody));
-
         StringRequest request = new StringRequest(Request.Method.POST, url.toString(),
                 new Response.Listener<String>() {
                     @Override
