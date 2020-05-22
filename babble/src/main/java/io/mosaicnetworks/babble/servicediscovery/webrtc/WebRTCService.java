@@ -39,6 +39,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +80,7 @@ public class WebRTCService implements ServiceAdvertiser {
     private static WebRTCService INSTANCE;
 
     private List<ResolvedGroup> mResolvedGroups;
-
+    private HashMap<String, Boolean> mResolvedGroupsIndex;
     /**
      * Factory for the {@link WebRTCService}
      *
@@ -117,6 +118,17 @@ public class WebRTCService implements ServiceAdvertiser {
 
     public void setResolvedGroups(List<ResolvedGroup> resolvedGroups) {
         mResolvedGroups = resolvedGroups;
+        mResolvedGroupsIndex = new HashMap<String, Boolean>();
+    }
+
+    public void addGroup(ResolvedGroup group) {
+        mResolvedGroups.add(group);
+        mResolvedGroupsIndex.put(group.getGroupUid(), true);
+    }
+
+    public void removeGroup(ResolvedGroup group) {
+        mResolvedGroups.remove(group);
+        mResolvedGroupsIndex.remove(group.getGroupUid());
     }
 
     public void stopDiscoverService() {
@@ -140,17 +152,8 @@ public class WebRTCService implements ServiceAdvertiser {
                             Map.Entry<String, Disco> entry = itr.next();
                             Disco disco = entry.getValue();
 
-                            // XXX find better way of checking existence
-                            boolean isNewGroup = true;
-
-                            for (ResolvedGroup g: mResolvedGroups) {
-                                if (g.getGroupUid().equals(entry.getKey())) {
-                                    isNewGroup = false;
-                                    break;
-                                }
-                            }
-
-                            if (!isNewGroup) {
+                            Boolean exists = mResolvedGroupsIndex.get(entry.getKey());
+                            if (exists != null) {
                                 continue;
                             }
 
@@ -170,17 +173,15 @@ public class WebRTCService implements ServiceAdvertiser {
                                     ResolvedGroup.Source.WEBRTC
                             );
 
-                            // XXX whats this
                             webRTCResolvedService.setResolvedGroup(webRTCResolvedGroup);
 
-                            mResolvedGroups.add(webRTCResolvedGroup);
-
+                            addGroup(webRTCResolvedGroup);
                         }
 
-                        // XXX remove deleted groups
+                        // remove deleted groups
                         for (ResolvedGroup g: mResolvedGroups) {
                             if (!discos.containsKey(g.getGroupUid())) {
-                                mResolvedGroups.remove(g);
+                                removeGroup(g);
                             }
                         }
 
@@ -254,8 +255,8 @@ public class WebRTCService implements ServiceAdvertiser {
     public void stopAdvertising() {
         Disco group = ConfigManager.getInstance(null).getDisco();
 
-        // XXX this is a temporary hack to prevent anyone other than the group creator to delete the
-        // group from disco. The functionality should be propertly implemented server side.
+        // TODO: this is a temporary hack to prevent anyone other than the group creator to delete
+        // the group from disco. The functionality should be propertly implemented server side.
         if (!group.PubKey.equals(ConfigManager.getInstance(null).getPublicKey())) {
             Log.d(TAG, "Not group creator => not deleting from disco");
             return;
