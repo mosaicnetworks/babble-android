@@ -61,9 +61,9 @@ public class WebRTCService implements ServiceAdvertiser {
     private static final String TAG = "WebRTCService";
     // XXX localhost values
     // TODO these should not be hardcoded
-    public static final String DISCOVER_SERVER_HOST = "192.168.0.13";
+    public static final String DISCOVER_SERVER_HOST = "disco-staging.babble.io";
     public static final int DISCOVER_SERVER_PORT = 1443;
-    public static final String RELAY_SEVER_ADDRESS = "192.168.0.13:2443";
+    public static final String RELAY_SEVER_ADDRESS = "disco-staging.babble.io:2443";
 
     private static final String DISCOVER_END_POINT = "groups";
     private static final String REGISTER_END_POINT = "group";
