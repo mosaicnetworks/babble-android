@@ -37,24 +37,21 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import androidx.annotation.NonNull;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+import androidx.annotation.NonNull;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.BaseConfigActivity;
 import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
-import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService;
 import io.mosaicnetworks.babble.service.BabbleServiceBinder;
-import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.utils.DialogUtils;
@@ -202,22 +199,7 @@ public class WebRTCJoinGroupFragment extends BabbleServiceBinder implements Resp
     protected void onServiceConnected() {
 
         try {
-            mBoundService.start(mConfigDirectory, mGroupDescriptor, new ServiceAdvertiser() {
-                @Override
-                public boolean advertise(String genesisPeers, String currentPeers, PeersProvider peersProvider) {
-                    return false;
-                }
-
-                @Override
-                public void stopAdvertising() {
-                    //do nothing
-                }
-
-                @Override
-                public void onPeersChange(String newPeers) {
-                    //do nothing
-                }
-            });
+            mBoundService.start(mConfigDirectory, null);
             mLoadingDialog.dismiss();
             mListener.baseOnJoined(mMoniker, mGroupDescriptor.getName());
         } catch (IllegalStateException ex) {

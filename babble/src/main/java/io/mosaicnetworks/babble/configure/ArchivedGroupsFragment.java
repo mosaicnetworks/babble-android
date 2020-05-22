@@ -28,12 +28,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -47,10 +41,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
-import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService;
 import io.mosaicnetworks.babble.service.BabbleServiceBinder;
 import io.mosaicnetworks.babble.utils.DialogUtils;
@@ -211,7 +208,7 @@ public class ArchivedGroupsFragment extends BabbleServiceBinder implements Archi
     @Override
     protected void onServiceConnected() {
         try {
-            mBoundService.startArchive(mConfigManager.getTomlDir(), new GroupDescriptor("Archived Group"), null); //TODO: need to get a proper group descriptor
+            mBoundService.startArchive(mConfigManager.getTomlDir());
             mListener.onArchiveLoaded(mMoniker, "Archived Group");
         } catch (IllegalArgumentException ex) {
             DialogUtils.displayOkAlertDialog(Objects.requireNonNull(getContext()), R.string.babble_init_fail_title, R.string.babble_init_fail_message);
