@@ -77,8 +77,6 @@ public class WebRTCServicesListView extends RecyclerView {
 
         setAdapter(adapter);
 
-        // XXX Why are we doing this here? It is also done in ViewModel
-
         mWebRTCService = WebRTCService.getInstance(context);
 
         mWebRTCService.setResolvedGroups(mServiceInfoList);

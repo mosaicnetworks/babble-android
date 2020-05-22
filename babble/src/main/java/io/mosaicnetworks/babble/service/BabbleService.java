@@ -136,11 +136,11 @@ public class BabbleService extends Service {
                 },
                 configDirectory,
                 new NodeStateChangeHandler() {
-            @Override
-            public void onStateChanged(BabbleNode.State state) {
-                mNodeState = state;
-            }
-        }
+                    @Override
+                    public void onStateChanged(BabbleNode.State state) {
+                        mNodeState = state;
+                    }
+                }
         );
 
         mBabbleNode.run();

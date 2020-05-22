@@ -193,19 +193,6 @@ public final class ConfigManager {
     }
 
     /**
-     * Returns the ID of the package that uses this class (ex: io.mosaicnetworks.sample)
-     * @return the AppID
-     */
-    public String getAppID() { return mAppId; }
-
-    /**
-     * Returns the value of mSkipVerify which decides whether to check TLS certificates in https
-     * requests.
-     * @return value of skip-verify option
-     */
-    public boolean getSkipVerify() { return mSkipVerify; }
-
-    /**
      * Configure the service to create a new group using the default ports
      * @param moniker node moniker
      * @throws IllegalStateException if the service is currently running

@@ -60,7 +60,7 @@ public class WebRTCService implements ServiceAdvertiser {
 
     private static final String TAG = "WebRTCService";
     // XXX localhost values
-    // TODO these should not be hardcoded
+    // TODO: these should not be hardcoded
     public static final String DISCOVER_SERVER_HOST = "disco-staging.babble.io";
     public static final int DISCOVER_SERVER_PORT = 1443;
     public static final String RELAY_SEVER_ADDRESS = "disco-staging.babble.io:2443";
@@ -71,7 +71,7 @@ public class WebRTCService implements ServiceAdvertiser {
     private static String mGroupsURL;
 
     // XXX Unsafe.
-    // TODO this should not be hardcoded
+    // TODO: this should not be hardcoded
     private static final boolean SKIP_VERIFY = true;
 
     private static RequestQueue sQueue;
@@ -121,12 +121,12 @@ public class WebRTCService implements ServiceAdvertiser {
         mResolvedGroupsIndex = new HashMap<String, Boolean>();
     }
 
-    public void addGroup(ResolvedGroup group) {
+    private void addGroup(ResolvedGroup group) {
         mResolvedGroups.add(group);
         mResolvedGroupsIndex.put(group.getGroupUid(), true);
     }
 
-    public void removeGroup(ResolvedGroup group) {
+    private void removeGroup(ResolvedGroup group) {
         mResolvedGroups.remove(group);
         mResolvedGroupsIndex.remove(group.getGroupUid());
     }
