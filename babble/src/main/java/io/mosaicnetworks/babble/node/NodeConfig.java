@@ -64,10 +64,10 @@ public final class NodeConfig {
         private String mJoinTimeout = "20s";  //join_timeout
         private boolean mMaintenanceMode = false;  //maintenance-mode
         private int mSuspendLimit = 300;      //suspend-limit
-        private boolean mLoadPeers = true;    //loadpeers
         private boolean mNoService = true;    //no-service
         private boolean mWebRTC = false;  //webrtc
         private String mSignalAddr = "";  //signal-addr
+        private boolean mSkipVerify = false;
 
 
         /**
@@ -101,7 +101,16 @@ public final class NodeConfig {
             return this;
         }
 
-
+        /**
+         * Unsafe. Do not verify the TLS certificate of disco server. This option is used in
+         * development only.
+         * @param skip value
+         * @return modified builder
+         */
+        public Builder skipVerify(boolean skip) {
+            mSkipVerify = skip;
+            return this;
+        }
 
 
         /**
@@ -263,16 +272,6 @@ public final class NodeConfig {
         }
 
         /**
-         * Specified whether babble loads peers from a file. This should always be true
-         * @param loadPeers open peers from a file
-         * @return modified builder
-         */
-        public Builder loadPeers(boolean loadPeers) {
-            mLoadPeers = loadPeers;
-            return this;
-        }
-
-        /**
          * Disables the babble service. This should always be true
          * @param noService disable babble service
          * @return modified builder
@@ -368,15 +367,16 @@ public final class NodeConfig {
      * Number of undetermined events to trigger a suspend state
      */
     public final int suspendLimit;      //suspend-limit
-    /**
-     * Enable loading of peers from a file
-     */
-    public final boolean loadPeers;    //loadpeers
+
     /**
      * Disable the babble service
      */
     public final boolean noService;    //no-service
 
+    /**
+     * Unsafe. Disable TLS certificate verification
+     */
+    public final boolean skipVerify; //signal-skip-verify
 
     /**
      * Enable fast sync
@@ -398,10 +398,10 @@ public final class NodeConfig {
         joinTimeout= builder.mJoinTimeout;
         maintenanceMode = builder.mMaintenanceMode;
         suspendLimit = builder.mSuspendLimit;
-        loadPeers = builder.mLoadPeers;
         noService = builder.mNoService;
         webrtc = builder.mWebRTC;
         signalAddr = builder.mSignalAddr;
+        skipVerify = builder.mSkipVerify;
     }
 
 

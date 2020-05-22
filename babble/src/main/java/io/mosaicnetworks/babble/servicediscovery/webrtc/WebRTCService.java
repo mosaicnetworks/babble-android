@@ -25,6 +25,7 @@
 package io.mosaicnetworks.babble.servicediscovery.webrtc;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -38,6 +39,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,25 +50,37 @@ import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
+import io.mosaicnetworks.babble.utils.HttpsTrustManager;
+
 
 /**
  * Service class to handle WebRTC
  */
 public class WebRTCService implements ServiceAdvertiser {
 
-    public static final String DISCOVER_SERVER_HOST = "disco.babble.io";
-    public static final String RELAY_SEVER_ADDRESS = "disco.babble.io:2443";
+    private static final String TAG = "WebRTCService";
+    // XXX localhost values
+    // TODO: these should not be hardcoded
+    public static final String DISCOVER_SERVER_HOST = "disco-staging.babble.io";
     public static final int DISCOVER_SERVER_PORT = 1443;
+    public static final String RELAY_SEVER_ADDRESS = "disco-staging.babble.io:2443";
 
     private static final String DISCOVER_END_POINT = "groups";
     private static final String REGISTER_END_POINT = "group";
+
+    private static String mGroupsURL;
+
+    // XXX Unsafe.
+    // TODO: this should not be hardcoded
+    private static final boolean SKIP_VERIFY = true;
 
     private static RequestQueue sQueue;
     private ServiceDiscoveryListener mServiceDiscoveryListener;
 
     private static WebRTCService INSTANCE;
-    private List<ResolvedGroup> mResolvedGroups;
 
+    private List<ResolvedGroup> mResolvedGroups;
+    private HashMap<String, Boolean> mResolvedGroupsIndex;
     /**
      * Factory for the {@link WebRTCService}
      *
@@ -74,13 +88,29 @@ public class WebRTCService implements ServiceAdvertiser {
      */
     public static WebRTCService getInstance(Context context) {
         if (INSTANCE == null) {
-            INSTANCE = new WebRTCService();
-            sQueue = Volley.newRequestQueue(context.getApplicationContext());
+            INSTANCE = new WebRTCService(context);
         }
         return INSTANCE;
     }
 
-    private WebRTCService() {}
+    private WebRTCService(Context context) {
+
+        sQueue = Volley.newRequestQueue(context.getApplicationContext());
+
+        // calculate groups URI once and for all
+        mGroupsURL = String.format(
+                "https://%s:%d/%s?app-id=%s",
+                DISCOVER_SERVER_HOST,
+                DISCOVER_SERVER_PORT,
+                DISCOVER_END_POINT,
+                context.getApplicationContext().getPackageName()
+        );
+
+        // disable TLS verification if skip-verify is set
+        if (SKIP_VERIFY) {
+            HttpsTrustManager.allowAllSSL();
+        }
+    }
 
     public void registerServiceDiscoveryListener(ServiceDiscoveryListener listener){
         mServiceDiscoveryListener = listener;
@@ -88,6 +118,17 @@ public class WebRTCService implements ServiceAdvertiser {
 
     public void setResolvedGroups(List<ResolvedGroup> resolvedGroups) {
         mResolvedGroups = resolvedGroups;
+        mResolvedGroupsIndex = new HashMap<String, Boolean>();
+    }
+
+    private void addGroup(ResolvedGroup group) {
+        mResolvedGroups.add(group);
+        mResolvedGroupsIndex.put(group.getGroupUid(), true);
+    }
+
+    private void removeGroup(ResolvedGroup group) {
+        mResolvedGroups.remove(group);
+        mResolvedGroupsIndex.remove(group.getGroupUid());
     }
 
     public void stopDiscoverService() {
@@ -95,16 +136,9 @@ public class WebRTCService implements ServiceAdvertiser {
     }
 
     public void discoverService() {
-        URL url;
+        Log.d("WebRTCService", mGroupsURL);
 
-        try {
-            url = new URL("https", DISCOVER_SERVER_HOST, DISCOVER_SERVER_PORT, DISCOVER_END_POINT);
-        } catch (MalformedURLException e) {
-            //We should never arrive here!
-            throw new RuntimeException("Unexpected Invalid host exception");
-        }
-
-        StringRequest request = new StringRequest(Request.Method.GET, url.toString(),
+        StringRequest request = new StringRequest(Request.Method.GET, mGroupsURL,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -113,10 +147,15 @@ public class WebRTCService implements ServiceAdvertiser {
                         Map<String,Disco> discos = gson.fromJson(response, new TypeToken<Map<String, Disco>>(){}.getType());
                         Iterator<Map.Entry<String, Disco>> itr = discos.entrySet().iterator();
 
-                        while(itr.hasNext())  {
+                        while(itr.hasNext()) {
 
                             Map.Entry<String, Disco> entry = itr.next();
                             Disco disco = entry.getValue();
+
+                            Boolean exists = mResolvedGroupsIndex.get(entry.getKey());
+                            if (exists != null) {
+                                continue;
+                            }
 
                             ResolvedService webRTCResolvedService =
                                     new ResolvedService(disco.GroupUID,
@@ -129,30 +168,35 @@ public class WebRTCService implements ServiceAdvertiser {
                                             0
                                     );
 
-                            //check if seen before
-                            for (ResolvedGroup group:mResolvedGroups) {
-                                if (group.getGroupUid().equals(webRTCResolvedService.getGroupUid())) {
-                                    //already seen - remove the previous version
-                                    mResolvedGroups.remove(group);
-                                    break;
-                                }
-                            }
+                            ResolvedGroup webRTCResolvedGroup = new ResolvedGroup(
+                                    webRTCResolvedService,
+                                    ResolvedGroup.Source.WEBRTC
+                            );
 
-                            ResolvedGroup webRTCResolvedGroup = new ResolvedGroup(webRTCResolvedService, ResolvedGroup.Source.WEBRTC);
-                            mResolvedGroups.add(webRTCResolvedGroup);
                             webRTCResolvedService.setResolvedGroup(webRTCResolvedGroup);
+
+                            addGroup(webRTCResolvedGroup);
                         }
+
+                        // remove deleted groups
+                        for (ResolvedGroup g: mResolvedGroups) {
+                            if (!discos.containsKey(g.getGroupUid())) {
+                                removeGroup(g);
+                            }
+                        }
+
                         mServiceDiscoveryListener.onServiceListUpdated(true);
                     }
-                }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //TODO: error handling
-                //             sQueue.stop();
-                //            responseListener.onFailure(ResponseListener.Error.CONNECTION_ERROR);
-            }
-        })      ;
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //TODO: error handling
+                        // sQueue.stop();
+                        // responseListener.onFailure(ResponseListener.Error.CONNECTION_ERROR);
+                        Log.e(TAG, "CONNECTION_ERROR", error);
+                    }
+        });
 
         sQueue.add(request);
     }
@@ -191,11 +235,12 @@ public class WebRTCService implements ServiceAdvertiser {
                     @Override
                     public void onResponse(String response) {
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //TODO: error handling
-            }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                    //TODO: go.error handling
+                }
         })  {
             @Override
             public byte[] getBody() throws AuthFailureError {
@@ -208,6 +253,44 @@ public class WebRTCService implements ServiceAdvertiser {
 
     @Override
     public void stopAdvertising() {
-        //do nothing
+        Disco group = ConfigManager.getInstance(null).getDisco();
+
+        // TODO: this is a temporary hack to prevent anyone other than the group creator to delete
+        // the group from disco. The functionality should be propertly implemented server side.
+        if (!group.PubKey.equals(ConfigManager.getInstance(null).getPublicKey())) {
+            Log.d(TAG, "Not group creator => not deleting from disco");
+            return;
+        }
+
+        URL url;
+        try {
+            url = new URL(
+                    "https",
+                    DISCOVER_SERVER_HOST,
+                    DISCOVER_SERVER_PORT,
+                    String.format("groups/%s", group.GroupUID)
+            );
+        } catch (MalformedURLException e) {
+            //We should never arrive here!
+            throw new RuntimeException("Unexpected Invalid host exception");
+        }
+
+        Log.d(TAG, "URL: " + url.toString());
+
+        StringRequest request = new StringRequest(Request.Method.DELETE, url.toString(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "Error removing group from disco", error);
+                    }
+                }
+         )  {} ;
+
+        sQueue.add(request);
     }
 }

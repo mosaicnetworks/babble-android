@@ -28,19 +28,18 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.moandjiezana.toml.TomlWriter;
 import com.moandjiezana.toml.Toml;
+import com.moandjiezana.toml.TomlWriter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -87,6 +86,7 @@ public final class ConfigManager {
     private String mPeersJsonFile = "peers.json";
     private String mPeersGenesisJsonFile = "peers.genesis.json";
     private String mBabbleTomlFile = "babble.toml";
+    private boolean mSkipVerify = true; // XXX Unsafe This should be read from context or config file
 
     /**
      * Provides an instance of the static ConfigManager class, reusing one if available, calling the
@@ -107,7 +107,6 @@ public final class ConfigManager {
      * @param appContext the application context
      */
     private ConfigManager(Context appContext) {
-
         if (mRootDir.equals("")) {
             mRootDir = appContext.getFilesDir().toString();
         }
@@ -288,6 +287,7 @@ public final class ConfigManager {
         NodeConfig nodeConfig = new NodeConfig.Builder()
                 .webrtc(networkType == BabbleService.NETWORK_GLOBAL)
                 .signalAddress(networkType == BabbleService.NETWORK_GLOBAL ? WebRTCService.RELAY_SEVER_ADDRESS : "")
+                .skipVerify(mSkipVerify)
                 .build();
         mMoniker = moniker;
 
@@ -299,7 +299,14 @@ public final class ConfigManager {
 
         // If we are a WebRTC/Global type, build the disco object for use later.
         if (networkType == BabbleService.NETWORK_GLOBAL) {
-            mDisco = new Disco( groupDescriptor.getUid(), groupDescriptor.getName(), mAppId, mKeyPair.publicKey, 0, -1, currentPeers, genesisPeers  );
+            mDisco = new Disco( groupDescriptor.getUid(),
+                    groupDescriptor.getName(),
+                    mAppId,
+                    mKeyPair.publicKey,
+                    0,
+                    -1,
+                    currentPeers,
+                    genesisPeers  );
         } else {
             mDisco = null;
         }
@@ -427,7 +434,7 @@ public final class ConfigManager {
         babble.put("maintenance-mode", nodeConfig.maintenanceMode);
         babble.put("suspend-limit", nodeConfig.suspendLimit);
         babble.put("moniker", moniker);
-        babble.put("loadpeers", nodeConfig.loadPeers);
+        babble.put("signal-skip-verify", nodeConfig.skipVerify);
 
         writeTomlFile(babble);
 
