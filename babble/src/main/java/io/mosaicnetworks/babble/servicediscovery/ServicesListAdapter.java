@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.servicediscovery.mdns;
+package io.mosaicnetworks.babble.servicediscovery;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -30,15 +30,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
-public class MdnsServicesListAdapter extends RecyclerView.Adapter<MdnsServicesListAdapter.ViewHolder> {
+public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapter.ViewHolder> {
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -63,7 +61,7 @@ public class MdnsServicesListAdapter extends RecyclerView.Adapter<MdnsServicesLi
     private ItemClickListener mClickListener;
     private Context mContext;
 
-    public MdnsServicesListAdapter(Context context, List<ResolvedGroup> data) {
+    public ServicesListAdapter(Context context, List<ResolvedGroup> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
         mContext = context.getApplicationContext();

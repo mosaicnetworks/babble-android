@@ -41,10 +41,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsServicesListAdapter;
+import io.mosaicnetworks.babble.servicediscovery.ServicesListAdapter;
 
 /**
  * This fragment implements a visual component to allow selection of a discovered group. It includes
@@ -59,8 +58,7 @@ public class DiscoverGroupsFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshServicesDisplaying;
     private ConfigManager mConfigManager;
     private DiscoverGroupsViewModel mViewModel;
-    private MdnsServicesListAdapter mMdnsServicesListAdapter;
-    private SelectableData<ConfigDirectory> mArchivedList = new SelectableData<>();
+    private ServicesListAdapter mServicesListAdapter;
     private List<ResolvedGroup> mServiceInfoList;
 
     /**
@@ -92,7 +90,7 @@ public class DiscoverGroupsFragment extends Fragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
 
-        final View view = inflater.inflate(R.layout.fragment_mdns_discovery, container, false);
+        final View view = inflater.inflate(R.layout.fragment_service_discovery, container, false);
 
         mRvDiscoveredGroups = view.findViewById(R.id.servicesListView);
         mSwipeRefreshServiceSearch = view.findViewById(R.id.swipeRefresh_service_search);
@@ -171,14 +169,14 @@ public class DiscoverGroupsFragment extends Fragment {
 
         mServiceInfoList = mViewModel.getmServiceInfoList();
 
-        mMdnsServicesListAdapter = new MdnsServicesListAdapter(getContext(), mServiceInfoList);
+        mServicesListAdapter = new ServicesListAdapter(getContext(), mServiceInfoList);
         mRvDiscoveredGroups.setLayoutManager(new LinearLayoutManager(getContext()));
-        mRvDiscoveredGroups.setAdapter(mMdnsServicesListAdapter);
+        mRvDiscoveredGroups.setAdapter(mServicesListAdapter);
 
-        mMdnsServicesListAdapter.setClickListener(new MdnsServicesListAdapter.ItemClickListener() {
+        mServicesListAdapter.setClickListener(new ServicesListAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                mListener.onServiceSelected(mMdnsServicesListAdapter.getItem(position));
+                mListener.onServiceSelected(mServicesListAdapter.getItem(position));
             }
         });
 
@@ -196,7 +194,7 @@ public class DiscoverGroupsFragment extends Fragment {
                     mSwipeRefreshServicesDisplaying.setVisibility(View.VISIBLE);
                 }
 
-                mMdnsServicesListAdapter.notifyDataSetChanged();
+                mServicesListAdapter.notifyDataSetChanged();
             }
         };
 

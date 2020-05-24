@@ -22,42 +22,39 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.servicediscovery.mdns;
+package io.mosaicnetworks.babble.servicediscovery;
 
 import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
-import io.mosaicnetworks.babble.servicediscovery.ServicesListListener;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsDiscovery;
 
-public class MdnsServicesListView extends RecyclerView {
+public class ServicesListView extends RecyclerView {
     private List<ResolvedGroup> mServiceInfoList = new ArrayList<>();
     private ServicesListListener mServicesListListener;
     private MdnsDiscovery mMdnsDiscovery;
     private boolean mPrevIsEmpty = true;
 
-    public MdnsServicesListView(Context context) {
+    public ServicesListView(Context context) {
         super(context);
         initialize(context);
     }
 
-    public MdnsServicesListView(Context context, @Nullable AttributeSet attrs) {
+    public ServicesListView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         initialize(context);
     }
 
-    public MdnsServicesListView(Context context, @Nullable AttributeSet attrs, int defStyle) {
+    public ServicesListView(Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initialize(context);
     }
@@ -66,8 +63,9 @@ public class MdnsServicesListView extends RecyclerView {
 
         setLayoutManager(new LinearLayoutManager(context));
 
-        final MdnsServicesListAdapter adapter = new MdnsServicesListAdapter(context, mServiceInfoList);
-        adapter.setClickListener(new MdnsServicesListAdapter.ItemClickListener() {
+        final ServicesListAdapter adapter = new ServicesListAdapter(context, mServiceInfoList);
+
+        adapter.setClickListener(new ServicesListAdapter.ItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 mServicesListListener.onServiceSelectedSuccess(adapter.getItem(position));
