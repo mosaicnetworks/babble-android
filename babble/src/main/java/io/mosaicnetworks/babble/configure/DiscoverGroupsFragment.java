@@ -30,6 +30,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -38,9 +40,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import java.util.List;
-
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
@@ -78,12 +77,21 @@ public class DiscoverGroupsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mConfigManager = ConfigManager.getInstance(getContext().getApplicationContext());
-        mViewModel = new ViewModelProvider(this, new DiscoverGroupsViewModelFactory(getActivity().getApplication(), mConfigManager)).get(DiscoverGroupsViewModel.class);
+
+        mViewModel = new ViewModelProvider(
+                this,
+                new DiscoverGroupsViewModelFactory(
+                        getActivity().getApplication(),
+                        mConfigManager
+                )
+        ).get(DiscoverGroupsViewModel.class);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState) {
+
         final View view = inflater.inflate(R.layout.fragment_mdns_discovery, container, false);
 
         mRvDiscoveredGroups = view.findViewById(R.id.servicesListView);

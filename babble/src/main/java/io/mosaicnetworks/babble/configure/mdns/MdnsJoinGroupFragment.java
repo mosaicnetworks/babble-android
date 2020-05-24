@@ -30,9 +30,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +41,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
+import androidx.annotation.NonNull;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.BaseConfigActivity;
 import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
@@ -243,7 +241,7 @@ public class MdnsJoinGroupFragment extends BabbleServiceBinder implements Respon
                 getContext().getApplicationContext());
 
         try {
-            mBoundService.start(mConfigDirectory, mGroupDescriptor, serviceAdvertiser);
+            mBoundService.start(mConfigDirectory, serviceAdvertiser);
             mLoadingDialog.dismiss();
             mListener.baseOnJoined(mMoniker, mGroupDescriptor.getName());
         } catch (IllegalStateException ex) {

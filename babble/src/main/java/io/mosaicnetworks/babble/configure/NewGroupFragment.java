@@ -36,10 +36,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Switch;
 
-import androidx.annotation.NonNull;
-
 import java.util.Objects;
 
+import androidx.annotation.NonNull;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
@@ -180,7 +179,7 @@ public class NewGroupFragment extends BabbleServiceBinder {
     @Override
     protected void onServiceConnected() {
         try {
-            mBoundService.start(mConfigDirectory, mGroupDescriptor, mServiceAdvertiser);
+            mBoundService.start(mConfigDirectory, mServiceAdvertiser);
             mListener.baseOnStartedNew(mMoniker, mGroupDescriptor.getName());
         } catch (IllegalStateException ex) {
             // we'll assume this is caused by the node taking a while to leave a previous group,
