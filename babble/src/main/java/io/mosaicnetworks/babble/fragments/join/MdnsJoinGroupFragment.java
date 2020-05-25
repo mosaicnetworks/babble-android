@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure.mdns;
+package io.mosaicnetworks.babble.fragments.join;
 
 import android.app.ProgressDialog;
 import android.content.Context;

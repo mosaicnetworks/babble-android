@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure;
+package io.mosaicnetworks.babble.fragments.tabs;
 
 import android.content.Context;
 import android.os.Bundle;

@@ -25,18 +25,18 @@
 package io.mosaicnetworks.babble.configure;
 
 import android.os.Bundle;
+import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.view.View;
-
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.configure.mdns.MdnsJoinGroupFragment;
-import io.mosaicnetworks.babble.configure.webrtc.WebRTCJoinGroupFragment;
+import io.mosaicnetworks.babble.fragments.join.MdnsJoinGroupFragment;
+import io.mosaicnetworks.babble.fragments.join.WebRTCJoinGroupFragment;
 import io.mosaicnetworks.babble.fragments.archive.ArchivedGroupsFragment;
 import io.mosaicnetworks.babble.fragments.create.NewGroupFragment;
+import io.mosaicnetworks.babble.fragments.tabs.TabsFragment;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 /**
