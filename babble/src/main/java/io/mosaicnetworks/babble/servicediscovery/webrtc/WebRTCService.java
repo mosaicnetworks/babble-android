@@ -46,7 +46,7 @@ import java.util.Map;
 
 import io.mosaicnetworks.babble.servicediscovery.mdns.PeersProvider;
 import io.mosaicnetworks.babble.node.ConfigManager;
-import io.mosaicnetworks.babble.service.ServiceAdvertiser;
+import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
 import io.mosaicnetworks.babble.fragments.discover.ServiceDiscoveryListener;

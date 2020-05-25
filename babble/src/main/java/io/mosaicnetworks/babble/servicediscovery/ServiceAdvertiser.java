@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.service;
+package io.mosaicnetworks.babble.servicediscovery;
 
 
+import io.mosaicnetworks.babble.service.BabbleService;
 import io.mosaicnetworks.babble.servicediscovery.mdns.PeersProvider;
 
 /**

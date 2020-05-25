@@ -50,6 +50,7 @@ import io.mosaicnetworks.babble.node.Block;
 import io.mosaicnetworks.babble.node.BlockConsumer;
 import io.mosaicnetworks.babble.node.LeaveResponseListener;
 import io.mosaicnetworks.babble.node.NodeStateChangeHandler;
+import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 
 import static androidx.core.app.NotificationCompat.PRIORITY_LOW;
 
