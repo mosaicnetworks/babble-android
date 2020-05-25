@@ -42,7 +42,8 @@ import io.mosaicnetworks.babble.fragments.archive.ArchivedGroupsFragment;
 import io.mosaicnetworks.babble.fragments.discover.DiscoverGroupsFragment;
 
 /**
- * This Fragment implements a multi-tabbed UX allowing the display of multiple Discovery Fragments
+ * This Fragment implements a multi-tabbed UX allowing the display of the discovery and archive
+ * fragments.
  */
 public class TabsFragment extends Fragment {
 

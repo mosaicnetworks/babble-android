@@ -46,7 +46,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.fragments.SelectableData;
 import io.mosaicnetworks.babble.fragments.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;

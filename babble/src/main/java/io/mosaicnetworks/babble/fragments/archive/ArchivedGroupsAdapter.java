@@ -34,7 +34,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.fragments.SelectableData;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 
 class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.ViewHolder> {

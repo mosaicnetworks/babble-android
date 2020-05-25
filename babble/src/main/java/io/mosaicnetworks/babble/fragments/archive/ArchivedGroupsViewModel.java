@@ -26,7 +26,6 @@ package io.mosaicnetworks.babble.fragments.archive;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import io.mosaicnetworks.babble.fragments.SelectableData;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
 

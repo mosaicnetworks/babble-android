@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.fragments;
+package io.mosaicnetworks.babble.fragments.archive;
 
 import java.util.ArrayList;
 import java.util.Collections;

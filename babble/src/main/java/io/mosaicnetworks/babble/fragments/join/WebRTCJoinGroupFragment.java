@@ -58,7 +58,8 @@ import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
 /**
- * This fragment enables the user to configure the BabbleService to join an existing group.
+ * This fragment enables the user to configure the BabbleService to join an existing group that was
+ * discovered with WebRTCDiscovery (not mDNS).
  * Activities that contain this fragment must implement the {@link OnFragmentInteractionListener}
  * interface to handle interaction events. Use the {@link WebRTCJoinGroupFragment#newInstance} factory
  * method to create an instance of this fragment.
