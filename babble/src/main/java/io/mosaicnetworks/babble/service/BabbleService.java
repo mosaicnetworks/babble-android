@@ -142,10 +142,7 @@ public class BabbleService extends Service {
         mBabbleNode.run();
 
         if (mServiceAdvertiser != null) {
-            mServiceAdvertiser.advertise(
-                    mBabbleNode.getGenesisPeers(),
-                    mBabbleNode.getCurrentPeers(),
-                    mBabbleNode);
+            mServiceAdvertiser.advertise(mBabbleNode);
         }
 
         mState = State.RUNNING;

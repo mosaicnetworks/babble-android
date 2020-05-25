@@ -34,7 +34,7 @@ apply plugin: io.mosaicnetworks.getbabblecore.GetBabbleCorePlugin
 // def repository = "https://github.com/mosaicnetworks/babble/releases/download"
 // def method = "https"
 
-def babbleCoreVersion = "develop_e42d59028ed5465209d54d6dbc2f238042559f37"
+def babbleCoreVersion = "develop_36a77f5a89f6c3b61ae9a50ec62986af4616b0b2"
 def repository = (System.getenv('GOPATH') == null ? System.properties['user.home'] + "/go" : System.getenv('GOPATH'))  + "/src/github.com/mosaicnetworks/babble/build/distmobile"
 def method = "file"
 

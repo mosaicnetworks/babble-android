@@ -31,6 +31,7 @@ import android.net.nsd.NsdServiceInfo;
 import java.io.IOException;
 import java.util.Objects;
 
+import io.mosaicnetworks.babble.node.BabbleNode;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.utils.RandomString;
@@ -42,13 +43,16 @@ public class MdnsAdvertiser implements ServiceAdvertiser {
     public static final String GROUP_NAME = "groupName";
     public static final String GROUP_UID = "groupUid";
     private static int sDiscoveryPort = 8988;
+
     private NsdManager mNsdManager;
     private NsdManager.RegistrationListener mRegistrationListener;
+
     private String mServiceName;
     private NsdServiceInfo mServiceInfo = new NsdServiceInfo();
+
     private Context mAppContext;
+
     private HttpPeerDiscoveryServer mHttpPeerDiscoveryServer;
-    private String mCurrentPeers;
     private boolean mAdvertising = false;
 
     public MdnsAdvertiser(GroupDescriptor groupDescriptor, Context context) {
@@ -70,11 +74,9 @@ public class MdnsAdvertiser implements ServiceAdvertiser {
     }
 
     @Override
-    public boolean advertise(final String genesisPeers, final String currentPeers, PeersProvider peersProvider) {
+    public boolean advertise(BabbleNode node) {
 
-        mCurrentPeers = currentPeers;
-
-        mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(sDiscoveryPort, peersProvider);
+        mHttpPeerDiscoveryServer = new HttpPeerDiscoveryServer(sDiscoveryPort, node);
 
         try {
             mHttpPeerDiscoveryServer.start();
@@ -84,6 +86,7 @@ public class MdnsAdvertiser implements ServiceAdvertiser {
         }
 
         mNsdManager = (NsdManager) mAppContext.getSystemService(Context.NSD_SERVICE);
+
         Objects.requireNonNull(mNsdManager).registerService(mServiceInfo, NsdManager.PROTOCOL_DNS_SD, mRegistrationListener);
 
         mAdvertising = true;
@@ -93,16 +96,13 @@ public class MdnsAdvertiser implements ServiceAdvertiser {
     }
 
     @Override
-    public void onPeersChange(String newPeers) {
-        mCurrentPeers = newPeers;
-    }
+    public void onPeersChange(String newPeers) { }
 
     @Override
     public void stopAdvertising() {
 
         if (mAdvertising) {
             mNsdManager.unregisterService(mRegistrationListener);
-
             mHttpPeerDiscoveryServer.stop();
             mHttpPeerDiscoveryServer = null;
             mAdvertising = false;

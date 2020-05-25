@@ -22,29 +22,17 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.fragments.discover;
+package io.mosaicnetworks.babble.servicediscovery.webrtc;
 
-import android.app.Application;
+public class Constants {
+    // XXX localhost values
+    // TODO: these should not be hardcoded
+    public static final String DISCOVER_SERVER_HOST = "disco-staging.babble.io";
+    public static final int DISCOVER_SERVER_PORT = 1443;
+    public static final String RELAY_SEVER_ADDRESS = "disco-staging.babble.io:2443";
 
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
-import io.mosaicnetworks.babble.node.ConfigManager;
+    public static final String DISCOVER_END_POINT = "groups";
+    public static final String REGISTER_END_POINT = "group";
 
-/**
- * This factory class produces {@link DiscoverGroupsViewModel}
- */
-public class DiscoverGroupsViewModelFactory implements ViewModelProvider.Factory {
-    private ConfigManager mConfigManager;
-    private Application mApplication;
-
-    public DiscoverGroupsViewModelFactory(Application application, ConfigManager configManager) {
-        mConfigManager = configManager;
-        mApplication = application;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")  //unchecked cast warning caused by the use of generics.
-    public <T extends ViewModel> T create(Class<T> modelClass) {
-        return (T) new DiscoverGroupsViewModel(mApplication);
-    }
+    public static final boolean SKIP_VERIFY = true;
 }

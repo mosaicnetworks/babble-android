@@ -47,7 +47,7 @@ import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 /**
  * This fragment implements a visual component to allow selection of a discovered group. It
- * aggregates groups discovered via mDNS or WebRTC discovery. It includes swipe refresh and a
+ * aggregates groups discovered via mDNS and WebRTC discovery. It includes swipe refresh and a
  * nothing found message.
  */
 public class DiscoverGroupsFragment extends Fragment {

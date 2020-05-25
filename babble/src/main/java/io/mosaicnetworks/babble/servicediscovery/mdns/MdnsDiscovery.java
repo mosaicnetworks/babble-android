@@ -49,11 +49,13 @@ public class MdnsDiscovery {
     private ServiceDiscoveryListener mServiceDiscoveryListener;
 
     private final String mPackageName;
-    public MdnsDiscovery(Context context, List<ResolvedGroup> resolvedGroups,
+
+    public MdnsDiscovery(Context context,
+                         List<ResolvedGroup> resolvedGroups,
                          ServiceDiscoveryListener serviceDiscoveryListener) {
+
         Context appContext = context.getApplicationContext();
         mNsdManager = new CustomNsdManager(context);
-
         mResolvedGroups = resolvedGroups;
         mServiceDiscoveryListener = serviceDiscoveryListener;
         mPackageName =  appContext.getPackageName() ;

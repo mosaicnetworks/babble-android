@@ -44,8 +44,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import io.mosaicnetworks.babble.service.BabbleService;
-import io.mosaicnetworks.babble.servicediscovery.webrtc.Disco;
-import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.Constants;
 
 /**
  * ConfigManager is a singleton class that manages the babble configuration files used by babble-go
@@ -77,7 +76,6 @@ public final class ConfigManager {
     private static ConfigDirectoryBackupPolicy sConfigDirectoryBackupPolicy = ConfigDirectoryBackupPolicy.SINGLE_BACKUP;
     private ArrayList<ConfigDirectory> mDirectories = new ArrayList<>();
     private KeyPair mKeyPair;
-    private Disco mDisco;
     private String mBabbleRootDir = "babble";
     private int mDefaultBabblePort = 6666;
     private String mDbSubDir = "badger_db";
@@ -209,17 +207,23 @@ public final class ConfigManager {
      */
     public String createConfigNewGroup(GroupDescriptor groupDescriptor, String moniker,  String peersInetAddress, String babbleInetAddress, int babblingPort, int networkType) {
 
-        List<Peer> genesisPeers = new ArrayList<>();
-
-        // Only append port if no @ in the NetAddr - i.e. not WebRTC
+        // In WebRTC mode, the NetAddress is the public key, so we no not append the port number.
         String suffix = peersInetAddress.startsWith("0X") ? "" : ":" + babblingPort;
 
-
+        List<Peer> genesisPeers = new ArrayList<>();
         genesisPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress +suffix, moniker));
+
         List<Peer> currentPeers = new ArrayList<>();
         currentPeers.add(new Peer(mKeyPair.publicKey, peersInetAddress + suffix, moniker));
 
-        return createConfig(genesisPeers, currentPeers, groupDescriptor, moniker, babbleInetAddress, babblingPort, networkType);
+        return createConfig(
+                genesisPeers,
+                currentPeers,
+                groupDescriptor,
+                moniker,
+                babbleInetAddress,
+                babblingPort,
+                networkType);
     }
 
     /**
@@ -285,7 +289,7 @@ public final class ConfigManager {
 
         NodeConfig nodeConfig = new NodeConfig.Builder()
                 .webrtc(networkType == BabbleService.NETWORK_GLOBAL)
-                .signalAddress(networkType == BabbleService.NETWORK_GLOBAL ? WebRTCService.RELAY_SEVER_ADDRESS : "")
+                .signalAddress(networkType == BabbleService.NETWORK_GLOBAL ? Constants.RELAY_SEVER_ADDRESS : "")
                 .skipVerify(mSkipVerify)
                 .build();
         mMoniker = moniker;
@@ -295,20 +299,6 @@ public final class ConfigManager {
 
         // private key -- does not overwrite
         writePrivateKey(fullPath, mKeyPair.privateKey);
-
-        // If we are a WebRTC/Global type, build the disco object for use later.
-        if (networkType == BabbleService.NETWORK_GLOBAL) {
-            mDisco = new Disco( groupDescriptor.getUid(),
-                    groupDescriptor.getName(),
-                    mAppId,
-                    mKeyPair.publicKey,
-                    0,
-                    -1,
-                    currentPeers,
-                    genesisPeers  );
-        } else {
-            mDisco = null;
-        }
 
         return fullPath;
     }
@@ -660,10 +650,6 @@ public final class ConfigManager {
         } else {
             throw  new IllegalAccessError();
         }
-    }
-
-    public Disco getDisco() {
-        return mDisco;
     }
 
     private void populateDirectories(File babbleDir) {

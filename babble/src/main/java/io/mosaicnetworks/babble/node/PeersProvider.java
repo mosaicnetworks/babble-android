@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.servicediscovery.mdns;
+package io.mosaicnetworks.babble.node;
 
 /**
  * A provider of peer information
