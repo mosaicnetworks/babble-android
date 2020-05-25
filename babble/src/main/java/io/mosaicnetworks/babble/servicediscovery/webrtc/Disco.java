@@ -28,7 +28,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-import io.mosaicnetworks.babble.discovery.Peer;
+import io.mosaicnetworks.babble.node.Peer;
 
 /**
  * The Disco class maps the group class in the Disco go repo.

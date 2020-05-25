@@ -43,7 +43,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.service.BabbleService;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.Disco;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;

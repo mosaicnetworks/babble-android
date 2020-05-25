@@ -48,9 +48,9 @@ import io.mosaicnetworks.babble.node.BabbleState;
 import io.mosaicnetworks.babble.node.BabbleTx;
 import io.mosaicnetworks.babble.node.Block;
 import io.mosaicnetworks.babble.node.BlockConsumer;
-import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.node.LeaveResponseListener;
 import io.mosaicnetworks.babble.node.NodeStateChangeHandler;
+import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 
 import static androidx.core.app.NotificationCompat.PRIORITY_LOW;
 
@@ -58,7 +58,6 @@ import static androidx.core.app.NotificationCompat.PRIORITY_LOW;
  * The Android Service that manages the Babble Node
  */
 public class BabbleService extends Service {
-
     /**
      * The state of the Babble Service
      */
@@ -78,51 +77,47 @@ public class BabbleService extends Service {
     }
 
     /**
-     * Interface to expose methods for starting a Group in archive mode.
-     */
-    public interface StartArchiveListener {
-
-        void onInitialised();
-
-        void onFailed();
-    }
-
-    /**
-     * Network type of no Discovery. I.e. an Archive
-     */
-    public final static int NETWORK_NONE = 0;
-    /**
      * Network type of WiFi i.e. mDNS
      */
     public final static int NETWORK_WIFI = 1;
     /**
      * Network type of Global i.e. WebRTC
      */
-    public final static int NETWORK_GLOBAL = 3;
+    public final static int NETWORK_GLOBAL = 2;
 
-    private BabbleNode mBabbleNode;
+    // mState corresponds to the state of the BabbleService
     private State mState = State.STOPPED;
-    private GroupDescriptor mGroupDescriptor;
-    private static BabbleState mAppState;
-    private ServiceAdvertiser mServiceAdvertiser;
-    private boolean mIsArchive = false;
+
+    // mBabbleNode is a reference to the underlying Babble node
+    private BabbleNode mBabbleNode;
+
+    // mNodeState corresponds to the state of the Babble node
     private BabbleNode.State mNodeState;
 
+    // mAppState corresponds to the state of the application that uses this BabbleService
+    private static BabbleState mAppState;
+
+    // mServiceAdvertiser is used to expose the presence of the group to which this node belongs.
+    // By advertising a group, other users can discover and join it.
+    private ServiceAdvertiser mServiceAdvertiser;
+
+
     /**
-     * Start the service
+     * Start the service and advertise the group if serviceAdvertiser is not null. The service
+     * connects the AppState to a Babble node. The Babble node commits blocks to the AppState via
+     * its processBlock handler, and reads its configuration from the configDirectory.
      *
      * @param configDirectory The full path to the babble configuration directory
-     * @param groupDescriptor The group descriptor
-     * @throws IllegalStateException if the service is currently running
+     * @param serviceAdvertiser The ServiceAdvertiser
+     * @throws IllegalStateException if the service isn't currently STOPPED
      */
-    public void start(String configDirectory, GroupDescriptor groupDescriptor,
-                      ServiceAdvertiser serviceAdvertiser) {
+    public void start(String configDirectory, ServiceAdvertiser serviceAdvertiser) {
+
         if (mState!= State.STOPPED) {
             throw new IllegalStateException("Cannot start service which isn't stopped");
         }
 
         mServiceAdvertiser = serviceAdvertiser;
-        mGroupDescriptor = groupDescriptor;
 
         mBabbleNode = BabbleNode.create(
                 new BlockConsumer() {
@@ -138,68 +133,60 @@ public class BabbleService extends Service {
                 new NodeStateChangeHandler() {
                     @Override
                     public void onStateChanged(BabbleNode.State state) {
+                        Log.i("OnStateChanged", state.name());
                         mNodeState = state;
                     }
                 }
         );
 
         mBabbleNode.run();
-        mServiceAdvertiser.advertise(mBabbleNode.getGenesisPeers(), mBabbleNode.getCurrentPeers(), mBabbleNode);
+
+        if (mServiceAdvertiser != null) {
+            mServiceAdvertiser.advertise(
+                    mBabbleNode.getGenesisPeers(),
+                    mBabbleNode.getCurrentPeers(),
+                    mBabbleNode);
+        }
+
         mState = State.RUNNING;
     }
 
 
     /**
      * This is an asynchronous call to start the service in archive mode
-     * @param configDirectory
-     * @param groupDescriptor
-     * @param listener
+     * @param configDirectory The full path to the Babble configuration directory
+     * @throws IllegalStateException if the service isn't currently STOPPED
      */
-    public void startArchive(final String configDirectory, GroupDescriptor groupDescriptor,
-                             final StartArchiveListener listener) {
+    public void startArchive(final String configDirectory) {
+
         if (mState!=State.STOPPED) {
             throw new IllegalStateException("Cannot start archive service which isn't stopped");
         }
 
         mState = State.ARCHIVE;
-        mIsArchive = true;
+
         new Thread(new Runnable() {
             public void run() {
-                try {
-                    mBabbleNode = BabbleNode.create(
-                            new BlockConsumer() {
-                                    @Override
-                                    public Block onReceiveBlock(Block block) {
-                                        Log.i("ProcessBlock", "Process block");
-                                        Block processedBlock = mAppState.processBlock(block);
-                                        notifyObservers();
-                                        return processedBlock;
-                                    }
-                            },
-                            configDirectory,
-                            new NodeStateChangeHandler() {
+                mBabbleNode = BabbleNode.create(
+                    new BlockConsumer() {
+                        @Override
+                        public Block onReceiveBlock(Block block) {
+                            Log.i("ProcessBlock", "Process block");
+                            Block processedBlock = mAppState.processBlock(block);
+                            notifyObservers();
+                            return processedBlock;
+                        }
+                    },
+                    configDirectory,
+                    new NodeStateChangeHandler() {
                         @Override
                         public void onStateChanged(BabbleNode.State state) {
                             mNodeState = state;
                         }
                     }
-                    );
-                } catch (IllegalArgumentException ex) {
-                    //TODO: need more refined Babble exceptions
-                    if (listener!=null) {
-                        listener.onFailed();
-                    }
-                    return;
-                }
-
-                if (listener!=null) {
-                    listener.onInitialised();
-                }
-
+                );
             }
         }).start();
-
-        mGroupDescriptor = groupDescriptor;
     }
 
     /**
@@ -219,7 +206,8 @@ public class BabbleService extends Service {
     }
 
     /**
-     * Asynchronous method for leaving a group
+     * Asynchronous method for leaving a group. Stop advertising and call Babble leave method to
+     * exit the group politely.
      * @param listener called when the leave completes
      * @throws IllegalStateException if the service is not currently running
      */
@@ -235,7 +223,6 @@ public class BabbleService extends Service {
         if (mBabbleNode==null) {
             //If an archive fails to load then the babble node can be null
             mState = State.STOPPED;
-            mGroupDescriptor = null;
             mAppState.reset();
             stopSelf();
 
@@ -250,7 +237,6 @@ public class BabbleService extends Service {
                 public void onComplete() {
                     mBabbleNode = null;
                     mState = State.STOPPED;
-                    mGroupDescriptor = null;
                     mAppState.reset();
                     stopSelf();
 
@@ -272,14 +258,6 @@ public class BabbleService extends Service {
             throw new IllegalStateException("Cannot submit when the service isn't running");
         }
         mBabbleNode.submitTx(tx.toBytes());
-    }
-
-    /**
-     * Gets the state from the Babble Node
-     * @return
-     */
-    public BabbleNode.State getNodeState() {
-        return mNodeState;
     }
 
     /**

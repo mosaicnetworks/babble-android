@@ -13,6 +13,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import fi.iki.elonen.NanoHTTPD;
+import io.mosaicnetworks.babble.node.Peer;
+import io.mosaicnetworks.babble.servicediscovery.mdns.HttpPeerDiscoveryRequest;
+import io.mosaicnetworks.babble.servicediscovery.mdns.PeersProvider;
+import io.mosaicnetworks.babble.servicediscovery.mdns.ResponseListener;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

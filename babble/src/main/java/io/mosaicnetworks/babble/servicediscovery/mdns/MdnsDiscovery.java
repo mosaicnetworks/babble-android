@@ -34,7 +34,7 @@ import java.util.Map;
 
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
-import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
+import io.mosaicnetworks.babble.fragments.discover.ServiceDiscoveryListener;
 
 /**
  * This class encapsulates the MDNS discover process.

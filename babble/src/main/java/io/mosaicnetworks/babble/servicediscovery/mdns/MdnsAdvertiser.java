@@ -31,10 +31,8 @@ import android.net.nsd.NsdServiceInfo;
 import java.io.IOException;
 import java.util.Objects;
 
-import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryServer;
-import io.mosaicnetworks.babble.discovery.PeersProvider;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
-import io.mosaicnetworks.babble.service.ServiceAdvertiser;
+import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.utils.RandomString;
 
 public class MdnsAdvertiser implements ServiceAdvertiser {

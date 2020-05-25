@@ -29,7 +29,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import io.mosaicnetworks.babble.configure.BaseConfigActivity;
+import io.mosaicnetworks.babble.fragments.BaseConfigActivity;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 

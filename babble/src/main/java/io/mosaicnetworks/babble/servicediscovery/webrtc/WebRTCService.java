@@ -44,12 +44,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import io.mosaicnetworks.babble.discovery.PeersProvider;
+import io.mosaicnetworks.babble.servicediscovery.mdns.PeersProvider;
 import io.mosaicnetworks.babble.node.ConfigManager;
-import io.mosaicnetworks.babble.service.ServiceAdvertiser;
+import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
-import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
+import io.mosaicnetworks.babble.fragments.discover.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.utils.HttpsTrustManager;
 
 
