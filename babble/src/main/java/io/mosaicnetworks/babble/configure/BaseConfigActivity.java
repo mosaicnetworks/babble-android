@@ -35,6 +35,7 @@ import android.view.View;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.configure.mdns.MdnsJoinGroupFragment;
 import io.mosaicnetworks.babble.configure.webrtc.WebRTCJoinGroupFragment;
+import io.mosaicnetworks.babble.fragments.create.NewGroupFragment;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 /**

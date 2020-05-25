@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure;
+package io.mosaicnetworks.babble.fragments.create;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -40,6 +40,8 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.configure.BaseConfigActivity;
+import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService;
