@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure;
+package io.mosaicnetworks.babble.fragments.archive;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -46,6 +46,8 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
+import io.mosaicnetworks.babble.configure.SelectableData;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.service.BabbleService;

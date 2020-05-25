@@ -22,31 +22,54 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure;
+package io.mosaicnetworks.babble.fragments.archive;
 
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
 
+import io.mosaicnetworks.babble.configure.SelectableData;
+import io.mosaicnetworks.babble.node.ConfigDirectory;
 import io.mosaicnetworks.babble.node.ConfigManager;
 
 /**
- * Factory class to create {@link ArchivedGroupsViewModel} instance
+ * This class extends {@link ViewModel} and exposes methods to populate
+ * the list of archive groups.
  */
-public class ArchivedGroupsViewModelFactory implements ViewModelProvider.Factory {
+public class ArchivedGroupsViewModel extends ViewModel {
+
+    private MutableLiveData<SelectableData<ConfigDirectory>> mArchivedList;
     private ConfigManager mConfigManager;
 
     /**
-     * Constructor. Needs {@link ConfigManager} instance to pass to {@link ArchivedGroupsViewModel}
-     * @param configManager
+     * Constructor that set the instance of {@link ConfigManager} used to populate
+     * the archive group list.
+     *
+     * @param configManager a ConfigManager instance
      */
-    public ArchivedGroupsViewModelFactory(ConfigManager configManager) {
+    public ArchivedGroupsViewModel(ConfigManager configManager) {
+        super();
         mConfigManager = configManager;
+
+        mArchivedList = new MutableLiveData<>();
+        loadArchiveList();
     }
 
-
-    @Override
-    @SuppressWarnings("unchecked")  //unchecked cast warning caused by the use of generics.
-    public <T extends ViewModel> T create(Class<T> modelClass) {
-        return (T) new ArchivedGroupsViewModel(mConfigManager);
+    /**
+     * This method populates the mArchivedList global with Archive Group data
+     */
+    public void loadArchiveList() {
+        SelectableData<ConfigDirectory> data = new SelectableData<>();
+        data.addAll(mConfigManager.getDirectories());
+        mArchivedList.setValue(data);
     }
+
+    /**
+     * Getter to retrieve the list populated by {@link #loadArchiveList()}
+     * @return
+     */
+    public MutableLiveData<SelectableData<ConfigDirectory>> getArchivedList() {
+        return mArchivedList;
+    }
+
 }
+

@@ -38,6 +38,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.fragments.archive.ArchivedGroupsFragment;
 import io.mosaicnetworks.babble.fragments.discover.DiscoverGroupsFragment;
 
 /**

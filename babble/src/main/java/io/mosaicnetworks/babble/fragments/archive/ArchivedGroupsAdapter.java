@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure;
+package io.mosaicnetworks.babble.fragments.archive;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -34,6 +34,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.configure.SelectableData;
 import io.mosaicnetworks.babble.node.ConfigDirectory;
 
 class ArchivedGroupsAdapter extends RecyclerView.Adapter<ArchivedGroupsAdapter.ViewHolder> {
