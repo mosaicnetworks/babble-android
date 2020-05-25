@@ -2,6 +2,8 @@ package io.mosaicnetworks.babble.discovery;
 
 import org.junit.Test;
 
+import io.mosaicnetworks.babble.node.Peer;
+
 import static org.junit.Assert.assertEquals;
 
 public class PeerTest {

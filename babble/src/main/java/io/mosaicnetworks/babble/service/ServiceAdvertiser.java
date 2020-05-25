@@ -25,7 +25,7 @@
 package io.mosaicnetworks.babble.service;
 
 
-import io.mosaicnetworks.babble.discovery.PeersProvider;
+import io.mosaicnetworks.babble.servicediscovery.mdns.PeersProvider;
 
 /**
  * This interface defines the methods that an Advertiser passed to {@link BabbleService} would

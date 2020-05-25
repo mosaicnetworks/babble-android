@@ -4,6 +4,11 @@ import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.GrantPermissionRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import io.mosaicnetworks.babble.node.Peer;
+import io.mosaicnetworks.babble.servicediscovery.mdns.HttpPeerDiscoveryRequest;
+import io.mosaicnetworks.babble.servicediscovery.mdns.HttpPeerDiscoveryServer;
+import io.mosaicnetworks.babble.servicediscovery.mdns.PeersProvider;
+import io.mosaicnetworks.babble.servicediscovery.mdns.ResponseListener;
 
 import org.junit.Rule;
 import org.junit.Test;

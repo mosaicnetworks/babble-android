@@ -45,9 +45,9 @@ import androidx.annotation.NonNull;
 import io.mosaicnetworks.babble.R;
 import io.mosaicnetworks.babble.fragments.BaseConfigActivity;
 import io.mosaicnetworks.babble.fragments.OnFragmentInteractionListener;
-import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
-import io.mosaicnetworks.babble.discovery.Peer;
-import io.mosaicnetworks.babble.discovery.ResponseListener;
+import io.mosaicnetworks.babble.servicediscovery.mdns.HttpPeerDiscoveryRequest;
+import io.mosaicnetworks.babble.node.Peer;
+import io.mosaicnetworks.babble.servicediscovery.mdns.ResponseListener;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.node.GroupDescriptor;
 import io.mosaicnetworks.babble.service.BabbleService;
@@ -198,7 +198,7 @@ public class MdnsJoinGroupFragment extends BabbleServiceBinder implements Respon
     }
 
     @Override
-    public void onFailure(io.mosaicnetworks.babble.discovery.ResponseListener.Error error) {
+    public void onFailure(ResponseListener.Error error) {
         mLoadingDialog.dismiss();
         int messageId;
         switch (error) {

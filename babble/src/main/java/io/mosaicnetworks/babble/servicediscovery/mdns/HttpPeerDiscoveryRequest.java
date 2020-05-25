@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.discovery;
+package io.mosaicnetworks.babble.servicediscovery.mdns;
 
 import android.content.Context;
 
@@ -39,6 +39,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import io.mosaicnetworks.babble.node.Peer;
 
 /**
  * A wrapper around volley's {@link StringRequest} to request peers over http. There are two request

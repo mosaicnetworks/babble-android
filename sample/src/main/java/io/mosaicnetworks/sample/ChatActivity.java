@@ -40,7 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import io.mosaicnetworks.babble.discovery.Peer;
+import io.mosaicnetworks.babble.node.Peer;
 import io.mosaicnetworks.babble.node.BabbleNode;
 import io.mosaicnetworks.babble.service.BabbleServiceBinderActivity;
 import io.mosaicnetworks.babble.service.ServiceObserver;

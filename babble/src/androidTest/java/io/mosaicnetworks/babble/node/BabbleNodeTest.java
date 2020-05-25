@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.service.BabbleService;
 
 import static org.junit.Assert.*;

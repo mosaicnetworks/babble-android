@@ -27,12 +27,11 @@ package io.mosaicnetworks.babble.servicediscovery;
 import android.net.nsd.NsdServiceInfo;
 
 import java.net.InetAddress;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-import io.mosaicnetworks.babble.discovery.Peer;
+import io.mosaicnetworks.babble.node.Peer;
 
 import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.APP_IDENTIFIER;
 import static io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser.GROUP_NAME;

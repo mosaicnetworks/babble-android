@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.discovery;
+package io.mosaicnetworks.babble.servicediscovery.mdns;
 
 import android.util.Log;
 

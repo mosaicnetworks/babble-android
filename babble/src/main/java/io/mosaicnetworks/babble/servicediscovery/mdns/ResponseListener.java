@@ -22,9 +22,11 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.discovery;
+package io.mosaicnetworks.babble.servicediscovery.mdns;
 
 import java.util.List;
+
+import io.mosaicnetworks.babble.node.Peer;
 
 /**
  * Listeners to a peer discovery request

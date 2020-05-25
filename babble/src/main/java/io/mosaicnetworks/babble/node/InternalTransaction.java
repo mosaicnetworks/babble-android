@@ -36,8 +36,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.lang.reflect.Type;
 
-import io.mosaicnetworks.babble.discovery.Peer;
-
 /**
  * This data class is used to hold instances of Internal Transactions as specified in a {@link Block}.
  * Internal Transaction are usually used for joining and leaving a group.
