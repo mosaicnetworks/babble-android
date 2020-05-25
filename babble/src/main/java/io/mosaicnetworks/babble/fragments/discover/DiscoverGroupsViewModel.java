@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure;
+package io.mosaicnetworks.babble.fragments.discover;
 
 import android.app.Application;
 import android.content.Context;
@@ -35,7 +35,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsDiscovery;
 import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
 

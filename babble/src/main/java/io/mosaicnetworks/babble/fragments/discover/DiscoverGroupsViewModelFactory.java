@@ -22,13 +22,12 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure;
+package io.mosaicnetworks.babble.fragments.discover;
 
 import android.app.Application;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-
 import io.mosaicnetworks.babble.node.ConfigManager;
 
 /**

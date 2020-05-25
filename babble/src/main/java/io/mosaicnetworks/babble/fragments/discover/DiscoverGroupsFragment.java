@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.configure;
+package io.mosaicnetworks.babble.fragments.discover;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -41,9 +41,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
-import io.mosaicnetworks.babble.servicediscovery.ServicesListAdapter;
 
 /**
  * This fragment implements a visual component to allow selection of a discovered group. It includes

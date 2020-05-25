@@ -22,7 +22,9 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.servicediscovery;
+package io.mosaicnetworks.babble.fragments.discover;
+
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 public interface ServicesListListener {
 

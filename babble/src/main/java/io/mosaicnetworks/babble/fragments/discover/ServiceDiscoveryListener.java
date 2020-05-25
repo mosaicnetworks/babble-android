@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.servicediscovery;
+package io.mosaicnetworks.babble.fragments.discover;
 
 
 public interface ServiceDiscoveryListener {

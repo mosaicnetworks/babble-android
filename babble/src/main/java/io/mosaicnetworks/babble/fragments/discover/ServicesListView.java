@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.servicediscovery;
+package io.mosaicnetworks.babble.fragments.discover;
 
 import android.content.Context;
 import android.os.Handler;
@@ -36,6 +36,7 @@ import java.util.Objects;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsDiscovery;
 
 public class ServicesListView extends RecyclerView {

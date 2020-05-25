@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package io.mosaicnetworks.babble.servicediscovery;
+package io.mosaicnetworks.babble.fragments.discover;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -35,6 +35,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import io.mosaicnetworks.babble.R;
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 
 public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapter.ViewHolder> {
 

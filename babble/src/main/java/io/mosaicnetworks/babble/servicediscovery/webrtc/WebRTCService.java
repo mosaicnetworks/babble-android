@@ -49,7 +49,7 @@ import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.service.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedService;
-import io.mosaicnetworks.babble.servicediscovery.ServiceDiscoveryListener;
+import io.mosaicnetworks.babble.fragments.discover.ServiceDiscoveryListener;
 import io.mosaicnetworks.babble.utils.HttpsTrustManager;
 
 
