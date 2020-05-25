@@ -22,8 +22,36 @@
  * SOFTWARE.
  */
 
+package io.mosaicnetworks.babble.fragments;
+
+import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
+
 /**
- * io.mosaicnetworks.babble.configure contains UI components to display discovered babble instances
- * and fragments to join / create new groups
+ * This interface defines listeners for the join group and new group fragments
  */
-package io.mosaicnetworks.babble.configure;
+public interface OnFragmentInteractionListener {
+
+    /**
+     * This method will be called when the BabbleService has successfully joined a group.
+     *
+     * @param moniker the moniker chosen by the user
+     */
+    void baseOnJoined(String moniker, String group);
+
+    /**
+     * This method will be called when the BabbleService has successfully started a new
+     * group.
+     *
+     * @param moniker the moniker chosen by the user
+     */
+    void baseOnStartedNew(String moniker, String group);
+
+    /**
+     * This method will be called when the BabbleService has loaded an archive group
+     * @param moniker the moniker as chosen previous by the user.
+     */
+    void onArchiveLoaded(String moniker, String group);
+
+    void onServiceSelected(ResolvedGroup resolvedGroup);
+
+}

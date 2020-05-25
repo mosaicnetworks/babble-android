@@ -43,8 +43,8 @@ import java.util.Random;
 
 import androidx.annotation.NonNull;
 import io.mosaicnetworks.babble.R;
-import io.mosaicnetworks.babble.configure.BaseConfigActivity;
-import io.mosaicnetworks.babble.configure.OnFragmentInteractionListener;
+import io.mosaicnetworks.babble.fragments.BaseConfigActivity;
+import io.mosaicnetworks.babble.fragments.OnFragmentInteractionListener;
 import io.mosaicnetworks.babble.discovery.HttpPeerDiscoveryRequest;
 import io.mosaicnetworks.babble.discovery.Peer;
 import io.mosaicnetworks.babble.discovery.ResponseListener;
