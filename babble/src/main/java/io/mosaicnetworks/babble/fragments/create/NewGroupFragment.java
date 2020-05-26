@@ -48,7 +48,7 @@ import io.mosaicnetworks.babble.service.BabbleService;
 import io.mosaicnetworks.babble.service.BabbleServiceBinder;
 import io.mosaicnetworks.babble.servicediscovery.ServiceAdvertiser;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser;
-import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCAdvertiser;
 import io.mosaicnetworks.babble.utils.DialogUtils;
 import io.mosaicnetworks.babble.utils.Utils;
 
@@ -146,8 +146,10 @@ public class NewGroupFragment extends BabbleServiceBinder {
         boolean isGlobal = switchGlobal.isChecked();
 
         if (isGlobal) {
-            WebRTCService webRTCService = WebRTCService.getInstance(getContext());
-            mServiceAdvertiser = webRTCService;
+            mServiceAdvertiser = new WebRTCAdvertiser(
+                    mGroupDescriptor,
+                    getContext().getApplicationContext()
+            );
 
             String ip = Utils.getIPAddr(getContext());
 
@@ -157,9 +159,13 @@ public class NewGroupFragment extends BabbleServiceBinder {
             configAndStartBabble(peersAddr, ip, BabbleService.NETWORK_GLOBAL);
 
         } else {
-            mServiceAdvertiser = new MdnsAdvertiser(mGroupDescriptor,
-                    getContext().getApplicationContext());
+            mServiceAdvertiser = new MdnsAdvertiser(
+                    mGroupDescriptor,
+                    getContext().getApplicationContext()
+            );
+
             String ipAddr = Utils.getIPAddr(getContext());
+
             configAndStartBabble(ipAddr, ipAddr, BabbleService.NETWORK_WIFI);
         }
     }

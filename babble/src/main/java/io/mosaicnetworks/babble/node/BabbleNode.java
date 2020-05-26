@@ -35,9 +35,10 @@ import mobile.Mobile;
 import mobile.Node;
 
 /**
- * This is the core Babble node. It can be used directly or alternatively the {@link io.mosaicnetworks.babble.service.BabbleService}
- * class can be used to offer the same functionality wrapped up as a service. After creating the
- * node, call {@link BabbleNode#run()} to start it.
+ * This is the core Babble node. It can be used directly or alternatively the
+ * {@link io.mosaicnetworks.babble.service.BabbleService} class can be used to offer the same
+ * functionality wrapped up as a service. After creating the node, call {@link BabbleNode#run()} to
+ * start it.
  */
 public final class BabbleNode implements PeersProvider {
 
@@ -86,7 +87,8 @@ public final class BabbleNode implements PeersProvider {
 
     private final Node mNode;
 
-    public static BabbleNode create(final BlockConsumer blockConsumer, String configDir,
+    public static BabbleNode create(final BlockConsumer blockConsumer,
+                                    String configDir,
                                     final NodeStateChangeHandler stateChangeHandler) {
 
         Log.i("BabbleNode.create", configDir);
@@ -221,6 +223,17 @@ public final class BabbleNode implements PeersProvider {
     }
 
     /**
+     * Get node public key in Hex format
+     * @return Public key in Hex format
+     */
+    public String getPubKey() {
+        if (mNode != null) {
+            return mNode.getPubKey();
+        }
+        return null;
+    }
+
+    /**
      * Provide node statistics
      * @return json formatted string of statistics
      */
@@ -228,7 +241,6 @@ public final class BabbleNode implements PeersProvider {
         if (mNode != null) {
             return mNode.getStats();
         }
-
         return null;
     }
 }

@@ -45,7 +45,7 @@ import io.mosaicnetworks.babble.node.Peer;
  * 	GenesisPeers []*peers.Peer
  * }
  */
-public final class Disco {
+public final class DiscoGroup {
 
         /**
          * Unique Group Identifier
@@ -97,7 +97,7 @@ public final class Disco {
         /**
          * Constructor
          */
-        public Disco(String groupUID, String groupName, String appId, String pubKey, int lastUpdated, int lastBlockIndex, List<Peer> peers, List<Peer> initialPeers) {
+        public DiscoGroup(String groupUID, String groupName, String appId, String pubKey, int lastUpdated, int lastBlockIndex, List<Peer> peers, List<Peer> initialPeers) {
 
             if (groupUID==null || groupName==null || appId==null || pubKey==null ) {
                 throw new NullPointerException("Null arguments are not accepted");

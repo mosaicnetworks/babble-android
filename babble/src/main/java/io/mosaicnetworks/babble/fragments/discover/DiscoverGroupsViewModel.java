@@ -33,10 +33,9 @@ import java.util.List;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import io.mosaicnetworks.babble.node.ConfigManager;
 import io.mosaicnetworks.babble.servicediscovery.ResolvedGroup;
 import io.mosaicnetworks.babble.servicediscovery.mdns.MdnsDiscovery;
-import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService;
+import io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCDiscovery;
 
 /**
  * This class implements a ViewModel for the {@link DiscoverGroupsFragment}
@@ -49,25 +48,27 @@ public class DiscoverGroupsViewModel extends AndroidViewModel {
     private MutableLiveData<List<ResolvedGroup>> mMutableServiceInfoList;
 
     private MdnsDiscovery mMdnsDiscovery;
-    private WebRTCService mWebRTCService;
+    private WebRTCDiscovery mWebRTCDiscovery;
 
-    public DiscoverGroupsViewModel(Application application, ConfigManager configManager) {
+    public DiscoverGroupsViewModel(Application application) {
         super(application);
+
         mAppContext = application.getApplicationContext();
 
-        initialise();
-        initialiseWebRtcDiscovery();
         mMutableServiceInfoList = new MutableLiveData<>();
+
+        initialise();
+
         mMdnsDiscovery.discoverServices();
-        mWebRTCService.discoverService();
+        mWebRTCDiscovery.discoverService();
     }
 
     public void refreshDiscovery() {
-        mWebRTCService.discoverService();
+        mWebRTCDiscovery.discoverService();
     }
 
     private void initialise() {
-        mMdnsDiscovery = new MdnsDiscovery(mAppContext, mServiceInfoList, new ServiceDiscoveryListener() {
+        ServiceDiscoveryListener listener = new ServiceDiscoveryListener() {
             @Override
             public void onServiceListUpdated (boolean groupCountChange){
                 Handler mainHandler = new Handler(mAppContext.getMainLooper());
@@ -85,34 +86,10 @@ public class DiscoverGroupsViewModel extends AndroidViewModel {
             public void onStartDiscoveryFailed () {
                 //TODO: how should mdns discovery start failures be handled?
             }
-        });
-    }
+        };
 
-    private void initialiseWebRtcDiscovery() {
-        mWebRTCService = WebRTCService.getInstance(mAppContext);
-
-        mWebRTCService.setResolvedGroups(mServiceInfoList);
-
-        mWebRTCService.registerServiceDiscoveryListener(new ServiceDiscoveryListener() {
-            @Override
-            public void onServiceListUpdated(boolean groupCountChange) {
-                Handler mainHandler = new Handler(mAppContext.getMainLooper());
-
-                Runnable myRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        mMutableServiceInfoList.setValue(mServiceInfoList);
-                    }
-                };
-                mainHandler.post(myRunnable);
-
-            }
-
-            @Override
-            public void onStartDiscoveryFailed() {
-
-            }
-        });
+        mMdnsDiscovery = new MdnsDiscovery(mAppContext, mServiceInfoList, listener);
+        mWebRTCDiscovery = new WebRTCDiscovery(mAppContext, mServiceInfoList, listener);
     }
 
     public MutableLiveData<List<ResolvedGroup>> getServiceInfoList() {

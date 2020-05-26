@@ -25,23 +25,19 @@
 package io.mosaicnetworks.babble.servicediscovery;
 
 
+import io.mosaicnetworks.babble.node.BabbleNode;
 import io.mosaicnetworks.babble.service.BabbleService;
-import io.mosaicnetworks.babble.servicediscovery.mdns.PeersProvider;
 
 /**
  * This interface defines the methods that an Advertiser passed to {@link BabbleService} would
  * need to implement. {@link io.mosaicnetworks.babble.servicediscovery.mdns.MdnsAdvertiser} and
- * {@link io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCService} implement this interface.
+ * {@link io.mosaicnetworks.babble.servicediscovery.webrtc.WebRTCAdvertiser} implement this
+ * interface.
  */
 public interface ServiceAdvertiser {
 
-    //TODO: swap out the "string methods" with the "list methods"
-
-    //boolean advertise(List<Peer> genesisPeers, List<Peer> currentPeers, PeersProvider peersProvider);
-    boolean advertise(String genesisPeers, String currentPeers, PeersProvider peersProvider);
+    boolean advertise(BabbleNode node);
 
     void stopAdvertising();
 
-    //void onPeersChange(List<Peer> newPeers);
-    void onPeersChange(String newPeers);
 }
