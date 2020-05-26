@@ -29,7 +29,6 @@ import android.util.Log;
 import java.io.IOException;
 
 import fi.iki.elonen.NanoHTTPD;
-import io.mosaicnetworks.babble.node.PeersProvider;
 
 /**
  * An HttpPeerDiscoveryServer serves a list of peers. There are two endpoints, genesis-peers and

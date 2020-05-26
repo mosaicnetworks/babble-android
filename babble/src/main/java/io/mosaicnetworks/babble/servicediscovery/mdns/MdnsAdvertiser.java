@@ -96,9 +96,6 @@ public class MdnsAdvertiser implements ServiceAdvertiser {
     }
 
     @Override
-    public void onPeersChange(String newPeers) { }
-
-    @Override
     public void stopAdvertising() {
 
         if (mAdvertising) {

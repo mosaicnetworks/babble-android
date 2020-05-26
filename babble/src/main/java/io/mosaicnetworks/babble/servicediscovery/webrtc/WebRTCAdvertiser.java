@@ -134,13 +134,6 @@ public class WebRTCAdvertiser implements ServiceAdvertiser {
         return true;
     }
 
-
-    @Override
-    public void onPeersChange(String newPeers) {
-        //TODO: implement this
-    }
-
-
     @Override
     public void stopAdvertising() {
         // TODO: this is a temporary hack to prevent anyone other than the group creator to delete

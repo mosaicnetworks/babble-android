@@ -36,11 +36,8 @@ import io.mosaicnetworks.babble.service.BabbleService;
  */
 public interface ServiceAdvertiser {
 
-    //TODO: swap out the "string methods" with the "list methods"
-
     boolean advertise(BabbleNode node);
 
     void stopAdvertising();
 
-    void onPeersChange(String newPeers);
 }
