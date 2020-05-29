@@ -68,6 +68,10 @@ public final class NodeConfig {
         private boolean mWebRTC = false;  //webrtc
         private String mSignalAddr = "";  //signal-addr
         private boolean mSkipVerify = false;
+        // XXX
+        private String mTurnAddr = "turn:disco-staging.babble.io:3478";
+        private String mTurnUser = "test";
+        private String mTurnPass = "test";
 
 
         /**
@@ -302,6 +306,9 @@ public final class NodeConfig {
     //TODO: JavaDoc
     public final String signalAddr; //signal Address
     public final boolean webrtc; //use webrtc
+    public final String turnAddr;
+    public final String turnUser;
+    public final String turnPass;
 
 
 
@@ -402,6 +409,9 @@ public final class NodeConfig {
         webrtc = builder.mWebRTC;
         signalAddr = builder.mSignalAddr;
         skipVerify = builder.mSkipVerify;
+        turnAddr = builder.mTurnAddr;
+        turnUser = builder.mTurnUser;
+        turnPass = builder.mTurnPass;
     }
 
 

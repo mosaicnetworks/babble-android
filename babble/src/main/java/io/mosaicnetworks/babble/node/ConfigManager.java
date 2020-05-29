@@ -424,6 +424,9 @@ public final class ConfigManager {
         babble.put("suspend-limit", nodeConfig.suspendLimit);
         babble.put("moniker", moniker);
         babble.put("signal-skip-verify", nodeConfig.skipVerify);
+        babble.put("ice-addr", nodeConfig.turnAddr);
+        babble.put("ice-username", nodeConfig.turnUser);
+        babble.put("ice-password", nodeConfig.turnPass);
 
         writeTomlFile(babble);
 
