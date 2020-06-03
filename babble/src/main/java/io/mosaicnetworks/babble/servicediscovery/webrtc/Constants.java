@@ -27,12 +27,12 @@ package io.mosaicnetworks.babble.servicediscovery.webrtc;
 public class Constants {
     // XXX localhost values
     // TODO: these should not be hardcoded
-    public static final String DISCOVER_SERVER_HOST = "disco-staging.babble.io";
+    public static final String DISCOVER_SERVER_HOST = "disco.babble.io";
     public static final int DISCOVER_SERVER_PORT = 1443;
-    public static final String RELAY_SEVER_ADDRESS = "disco-staging.babble.io:2443";
+    public static final String RELAY_SEVER_ADDRESS = "disco.babble.io:2443";
 
     public static final String DISCOVER_END_POINT = "groups";
     public static final String REGISTER_END_POINT = "group";
 
-    public static final boolean SKIP_VERIFY = true;
+    public static final boolean SKIP_VERIFY = false;
 }

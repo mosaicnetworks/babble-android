@@ -83,7 +83,7 @@ public final class ConfigManager {
     private String mPeersJsonFile = "peers.json";
     private String mPeersGenesisJsonFile = "peers.genesis.json";
     private String mBabbleTomlFile = "babble.toml";
-    private boolean mSkipVerify = true; // XXX Unsafe This should be read from context or config file
+    private boolean mSkipVerify = false; // XXX Unsafe This should be read from context or config file
 
     /**
      * Provides an instance of the static ConfigManager class, reusing one if available, calling the
