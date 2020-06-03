@@ -23,34 +23,6 @@
   ~ SOFTWARE.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.mosaicnetworks.sample">
-
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
-    <application
-        android:allowBackup="true"
-        android:icon="@mipmap/magpie"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/magpie_round"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-
-        <service
-            android:name="io.mosaicnetworks.babble.service.BabbleService"
-            android:enabled="true"
-            android:stopWithTask="true"
-            android:exported="false" />
-
-        <activity android:name=".ChatActivity" />
-        <activity android:name=".MainActivity"
-            android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
-
-</manifest>
+<resources>
+    <color name="magpie_background">#FFFFFF</color>
+</resources>
