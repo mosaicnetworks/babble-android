@@ -67,8 +67,8 @@ public final class NodeConfig {
         private boolean mNoService = true;    //no-service
         private boolean mWebRTC = false;  //webrtc
         private String mSignalAddr = "";  //signal-addr
-        private boolean mSkipVerify = false;
-        private String mTurnAddr = "turn:disco.babble.io:3478";
+        private boolean mSkipVerify = true;
+        private String mTurnAddr = "turn:disco-staging.babble.io:3478";
         private String mTurnUser = "test";
         private String mTurnPass = "test";
 
