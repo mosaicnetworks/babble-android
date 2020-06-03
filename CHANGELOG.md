@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## v0.5.1 (June 3, 2020)
+
+SECURITY:
+
+FEATURES:
+
+- Ability to connect to turn seerver enabling connectivity in a wider set
+of scenarios
+
+IMPROVEMENTS:
+
+- Library code refactor
+
+BUG FIXES:
+
 ## v0.5.0 (May 4, 2020)
 
 SECURITY:
